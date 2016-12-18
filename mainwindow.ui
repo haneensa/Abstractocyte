@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>639</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Juxtastrocyte</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="GLWidget" name="openGLWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>639</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>190</width>
+     <height>220</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>400</width>
+     <height>220</height>
+    </size>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <widget class="QSlider" name="verticalSlider">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>30</y>
+       <width>22</width>
+       <height>141</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QSlider" name="horizontalSlider">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>170</y>
+       <width>151</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+    <widget class="MousePad" name="openGLWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>30</y>
+       <width>141</width>
+       <height>131</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>10</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Mouse Pad</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MousePad</class>
+   <extends>QOpenGLWidget</extends>
+   <header>mousepad.h</header>
+   <slots>
+    <signal>mouseMoveEvent(QMouseEvent*)</signal>
+    <signal>setSliderX(int)</signal>
+    <signal>setSliderY(int)</signal>
+    <slot>setSlotsX(int)</slot>
+    <slot>setSlotsY(int)</slot>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>GLWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header>glwidget.h</header>
+   <slots>
+    <slot>getSliderX(int)</slot>
+    <slot>getSliderY(int)</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>setSlotsX(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>90</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>90</x>
+     <y>196</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>verticalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>setSlotsY(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>14</x>
+     <y>148</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>38</x>
+     <y>148</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget_2</sender>
+   <signal>setSliderX(int)</signal>
+   <receiver>horizontalSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>55</x>
+     <y>201</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>56</x>
+     <y>220</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget_2</sender>
+   <signal>setSliderY(int)</signal>
+   <receiver>verticalSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>32</x>
+     <y>168</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>17</x>
+     <y>168</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget_2</sender>
+   <signal>setSliderX(int)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getSliderX(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>157</x>
+     <y>148</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>214</x>
+     <y>146</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget_2</sender>
+   <signal>setSliderY(int)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getSliderY(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>168</x>
+     <y>162</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>208</x>
+     <y>162</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
