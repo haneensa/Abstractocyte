@@ -14,16 +14,13 @@
    <string>Juxtastrocyte</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="GLWidget" name="openGLWidget">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="GLWidget" name="openGLWidget"/>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -199,38 +196,6 @@
     <hint type="destinationlabel">
      <x>17</x>
      <y>168</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>openGLWidget_2</sender>
-   <signal>setSliderX(int)</signal>
-   <receiver>openGLWidget</receiver>
-   <slot>getSliderX(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>157</x>
-     <y>148</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>214</x>
-     <y>146</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>openGLWidget_2</sender>
-   <signal>setSliderY(int)</signal>
-   <receiver>openGLWidget</receiver>
-   <slot>getSliderY(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>168</x>
-     <y>162</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>208</x>
-     <y>162</y>
     </hint>
    </hints>
   </connection>
