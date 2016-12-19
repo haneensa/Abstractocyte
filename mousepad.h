@@ -7,6 +7,7 @@
 #include <QMouseEvent>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
+#include <QOpenGLBuffer>
 
 class MousePad : public QOpenGLWidget, QOpenGLFunctions
 {
@@ -31,10 +32,14 @@ protected:
     void resizeGL(int w, int h) Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    bool initShader(QOpenGLShaderProgram *program, const char *vshader, const char *gshader, const char *fshader);
 
 private:
-    QOpenGLVertexArrayObject m_vao;
-    QOpenGLShaderProgram *m_program;
+    QMatrix4x4                  m_projection;
+    QOpenGLVertexArrayObject    m_vao_circlue;
+    QOpenGLBuffer               m_vbo_circlue;
+
+    QOpenGLShaderProgram        *m_program_circle;
 };
 
 #endif // MOUSEPAD_H

@@ -25,3 +25,6 @@ HEADERS  += mainwindow.h \
     glwidget.h
 
 FORMS    += mainwindow.ui
+
+RESOURCES += \
+    resources.qrc
