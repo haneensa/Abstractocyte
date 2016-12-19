@@ -1,3 +1,7 @@
+// todo:    1- circle border using shaders (done)
+//          2- select circle and move around (today)
+//          3- text
+
 #include "mousepad.h"
 #include <iostream>
 #include <QDebug>
@@ -47,21 +51,21 @@ void MousePad::initializeGL()
         return;
     }
 
-
     // "posAttr", "colAttr", "matrix", "volumeAttr"
-    GLfloat points[] = { -0.5f, -0.5f, 0.0f, 1.0f,
-                        0.5f, -0.5f, 0.0f, 1.0f,
-                        0.0f, 0.5f, 0.0f, 1.0f };
+    GLfloat points[] = { 0.0f, 0.0f};
 
-    m_vbo_circlue.allocate(points, 3 * 4 * sizeof(GLfloat));
+    m_vbo_circlue.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
 
     m_program_circle->bind();
     m_program_circle->enableAttributeArray("posAttr");
-    m_program_circle->setAttributeBuffer("posAttr", GL_FLOAT, 0, 4);
+    m_program_circle->setAttributeBuffer("posAttr", GL_FLOAT, 0, 2);
     m_program_circle->release();
 
     m_vbo_circlue.release();
     m_vao_circlue.release();
+
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
 }
 
 bool MousePad::initShader(QOpenGLShaderProgram *program, const char *vshader, const char *gshader, const char *fshader)
@@ -108,7 +112,7 @@ void MousePad::paintGL()
 
     m_vao_circlue.bind();
     m_program_circle->bind();
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_POINTS, 0, 1);
     m_program_circle->release();
     m_vao_circlue.release();
 }
