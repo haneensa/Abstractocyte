@@ -1,3 +1,6 @@
+// todo:    1- render 3d segmentation
+//          2- render the skeleton
+
 #include "glwidget.h"
 #include <iostream>
 #include <QDebug>

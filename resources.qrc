@@ -3,5 +3,8 @@
         <file>shaders/shader.frag</file>
         <file>shaders/shader.geom</file>
         <file>shaders/shader.vert</file>
+        <file>shaders/selection.frag</file>
+        <file>shaders/selection.geom</file>
+        <file>shaders/selection.vert</file>
     </qresource>
 </RCC>
