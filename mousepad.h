@@ -38,10 +38,13 @@ protected:
 
     bool initShader(QOpenGLShaderProgram *program, const char *vshader, const char *gshader, const char *fshader);
     void renderSelection(void);
-    void processSelection(float xx, float yy);
+    void processSelection(int xx, int yy);
 
 private:
     QMatrix4x4                  m_projection;
+    QMatrix4x4                  m_mMatrix;
+    QMatrix4x4                  m_vMatrix;
+
     QOpenGLVertexArrayObject    m_vao_circlue;
     QOpenGLBuffer               m_vbo_circlue;
     QOpenGLShaderProgram        *m_program_circle;
@@ -49,6 +52,9 @@ private:
     QOpenGLVertexArrayObject    m_vao_selection;
     QOpenGLBuffer               m_vbo_selection;
     QOpenGLShaderProgram        *m_program_selection;
+
+    int m_w;
+    int m_h;
 
 };
 
