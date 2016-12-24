@@ -9,7 +9,9 @@
 
 MousePad::MousePad(QWidget *parent)
     :  QOpenGLWidget(parent),
-       m_vbo_circlue( QOpenGLBuffer::VertexBuffer )
+       m_vbo_circlue( QOpenGLBuffer::VertexBuffer ),
+       m_vbo_selection( QOpenGLBuffer::VertexBuffer )
+
 {
 }
 
@@ -20,6 +22,10 @@ MousePad::~MousePad()
     delete m_program_selection;
     m_vao_circlue.destroy();
     m_vbo_circlue.destroy();
+
+    m_vbo_selection.destroy();
+    m_vao_selection.destroy();
+
     doneCurrent();
 }
 
@@ -27,6 +33,8 @@ void MousePad::initializeGL()
 {
     initializeOpenGLFunctions();
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     qDebug() << "Widget OpenGl: " << format().majorVersion() << "." << format().minorVersion();
     qDebug() << "Context valid: " << context()->isValid();
     qDebug() << "Really used OpenGl: " << context()->format().majorVersion() << "." << context()->format().minorVersion();
@@ -59,12 +67,12 @@ void MousePad::initializeGL()
         return;
     }
 
-    GLfloat points[] = { 0.0f, 0.0f };
+    GLfloat points[] = { 0.5f, 0.5f };
 
     m_vbo_circlue.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
 
     m_program_circle->bind();
-    m_program_circle->setUniformValue("mvpMatrix", m_projection);
+    m_program_circle->setUniformValue("mvpMatrix", m_projection * m_vMatrix *  m_mMatrix );
     m_program_circle->enableAttributeArray("posAttr");
     m_program_circle->setAttributeBuffer("posAttr", GL_FLOAT, 0, 2);
     m_program_circle->release();
@@ -80,11 +88,11 @@ void MousePad::initializeGL()
 
 
     m_vbo_selection.create();
-    m_vbo_selection.setUsagePattern( QOpenGLBuffer::StaticDraw);
-    if ( !m_vbo_selection.bind() ) {
-        qDebug() << "Could not bind vertex buffer to the context.";
-        return;
-    }
+      m_vbo_selection.setUsagePattern( QOpenGLBuffer::StaticDraw);
+      if ( !m_vbo_selection.bind() ) {
+          qDebug() << "Could not bind vertex buffer to the context.";
+          return;
+      }
 
     m_vbo_selection.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
 
@@ -98,7 +106,7 @@ void MousePad::initializeGL()
     m_vao_selection.release();
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-    glEnable(GL_MULTISAMPLE);
+    //glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -142,12 +150,13 @@ bool MousePad::initShader(QOpenGLShaderProgram *program, const char *vshader, co
 void MousePad::paintGL()
 {
     qDebug() << "Draw!";
+    glViewport( 0, 0, m_w, m_h);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_vao_circlue.bind();
     m_program_circle->bind();
-    m_program_circle->setUniformValue("mvpMatrix", m_projection);
+    m_program_circle->setUniformValue("mvpMatrix", m_projection * m_vMatrix *  m_mMatrix );
     glDrawArrays(GL_POINTS, 0, 1);
     m_program_circle->release();
     m_vao_circlue.release();
@@ -155,27 +164,25 @@ void MousePad::paintGL()
 
 void MousePad::resizeGL(int w, int h)
 {
-//    qDebug() << "Func: resizeGL: " << w << " " << h;
-//   // glViewport(0.0, 0.0, (GLsizei) w*2, (GLsizei) h*2);
-//    m_w = w;
-//    m_h = h;
-//    m_projection.setToIdentity();
-//    // pcamera.setAspectRatio( (float)width/(float)height);
-//    m_projection.ortho(0, 1, 0, 1, -1.0, 1.0 );
+    qDebug() << "Func: resizeGL: " << w << " " << h;
     // Calculate aspect ratio
     h = (h == 0) ? 1 : h;
-    const qreal retinaScale = devicePixelRatio();
-    glViewport(0, 0, w * retinaScale, h * retinaScale);
-    m_projection.setToIdentity();
-    m_projection.ortho( GLfloat(-w) / GLfloat(h),  GLfloat(w) / GLfloat(h), -1.0f, 1.0f, -100.0, 100.0 );
+    m_h = h;
+    m_w = w;
 
-    //set up view
+    glViewport( 0, 0, m_w, m_h);
+    m_projection.setToIdentity();
+    m_projection.ortho( 0, 1, 0 , 1, -1.0, 1.0 );
+
+    // set up view
     // view matrix: transform a model's vertices from world space to view space, represents the camera
-    QVector3D m_center = QVector3D(0.5, 0.5, 0.5);
-    QVector3D m_cameraPosition = QVector3D(0.5, 0.5, 1.0);
+    QVector3D m_center = QVector3D(0.0, 0.0, 0.0);
+    QVector3D m_cameraPosition = QVector3D(0.0, 0.0, 0.0);
     QVector3D  cameraUpDirection = /*cameraTransformation */ QVector3D(0.0, 1.0, 0.0);
     m_vMatrix.setToIdentity();
-    m_vMatrix.lookAt(m_cameraPosition, m_center, cameraUpDirection);
+    m_mMatrix.setToIdentity();
+    //m_vMatrix.lookAt(m_cameraPosition, m_center, cameraUpDirection);
+    update();
 }
 
 void MousePad::mouseMoveEvent(QMouseEvent *event)
@@ -221,6 +228,7 @@ void MousePad::renderSelection(void)
 {
     aboutToCompose();
     qDebug() << "Draw Selection!";
+    glViewport( 0, 0, m_w, m_h);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -253,9 +261,9 @@ void MousePad::processSelection(int xx, int yy)
     // 4 bytes per pixel (RGBA), 1x1 bitmap
     // width * height * components (RGBA)
     unsigned char res[4];
-    qDebug() << "Pixel at: " << xx << " " << viewport[3]/2 - yy;
+    qDebug() << "Pixel at: " << xx << " " << viewport[3] - yy;
     glReadBuffer(GL_BACK);
-    glReadPixels(xx,  viewport[3]/2 - yy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &res);
+    glReadPixels(xx,  viewport[3] - yy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &res);
     int pickedID = res[0] + res[1] * 256 + res[2] * 256 * 256;
 
     qDebug() <<  res[0] <<  " " << res[1] <<  " " << res[2];
@@ -264,16 +272,16 @@ void MousePad::processSelection(int xx, int yy)
         qDebug() << "Background, Picked ID: " << pickedID;
     } else {
         qDebug() << "Picked ID: " << pickedID;
-        // get the x, and y and update the circle position
-        if ( !m_vbo_circlue.bind() ) {
-            qDebug() << "Could not bind vertex buffer to the context.";
-            return;
-        }
+//        // get the x, and y and update the circle position
+//        if ( !m_vbo_circlue.bind() ) {
+//            qDebug() << "Could not bind vertex buffer to the context.";
+//            return;
+//        }
 
-        // "posAttr", "colAttr", "matrix", "volumeAttr"
-        GLfloat points[] = { 0.5,  0.5 };
-        m_vbo_circlue.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
-        m_vbo_circlue.release();
+//        // "posAttr", "colAttr", "matrix", "volumeAttr"
+//        GLfloat points[] = { 0.5,  0.5 };
+//        m_vbo_circlue.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
+//        m_vbo_circlue.release();
     }
 
     // update the circle vbo
