@@ -72,7 +72,7 @@ void MousePad::initializeGL()
     m_vbo_circlue.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
 
     m_program_circle->bind();
-    m_program_circle->setUniformValue("mvpMatrix", m_projection * m_vMatrix *  m_mMatrix );
+    m_program_circle->setUniformValue("mvpMatrix", m_projection  /* m_vMatrix *  m_mMatrix*/  );
     m_program_circle->enableAttributeArray("posAttr");
     m_program_circle->setAttributeBuffer("posAttr", GL_FLOAT, 0, 2);
     m_program_circle->release();
@@ -97,9 +97,9 @@ void MousePad::initializeGL()
     m_vbo_selection.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
 
     m_program_selection->bind();
-    m_program_selection->setUniformValue("mvpMatrix",  m_projection * m_vMatrix *  m_mMatrix );
     m_program_selection->enableAttributeArray("posAttr");
     m_program_selection->setAttributeBuffer("posAttr", GL_FLOAT, 0, 2);
+    m_program_selection->setUniformValue("mvpMatrix",   m_projection/* m_vMatrix *  m_mMatrix*/ );
     m_program_selection->release();
 
     m_vbo_selection.release();
@@ -156,7 +156,7 @@ void MousePad::paintGL()
 
     m_vao_circlue.bind();
     m_program_circle->bind();
-    m_program_circle->setUniformValue("mvpMatrix", m_projection * m_vMatrix *  m_mMatrix );
+    m_program_circle->setUniformValue("mvpMatrix", m_projection  /* m_vMatrix *  m_mMatrix*/  );
     glDrawArrays(GL_POINTS, 0, 1);
     m_program_circle->release();
     m_vao_circlue.release();
@@ -164,24 +164,19 @@ void MousePad::paintGL()
 
 void MousePad::resizeGL(int w, int h)
 {
-    qDebug() << "Func: resizeGL: " << w << " " << h;
+    qDebug() << "Func: resizeGL: " << w << " " <<   width() <<  " " << h << " " << height();
     // Calculate aspect ratio
+    const qreal retinaScale = devicePixelRatio();
+
+    m_h = h * retinaScale;
+    m_w = w * retinaScale;
     h = (h == 0) ? 1 : h;
-    m_h = h;
-    m_w = w;
-
-    glViewport( 0, 0, m_w, m_h);
+    glViewport(0, 0, w * retinaScale, h * retinaScale);
     m_projection.setToIdentity();
-    m_projection.ortho( 0, 1, 0 , 1, -1.0, 1.0 );
+    m_projection.ortho( 0.0f,  1.0f, 0.0f, 1.0f, -1.0, 1.0 );
 
-    // set up view
-    // view matrix: transform a model's vertices from world space to view space, represents the camera
-    QVector3D m_center = QVector3D(0.0, 0.0, 0.0);
-    QVector3D m_cameraPosition = QVector3D(0.0, 0.0, 0.0);
-    QVector3D  cameraUpDirection = /*cameraTransformation */ QVector3D(0.0, 1.0, 0.0);
     m_vMatrix.setToIdentity();
     m_mMatrix.setToIdentity();
-    //m_vMatrix.lookAt(m_cameraPosition, m_center, cameraUpDirection);
     update();
 }
 
@@ -203,9 +198,10 @@ void MousePad::mouseReleaseEvent(QMouseEvent *event)
 {
     qDebug() << "Func: mouseReleaseEvent " <<  event->x() << " " << event->y();
     setFocus();
+    const qreal retinaScale = devicePixelRatio();
 
-    int x = event->x();
-    int y = event->y();
+    int x = event->x()*retinaScale;
+    int y = event->y()*retinaScale;
     processSelection(x, y);
 
     event->accept();
@@ -228,13 +224,12 @@ void MousePad::renderSelection(void)
 {
     aboutToCompose();
     qDebug() << "Draw Selection!";
-    glViewport( 0, 0, m_w, m_h);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_vao_selection.bind();
     m_program_selection->bind();
-    m_program_selection->setUniformValue("mvpMatrix",  m_projection * m_vMatrix *  m_mMatrix );
+    m_program_selection->setUniformValue("mvpMatrix",  m_projection /* m_vMatrix *  m_mMatrix*/ );
 
     // set the uniform with the appropriate color code
     glDrawArrays(GL_POINTS, 0, 1);
