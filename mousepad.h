@@ -50,7 +50,6 @@ private:
     QOpenGLShaderProgram        *m_program_circle;
 
     QOpenGLVertexArrayObject    m_vao_selection;
-    QOpenGLBuffer               m_vbo_selection;
     QOpenGLShaderProgram        *m_program_selection;
 
     int m_w;

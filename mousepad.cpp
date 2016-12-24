@@ -10,8 +10,6 @@
 MousePad::MousePad(QWidget *parent)
     :  QOpenGLWidget(parent),
        m_vbo_circlue( QOpenGLBuffer::VertexBuffer ),
-       m_vbo_selection( QOpenGLBuffer::VertexBuffer )
-
 {
 }
 
@@ -85,16 +83,10 @@ void MousePad::initializeGL()
     // create vbos and vaos
     m_vao_selection.create();
     m_vao_selection.bind();
-
-
-    m_vbo_selection.create();
-      m_vbo_selection.setUsagePattern( QOpenGLBuffer::StaticDraw);
-      if ( !m_vbo_selection.bind() ) {
-          qDebug() << "Could not bind vertex buffer to the context.";
-          return;
-      }
-
-    m_vbo_selection.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
+    if ( !m_vbo_circlue.bind() ) {
+        qDebug() << "Could not bind vertex buffer to the context.";
+        return;
+    }
 
     m_program_selection->bind();
     m_program_selection->enableAttributeArray("posAttr");
@@ -102,7 +94,7 @@ void MousePad::initializeGL()
     m_program_selection->setUniformValue("mvpMatrix",   m_projection/* m_vMatrix *  m_mMatrix*/ );
     m_program_selection->release();
 
-    m_vbo_selection.release();
+    m_vbo_circlue.release();
     m_vao_selection.release();
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -200,8 +192,8 @@ void MousePad::mouseReleaseEvent(QMouseEvent *event)
     setFocus();
     const qreal retinaScale = devicePixelRatio();
 
-    int x = event->x()*retinaScale;
-    int y = event->y()*retinaScale;
+    int x = event->x() * retinaScale;
+    int y = event->y() * retinaScale;
     processSelection(x, y);
 
     event->accept();
@@ -267,16 +259,15 @@ void MousePad::processSelection(int xx, int yy)
         qDebug() << "Background, Picked ID: " << pickedID;
     } else {
         qDebug() << "Picked ID: " << pickedID;
-//        // get the x, and y and update the circle position
-//        if ( !m_vbo_circlue.bind() ) {
-//            qDebug() << "Could not bind vertex buffer to the context.";
-//            return;
-//        }
+        // get the x, and y and update the circle position
+        if ( !m_vbo_circlue.bind() ) {
+            qDebug() << "Could not bind vertex buffer to the context.";
+            return;
+        }
 
-//        // "posAttr", "colAttr", "matrix", "volumeAttr"
-//        GLfloat points[] = { 0.5,  0.5 };
-//        m_vbo_circlue.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
-//        m_vbo_circlue.release();
+        GLfloat points[] = { 0.8,  0.8 };
+        m_vbo_circlue.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
+        m_vbo_circlue.release();
     }
 
     // update the circle vbo
