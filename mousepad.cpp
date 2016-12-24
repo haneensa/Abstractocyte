@@ -9,7 +9,7 @@
 
 MousePad::MousePad(QWidget *parent)
     :  QOpenGLWidget(parent),
-       m_vbo_circlue( QOpenGLBuffer::VertexBuffer ),
+       m_vbo_circlue( QOpenGLBuffer::VertexBuffer )
 {
 }
 
@@ -21,7 +21,6 @@ MousePad::~MousePad()
     m_vao_circlue.destroy();
     m_vbo_circlue.destroy();
 
-    m_vbo_selection.destroy();
     m_vao_selection.destroy();
 
     doneCurrent();
@@ -70,7 +69,7 @@ void MousePad::initializeGL()
     m_vbo_circlue.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
 
     m_program_circle->bind();
-    m_program_circle->setUniformValue("mvpMatrix", m_projection  /* m_vMatrix *  m_mMatrix*/  );
+    m_program_circle->setUniformValue("pMatrix", m_projection);
     m_program_circle->enableAttributeArray("posAttr");
     m_program_circle->setAttributeBuffer("posAttr", GL_FLOAT, 0, 2);
     m_program_circle->release();
@@ -91,7 +90,7 @@ void MousePad::initializeGL()
     m_program_selection->bind();
     m_program_selection->enableAttributeArray("posAttr");
     m_program_selection->setAttributeBuffer("posAttr", GL_FLOAT, 0, 2);
-    m_program_selection->setUniformValue("mvpMatrix",   m_projection/* m_vMatrix *  m_mMatrix*/ );
+    m_program_selection->setUniformValue("pMatrix",   m_projection);
     m_program_selection->release();
 
     m_vbo_circlue.release();
@@ -148,7 +147,7 @@ void MousePad::paintGL()
 
     m_vao_circlue.bind();
     m_program_circle->bind();
-    m_program_circle->setUniformValue("mvpMatrix", m_projection  /* m_vMatrix *  m_mMatrix*/  );
+    m_program_circle->setUniformValue("pMatrix", m_projection);
     glDrawArrays(GL_POINTS, 0, 1);
     m_program_circle->release();
     m_vao_circlue.release();
@@ -167,8 +166,6 @@ void MousePad::resizeGL(int w, int h)
     m_projection.setToIdentity();
     m_projection.ortho( 0.0f,  1.0f, 0.0f, 1.0f, -1.0, 1.0 );
 
-    m_vMatrix.setToIdentity();
-    m_mMatrix.setToIdentity();
     update();
 }
 
@@ -221,7 +218,7 @@ void MousePad::renderSelection(void)
 
     m_vao_selection.bind();
     m_program_selection->bind();
-    m_program_selection->setUniformValue("mvpMatrix",  m_projection /* m_vMatrix *  m_mMatrix*/ );
+    m_program_selection->setUniformValue("pMatrix",  m_projection);
 
     // set the uniform with the appropriate color code
     glDrawArrays(GL_POINTS, 0, 1);
@@ -265,7 +262,7 @@ void MousePad::processSelection(int xx, int yy)
             return;
         }
 
-        GLfloat points[] = { 0.8,  0.8 };
+        GLfloat points[] = { 0.6,  0.6 };
         m_vbo_circlue.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
         m_vbo_circlue.release();
     }

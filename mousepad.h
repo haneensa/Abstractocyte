@@ -42,8 +42,6 @@ protected:
 
 private:
     QMatrix4x4                  m_projection;
-    QMatrix4x4                  m_mMatrix;
-    QMatrix4x4                  m_vMatrix;
 
     QOpenGLVertexArrayObject    m_vao_circlue;
     QOpenGLBuffer               m_vbo_circlue;
