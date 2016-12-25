@@ -6,5 +6,8 @@
         <file>shaders/selection.frag</file>
         <file>shaders/selection.geom</file>
         <file>shaders/selection.vert</file>
+        <file>shaders/text.frag</file>
+        <file>shaders/text.geom</file>
+        <file>shaders/text.vert</file>
     </qresource>
 </RCC>

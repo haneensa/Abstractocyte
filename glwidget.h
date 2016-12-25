@@ -5,7 +5,18 @@
 #include <QWidget>
 #include <QOpenGLFunctions>
 #include <QMouseEvent>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLBuffer>
 
+// text includes
+#include <QFontMetrics>
+#include <QHash>
+
+struct FontChar {
+    int width;
+    GLuint textureID;
+    QOpenGLVertexArrayObject *vao;
+};
 
 class GLWidget : public QOpenGLWidget, QOpenGLFunctions
 {
@@ -23,6 +34,10 @@ protected:
     void resizeGL(int w, int h) Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+
+    void initText( const QFont &_f  );
+    void renderText( float x, float y, const QString &text );
+    QHash <char, FontChar> m_characters;
 };
 
 

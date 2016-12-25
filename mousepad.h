@@ -9,6 +9,11 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
+struct point {
+    float x;
+    float y;
+};
+
 class MousePad : public QOpenGLWidget, QOpenGLFunctions
 {
     Q_OBJECT
@@ -38,20 +43,22 @@ protected:
 
     bool initShader(QOpenGLShaderProgram *program, const char *vshader, const char *gshader, const char *fshader);
     void renderSelection(void);
-    void processSelection(int xx, int yy);
+    void processSelection(int xx, int yy, float dx, float dy);
 
 private:
     QMatrix4x4                  m_projection;
 
-    QOpenGLVertexArrayObject    m_vao_circlue;
-    QOpenGLBuffer               m_vbo_circlue;
+    QOpenGLVertexArrayObject    m_vao_circle;
+    QOpenGLBuffer               m_vbo_circle;
     QOpenGLShaderProgram        *m_program_circle;
 
     QOpenGLVertexArrayObject    m_vao_selection;
     QOpenGLShaderProgram        *m_program_selection;
 
-    int m_w;
-    int m_h;
+    struct point                circle;
+    struct point                press_event;
+    int                         m_w;
+    int                         m_h;
 
 };
 
