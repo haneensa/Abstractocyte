@@ -7,6 +7,7 @@
 #include <QMouseEvent>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
+#include <QOpenGLShaderProgram>
 
 // text includes
 #include <QFontMetrics>
@@ -17,6 +18,7 @@ struct FontChar {
     GLuint textureID;
     QOpenGLVertexArrayObject *vao;
 };
+
 
 class GLWidget : public QOpenGLWidget, QOpenGLFunctions
 {
@@ -34,10 +36,20 @@ protected:
     void resizeGL(int w, int h) Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    bool initShader(QOpenGLShaderProgram *program, const char *vshader, const char *gshader, const char *fshader);
 
     void initText( const QFont &_f  );
     void renderText( float x, float y, const QString &text );
     QHash <char, FontChar> m_characters;
+
+    QOpenGLShaderProgram        *m_program_text;
+
+    /* testing */
+    QMatrix4x4                  m_projection;
+
+    QOpenGLVertexArrayObject    m_vao_circle;
+    QOpenGLBuffer               m_vbo_circle;
+    QOpenGLShaderProgram        *m_program_circle;
 };
 
 

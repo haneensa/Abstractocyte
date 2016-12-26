@@ -33,10 +33,6 @@ void GLWidget::initText( const QFont &_f  )
     QFontMetrics metric(_f);
     int fontHeight = metric.height();
 
-    qDebug() << "font height: " << fontHeight;
-
-    // todo: initialize text shader
-
     // loop over all the basic keyboad chars from space to ~
     const static char startChar = ' ';
     const static char endChar = '~';
@@ -67,7 +63,7 @@ void GLWidget::initText( const QFont &_f  )
         // scale text-cord from 0-1 based on the coverage of the glyph
         float s1 = width * 1.0f / widthPow2;
         float t0 = 0.0f;
-        float t1 = metric.height() * -1.0f / heightPow2;
+        float t1 = metric.height() * -1.0f/heightPow2;
 
         // store the width for later drawing
         fc.width = width;
@@ -86,11 +82,12 @@ void GLWidget::initText( const QFont &_f  )
         painter.drawText(0, metric.ascent(), QString(c));
         painter.end();
 
+
+        /* debug
         QString filename = ".png";
         filename.prepend(c);
         qDebug() << filename;
 
-        /* debug
         if (finalImage.save(filename))
             qDebug() << filename;
         else
@@ -99,17 +96,10 @@ void GLWidget::initText( const QFont &_f  )
 
         // convert QImage to format suitable for opengl
         finalImage = finalImage.convertToFormat(QImage::Format_ARGB32_Premultiplied);
-
-        // create opengl texture ID and bind it to make it active
-
-        glGenTextures(1, &fc.textureID);
-        glBindTexture(GL_TEXTURE_2D, fc.textureID);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-
         // set rgba image data
         int widthTexture = finalImage.width();
         int heightTexture = finalImage.height();
+
         std::unique_ptr<unsigned char[]> data(new unsigned char[widthTexture * heightTexture * 4]);
         unsigned int index = 0;
         QRgb color;
@@ -123,9 +113,16 @@ void GLWidget::initText( const QFont &_f  )
             }
         }
 
+        // create opengl texture ID and bind it to make it active
+        glGenTextures(1, &fc.textureID);
+        glBindTexture(GL_TEXTURE_2D, fc.textureID);
+
         // the image in RGBA format and unsigned byte load it ready for later
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, widthTexture, heightTexture,
                      0, GL_RGBA, GL_UNSIGNED_BYTE, data.get());
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         // check if billboard exist with this width
@@ -144,28 +141,28 @@ void GLWidget::initText( const QFont &_f  )
             textVertData* d = new textVertData[6];
 
             // load values for triable 1
-            d[0].x = 0;
-            d[0].y = 0;
+            d[0].x = 0.0;
+            d[0].y = 0.0;
             d[0].u = s0;
             d[0].v = t0;
 
             d[1].x = fc.width;
-            d[1].y = 0;
+            d[1].y = 0.0;
             d[1].u = s1;
             d[1].v = t0;
 
-            d[2].x = 0;
+            d[2].x = 0.0;
             d[2].y = fontHeight;
             d[2].u = s0;
             d[2].v = t1;
 
-            d[3].x = 0;
+            d[3].x = 0.0;
             d[3].y = fontHeight;
             d[3].u = s0;
             d[3].v = t1;
 
             d[4].x = fc.width;
-            d[4].y = 0;
+            d[4].y = 0.0;
             d[4].u = s1;
             d[4].v = t0;
 
@@ -175,11 +172,11 @@ void GLWidget::initText( const QFont &_f  )
             d[5].v = t1;
 
             // create VAO to store the data
-            QOpenGLVertexArrayObject   vao;
-            vao.create();
-            vao.bind();
+            QOpenGLVertexArrayObject   *vao = new QOpenGLVertexArrayObject;
+            vao->create();
+            vao->bind();
             // set the vertex data (2 for x, y 2 for u, v)
-            QOpenGLBuffer               vbo;
+            QOpenGLBuffer               vbo(QOpenGLBuffer::VertexBuffer);
             vbo.create();
             vbo.setUsagePattern( QOpenGLBuffer::StaticDraw);
             if ( !vbo.bind() ) {
@@ -187,47 +184,84 @@ void GLWidget::initText( const QFont &_f  )
                 return;
             }
 
-
             vbo.allocate(d, 6 * sizeof(textVertData));
 
             // set attribute pointer to be 0 (for shader), vertIn
-//            quintptr offset = 0;
-//            int vertIn = program->attributeLocation("vertIn");
-//            program->enableAttributeArray(vertIn);
-//            program->setAttributeBuffer(vertIn, GL_FLOAT, offset, 1, sizeof(VertexData));
+            quintptr offset = 0;
+            int vertIn = m_program_text->attributeLocation("vertIn");
+            m_program_text->enableAttributeArray(vertIn);
+            m_program_text->setAttributeBuffer(vertIn, GL_FLOAT, offset, 2, sizeof(textVertData));
 
-//            // set attribute pointer to be 1, for uv_coords
-//            int uv_coords = program->attributeLocation("uv_coords");
-//            program->enableAttributeArray(uv_coords);
-//            offset += (2 * sizeof(float));
-//            program->setAttributeBuffer(uv_coords, GL_INT, offset, 1, sizeof(VertexData));
+            // set attribute pointer to be 1, for uv_coords
+            int uv_coords = m_program_text->attributeLocation("uv_coords");
+            m_program_text->enableAttributeArray(uv_coords);
+            offset += (2 * sizeof(float));
+            m_program_text->setAttributeBuffer(uv_coords, GL_FLOAT, offset, 2, sizeof(textVertData));
 
             vbo.release();
-            vao.release();
+            vao->release();
 
             // store the vao pointer for later use in the draw method
-            fc.vao = &vao;
+            fc.vao = vao;
             widthVAO[width] = fc.vao;
         } else {
             fc.vao = widthVAO[width];
         }
 
         // add the element to the map
-        qDebug() << "c: " << c << " width: " << fc.width;
+        qDebug() << "c: " << c << " width: " << fc.width << " f.textureID: " <<  fc.textureID;
         m_characters[c] = fc;
     }
 
     qDebug() << "Created " << widthVAO.size() << " unique billboards";
-
 }
 
 void GLWidget::renderText( float x, float y, const QString &text )
 {
     // todo tomorrow!
+
+    glActiveTexture(GL_TEXTURE0);
+
+    m_program_text->bind();
+    m_program_text->setUniformValue("ypos",  y);
+    float scaleX = 2.0/width();
+    m_program_text->setUniformValue("scaleX",  scaleX);
+    float scaleY = 2.0/height();
+    m_program_text->setUniformValue("scaleY",  scaleY);
+    qDebug() << scaleX << " " << scaleY;
+    // for fonts to renders correctly
+    glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // loop for each of the car and draw our billboard
+    int textLength = text.length();
+    for (int i = 0; i < textLength; ++i) {
+        qDebug() << "render text: " << text[i];
+        // set the shader x position
+        // we render a glyph by the width of the char
+        FontChar f = m_characters[text[i].toLatin1()];
+        f.vao->bind();
+        m_program_text->setUniformValue("xpos",  x);
+        // bind the pre generated texture
+        glBindTexture(GL_TEXTURE_2D, f.textureID);
+        qDebug() << "x: " << x << " f.textureID: " <<  f.textureID;
+
+        m_program_text->setUniformValue("tex",  0);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        f.vao->release();
+        x += f.width;
+    }
+
+    m_program_text->release();
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
 }
 
 GLWidget::GLWidget(QWidget *parent)
-    :  QOpenGLWidget(parent)
+    :  QOpenGLWidget(parent),
+       m_vbo_circle( QOpenGLBuffer::VertexBuffer )
+
 {
 
 }
@@ -235,32 +269,142 @@ GLWidget::GLWidget(QWidget *parent)
 GLWidget::~GLWidget()
 {
     qDebug() << "~GLWidget()";
+
+    makeCurrent();
     // our dtor should clear out the textures and remove the VAO's
     for( auto &m : m_characters)
     {
-        qDebug() << m.width;
         glDeleteTextures(1,&m.textureID);
+        m.vao->destroy();
     }
 
+    delete m_program_circle;
+    m_vao_circle.destroy();
+    m_vbo_circle.destroy();
+    doneCurrent();
+}
+
+
+bool GLWidget::initShader(QOpenGLShaderProgram *program, const char *vshader, const char *gshader, const char *fshader)
+{
+    qDebug() << "Initializing shaders";
+
+    // Compile vertex shader
+    if (!program->addShaderFromSourceFile(QOpenGLShader::Vertex, vshader))
+    {
+        qDebug() << "Error in vertex shader:" << program->log();
+        return false;
+    }
+
+    // Compile geometry shader
+    if (!program->addShaderFromSourceFile(QOpenGLShader::Geometry, gshader))
+    {
+        qDebug() << "Error in Geometry shader:" << program->log();
+        return false;
+    }
+
+    // Compile fragment shader
+    if (!program->addShaderFromSourceFile(QOpenGLShader::Fragment, fshader))
+    {
+        qDebug() << "Error in fragment shader:" << program->log();
+        return false;
+    }
+
+    // Link shader pipeline
+    if (!program->link())
+    {
+        qDebug() << "Error in linking shader program:" << program->log();
+        return false;
+    }
+
+    return true;
 }
 
 void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    m_program_text = new QOpenGLShaderProgram(this);
+    bool res = initShader(m_program_text, ":/shaders/text.vert", ":/shaders/text.geom", ":/shaders/text.frag");
+    if(res == false)
+        return;
+
     const QFont f;
     initText(f);
 
+    /* testing */
+    m_projection.setToIdentity();
+
+    m_program_circle = new QOpenGLShaderProgram(this);
+    res = initShader(m_program_circle, ":/shaders/shader.vert", ":/shaders/shader.geom", ":/shaders/shader.frag");
+    if(res == false)
+        return;
+
+    qDebug() << "Initializing curser VAO";
+    // create vbos and vaos
+    m_vao_circle.create();
+    m_vao_circle.bind();
+
+    m_vbo_circle.create();
+    m_vbo_circle.setUsagePattern( QOpenGLBuffer::StaticDraw);
+    if ( !m_vbo_circle.bind() ) {
+        qDebug() << "Could not bind vertex buffer to the context.";
+        return;
+    }
+
+    GLfloat points[] = { 0.5f, 0.5f };
+
+    m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
+
+    m_program_circle->bind();
+    m_program_circle->setUniformValue("pMatrix", m_projection);
+    m_program_circle->enableAttributeArray("posAttr");
+    m_program_circle->setAttributeBuffer("posAttr", GL_FLOAT, 0, 2);
+    m_program_circle->release();
+
+    m_vbo_circle.release();
+    m_vao_circle.release();
+
+    /* end testing */
+
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+    glEnable(GL_MULTISAMPLE);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void GLWidget::paintGL()
 {
-    // paint the text here!
+    // paint the text here
+    qDebug() << "draw";
+
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    const QString text = "Juxtastrocyte";
+    renderText( 0.0, 1.0, text);
+
+    m_vao_circle.bind();
+    m_program_circle->bind();
+    m_program_circle->setUniformValue("pMatrix", m_projection);
+    glDrawArrays(GL_POINTS, 0, 1);
+    m_program_circle->release();
+    m_vao_circle.release();
+
 }
 
 void GLWidget::resizeGL(int w, int h)
 {
-
+    qDebug() << "Func: resizeGL: " << w << " " <<   width() <<  " " << h << " " << height();
+    // Calculate aspect ratio
+    const qreal retinaScale = devicePixelRatio();
+    h = (h == 0) ? 1 : h;
+    glViewport(0, 0, w * retinaScale, h * retinaScale);
+    m_projection.setToIdentity();
+    m_projection.ortho( 0.0f,  1.0f, 0.0f, 1.0f, -1.0, 1.0 );
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)

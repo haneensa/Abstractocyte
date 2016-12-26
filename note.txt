@@ -1,0 +1,1 @@
+todo: make general class that contain shared functions for both opengl windows to inheirt from.

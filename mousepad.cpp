@@ -64,7 +64,7 @@ void MousePad::initializeGL()
         return;
     }
 
-    circle  = { 0.5f, 0.5f };
+    struct point circle  = { 0.5f, 0.5f };
     GLfloat points[] = { circle.x, circle.y };
 
     m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
@@ -98,7 +98,7 @@ void MousePad::initializeGL()
     m_vao_selection.release();
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-    //glEnable(GL_MULTISAMPLE);
+    glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
