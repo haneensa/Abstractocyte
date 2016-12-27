@@ -4,17 +4,8 @@
 #include <QOpenGLWidget>
 #include <QWidget>
 
-// text includes
-#include <QFontMetrics>
-#include <QHash>
-
 #include "mainopengl.h"
 
-struct FontChar {
-    int width;
-    GLuint textureID;
-    QOpenGLVertexArrayObject *vao;
-};
 
 
 class GLWidget : public QOpenGLWidget, MainOpenGL
@@ -33,12 +24,6 @@ protected:
     void resizeGL(int w, int h) Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-
-    void initText( const QFont &_f  );
-    void renderText( float x, float y, float scaleX, float scaleY, const QString &text );
-    QHash <char, FontChar> m_characters;
-
-    QOpenGLShaderProgram        *m_program_text;
 
     /* testing */
     QMatrix4x4                  m_projection;
