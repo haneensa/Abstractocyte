@@ -39,7 +39,7 @@ protected:
     bool initShader(QOpenGLShaderProgram *program, const char *vshader, const char *gshader, const char *fshader);
 
     void initText( const QFont &_f  );
-    void renderText( float x, float y, const QString &text );
+    void renderText( float x, float y, float scaleX, float scaleY, const QString &text );
     QHash <char, FontChar> m_characters;
 
     QOpenGLShaderProgram        *m_program_text;

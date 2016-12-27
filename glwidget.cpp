@@ -54,7 +54,7 @@ void GLWidget::initText( const QFont &_f  )
 
         // set the texture coordinates for our quad
         // triangle billboard with text-cords as:
-        //  s0/t0  ---- s1,t0
+        //  s0,t0  ---- s1,t0
         //         |\ |
         //         | \|
         //  s0,t1  ---- s1,t1
@@ -62,9 +62,10 @@ void GLWidget::initText( const QFont &_f  )
         float s0 = 0.0;
         // scale text-cord from 0-1 based on the coverage of the glyph
         float s1 = width * 1.0f / widthPow2;
-        float t0 = 0.0f;
-        float t1 = metric.height() * -1.0f/heightPow2;
+        float t1 = 0.0f;
+        float t0 = metric.height() * -1.0f/heightPow2;
 
+        qDebug() << " s1: " << s1 << " t1: " << t1 ;
         // store the width for later drawing
         fc.width = width;
 
@@ -121,7 +122,7 @@ void GLWidget::initText( const QFont &_f  )
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, widthTexture, heightTexture,
                      0, GL_RGBA, GL_UNSIGNED_BYTE, data.get());
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
         glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -140,7 +141,7 @@ void GLWidget::initText( const QFont &_f  )
             // 6 verts
             textVertData* d = new textVertData[6];
 
-            // load values for triable 1
+            // load values for triangle 1
             d[0].x = 0.0;
             d[0].y = 0.0;
             d[0].u = s0;
@@ -156,6 +157,7 @@ void GLWidget::initText( const QFont &_f  )
             d[2].u = s0;
             d[2].v = t1;
 
+            // load values for triangle two
             d[3].x = 0.0;
             d[3].y = fontHeight;
             d[3].u = s0;
@@ -216,7 +218,7 @@ void GLWidget::initText( const QFont &_f  )
     qDebug() << "Created " << widthVAO.size() << " unique billboards";
 }
 
-void GLWidget::renderText( float x, float y, const QString &text )
+void GLWidget::renderText( float x, float y, float scaleX, float scaleY, const QString &text  )
 {
     // todo tomorrow!
 
@@ -224,9 +226,7 @@ void GLWidget::renderText( float x, float y, const QString &text )
 
     m_program_text->bind();
     m_program_text->setUniformValue("ypos",  y);
-    float scaleX = 2.0/width();
     m_program_text->setUniformValue("scaleX",  scaleX);
-    float scaleY = 2.0/height();
     m_program_text->setUniformValue("scaleY",  scaleY);
     qDebug() << scaleX << " " << scaleY;
     // for fonts to renders correctly
@@ -278,6 +278,7 @@ GLWidget::~GLWidget()
         m.vao->destroy();
     }
 
+    delete m_program_text;
     delete m_program_circle;
     m_vao_circle.destroy();
     m_vbo_circle.destroy();
@@ -331,7 +332,8 @@ void GLWidget::initializeGL()
     if(res == false)
         return;
 
-    const QFont f;
+    QFont f;
+    f.setPixelSize(50);
     initText(f);
 
     /* testing */
@@ -385,7 +387,11 @@ void GLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const QString text = "Juxtastrocyte";
-    renderText( 0.0, 1.0, text);
+    float scaleX = 1.0/width();
+    float scaleY = 1.0/height();
+    float x = -10.0;
+    float y = 5.0;
+    renderText( x, y, scaleX, scaleY, text);
 
     m_vao_circle.bind();
     m_program_circle->bind();
