@@ -1,9 +1,16 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QGLFormat>
+#include <QResource>
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
+    if (!QResource::registerResource("external_resources.rcc")) {
+          qDebug() << "Could not register resources.";
+          return 0;
+    }
+
     QApplication app(argc, argv);
 
     QSurfaceFormat format;

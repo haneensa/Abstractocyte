@@ -4,7 +4,6 @@ MainOpenGL::MainOpenGL()
     : flag(false)
 {
     qDebug() << "MainOpenGL";
-
 }
 
 MainOpenGL::~MainOpenGL()
@@ -83,6 +82,10 @@ void MainOpenGL::initText( const QFont &_f  )
     bool res = initShader(m_program_text, ":/shaders/text.vert", ":/shaders/text.geom", ":/shaders/text.frag");
     if(res == false)
         return;
+
+    m_projection.setToIdentity();
+  /*  m_projection.ortho( 0.0f,  1.0f, 0.0f, 1.0f, -1.0, 1.0 ); */
+    m_program_text->setUniformValue("pMatrix", m_projection);
 
     QFontMetrics metric(_f);
     int fontHeight = metric.height();
@@ -307,4 +310,38 @@ void MainOpenGL::renderText( float x, float y, float scaleX, float scaleY, const
     m_program_text->release();
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
+}
+
+bool MainOpenGL::loadOBJ(QString path/*, std::vector<QVector3D> & out_vertices*/)
+{
+    qDebug() << "Func: loadVertices";
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        qDebug() << "Could not open the file for reading";
+        return false;
+    }
+
+    QTextStream in(&file);
+    int k = 0;
+    QList<QByteArray> wordList;
+    while (!file.atEnd() && k < 10) {
+        QByteArray line = file.readLine();
+        wordList = line.split(' ');
+        k++;
+        if (wordList[0]  == "v") {
+            qDebug() << wordList[0].data() << "," << wordList[1].data() << "," << wordList[2].data() << "," << wordList[3].data();
+        } else {
+            qDebug() << wordList[0].data();
+            continue;
+        }
+
+        float x = atof(wordList[1].data());
+        float y = atof(wordList[2].data());
+        float z = atof(wordList[3].data());
+
+        qDebug() <<  wordList[0].data() << " " << x << " " << y << " " << z;
+    }
+
+    file.close();
+    return true;
 }

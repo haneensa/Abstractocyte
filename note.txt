@@ -1,1 +1,2 @@
-todo: make general class that contain shared functions for both opengl windows to inheirt from.
+todo: make general class that contain shared functions for both opengl windows to inheirt from. (done)
+todo: render 3D image

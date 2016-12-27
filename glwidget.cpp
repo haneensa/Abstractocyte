@@ -2,12 +2,14 @@
 //          2- render the skeleton
 
 #include "glwidget.h"
+#include <QResource>
 
 GLWidget::GLWidget(QWidget *parent)
     :  QOpenGLWidget(parent),
        m_vbo_circle( QOpenGLBuffer::VertexBuffer )
-
 {
+    QString path = "://data/mouse03.obj";
+    loadOBJ(path);
 }
 
 GLWidget::~GLWidget()
@@ -85,8 +87,8 @@ void GLWidget::paintGL()
     const QString text = "Juxtastrocyte";
     float scaleX = 1.0/width();
     float scaleY = 1.0/height();
-    float x = -10.0;
-    float y = 5.0;
+    float x = 0.0;
+    float y = 0.0;
     renderText( x, y, scaleX, scaleY, text);
 
     m_vao_circle.bind();

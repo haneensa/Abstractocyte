@@ -25,6 +25,13 @@ protected:
     void paintGL() Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
+    void loadMesh();
+
+    /* mesh */
+    QOpenGLVertexArrayObject    m_vao_mesh;
+    QOpenGLBuffer               m_vbo_mesh;
+    QOpenGLShaderProgram        *m_program_mesh;
+
     /* testing */
     QMatrix4x4                  m_projection;
 
