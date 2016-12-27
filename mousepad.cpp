@@ -4,8 +4,6 @@
 //          3- text
 
 #include "mousepad.h"
-#include <iostream>
-#include <QDebug>
 
 MousePad::MousePad(QWidget *parent)
     :  QOpenGLWidget(parent),
@@ -102,41 +100,6 @@ void MousePad::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-}
-
-bool MousePad::initShader(QOpenGLShaderProgram *program, const char *vshader, const char *gshader, const char *fshader)
-{
-    qDebug() << "Initializing shaders";
-
-    // Compile vertex shader
-    if (!program->addShaderFromSourceFile(QOpenGLShader::Vertex, vshader))
-    {
-        qDebug() << "Error in vertex shader:" << program->log();
-        return false;
-    }
-
-    // Compile geometry shader
-    if (!program->addShaderFromSourceFile(QOpenGLShader::Geometry, gshader))
-    {
-        qDebug() << "Error in Geometry shader:" << program->log();
-        return false;
-    }
-
-    // Compile fragment shader
-    if (!program->addShaderFromSourceFile(QOpenGLShader::Fragment, fshader))
-    {
-        qDebug() << "Error in fragment shader:" << program->log();
-        return false;
-    }
-
-    // Link shader pipeline
-    if (!program->link())
-    {
-        qDebug() << "Error in linking shader program:" << program->log();
-        return false;
-    }
-
-    return true;
 }
 
 void MousePad::paintGL()

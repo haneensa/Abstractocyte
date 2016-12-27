@@ -3,18 +3,16 @@
 
 #include <QOpenGLWidget>
 #include <QWidget>
-#include <QOpenGLFunctions>
-#include <QMouseEvent>
-#include <QOpenGLVertexArrayObject>
-#include <QOpenGLShaderProgram>
-#include <QOpenGLBuffer>
+
+
+#include "mainopengl.h"
 
 struct point {
     float x;
     float y;
 };
 
-class MousePad : public QOpenGLWidget, QOpenGLFunctions
+class MousePad : public QOpenGLWidget, MainOpenGL
 {
     Q_OBJECT
 
@@ -41,7 +39,6 @@ protected:
     void mousePressEvent(QMouseEvent*event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
-    bool initShader(QOpenGLShaderProgram *program, const char *vshader, const char *gshader, const char *fshader);
     void renderSelection(void);
     void processSelection(int xx, int yy, float dx, float dy);
 

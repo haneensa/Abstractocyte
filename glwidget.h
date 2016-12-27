@@ -3,15 +3,12 @@
 
 #include <QOpenGLWidget>
 #include <QWidget>
-#include <QOpenGLFunctions>
-#include <QMouseEvent>
-#include <QOpenGLVertexArrayObject>
-#include <QOpenGLBuffer>
-#include <QOpenGLShaderProgram>
 
 // text includes
 #include <QFontMetrics>
 #include <QHash>
+
+#include "mainopengl.h"
 
 struct FontChar {
     int width;
@@ -20,7 +17,7 @@ struct FontChar {
 };
 
 
-class GLWidget : public QOpenGLWidget, QOpenGLFunctions
+class GLWidget : public QOpenGLWidget, MainOpenGL
 {
     Q_OBJECT
 
@@ -36,7 +33,6 @@ protected:
     void resizeGL(int w, int h) Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    bool initShader(QOpenGLShaderProgram *program, const char *vshader, const char *gshader, const char *fshader);
 
     void initText( const QFont &_f  );
     void renderText( float x, float y, float scaleX, float scaleY, const QString &text );

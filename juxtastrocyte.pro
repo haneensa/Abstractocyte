@@ -18,11 +18,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     mousepad.cpp \
-    glwidget.cpp
+    glwidget.cpp \
+    mainopengl.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
-    glwidget.h
+    glwidget.h \
+    mainopengl.h
 
 FORMS    += mainwindow.ui
 

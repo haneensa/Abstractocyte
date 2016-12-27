@@ -2,31 +2,11 @@
 //          2- render the skeleton
 
 #include "glwidget.h"
-#include <iostream>
-#include <QDebug>
 #include <QtGui/QImage>
 #include <QPainter>
 #include <unordered_map>
 #include <array>
 
-
-//---------------------------------------------------------------------------
-// @brief code taken from here http://jeffreystedfast.blogspot.com/2008/06/calculating-nearest-power-of-2.html
-// @param _num the number we wish to get the nearest power from
-// OpenGL needs textures to be in powers of two, this function will get the
-// nearest power of two to the current value passed in
-//---------------------------------------------------------------------------
-unsigned int nearestPowerOfTwo ( unsigned int _num )
-{
-    unsigned int j, k;
-    (j = _num & 0xFFFF0000) || (j = _num);
-    (k = j & 0xFF00FF00) || (k = j);
-    (j = k & 0xF0F0F0F0) || (j = k);
-    (k = j & 0xCCCCCCCC) || (k = j);
-    (j = k & 0xAAAAAAAA) || (j = k);
-    return j << 1;
-}
-// end citation
 
 void GLWidget::initText( const QFont &_f  )
 {
@@ -65,7 +45,6 @@ void GLWidget::initText( const QFont &_f  )
         float t1 = 0.0f;
         float t0 = metric.height() * -1.0f/heightPow2;
 
-        qDebug() << " s1: " << s1 << " t1: " << t1 ;
         // store the width for later drawing
         fc.width = width;
 
@@ -211,7 +190,6 @@ void GLWidget::initText( const QFont &_f  )
         }
 
         // add the element to the map
-        qDebug() << "c: " << c << " width: " << fc.width << " f.textureID: " <<  fc.textureID;
         m_characters[c] = fc;
     }
 
@@ -237,7 +215,6 @@ void GLWidget::renderText( float x, float y, float scaleX, float scaleY, const Q
     // loop for each of the car and draw our billboard
     int textLength = text.length();
     for (int i = 0; i < textLength; ++i) {
-        qDebug() << "render text: " << text[i];
         // set the shader x position
         // we render a glyph by the width of the char
         FontChar f = m_characters[text[i].toLatin1()];
@@ -245,8 +222,6 @@ void GLWidget::renderText( float x, float y, float scaleX, float scaleY, const Q
         m_program_text->setUniformValue("xpos",  x);
         // bind the pre generated texture
         glBindTexture(GL_TEXTURE_2D, f.textureID);
-        qDebug() << "x: " << x << " f.textureID: " <<  f.textureID;
-
         m_program_text->setUniformValue("tex",  0);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         f.vao->release();
@@ -263,7 +238,7 @@ GLWidget::GLWidget(QWidget *parent)
        m_vbo_circle( QOpenGLBuffer::VertexBuffer )
 
 {
-
+   test();
 }
 
 GLWidget::~GLWidget()
@@ -285,41 +260,6 @@ GLWidget::~GLWidget()
     doneCurrent();
 }
 
-
-bool GLWidget::initShader(QOpenGLShaderProgram *program, const char *vshader, const char *gshader, const char *fshader)
-{
-    qDebug() << "Initializing shaders";
-
-    // Compile vertex shader
-    if (!program->addShaderFromSourceFile(QOpenGLShader::Vertex, vshader))
-    {
-        qDebug() << "Error in vertex shader:" << program->log();
-        return false;
-    }
-
-    // Compile geometry shader
-    if (!program->addShaderFromSourceFile(QOpenGLShader::Geometry, gshader))
-    {
-        qDebug() << "Error in Geometry shader:" << program->log();
-        return false;
-    }
-
-    // Compile fragment shader
-    if (!program->addShaderFromSourceFile(QOpenGLShader::Fragment, fshader))
-    {
-        qDebug() << "Error in fragment shader:" << program->log();
-        return false;
-    }
-
-    // Link shader pipeline
-    if (!program->link())
-    {
-        qDebug() << "Error in linking shader program:" << program->log();
-        return false;
-    }
-
-    return true;
-}
 
 void GLWidget::initializeGL()
 {
@@ -399,7 +339,6 @@ void GLWidget::paintGL()
     glDrawArrays(GL_POINTS, 0, 1);
     m_program_circle->release();
     m_vao_circle.release();
-
 }
 
 void GLWidget::resizeGL(int w, int h)
