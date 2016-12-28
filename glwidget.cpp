@@ -9,11 +9,10 @@ GLWidget::GLWidget(QWidget *parent)
        m_vbo_circle( QOpenGLBuffer::VertexBuffer ),
        m_vbo_mesh( QOpenGLBuffer::VertexBuffer )
 {
-    std::vector<QVector3D> out_vertices;
-    qDebug() << out_vertices.size();
+    qDebug() << vertices.size();
     QString path = "://data/mouse03.obj";
-    loadOBJ(path, out_vertices);
-    qDebug() << out_vertices.size();
+    loadOBJ(path, vertices);
+    qDebug() << vertices.size();
 }
 
 GLWidget::~GLWidget()
@@ -72,6 +71,20 @@ void GLWidget::initializeGL()
     m_vao_circle.release();
 
     /* end testing */
+
+    /* start initializing mesh */
+//    m_vbo_mesh.create();
+//    m_vbo_mesh.setUsagePattern( QOpenGLBuffer::StaticDraw);
+//    if ( !m_vbo_mesh.bind() ) {
+//        qDebug() << "Could not bind vertex buffer to the context.";
+//        return;
+//    }
+//    m_vbo_mesh.allocate(&vertices, vertices.size() * sizeof(QVector3D));
+
+//    // init shader
+
+//    m_vbo_mesh.release();
+
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
