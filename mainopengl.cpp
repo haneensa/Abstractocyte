@@ -328,11 +328,25 @@ bool MainOpenGL::loadOBJ(QString path, std::vector<QVector3D> & out_vertices)
     // temp containters
     std::vector< unsigned int > vertexIndices;
     std::vector< QVector3D > temp_vertices;
-
-    while (!file.atEnd() && k < 10) {
+    bool flag_prev = false;
+    while (!file.atEnd() /*&& k < 10*/) {
         QByteArray line = file.readLine();
         wordList = line.split(' ');
-        if (wordList[0]  == "v") {
+        if (wordList[0] == "o") {
+            qDebug() << wordList[1].data();
+            if (flag_prev) {
+                // indexing
+                // for each vertex of each triangle
+                for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
+                    unsigned int vertexIndex = vertexIndices[i];
+                    QVector3D vertex = temp_vertices[vertexIndex - 1];
+                    out_vertices.push_back(vertex);
+                }
+                break;
+            }
+             flag_prev = true;
+        }
+        else if (wordList[0]  == "v") {
             float x = atof(wordList[1].data());
             float y = atof(wordList[2].data());
             float z = atof(wordList[3].data());
@@ -350,14 +364,6 @@ bool MainOpenGL::loadOBJ(QString path, std::vector<QVector3D> & out_vertices)
     }
 
     file.close();
-
-    // indexing
-    // for each vertex of each triangle
-    for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
-        unsigned int vertexIndex = vertexIndices[i];
-        QVector3D vertex = temp_vertices[vertexIndex - 1];
-        out_vertices.push_back(vertex);
-    }
 
     qDebug() << "Done Func: loadVertices";
 
