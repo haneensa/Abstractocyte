@@ -8,8 +8,9 @@ GLWidget::GLWidget(QWidget *parent)
     :  QOpenGLWidget(parent),
        m_vbo_circle( QOpenGLBuffer::VertexBuffer )
 {
+    std::vector<QVector3D> out_vertices;
     QString path = "://data/mouse03.obj";
-    loadOBJ(path);
+    loadOBJ(path, out_vertices);
 }
 
 GLWidget::~GLWidget()

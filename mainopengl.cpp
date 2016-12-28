@@ -312,7 +312,7 @@ void MainOpenGL::renderText( float x, float y, float scaleX, float scaleY, const
     glEnable(GL_DEPTH_TEST);
 }
 
-bool MainOpenGL::loadOBJ(QString path/*, std::vector<QVector3D> & out_vertices*/)
+bool MainOpenGL::loadOBJ(QString path, std::vector<QVector3D> & out_vertices)
 {
     qDebug() << "Func: loadVertices";
     QFile file(path);
@@ -324,24 +324,42 @@ bool MainOpenGL::loadOBJ(QString path/*, std::vector<QVector3D> & out_vertices*/
     QTextStream in(&file);
     int k = 0;
     QList<QByteArray> wordList;
+
+    // temp containters
+    std::vector< unsigned int > vertexIndices;
+    std::vector< QVector3D > temp_vertices;
+
     while (!file.atEnd() && k < 10) {
         QByteArray line = file.readLine();
         wordList = line.split(' ');
-        k++;
         if (wordList[0]  == "v") {
-            qDebug() << wordList[0].data() << "," << wordList[1].data() << "," << wordList[2].data() << "," << wordList[3].data();
-        } else {
-            qDebug() << wordList[0].data();
-            continue;
+            float x = atof(wordList[1].data());
+            float y = atof(wordList[2].data());
+            float z = atof(wordList[3].data());
+            QVector3D vertex(x, y, z);
+            temp_vertices.push_back(vertex);
+        } else if (wordList[0]  == "f") {
+            k++;
+            unsigned int f1_index = atoi(wordList[1].data());
+            unsigned int f2_index = atoi(wordList[2].data());
+            unsigned int f3_index = atoi(wordList[3].data());
+            vertexIndices.push_back(f1_index);
+            vertexIndices.push_back(f2_index);
+            vertexIndices.push_back(f3_index);
         }
-
-        float x = atof(wordList[1].data());
-        float y = atof(wordList[2].data());
-        float z = atof(wordList[3].data());
-
-        qDebug() <<  wordList[0].data() << " " << x << " " << y << " " << z;
     }
 
     file.close();
+
+    // indexing
+    // for each vertex of each triangle
+    for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
+        unsigned int vertexIndex = vertexIndices[i];
+        QVector3D vertex = temp_vertices[vertexIndex - 1];
+        out_vertices.push_back(vertex);
+    }
+
+    qDebug() << "Done Func: loadVertices";
+
     return true;
 }
