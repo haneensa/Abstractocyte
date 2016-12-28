@@ -5,9 +5,8 @@
 #include <QResource>
 
 GLWidget::GLWidget(QWidget *parent)
-    :  QOpenGLWidget(parent),
-       m_vbo_circle( QOpenGLBuffer::VertexBuffer ),
-       m_vbo_mesh( QOpenGLBuffer::VertexBuffer )
+    :   QOpenGLWidget(parent),
+        m_vbo_mesh( QOpenGLBuffer::VertexBuffer )
 {
     qDebug() << vertices.size();
     QString path = "://data/mouse03.obj";
@@ -20,9 +19,9 @@ GLWidget::~GLWidget()
     qDebug() << "~GLWidget()";
 
     makeCurrent();
-    delete m_program_circle;
-    m_vao_circle.destroy();
-    m_vbo_circle.destroy();
+    delete m_program_mesh;
+    m_vao_mesh.destroy();
+    m_vbo_mesh.destroy();
     doneCurrent();
 }
 
@@ -37,54 +36,38 @@ void GLWidget::initializeGL()
     f.setPixelSize(50);
     initText(f);
 
-    /* testing */
+    /* start initializing mesh */
     m_projection.setToIdentity();
 
-    m_program_circle = new QOpenGLShaderProgram(this);
-    bool res = initShader(m_program_circle, ":/shaders/shader.vert", ":/shaders/shader.geom", ":/shaders/shader.frag");
+    m_program_mesh = new QOpenGLShaderProgram(this);
+    bool res = initShader(m_program_mesh, ":/shaders/mesh.vert", ":/shaders/mesh.geom", ":/shaders/mesh.frag");
     if(res == false)
         return;
 
     qDebug() << "Initializing curser VAO";
     // create vbos and vaos
-    m_vao_circle.create();
-    m_vao_circle.bind();
+    m_vao_mesh.create();
+    m_vao_mesh.bind();
 
-    m_vbo_circle.create();
-    m_vbo_circle.setUsagePattern( QOpenGLBuffer::StaticDraw);
-    if ( !m_vbo_circle.bind() ) {
+    m_vbo_mesh.create();
+    m_vbo_mesh.setUsagePattern( QOpenGLBuffer::StaticDraw);
+    if ( !m_vbo_mesh.bind() ) {
         qDebug() << "Could not bind vertex buffer to the context.";
         return;
     }
 
-    GLfloat points[] = { 0.5f, 0.5f };
+    // GLfloat points[] = { 0.5f, 0.5f };
+    // m_vbo_mesh.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
+    m_vbo_mesh.allocate(&vertices[0], vertices.size() * sizeof(QVector3D));
 
-    m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
+    m_program_mesh->bind();
+    m_program_mesh->setUniformValue("pMatrix", m_projection);
+    m_program_mesh->enableAttributeArray("posAttr");
+    m_program_mesh->setAttributeBuffer("posAttr", GL_FLOAT, 0, 3);
+    m_program_mesh->release();
 
-    m_program_circle->bind();
-    m_program_circle->setUniformValue("pMatrix", m_projection);
-    m_program_circle->enableAttributeArray("posAttr");
-    m_program_circle->setAttributeBuffer("posAttr", GL_FLOAT, 0, 2);
-    m_program_circle->release();
-
-    m_vbo_circle.release();
-    m_vao_circle.release();
-
-    /* end testing */
-
-    /* start initializing mesh */
-//    m_vbo_mesh.create();
-//    m_vbo_mesh.setUsagePattern( QOpenGLBuffer::StaticDraw);
-//    if ( !m_vbo_mesh.bind() ) {
-//        qDebug() << "Could not bind vertex buffer to the context.";
-//        return;
-//    }
-//    m_vbo_mesh.allocate(&vertices, vertices.size() * sizeof(QVector3D));
-
-//    // init shader
-
-//    m_vbo_mesh.release();
-
+    m_vbo_mesh.release();
+    m_vao_mesh.release();
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
@@ -108,12 +91,12 @@ void GLWidget::paintGL()
     float y = 0.0;
     renderText( x, y, scaleX, scaleY, text);
 
-    m_vao_circle.bind();
-    m_program_circle->bind();
-    m_program_circle->setUniformValue("pMatrix", m_projection);
-    glDrawArrays(GL_POINTS, 0, 1);
-    m_program_circle->release();
-    m_vao_circle.release();
+    m_vao_mesh.bind();
+    m_program_mesh->bind();
+    m_program_mesh->setUniformValue("pMatrix", m_projection);
+    glDrawArrays(GL_TRIANGLES, 0, vertices.size() );
+    m_program_mesh->release();
+    m_vao_mesh.release();
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -124,7 +107,7 @@ void GLWidget::resizeGL(int w, int h)
     h = (h == 0) ? 1 : h;
     glViewport(0, 0, w * retinaScale, h * retinaScale);
     m_projection.setToIdentity();
-    m_projection.ortho( 0.0f,  1.0f, 0.0f, 1.0f, -1.0, 1.0 );
+    m_projection.ortho( 0.0f,  1.0f, 0.0f, 1.0f, -10.0, 10.0 );
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)

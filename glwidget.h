@@ -33,12 +33,7 @@ protected:
     QOpenGLShaderProgram        *m_program_mesh;
     std::vector<QVector3D>      vertices;
 
-    /* testing */
     QMatrix4x4                  m_projection;
-
-    QOpenGLVertexArrayObject    m_vao_circle;
-    QOpenGLBuffer               m_vbo_circle;
-    QOpenGLShaderProgram        *m_program_circle;
 };
 
 

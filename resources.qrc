@@ -9,5 +9,8 @@
         <file>shaders/text.frag</file>
         <file>shaders/text.geom</file>
         <file>shaders/text.vert</file>
+        <file>shaders/mesh.frag</file>
+        <file>shaders/mesh.geom</file>
+        <file>shaders/mesh.vert</file>
     </qresource>
 </RCC>
