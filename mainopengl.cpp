@@ -329,6 +329,16 @@ bool MainOpenGL::loadOBJ(QString path, std::vector<QVector3D> & out_vertices)
     std::vector< unsigned int > vertexIndices;
     std::vector< QVector3D > temp_vertices;
     bool flag_prev = false;
+    float max_x, max_y, max_z;
+    max_x = INT_MIN;
+    max_y = INT_MIN;
+    max_z = INT_MIN;
+
+    float min_x, min_y, min_z;
+    min_x = INT_MAX;
+    min_y = INT_MAX;
+    min_z = INT_MAX;
+
     while (!file.atEnd() /*&& k < 10*/) {
         QByteArray line = file.readLine();
         wordList = line.split(' ');
@@ -351,6 +361,21 @@ bool MainOpenGL::loadOBJ(QString path, std::vector<QVector3D> & out_vertices)
             float y = atof(wordList[2].data());
             float z = atof(wordList[3].data());
             QVector3D vertex(x, y, z);
+
+            if (x < min_x)
+                min_x = x;
+            if (y < min_y)
+                min_y = y;
+            if (z < min_z)
+                min_z = z;
+
+            if (x > max_x)
+                max_x = x;
+            if (y > max_y)
+                max_y = y;
+            if (z > max_z)
+                max_z = z;
+
             temp_vertices.push_back(vertex);
         } else if (wordList[0]  == "f") {
             k++;
@@ -366,6 +391,8 @@ bool MainOpenGL::loadOBJ(QString path, std::vector<QVector3D> & out_vertices)
     file.close();
 
     qDebug() << "Done Func: loadVertices";
+    qDebug() << "MIN: " << min_x << " " << min_y << " " << min_z;
+    qDebug() << "MAX: " << max_x << " " << max_y << " " << max_z;
 
     return true;
 }

@@ -16,8 +16,15 @@ GLWidget::GLWidget(QWidget *parent)
     QString path = "://data/mouse03.obj";
     loadOBJ(path, vertices);
     qDebug() << vertices.size();
-    m_distance = 0.1;
+    m_distance = 0.2;
     m_rotation = QQuaternion();
+    //reset rotation
+    m_rotation.setScalar(1.0f);
+    m_rotation.setX(0.0f);
+    m_rotation.setY(0.0f);
+    m_rotation.setZ(0.0f);
+    //reset translation
+    m_translation = QVector3D(0.0, 0.0, 0.0);
 }
 
 GLWidget::~GLWidget()
@@ -45,6 +52,8 @@ void GLWidget::initializeGL()
 
     /* start initializing mesh */
     m_projection.setToIdentity();
+    m_projection.ortho(0.0,  1.0, 0.0f, 1.0f, -10.0, 10.0 );
+
     m_mMatrix.setToIdentity();
 
     // Scake
@@ -52,14 +61,13 @@ void GLWidget::initializeGL()
     m_mMatrix.scale(m_distance);
     m_mMatrix.translate(-1.0 * m_center);
 
+    // Translation
+    m_mMatrix.translate(m_translation);
+
     // Rotation
     m_mMatrix.translate(m_center);
     m_mMatrix.rotate(m_rotation);
     m_mMatrix.translate(-1.0 * m_center);
-
-     // Translation
-    m_mMatrix.translate(m_translation);
-
 
     m_program_mesh = new QOpenGLShaderProgram(this);
     bool res = initShader(m_program_mesh, ":/shaders/mesh.vert", ":/shaders/mesh.geom", ":/shaders/mesh.frag");
@@ -108,6 +116,8 @@ void GLWidget::paintGL()
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    const qreal retinaScale = devicePixelRatio();
+    glViewport(0, 0, width() * retinaScale, height() * retinaScale);
 
     const QString text = "Juxtastrocyte";
     float scaleX = 1.0/width();
@@ -115,8 +125,7 @@ void GLWidget::paintGL()
     float x = 0.0;
     float y = 0.0;
     renderText( x, y, scaleX, scaleY, text);
-
-
+    QVector3D temp_center = QVector3D(2.5, 2.5, 2.5);
     /* calculate model view transformation */
     // worl/model matrix: determines the position and orientation of an object in 3D space
     m_mMatrix.setToIdentity();
@@ -126,13 +135,13 @@ void GLWidget::paintGL()
     m_mMatrix.scale(m_distance);
     m_mMatrix.translate(-1.0 * m_center);
 
-    // Rotation
-    m_mMatrix.translate(m_center);
-    m_mMatrix.rotate(m_rotation);
-    m_mMatrix.translate(-1.0 * m_center);
-
-     // Translation
+    // Translation
     m_mMatrix.translate(m_translation);
+
+    // Rotation
+    m_mMatrix.translate(temp_center);
+    m_mMatrix.rotate(m_rotation);
+    m_mMatrix.translate(-1.0 * temp_center);
 
     m_vao_mesh.bind();
     m_program_mesh->bind();
@@ -151,7 +160,7 @@ void GLWidget::resizeGL(int w, int h)
     glViewport(0, 0, w * retinaScale, h * retinaScale);
 
     m_projection.setToIdentity();
-    m_projection.ortho( -1.0f,  1.0f, -1.0f, 1.0f, -100.0, 100.0 );
+    m_projection.ortho(0.0,  1.0, 0.0f, 1.0f, -10.0, 10.0 );
 
     // set up view
     // view matrix: transform a model's vertices from world space to view space, represents the camera
@@ -159,7 +168,7 @@ void GLWidget::resizeGL(int w, int h)
     m_cameraPosition = QVector3D(0.5, 0.5, 1.0);
     QVector3D  cameraUpDirection = QVector3D(0.0, 1.0, 0.0);
     m_vMatrix.setToIdentity();
-    m_vMatrix.lookAt(m_cameraPosition, m_center, cameraUpDirection);
+    m_vMatrix.lookAt(m_cameraPosition, QVector3D(0.5, 0.5, 0.5), cameraUpDirection);
 
     update();
 }
