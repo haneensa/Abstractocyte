@@ -11,9 +11,11 @@ in vec3 normal_out;
 //  - light is perpendicular to the triangle -> 0
 //  - light is behind the triangle -> 0
 
-vec3 light = vec3(1.0, 1.0, 0.0);
-float cosTheta = dot( normal_out, light );
+vec3 light = vec3(0.1, 0.8, -0.1);
+
+float cosTheta = clamp( dot( normal_out,light ), 0,1 );
+
 
 void main() {
-    outcol = vec4(posAttrG.r, 0.5, posAttrG.b, 1.0) * cosTheta;
+    outcol = vec4(posAttrG.r, posAttrG.g, posAttrG.b, 1.0) * cosTheta;
 }

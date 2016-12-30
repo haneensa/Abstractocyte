@@ -161,7 +161,7 @@ void GLWidget::resizeGL(int w, int h)
     glViewport(0, 0, w * retinaScale, h * retinaScale);
 
     m_projection.setToIdentity();
-    m_projection.ortho(-1.0,  1.0, -1.0f, 1.0f, -10.0, 10.0 );
+    m_projection.ortho(GLfloat(-w) / GLfloat(h),  GLfloat(w) / GLfloat(h), -1.0,  1.0f, -10.0, 10.0 );
 
     // set up view
     // view matrix: transform a model's vertices from world space to view space, represents the camera
