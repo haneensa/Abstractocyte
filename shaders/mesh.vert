@@ -1,9 +1,11 @@
 #version 150
 
 in vec4 posAttr;
-uniform mat4 pMatrix;
+out vec4 posAttrV;
+uniform mat4 mvpMatrix;
 
 void main(void)
 {
-    gl_Position =  pMatrix * vec4(posAttr.x, posAttr.y, posAttr.z, 1.0);
+    posAttrV = posAttr;
+    gl_Position =  mvpMatrix * vec4(posAttr.x, posAttr.y, posAttr.z, 1.0);
 }

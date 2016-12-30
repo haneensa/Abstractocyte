@@ -1,6 +1,10 @@
 // todo:    1- render 3d segmentation
 //          2- render the skeleton
 
+/*
+ * FinalMatrix = Projection * View * Model
+ * Model = RotationAroundOrigin * TranslationFromOrigin * RotationAroundObjectCenter
+ */
 #include "glwidget.h"
 #include <QResource>
 
@@ -12,6 +16,8 @@ GLWidget::GLWidget(QWidget *parent)
     QString path = "://data/mouse03.obj";
     loadOBJ(path, vertices);
     qDebug() << vertices.size();
+    m_distance = 0.1;
+    m_rotation = QQuaternion();
 }
 
 GLWidget::~GLWidget()
@@ -22,6 +28,7 @@ GLWidget::~GLWidget()
     delete m_program_mesh;
     m_vao_mesh.destroy();
     m_vbo_mesh.destroy();
+    vertices.clear();
     doneCurrent();
 }
 
@@ -38,6 +45,21 @@ void GLWidget::initializeGL()
 
     /* start initializing mesh */
     m_projection.setToIdentity();
+    m_mMatrix.setToIdentity();
+
+    // Scake
+    m_mMatrix.translate(m_center);
+    m_mMatrix.scale(m_distance);
+    m_mMatrix.translate(-1.0 * m_center);
+
+    // Rotation
+    m_mMatrix.translate(m_center);
+    m_mMatrix.rotate(m_rotation);
+    m_mMatrix.translate(-1.0 * m_center);
+
+     // Translation
+    m_mMatrix.translate(m_translation);
+
 
     m_program_mesh = new QOpenGLShaderProgram(this);
     bool res = initShader(m_program_mesh, ":/shaders/mesh.vert", ":/shaders/mesh.geom", ":/shaders/mesh.frag");
@@ -56,12 +78,10 @@ void GLWidget::initializeGL()
         return;
     }
 
-    // GLfloat points[] = { 0.5f, 0.5f };
-    // m_vbo_mesh.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
     m_vbo_mesh.allocate(&vertices[0], vertices.size() * sizeof(QVector3D));
 
     m_program_mesh->bind();
-    m_program_mesh->setUniformValue("pMatrix", m_projection);
+    m_program_mesh->setUniformValue("mvpMatrix",  m_projection * m_vMatrix *  m_mMatrix );
     m_program_mesh->enableAttributeArray("posAttr");
     m_program_mesh->setAttributeBuffer("posAttr", GL_FLOAT, 0, 3);
     m_program_mesh->release();
@@ -73,6 +93,11 @@ void GLWidget::initializeGL()
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+
+    // Enable lighting
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
@@ -91,9 +116,27 @@ void GLWidget::paintGL()
     float y = 0.0;
     renderText( x, y, scaleX, scaleY, text);
 
+
+    /* calculate model view transformation */
+    // worl/model matrix: determines the position and orientation of an object in 3D space
+    m_mMatrix.setToIdentity();
+
+    // Scale
+    m_mMatrix.translate(m_center);
+    m_mMatrix.scale(m_distance);
+    m_mMatrix.translate(-1.0 * m_center);
+
+    // Rotation
+    m_mMatrix.translate(m_center);
+    m_mMatrix.rotate(m_rotation);
+    m_mMatrix.translate(-1.0 * m_center);
+
+     // Translation
+    m_mMatrix.translate(m_translation);
+
     m_vao_mesh.bind();
     m_program_mesh->bind();
-    m_program_mesh->setUniformValue("pMatrix", m_projection);
+    m_program_mesh->setUniformValue("mvpMatrix",  m_projection * m_vMatrix *  m_mMatrix );
     glDrawArrays(GL_TRIANGLES, 0, vertices.size() );
     m_program_mesh->release();
     m_vao_mesh.release();
@@ -106,12 +149,49 @@ void GLWidget::resizeGL(int w, int h)
     const qreal retinaScale = devicePixelRatio();
     h = (h == 0) ? 1 : h;
     glViewport(0, 0, w * retinaScale, h * retinaScale);
+
     m_projection.setToIdentity();
-    m_projection.ortho( 0.0f,  1.0f, 0.0f, 1.0f, -10.0, 10.0 );
+    m_projection.ortho( -1.0f,  1.0f, -1.0f, 1.0f, -100.0, 100.0 );
+
+    // set up view
+    // view matrix: transform a model's vertices from world space to view space, represents the camera
+    m_center = QVector3D(0.5, 0.5, 0.5);
+    m_cameraPosition = QVector3D(0.5, 0.5, 1.0);
+    QVector3D  cameraUpDirection = QVector3D(0.0, 1.0, 0.0);
+    m_vMatrix.setToIdentity();
+    m_vMatrix.lookAt(m_cameraPosition, m_center, cameraUpDirection);
+
+    update();
 }
+
+void GLWidget::mousePressEvent(QMouseEvent *event)
+{
+    m_lastPos = event->pos();
+    setFocus();
+    event->accept();
+}
+
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
+    int deltaX = event->x() - m_lastPos.x();
+    int deltaY = event->y() - m_lastPos.y();
+
+    // Mouse release position - mouse press position
+    QVector2D diff = QVector2D(deltaX, deltaY);
+    // Rotation axis is perpendicular to the mouse position difference
+    QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
+    // Accelerate angular speed relative to the length of the mouse sweep
+    qreal acc = diff.length()/2.0;;
+
+    // Calculate new rotation axis as weighted sum
+    m_rotationAxis = (m_rotationAxis + n).normalized();
+    // angle in degrees and rotation axis
+    m_rotation = QQuaternion::fromAxisAndAngle(m_rotationAxis, acc) * m_rotation;
+
+    m_lastPos = event->pos();
+    event->accept();
+    update();
 }
 
 void GLWidget::getSliderX(int value)

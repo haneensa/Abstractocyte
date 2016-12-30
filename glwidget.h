@@ -24,6 +24,7 @@ protected:
     void resizeGL(int w, int h) Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
     void loadMesh();
 
@@ -33,7 +34,20 @@ protected:
     QOpenGLShaderProgram        *m_program_mesh;
     std::vector<QVector3D>      vertices;
 
+    /* matrices */
     QMatrix4x4                  m_projection;
+    QMatrix4x4                  m_mMatrix;
+    QMatrix4x4                  m_vMatrix;
+    QVector3D                   m_cameraPosition;
+    QVector3D                   m_center;
+
+    /* rotation */
+    QPoint m_lastPos;
+    double m_distance;
+
+    QQuaternion m_rotation;
+    QVector3D m_rotationAxis;
+    QVector3D m_translation;
 };
 
 
