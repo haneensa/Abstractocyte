@@ -285,7 +285,6 @@ void MainOpenGL::renderText( float x, float y, float scaleX, float scaleY, const
     m_program_text->setUniformValue("ypos",  y);
     m_program_text->setUniformValue("scaleX",  scaleX);
     m_program_text->setUniformValue("scaleY",  scaleY);
-    qDebug() << scaleX << " " << scaleY;
     // for fonts to renders correctly
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);

@@ -1,5 +1,7 @@
 // todo:    1- render 3d segmentation
 //          2- render the skeleton
+//          3- mesh normals
+
 
 /*
  * FinalMatrix = Projection * View * Model
@@ -52,22 +54,22 @@ void GLWidget::initializeGL()
 
     /* start initializing mesh */
     m_projection.setToIdentity();
-    m_projection.ortho(0.0,  1.0, 0.0f, 1.0f, -10.0, 10.0 );
+    m_projection.ortho(-1.0,  1.0, -1.0f, 1.0f, -10.0, 10.0 );
 
     m_mMatrix.setToIdentity();
 
     // Scake
-    m_mMatrix.translate(m_center);
+    m_mMatrix.translate(m_cameraPosition);
     m_mMatrix.scale(m_distance);
-    m_mMatrix.translate(-1.0 * m_center);
+    m_mMatrix.translate(-1.0 * m_cameraPosition);
 
     // Translation
     m_mMatrix.translate(m_translation);
 
     // Rotation
-    m_mMatrix.translate(m_center);
+    m_mMatrix.translate(m_cameraPosition);
     m_mMatrix.rotate(m_rotation);
-    m_mMatrix.translate(-1.0 * m_center);
+    m_mMatrix.translate(-1.0 * m_cameraPosition);
 
     m_program_mesh = new QOpenGLShaderProgram(this);
     bool res = initShader(m_program_mesh, ":/shaders/mesh.vert", ":/shaders/mesh.geom", ":/shaders/mesh.frag");
@@ -125,23 +127,22 @@ void GLWidget::paintGL()
     float x = 0.0;
     float y = 0.0;
     renderText( x, y, scaleX, scaleY, text);
-    QVector3D temp_center = QVector3D(2.5, 2.5, 2.5);
     /* calculate model view transformation */
     // worl/model matrix: determines the position and orientation of an object in 3D space
     m_mMatrix.setToIdentity();
 
     // Scale
-    m_mMatrix.translate(m_center);
+    m_mMatrix.translate(m_cameraPosition);
     m_mMatrix.scale(m_distance);
-    m_mMatrix.translate(-1.0 * m_center);
+    m_mMatrix.translate(-1.0 * m_cameraPosition);
 
     // Translation
     m_mMatrix.translate(m_translation);
 
     // Rotation
-    m_mMatrix.translate(temp_center);
+    m_mMatrix.translate(m_cameraPosition);
     m_mMatrix.rotate(m_rotation);
-    m_mMatrix.translate(-1.0 * temp_center);
+    m_mMatrix.translate(-1.0 * m_cameraPosition);
 
     m_vao_mesh.bind();
     m_program_mesh->bind();
@@ -160,15 +161,15 @@ void GLWidget::resizeGL(int w, int h)
     glViewport(0, 0, w * retinaScale, h * retinaScale);
 
     m_projection.setToIdentity();
-    m_projection.ortho(0.0,  1.0, 0.0f, 1.0f, -10.0, 10.0 );
+    m_projection.ortho(-1.0,  1.0, -1.0f, 1.0f, -10.0, 10.0 );
 
     // set up view
     // view matrix: transform a model's vertices from world space to view space, represents the camera
-    m_center = QVector3D(0.5, 0.5, 0.5);
-    m_cameraPosition = QVector3D(0.5, 0.5, 1.0);
+    m_center = QVector3D(0.0, 0.0, 0.0);
+    m_cameraPosition = QVector3D(2.5, 2.5, 2.5);
     QVector3D  cameraUpDirection = QVector3D(0.0, 1.0, 0.0);
     m_vMatrix.setToIdentity();
-    m_vMatrix.lookAt(m_cameraPosition, QVector3D(0.5, 0.5, 0.5), cameraUpDirection);
+    m_vMatrix.lookAt(m_cameraPosition, QVector3D(0.0, 0.0, 0.0), cameraUpDirection);
 
     update();
 }
