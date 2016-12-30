@@ -83,10 +83,6 @@ void MainOpenGL::initText( const QFont &_f  )
     if(res == false)
         return;
 
-    m_projection.setToIdentity();
-  /*  m_projection.ortho( 0.0f,  1.0f, 0.0f, 1.0f, -1.0, 1.0 ); */
-    m_program_text->setUniformValue("pMatrix", m_projection);
-
     QFontMetrics metric(_f);
     int fontHeight = metric.height();
 
@@ -138,18 +134,6 @@ void MainOpenGL::initText( const QFont &_f  )
         painter.setPen(Qt::black);
         painter.drawText(0, metric.ascent(), QString(c));
         painter.end();
-
-
-        /* debug
-        QString filename = ".png";
-        filename.prepend(c);
-        qDebug() << filename;
-
-        if (finalImage.save(filename))
-            qDebug() << filename;
-        else
-            qDebug() <<"ERROR: " << filename;
-        */
 
         // convert QImage to format suitable for opengl
         finalImage = finalImage.convertToFormat(QImage::Format_ARGB32_Premultiplied);
@@ -277,14 +261,17 @@ void MainOpenGL::initText( const QFont &_f  )
 
 void MainOpenGL::renderText( float x, float y, float scaleX, float scaleY, const QString &text  )
 {
-    // todo tomorrow!
-
     glActiveTexture(GL_TEXTURE0);
 
     m_program_text->bind();
     m_program_text->setUniformValue("ypos",  y);
     m_program_text->setUniformValue("scaleX",  scaleX);
     m_program_text->setUniformValue("scaleY",  scaleY);
+
+    m_projection.setToIdentity();
+    m_projection.ortho( -1.0f,  1.0f, -1.0f, 1.0f, -10.0, 10.0 );
+    m_program_text->setUniformValue("pMatrix", m_projection);
+
     // for fonts to renders correctly
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);

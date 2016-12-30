@@ -122,10 +122,11 @@ void GLWidget::paintGL()
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
 
     const QString text = "Juxtastrocyte";
-    float scaleX = 1.0/width();
-    float scaleY = 1.0/height();
-    float x = 0.0;
-    float y = 0.0;
+    // todo: separate scale factor from position
+    float scaleX = 0.5/width();
+    float scaleY = 0.5/height();
+    float x = 0.5 / scaleX;
+    float y = 0.5 / scaleY;
     renderText( x, y, scaleX, scaleY, text);
     /* calculate model view transformation */
     // worl/model matrix: determines the position and orientation of an object in 3D space
