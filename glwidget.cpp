@@ -104,10 +104,6 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    // Enable lighting
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
@@ -121,13 +117,14 @@ void GLWidget::paintGL()
     const qreal retinaScale = devicePixelRatio();
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
 
-    const QString text = "Juxtastrocyte";
-    // todo: separate scale factor from position
-    float scaleX = 0.5/width();
-    float scaleY = 0.5/height();
-    float x = 0.5 / scaleX;
-    float y = 0.5 / scaleY;
-    renderText( x, y, scaleX, scaleY, text);
+//    const QString text = "Juxtastrocyte";
+//    // todo: separate scale factor from position
+//    float scaleX = 0.5/width();
+//    float scaleY = 0.5/height();
+//    float x = 0.5 / scaleX;
+//    float y = 0.5 / scaleY;
+//    renderText( x, y, scaleX, scaleY, text);
+
     /* calculate model view transformation */
     // worl/model matrix: determines the position and orientation of an object in 3D space
     m_mMatrix.setToIdentity();
