@@ -3,14 +3,16 @@
 in vec4 posAttr;
 out vec4 posAttrV;
 
-// todo: separate the transformation
 // World transformation
+uniform mat4 mMatrix;
 // View Transformation
+uniform mat4 vMatrix;
 // Projection transformation
-uniform mat4 mvpMatrix;
+uniform mat4 pMatrix;
 
 void main(void)
 {
     posAttrV = posAttr;
-    gl_Position =  mvpMatrix * vec4(posAttr.xyz, 1.0);
+    mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
+    gl_Position =  pvmMatrix * vec4(posAttr.xyz, 1.0);
 }

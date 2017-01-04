@@ -39,7 +39,7 @@ void main() {
     else
         outcol = vec4(0.1, 0.1, 0.1, 1.0) * outcol;
 
-    //outcol = vec4(posAttrG.r, posAttrG.g, posAttrG.b, 1.0) * cosTheta  * diffuseColor * diffuseIntersity;
+    outcol = vec4(posAttrG.r, posAttrG.g, posAttrG.b, 1.0) * cosTheta  * diffuseColor * diffuseIntersity;
     //vec3 scatteredLight = vec3(Ambient); // this is the only light
     //vec3 rgb = min(posAttrG.rgb * scatteredLight * cosTheta, vec3(1.0));
     //outcol = vec4(rgb, posAttrG.a);

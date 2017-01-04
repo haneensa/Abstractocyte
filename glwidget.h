@@ -25,7 +25,10 @@ protected:
     void paintGL() Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
+    void setMVPAttrib(QOpenGLShaderProgram *program);
     void loadMesh();
 
     /* mesh */
@@ -42,12 +45,12 @@ protected:
     QVector3D                   m_center;
 
     /* rotation */
-    QPoint m_lastPos;
-    double m_distance;
-
-    QQuaternion m_rotation;
-    QVector3D m_rotationAxis;
-    QVector3D m_translation;
+    QPoint                      m_lastPos;
+    double                      m_distance;
+    bool                        m_isRotatable;
+    QQuaternion                 m_rotation;
+    QVector3D                   m_rotationAxis;
+    QVector3D                   m_translation;
 };
 
 
