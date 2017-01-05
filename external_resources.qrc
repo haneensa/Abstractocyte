@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>data/mouse03.obj</file>
+        <file>data/mouse03_clean.obj</file>
     </qresource>
 </RCC>

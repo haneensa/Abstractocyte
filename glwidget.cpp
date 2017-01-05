@@ -1,6 +1,6 @@
-// todo:    1- render 3d segmentation
+// todo:    1- render 3d segmentation (done)
 //          2- render the skeleton
-//          3- mesh normals
+//          3- mesh normals (to be fixed)
 
 
 /*
@@ -15,10 +15,10 @@ GLWidget::GLWidget(QWidget *parent)
         m_vbo_mesh( QOpenGLBuffer::VertexBuffer ),
         m_isRotatable(true)
 {
-    qDebug() << vertices.size();
-    QString path = "://data/mouse03.obj";
-    loadOBJ(path, vertices);
-    qDebug() << vertices.size();
+    qDebug() << m_objects.size();
+    QString path = "://data/mouse03_clean.obj";
+    loadOBJ(path, m_objects);
+    qDebug() << m_objects.size();
     m_distance = 0.2;
     m_rotation = QQuaternion();
     //reset rotation
@@ -38,7 +38,7 @@ GLWidget::~GLWidget()
     delete m_program_mesh;
     m_vao_mesh.destroy();
     m_vbo_mesh.destroy();
-    vertices.clear();
+    m_objects.clear();
     doneCurrent();
 }
 
@@ -94,6 +94,9 @@ void GLWidget::initializeGL()
         return;
     }
 
+    // todo: get the whole size of multiple meshes we want to render
+    std::vector<QVector3D> vertices = m_objects[0]->getVertices();
+    // loop over them ? or for each its own vbo?
     m_vbo_mesh.allocate(&vertices[0], vertices.size() * sizeof(QVector3D));
 
     m_program_mesh->bind();
@@ -116,8 +119,6 @@ void GLWidget::initializeGL()
 void GLWidget::paintGL()
 {
     // paint the text here
-    qDebug() << "draw";
-
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     const qreal retinaScale = devicePixelRatio();
@@ -134,6 +135,7 @@ void GLWidget::paintGL()
     m_vao_mesh.bind();
     m_program_mesh->bind();
     setMVPAttrib(m_program_mesh);
+    std::vector<QVector3D> vertices = m_objects[0]->getVertices();
     glDrawArrays(GL_TRIANGLES, 0, vertices.size() );
     m_program_mesh->release();
     m_vao_mesh.release();

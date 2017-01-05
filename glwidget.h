@@ -6,8 +6,6 @@
 
 #include "mainopengl.h"
 
-
-
 class GLWidget : public QOpenGLWidget, MainOpenGL
 {
     Q_OBJECT
@@ -35,7 +33,7 @@ protected:
     QOpenGLVertexArrayObject    m_vao_mesh;
     QOpenGLBuffer               m_vbo_mesh;
     QOpenGLShaderProgram        *m_program_mesh;
-    std::vector<QVector3D>      vertices;
+    std::vector<Object*>        m_objects;
 
     /* matrices */
     QMatrix4x4                  m_projection;

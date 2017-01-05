@@ -298,7 +298,9 @@ void MainOpenGL::renderText( float x, float y, float scaleX, float scaleY, const
     glEnable(GL_DEPTH_TEST);
 }
 
-bool MainOpenGL::loadOBJ(QString path, std::vector<QVector3D> & out_vertices)
+// change this to pass the objects vector (done)
+// todo: make this efficient by writing the input as binary file and loading items at once
+bool MainOpenGL::loadOBJ(QString path, std::vector<Object*> & objects)
 {
     qDebug() << "Func: loadVertices";
     QFile file(path);
@@ -308,7 +310,6 @@ bool MainOpenGL::loadOBJ(QString path, std::vector<QVector3D> & out_vertices)
     }
 
     QTextStream in(&file);
-    int k = 0;
     QList<QByteArray> wordList;
 
     // temp containters
@@ -325,20 +326,24 @@ bool MainOpenGL::loadOBJ(QString path, std::vector<QVector3D> & out_vertices)
     min_y = INT_MAX;
     min_z = INT_MAX;
 
-    while (!file.atEnd() /*&& k < 10*/) {
+    while (!file.atEnd()) {
         QByteArray line = file.readLine();
         wordList = line.split(' ');
         if (wordList[0] == "o") {
-            qDebug() << wordList[1].data();
+            std::string name = wordList[1].data();
+            Object *obj = new Object(name);
             if (flag_prev) {
                 // indexing
                 // for each vertex of each triangle
                 for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
                     unsigned int vertexIndex = vertexIndices[i];
                     QVector3D vertex = temp_vertices[vertexIndex - 1];
-                    out_vertices.push_back(vertex);
+                    obj->add_vertex(vertex);
                 }
-                break;
+                objects.push_back(obj);
+                if (objects.size() > 5) {
+                    break;
+                }
             }
              flag_prev = true;
         }
@@ -364,13 +369,14 @@ bool MainOpenGL::loadOBJ(QString path, std::vector<QVector3D> & out_vertices)
 
             temp_vertices.push_back(vertex);
         } else if (wordList[0]  == "f") {
-            k++;
             unsigned int f1_index = atoi(wordList[1].data());
             unsigned int f2_index = atoi(wordList[2].data());
             unsigned int f3_index = atoi(wordList[3].data());
             vertexIndices.push_back(f1_index);
             vertexIndices.push_back(f2_index);
             vertexIndices.push_back(f3_index);
+        } else if (wordList[0] == "vn") {
+            qDebug() << "To do compute the normals and read them from here";
         }
     }
 

@@ -7,8 +7,11 @@
 
 MousePad::MousePad(QWidget *parent)
     :  QOpenGLWidget(parent),
-       m_vbo_circle( QOpenGLBuffer::VertexBuffer )
+       m_vbo_circle( QOpenGLBuffer::VertexBuffer ),
+       m_slider_enabled(true)
 {
+    circle.x = 0.0;
+    circle.y = 0.0;
 }
 
 MousePad::~MousePad()
@@ -56,13 +59,12 @@ void MousePad::initializeGL()
     m_vao_circle.bind();
 
     m_vbo_circle.create();
-    m_vbo_circle.setUsagePattern( QOpenGLBuffer::StaticDraw);
+    m_vbo_circle.setUsagePattern( QOpenGLBuffer::DynamicDraw);
     if ( !m_vbo_circle.bind() ) {
         qDebug() << "Could not bind vertex buffer to the context.";
         return;
     }
 
-    struct point circle  = { 0.5f, 0.5f };
     GLfloat points[] = { circle.x, circle.y };
 
     m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
@@ -104,7 +106,6 @@ void MousePad::initializeGL()
 
 void MousePad::paintGL()
 {
-    qDebug() << "Draw!";
     glViewport( 0, 0, m_w, m_h);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -137,8 +138,7 @@ void MousePad::mouseMoveEvent(QMouseEvent *event)
 {
     qDebug() << "Func: mouseMoveEvent: " << event->pos().x() << " " << event->pos().y();
     // here update the mouse position as we move!
-    emit setSliderX(event->x());
-    emit setSliderY(100 - event->y());
+
 
     makeCurrent();
     const qreal retinaScale = devicePixelRatio();
@@ -151,7 +151,10 @@ void MousePad::mouseMoveEvent(QMouseEvent *event)
     doneCurrent();
     // calculate the offset from press to release, then update the point position
     // get the position were we pressed
-    processSelection(press_event.x, press_event.y, x, y);
+
+    emit setSliderX(event->x());
+    emit setSliderY(100 - event->y());
+    processSelection(x, y);
 }
 
 
@@ -159,10 +162,8 @@ void MousePad::mousePressEvent(QMouseEvent *event)
 {
     qDebug() << "Func: mousePressEvent: " << event->pos().x() << " " << event->pos().y();
     setFocus();
-
     event->accept();
 }
-
 
 void MousePad::mouseReleaseEvent(QMouseEvent *event)
 {
@@ -174,15 +175,32 @@ void MousePad::mouseReleaseEvent(QMouseEvent *event)
 
 void MousePad::setSlotsX(int value)
 {
-    emit setSignalX(value);
-    update();
+    // minimum = 0, maximum = 99
+    if (m_slider_enabled) {
+        emit setSignalX(value);
+        m_vbo_circle.bind();
+        circle.x = (float)value/100.0;
+        GLfloat points[] = { circle.x,  circle.y };
+        m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
+        m_vbo_circle.release();
+        update();
+    }
 }
 
 
 void MousePad::setSlotsY(int value)
 {
-    emit setSignalY(value);
-    update();
+    // minimum = 0, maximum = 99
+    if (m_slider_enabled) {
+        emit setSignalY(value);
+        m_vbo_circle.bind();
+        circle.y = (float)(value)/100.0;
+        GLfloat points[] = { circle.x,  circle.y };
+        m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
+        m_vbo_circle.release();
+        update();
+    }
+
 }
 
 void MousePad::renderSelection(void)
@@ -205,7 +223,7 @@ void MousePad::renderSelection(void)
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
-void MousePad::processSelection(int xx, int yy, float x, float y)
+void MousePad::processSelection(float x, float y)
 {
     makeCurrent();
     renderSelection();
@@ -214,36 +232,31 @@ void MousePad::processSelection(int xx, int yy, float x, float y)
     glFlush();
     glFinish();
 
-    GLint viewport[4]; //  return of glGetIntegerv() -> x, y, width, height of viewport
-    glGetIntegerv(GL_VIEWPORT, viewport);
-    qDebug() <<  viewport[0] <<  " " << viewport[1] <<  " " << viewport[2] << " " << viewport[3];
-
     // 4 bytes per pixel (RGBA), 1x1 bitmap
     // width * height * components (RGBA)
     unsigned char res[4];
-    qDebug() << "Pixel at: " << xx << " " << viewport[3] - yy;
+    qDebug() << "Pixel at: " << x << " " << y;
     glReadBuffer(GL_BACK);
-    glReadPixels(xx,  viewport[3] - yy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &res);
+    glReadPixels(x,  y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &res);
     int pickedID = res[0] + res[1] * 256 + res[2] * 256 * 256;
 
     qDebug() <<  res[0] <<  " " << res[1] <<  " " << res[2];
 
     if (pickedID == 0) {
         qDebug() << "Background, Picked ID: " << pickedID;
-    } else {
-        qDebug() << "Picked ID: " << pickedID;
-        // get the x, and y and update the circle position
-        if ( !m_vbo_circle.bind() ) {
-            qDebug() << "Could not bind vertex buffer to the context.";
-            return;
-        }
+    } else { 
+        GLint viewport[4];
+        glGetIntegerv(GL_VIEWPORT, viewport);
 
         circle.x = x/viewport[2];
         circle.y = y/viewport[3];
 
+        m_vbo_circle.bind();
         GLfloat points[] = { circle.x,  circle.y };
         m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
         m_vbo_circle.release();
+
+        qDebug() << "Picked ID: " << pickedID << "-> " << circle.x << " " << circle.y;
     }
 
     // update the circle vbo

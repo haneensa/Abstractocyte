@@ -12,10 +12,16 @@ in vec3 normal_out;
 //  - light is behind the triangle -> 0
 
 //-------------------- AMBIENT LIGHT PROPERTIES --------------------
-vec4 Ambient = vec4(1.0, 1.0, 1.0, 1.0); // sets lighting level, same across many vertices
+vec4 ambient = vec4(0.10, 0.10, 0.10, 1.0); // sets lighting level, same across many vertices
+/*
+Glfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+Glgloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
+Glfloat specularLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+Glfloat position[] = { -1.5f, 1.0f, -4.0f, 1.0f };
+*/
 
 //-------------------- DIFFUSE LIGHT PROPERTIES --------------------
-vec3 diffuseLightDirection = vec3(1.0, 1.0, -0.04);
+vec3 diffuseLightDirection = vec3(-1.5f, 1.0f, -0.5f);
 vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
 float diffuseIntersity = 1.0;
 
@@ -23,11 +29,13 @@ float diffuseIntersity = 1.0;
 // vec3 lineColor = vec4(0.0, 0.0,  0.0, 1.0); -> color to draw the lines in  (black)
 // float lineThickness = 0.03
 
-float cosTheta = clamp( dot( normal_out, diffuseLightDirection ), 0,1 );
+float cosTheta = clamp( dot( normal_out, diffuseLightDirection ), 0, 1 );
 float intensity = dot(diffuseLightDirection, normal_out);
 
 void main() {
-    outcol = vec4(posAttrG.r, posAttrG.g, posAttrG.b, 1.0) * diffuseColor * diffuseIntersity;
+    vec4 color = vec4(1.0, 0.0, 0.0, 1.0) * diffuseColor * diffuseIntersity + ambient;
+    //vec4 color = posAttrG;
+    outcol = vec4(color.r, color.g, color.b, 1.0);
     outcol.a = 1.0;
 
     if (intensity > 0.95)
@@ -39,10 +47,7 @@ void main() {
     else
         outcol = vec4(0.1, 0.1, 0.1, 1.0) * outcol;
 
-    outcol = vec4(posAttrG.r, posAttrG.g, posAttrG.b, 1.0) * cosTheta  * diffuseColor * diffuseIntersity;
-    //vec3 scatteredLight = vec3(Ambient); // this is the only light
-    //vec3 rgb = min(posAttrG.rgb * scatteredLight * cosTheta, vec3(1.0));
-    //outcol = vec4(rgb, posAttrG.a);
+    //outcol = vec4(color.r, color.g, color.b, 1.0) * cosTheta  * diffuseColor * diffuseIntersity + ambient;
 
     // todo: interpolate between two colors
 }

@@ -40,7 +40,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
     void renderSelection(void);
-    void processSelection(int xx, int yy, float dx, float dy);
+    void processSelection(float dx, float dy);
 
 private:
     QMatrix4x4                  m_projection;
@@ -53,9 +53,10 @@ private:
     QOpenGLShaderProgram        *m_program_selection;
 
     struct point                circle;
-    struct point                press_event;
     int                         m_w;
     int                         m_h;
+
+    bool                        m_slider_enabled;
 
 };
 

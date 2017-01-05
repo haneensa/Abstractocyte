@@ -19,12 +19,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     mousepad.cpp \
     glwidget.cpp \
-    mainopengl.cpp
+    mainopengl.cpp \
+    object.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
     glwidget.h \
-    mainopengl.h
+    mainopengl.h \
+    object.h
 
 FORMS    += mainwindow.ui
 
