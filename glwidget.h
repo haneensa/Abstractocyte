@@ -31,7 +31,6 @@ protected:
 
     /* mesh */
     QOpenGLVertexArrayObject    m_vao_mesh;
-    QOpenGLBuffer               m_vbo_mesh;
     QOpenGLShaderProgram        *m_program_mesh;
     std::vector<Object*>        m_objects;
 

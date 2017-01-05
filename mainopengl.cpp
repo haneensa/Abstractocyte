@@ -326,14 +326,15 @@ bool MainOpenGL::loadOBJ(QString path, std::vector<Object*> & objects)
     min_x = INT_MAX;
     min_y = INT_MAX;
     min_z = INT_MAX;
+    std::string name;
 
     while (!file.atEnd()) {
         QByteArray line = file.readLine();
         wordList = line.split(' ');
         if (wordList[0] == "o") {
-            std::string name = wordList[1].data();
-            Object *obj = new Object(name);
+
             if (flag_prev) {
+                Object *obj = new Object(name);
                 // indexing
                 // for each vertex of each triangle
                 for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
@@ -341,12 +342,16 @@ bool MainOpenGL::loadOBJ(QString path, std::vector<Object*> & objects)
                     QVector3D vertex = temp_vertices[vertexIndex - 1];
                     obj->add_vertex(vertex);
                 }
+
                 objects.push_back(obj);
                 if (objects.size() > 5) {
                     break;
                 }
             }
-             flag_prev = true;
+            name  = wordList[1].data();
+            vertexIndices.clear();
+            temp_vertices.clear();
+            flag_prev = true;
         }
         else if (wordList[0]  == "v") {
             float x = atof(wordList[1].data());
