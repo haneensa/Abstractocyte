@@ -15,7 +15,7 @@ GLWidget::GLWidget(QWidget *parent)
         m_isRotatable(true)
 {
     qDebug() << m_objects.size();
-    QString path = "://data/mouse03_clean.obj";
+    QString path = "://data/mouse03_clean_faces.obj";
     loadOBJ(path, m_objects);
     qDebug() << m_objects.size();
 
@@ -95,13 +95,13 @@ void GLWidget::initializeGL()
     m_program_mesh->release();
 
 
-    //for (std::size_t i = 0; i != m_objects.size(); i++) {
-        qDebug() << "allocating: " << m_objects[2]->getName().data();
-        if (m_objects[2]->allocate_vbo(m_program_mesh) == false) {
+    for (std::size_t i = 0; i != 3; i++) {
+        qDebug() << "allocating: " << m_objects[i]->getName().data();
+        if (m_objects[i]->allocate_vbo(m_program_mesh) == false) {
             qDebug() << "ERROR!";
             return;
         }
-   // }
+   }
 
 
     m_vao_mesh.release();
@@ -134,10 +134,10 @@ void GLWidget::paintGL()
     m_program_mesh->bind();
     setMVPAttrib(m_program_mesh);
 
- //   for (std::size_t i = 0; i != m_objects.size(); i++) {
-        qDebug() << "drawing " << m_objects[2]->getName().data() << " " << m_objects[2]->getSize();
-        m_objects[2]->draw();
-    //}
+    for (std::size_t i = 0; i != 3; i++) {
+        qDebug() << "drawing " << m_objects[i]->getName().data() << " " << m_objects[i]->getSize();
+        m_objects[i]->draw();
+    }
 
     m_program_mesh->release();
     m_vao_mesh.release();

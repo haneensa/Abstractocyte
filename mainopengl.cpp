@@ -328,20 +328,24 @@ bool MainOpenGL::loadOBJ(QString path, std::vector<Object*> & objects)
     min_z = INT_MAX;
     std::string name;
 
+    // load all vertices once -> should be fast
+    // for each object "o", go through its faces, and substitute using vertices loaded at the start
     while (!file.atEnd()) {
         QByteArray line = file.readLine();
         wordList = line.split(' ');
         if (wordList[0] == "o") {
-
             if (flag_prev) {
                 Object *obj = new Object(name);
                 // indexing
                 // for each vertex of each triangle
+                qDebug() << "vertexIndices: " << vertexIndices.size();
+                qDebug() << "temp_vertices: " << temp_vertices.size();
                 for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
                     unsigned int vertexIndex = vertexIndices[i];
                     QVector3D vertex = temp_vertices[vertexIndex - 1];
                     obj->add_vertex(vertex);
                 }
+                qDebug() << "done vertexIndices: " << vertexIndices.size();
 
                 objects.push_back(obj);
                 if (objects.size() > 5) {
