@@ -301,17 +301,20 @@ void MainOpenGL::renderText( float x, float y, float scaleX, float scaleY, const
 // change this to pass the objects vector (done)
 // todo: make this efficient by writing the input as binary file and loading items at once
 // todo: get the ID from hvgx and add it to the obj objects names -> used later to map skeleton to objects
-bool MainOpenGL::loadOBJ(QString path, std::vector<Object*> & objects)
+unsigned int MainOpenGL::loadOBJ(QString path, std::vector<Object*> & objects)
 {
     qDebug() << "Func: loadVertices";
+    unsigned int vertices_count = 0;
+
     QFile file(path);
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
         qDebug() << "Could not open the file for reading";
-        return false;
+        return vertices_count;
     }
 
     QTextStream in(&file);
     QList<QByteArray> wordList;
+
 
     // temp containters
     std::vector< unsigned int > vertexIndices;
@@ -340,13 +343,16 @@ bool MainOpenGL::loadOBJ(QString path, std::vector<Object*> & objects)
                 // for each vertex of each triangle
                 qDebug() << "vertexIndices: " << vertexIndices.size();
                 qDebug() << "temp_vertices: " << temp_vertices.size();
+                vertices_count += vertexIndices.size();
+
                 for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
                     unsigned int vertexIndex = vertexIndices[i];
                     QVector3D vertex = temp_vertices[vertexIndex - 1];
                     obj->add_vertex(vertex);
                 }
                 qDebug() << "done vertexIndices: " << vertexIndices.size();
-
+                QVector4D color = QVector4D(1.0, 0.0, 1.0, 1.0) ;
+                obj->setColor(color);
                 objects.push_back(obj);
                 if (objects.size() > 5) {
                     break;
@@ -396,5 +402,5 @@ bool MainOpenGL::loadOBJ(QString path, std::vector<Object*> & objects)
     qDebug() << "MIN: " << min_x << " " << min_y << " " << min_z;
     qDebug() << "MAX: " << max_x << " " << max_y << " " << max_z;
 
-    return true;
+    return vertices_count;
 }

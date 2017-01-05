@@ -38,7 +38,7 @@ public:
     unsigned int nearestPowerOfTwo ( unsigned int _num );
     void initText( const QFont &_f  );
     void renderText( float x, float y, float scaleX, float scaleY, const QString &text );
-    bool loadOBJ(QString path, std::vector<Object*> & objects);
+    unsigned int loadOBJ(QString path, std::vector<Object*> & objects);
 
 public:
     struct FontChar {

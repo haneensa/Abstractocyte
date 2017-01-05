@@ -1,5 +1,6 @@
 #version 150
 
+uniform vec4 color;
 out vec4  outcol;
 in vec4 posAttrG;
 
@@ -21,7 +22,7 @@ Glfloat position[] = { -1.5f, 1.0f, -4.0f, 1.0f };
 */
 
 //-------------------- DIFFUSE LIGHT PROPERTIES --------------------
-vec3 diffuseLightDirection = vec3(-1.5f, 1.0f, -0.5f);
+vec3 diffuseLightDirection = vec3(-1.5f, 1.0f, -0.4f);
 vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
 float diffuseIntersity = 1.0;
 
@@ -33,8 +34,8 @@ float cosTheta = clamp( dot( normal_out, diffuseLightDirection ), 0, 1 );
 float intensity = dot(diffuseLightDirection, normal_out);
 
 void main() {
-    vec4 color = vec4(1.0, 0.0, 0.0, 1.0) * diffuseColor * diffuseIntersity + ambient;
-    //vec4 color = posAttrG;
+    //vec4 color = vec4(1.0, 0.0, 0.0, 1.0) * diffuseColor * diffuseIntersity + ambient;
+    //vec4 color_temp = posAttrG;
     outcol = vec4(color.r, color.g, color.b, 1.0);
     outcol.a = 1.0;
 
@@ -47,7 +48,7 @@ void main() {
     else
         outcol = vec4(0.1, 0.1, 0.1, 1.0) * outcol;
 
-    //outcol = vec4(color.r, color.g, color.b, 1.0) * cosTheta  * diffuseColor * diffuseIntersity + ambient;
+    outcol = vec4(color.r, color.g, color.b, 1.0) * cosTheta + ambient;
 
     // todo: interpolate between two colors
 }

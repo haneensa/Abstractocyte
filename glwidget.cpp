@@ -12,11 +12,12 @@
 
 GLWidget::GLWidget(QWidget *parent)
     :   QOpenGLWidget(parent),
+        m_vbo( QOpenGLBuffer::VertexBuffer ),
         m_isRotatable(true)
 {
     qDebug() << m_objects.size();
     QString path = "://data/mouse03_clean_faces.obj";
-    loadOBJ(path, m_objects);
+    m_vertices_size = loadOBJ(path, m_objects);
     qDebug() << m_objects.size();
 
     for (std::size_t i = 0; i != m_objects.size(); i++) {
@@ -40,6 +41,7 @@ GLWidget::~GLWidget()
     makeCurrent();
     delete m_program_mesh;
     m_vao_mesh.destroy();
+    m_vbo.destroy();
     m_objects.clear();
     doneCurrent();
 }
@@ -94,16 +96,30 @@ void GLWidget::initializeGL()
     setMVPAttrib(m_program_mesh);
     m_program_mesh->release();
 
+    m_vbo.create();
+    m_vbo.setUsagePattern( QOpenGLBuffer::StaticDraw);
+    if ( !m_vbo.bind() ) {
+        qDebug() << "Could not bind vertex buffer to the context.";
+    }
 
-    for (std::size_t i = 0; i != 3; i++) {
+    m_vbo.allocate(NULL, m_vertices_size * sizeof(QVector3D));
+    m_program_mesh->bind();
+
+    int offset = 0;
+    for (std::size_t i = 1; i != m_objects.size(); i++) {
         qDebug() << "allocating: " << m_objects[i]->getName().data();
-        if (m_objects[i]->allocate_vbo(m_program_mesh) == false) {
-            qDebug() << "ERROR!";
-            return;
-        }
+        m_vbo.write(offset, &m_objects[i]->getVertices()[0], m_objects[i]->getSize() * sizeof(QVector3D));
+        offset += (m_objects[i]->getSize() * sizeof(QVector3D));
+        // should not be uniform!
+        m_program_mesh->setUniformValue("color",  m_objects[i]->getColor() );
    }
 
+    m_program_mesh->enableAttributeArray("posAttr");
+    m_program_mesh->setAttributeBuffer("posAttr", GL_FLOAT, 0, 3);
 
+    m_program_mesh->release();
+
+    m_vbo.release();
     m_vao_mesh.release();
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -134,10 +150,8 @@ void GLWidget::paintGL()
     m_program_mesh->bind();
     setMVPAttrib(m_program_mesh);
 
-    for (std::size_t i = 0; i != 3; i++) {
-        qDebug() << "drawing " << m_objects[i]->getName().data() << " " << m_objects[i]->getSize();
-        m_objects[i]->draw();
-    }
+    glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
+
 
     m_program_mesh->release();
     m_vao_mesh.release();
