@@ -11,6 +11,7 @@ public:
     Object(std::string name);
     void add_vertex(QVector3D vertex);
     std::vector<QVector3D> getVertices();
+    Object_t getObjectType(std::string name);
 
 private:
     Object_t                m_object_t;     /* object type */
