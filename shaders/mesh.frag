@@ -48,7 +48,7 @@ void main() {
     vec4 color = vec4(1.0, 0.0, 0.0, 1.0) * diffuseColor * diffuseIntersity + ambient;
     //vec4 color = posAttrG;
     vec4 toon_color = vec4(color.r, color.g, color.b, 1.0);
-    vec4 phong_color = vec4(color.r, color.g, color.b, 1.0) * cosTheta + ambient;
+    vec4 phong_color = vec4(color.r, color.g, color.b, 1.0) * cosTheta;
 
     if (intensity > 0.95)
         toon_color = vec4(1.0, 1.0, 1.0, 1.0) * toon_color;
