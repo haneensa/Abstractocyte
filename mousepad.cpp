@@ -127,14 +127,20 @@ void MousePad::resizeGL(int w, int h)
     m_w = w * retinaScale;
     h = (h == 0) ? 1 : h;
 
-    //int side = qMin(w, h);
-    //glViewport((w - side) / 2, (h - side) / 2, side, side);
-
     glViewport(0, 0, w * retinaScale, h * retinaScale);
     m_projection.setToIdentity();
     m_projection.ortho( 0.0f,  1.0f, 0.0f, 1.0f, -1.0, 1.0 );
 
     update();
+}
+
+QSize MousePad::minimumSizeHint() const
+{
+    return QSize(200, 200);
+}
+QSize MousePad::sizeHint() const
+{
+    return QSize(400, 400);
 }
 
 void MousePad::mouseMoveEvent(QMouseEvent *event)
@@ -154,9 +160,6 @@ void MousePad::mouseMoveEvent(QMouseEvent *event)
     doneCurrent();
     // calculate the offset from press to release, then update the point position
     // get the position were we pressed
-
-    emit setSliderX(event->x());
-    emit setSliderY(100 - event->y());
     processSelection(x, y);
 }
 
@@ -254,6 +257,9 @@ void MousePad::processSelection(float x, float y)
         GLfloat points[] = { circle.x,  circle.y };
         m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
         m_vbo_circle.release();
+
+        emit setSliderX(circle.x * 100);
+        emit setSliderY(circle.y * 100);
 
         qDebug() << "Picked ID: " << pickedID << "-> " << circle.x << " " << circle.y;
     }
