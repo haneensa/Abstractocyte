@@ -51,6 +51,11 @@ protected:
     QQuaternion                 m_rotation;
     QVector3D                   m_rotationAxis;
     QVector3D                   m_translation;
+
+    /* mouse pad */
+    int                         m_yaxis;
+    int                         m_xaxis;
+    int                         m_state; // determine the attributes to interpolate between
 };
 
 

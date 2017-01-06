@@ -13,7 +13,10 @@
 GLWidget::GLWidget(QWidget *parent)
     :   QOpenGLWidget(parent),
         m_vbo( QOpenGLBuffer::VertexBuffer ),
-        m_isRotatable(true)
+        m_isRotatable(true),
+        m_yaxis(0),
+        m_xaxis(0),
+        m_state(0)
 {
     qDebug() << m_objects.size();
     QString path = "://data/mouse03_clean_faces.obj";
@@ -102,20 +105,26 @@ void GLWidget::initializeGL()
         qDebug() << "Could not bind vertex buffer to the context.";
     }
 
-    m_vbo.allocate(NULL, m_vertices_size * sizeof(QVector3D));
-    m_program_mesh->bind();
+    m_vbo.allocate(NULL, /*m_vertices_size*/  m_objects[0]->getSize() * sizeof(QVector3D));
+
 
     int offset = 0;
-    for (std::size_t i = 1; i != m_objects.size(); i++) {
+    for (std::size_t i = 0; i != 1; i++) {
         qDebug() << "allocating: " << m_objects[i]->getName().data();
         m_vbo.write(offset, &m_objects[i]->getVertices()[0], m_objects[i]->getSize() * sizeof(QVector3D));
         offset += (m_objects[i]->getSize() * sizeof(QVector3D));
         // should not be uniform!
-        m_program_mesh->setUniformValue("color",  m_objects[i]->getColor() );
+        // have an ID for each cell type, and determine the color in the fragment based on ID
+        // int per vertex
    }
 
+    m_program_mesh->bind();
     m_program_mesh->enableAttributeArray("posAttr");
     m_program_mesh->setAttributeBuffer("posAttr", GL_FLOAT, 0, 3);
+
+    m_program_mesh->setUniformValue("y_axis", m_yaxis);
+    m_program_mesh->setUniformValue("x_axis", m_xaxis);
+    m_program_mesh->setUniformValue("state", m_state);
 
     m_program_mesh->release();
 
@@ -150,8 +159,11 @@ void GLWidget::paintGL()
     m_program_mesh->bind();
     setMVPAttrib(m_program_mesh);
 
-    glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
+    m_program_mesh->setUniformValue("y_axis", m_yaxis);
+    m_program_mesh->setUniformValue("x_axis", m_xaxis);
+    m_program_mesh->setUniformValue("state", m_state);
 
+    glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
 
     m_program_mesh->release();
     m_vao_mesh.release();
@@ -250,10 +262,12 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 
 void GLWidget::getSliderX(int value)
 {
-    qDebug() << value;
+    m_xaxis = value;
+    update();
 }
 
 void GLWidget::getSliderY(int value)
 {
-    qDebug() << value;
+    m_yaxis = value;
+    update();
 }

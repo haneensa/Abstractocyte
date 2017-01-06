@@ -7,8 +7,7 @@
 
 MousePad::MousePad(QWidget *parent)
     :  QOpenGLWidget(parent),
-       m_vbo_circle( QOpenGLBuffer::VertexBuffer ),
-       m_slider_enabled(true)
+       m_vbo_circle( QOpenGLBuffer::VertexBuffer )
 {
     circle.x = 0.0;
     circle.y = 0.0;
@@ -127,6 +126,10 @@ void MousePad::resizeGL(int w, int h)
     m_h = h * retinaScale;
     m_w = w * retinaScale;
     h = (h == 0) ? 1 : h;
+
+    //int side = qMin(w, h);
+    //glViewport((w - side) / 2, (h - side) / 2, side, side);
+
     glViewport(0, 0, w * retinaScale, h * retinaScale);
     m_projection.setToIdentity();
     m_projection.ortho( 0.0f,  1.0f, 0.0f, 1.0f, -1.0, 1.0 );
@@ -176,31 +179,27 @@ void MousePad::mouseReleaseEvent(QMouseEvent *event)
 void MousePad::setSlotsX(int value)
 {
     // minimum = 0, maximum = 99
-    if (m_slider_enabled) {
-        emit setSignalX(value);
-        m_vbo_circle.bind();
-        circle.x = (float)value/100.0;
-        GLfloat points[] = { circle.x,  circle.y };
-        m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
-        m_vbo_circle.release();
-        update();
-    }
+    emit setSignalX(value);
+    m_vbo_circle.bind();
+    circle.x = (float)value/100.0;
+    GLfloat points[] = { circle.x,  circle.y };
+    m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
+    m_vbo_circle.release();
+    update();
+
 }
 
 
 void MousePad::setSlotsY(int value)
 {
     // minimum = 0, maximum = 99
-    if (m_slider_enabled) {
-        emit setSignalY(value);
-        m_vbo_circle.bind();
-        circle.y = (float)(value)/100.0;
-        GLfloat points[] = { circle.x,  circle.y };
-        m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
-        m_vbo_circle.release();
-        update();
-    }
-
+    emit setSignalY(value);
+    m_vbo_circle.bind();
+    circle.y = (float)(value)/100.0;
+    GLfloat points[] = { circle.x,  circle.y };
+    m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
+    m_vbo_circle.release();
+    update();
 }
 
 void MousePad::renderSelection(void)

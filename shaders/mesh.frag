@@ -1,11 +1,11 @@
 #version 150
+out vec4        outcol;
+in vec4         posAttrG;
+in vec3         normal_out;
 
-uniform vec4 color;
-out vec4  outcol;
-in vec4 posAttrG;
-
-in vec3 normal_out;
-
+uniform int     y_axis;
+uniform int     x_axis;
+uniform int     state;
 // Cosine of the angle between the normal and the light direction,
 // clamped above 0
 //  - light is at the vertical of the triangle -> 1
@@ -14,12 +14,6 @@ in vec3 normal_out;
 
 //-------------------- AMBIENT LIGHT PROPERTIES --------------------
 vec4 ambient = vec4(0.10, 0.10, 0.10, 1.0); // sets lighting level, same across many vertices
-/*
-Glfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-Glgloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
-Glfloat specularLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
-Glfloat position[] = { -1.5f, 1.0f, -4.0f, 1.0f };
-*/
 
 //-------------------- DIFFUSE LIGHT PROPERTIES --------------------
 vec3 diffuseLightDirection = vec3(-1.5f, 1.0f, -0.4f);
@@ -33,22 +27,42 @@ float diffuseIntersity = 1.0;
 float cosTheta = clamp( dot( normal_out, diffuseLightDirection ), 0, 1 );
 float intensity = dot(diffuseLightDirection, normal_out);
 
+float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
+{
+    // if value < leftMin -> value = leftMin
+    value = max(value, leftMin);
+    // if value > leftMax -> value = leftMax
+    value = min(value, leftMax);
+    // Figure out how 'wide' each range is
+    float leftSpan = leftMax - leftMin;
+    float rightSpan = rightMax - rightMin;
+
+    // Convert the left range into a 0-1 range (float)
+    float valueScaled = float(value - leftMin) / float(leftSpan);
+
+    // Convert the 0-1 range into a value in the right range.
+    return rightMin + (valueScaled * rightSpan);
+}
+
 void main() {
-    //vec4 color = vec4(1.0, 0.0, 0.0, 1.0) * diffuseColor * diffuseIntersity + ambient;
-    //vec4 color_temp = posAttrG;
-    outcol = vec4(color.r, color.g, color.b, 1.0);
-    outcol.a = 1.0;
+    vec4 color = vec4(1.0, 0.0, 0.0, 1.0) * diffuseColor * diffuseIntersity + ambient;
+    //vec4 color = posAttrG;
+    vec4 toon_color = vec4(color.r, color.g, color.b, 1.0);
+    vec4 phong_color = vec4(color.r, color.g, color.b, 1.0) * cosTheta + ambient;
 
     if (intensity > 0.95)
-        outcol = vec4(1.0, 1.0, 1.0, 1.0) * outcol;
+        toon_color = vec4(1.0, 1.0, 1.0, 1.0) * toon_color;
     else if (intensity > 0.5)
-        outcol = vec4(0.7, 0.7, 0.7, 1.0) * outcol;
+        toon_color = vec4(0.7, 0.7, 0.7, 1.0) * toon_color;
     else if (intensity > 0.05)
-        outcol = vec4(0.35, 0.35, 0.35, 1.0) * outcol;
+        toon_color = vec4(0.35, 0.35, 0.35, 1.0) * toon_color;
     else
-        outcol = vec4(0.1, 0.1, 0.1, 1.0) * outcol;
+        toon_color = vec4(0.1, 0.1, 0.1, 1.0) * toon_color;
 
-    outcol = vec4(color.r, color.g, color.b, 1.0) * cosTheta + ambient;
+    // interpolate between two colors
+    // todo: based on the mesh type (astro, neurite)
+    // y_axis astrocyte, else if neurite use (x_axis)
+    float val = translate(y_axis, 0, 20, 0.0, 1.0);
+    outcol = toon_color * val +   (1.0 - val) * phong_color;
 
-    // todo: interpolate between two colors
 }

@@ -55,9 +55,6 @@ private:
     struct point                circle;
     int                         m_w;
     int                         m_h;
-
-    bool                        m_slider_enabled;
-
 };
 
 #endif // MOUSEPAD_H

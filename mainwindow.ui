@@ -120,8 +120,11 @@
     <signal>mouseMoveEvent(QMouseEvent*)</signal>
     <signal>setSliderX(int)</signal>
     <signal>setSliderY(int)</signal>
+    <signal>setSignalY(int)</signal>
+    <signal>setSignalX(int)</signal>
     <slot>setSlotsX(int)</slot>
     <slot>setSlotsY(int)</slot>
+    <slot>slot1()</slot>
    </slots>
   </customwidget>
   <customwidget>
@@ -197,6 +200,38 @@
     <hint type="destinationlabel">
      <x>89</x>
      <y>200</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget_2</sender>
+   <signal>setSignalX(int)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getSliderX(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>177</x>
+     <y>66</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>246</x>
+     <y>67</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget_2</sender>
+   <signal>setSignalY(int)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getSliderY(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>179</x>
+     <y>124</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>235</x>
+     <y>124</y>
     </hint>
    </hints>
   </connection>
