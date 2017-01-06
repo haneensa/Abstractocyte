@@ -301,6 +301,7 @@ void MainOpenGL::renderText( float x, float y, float scaleX, float scaleY, const
 // change this to pass the objects vector (done)
 // todo: make this efficient by writing the input as binary file and loading items at once
 // todo: get the ID from hvgx and add it to the obj objects names -> used later to map skeleton to objects
+// todo: combine skeleton and mesh information in one obj file
 unsigned int MainOpenGL::loadOBJ(QString path, std::vector<Object*> & objects)
 {
     qDebug() << "Func: loadVertices";

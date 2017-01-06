@@ -30,6 +30,9 @@ private:
     std::vector<QVector3D>  m_vertices;
     QVector4D               m_color;
     // either one per mesh or one for the whole object
+
+    // store skeleton nodes and edges here. graph? skeleton?
+    // one graph for all skeletons?
 };
 
 #endif // OBJECT_H

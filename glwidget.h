@@ -5,6 +5,7 @@
 #include <QWidget>
 
 #include "mainopengl.h"
+#include "graph.h"
 
 class GLWidget : public QOpenGLWidget, MainOpenGL
 {

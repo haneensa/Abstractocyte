@@ -4,6 +4,8 @@
 #include "node.h"
 #include "edge.h"
 
+// store graph per object?
+
 class Graph
 {
 public:
