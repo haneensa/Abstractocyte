@@ -2,8 +2,8 @@
 in vec4 posAttrV[];
 out vec4 posAttrG;
 
-out vec3 normal_out;
-
+//out vec3 normal_out;
+/*
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
@@ -20,6 +20,19 @@ void main() {
     EmitVertex();
   }
   EndPrimitive();
+}*/
+
+
+layout (points) in;
+layout (points, max_vertices = 1) out;
+
+
+void main() {
+gl_Position = gl_in[0].gl_Position;
+gl_PointSize = 20;
+EmitVertex();
+EndPrimitive();
 }
+
 
 

@@ -20,12 +20,17 @@ GLWidget::GLWidget(QWidget *parent)
 {
     qDebug() << m_objects.size();
     QString path = "://data/mouse03_clean_faces.obj";
-    m_vertices_size = loadOBJ(path, m_objects);
+    //m_vertices_size = loadOBJ(path, m_objects);
+
+    path = "://data/m3_points.csv";
+    m_vertices_size = loadSkeletonPoints(path, m_objects);
     qDebug() << m_objects.size();
+
 
     for (std::size_t i = 0; i != m_objects.size(); i++) {
         qDebug() << m_objects[i]->getName().data();
     }
+
     m_distance = 0.2;
     m_rotation = QQuaternion();
     //reset rotation
@@ -85,7 +90,9 @@ void GLWidget::initializeGL()
 
     /* start initializing mesh */
     m_program_mesh = new QOpenGLShaderProgram(this);
-    bool res = initShader(m_program_mesh, ":/shaders/mesh.vert", ":/shaders/mesh.geom", ":/shaders/mesh.frag");
+//    bool res = initShader(m_program_mesh, ":/shaders/mesh.vert", ":/shaders/mesh.geom", ":/shaders/mesh.frag");
+    bool res = initShader(m_program_mesh, ":/shaders/skeleton_point.vert", ":/shaders/skeleton_point.geom", ":/shaders/skeleton_point.frag");
+
     if(res == false)
         return;
 
@@ -106,7 +113,6 @@ void GLWidget::initializeGL()
     }
 
     m_vbo.allocate(NULL, /*m_vertices_size*/  m_objects[0]->getSize() * sizeof(QVector3D));
-
 
     int offset = 0;
     for (std::size_t i = 0; i != 1; i++) {
@@ -163,7 +169,8 @@ void GLWidget::paintGL()
     m_program_mesh->setUniformValue("x_axis", m_xaxis);
     m_program_mesh->setUniformValue("state", m_state);
 
-    glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
+    //glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
+    glDrawArrays(GL_POINTS, 0,  m_vertices_size );
 
     m_program_mesh->release();
     m_vao_mesh.release();

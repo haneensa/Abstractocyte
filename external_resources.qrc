@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>data/mouse03.obj</file>
         <file>data/mouse03_clean_faces.obj</file>
+        <file>data/m3_points.csv</file>
     </qresource>
 </RCC>

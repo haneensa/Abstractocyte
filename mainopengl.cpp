@@ -405,3 +405,45 @@ unsigned int MainOpenGL::loadOBJ(QString path, std::vector<Object*> & objects)
 
     return vertices_count;
 }
+
+unsigned int MainOpenGL::loadSkeletonPoints(QString path,  std::vector<Object*> & objects)
+{
+    qDebug() << "Func: loadSkeletonPoints";
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        qDebug() << "Could not open the file for reading";
+        return 0;
+    }
+
+    QTextStream in(&file);
+    QList<QByteArray> wordList;
+
+    float max_x, max_y, max_z;
+    max_x = INT_MIN;
+    max_y = INT_MIN;
+    max_z = INT_MIN;
+
+    float min_x, min_y, min_z;
+    min_x = INT_MAX;
+    min_y = INT_MAX;
+    min_z = INT_MAX;
+
+    Object *obj = new Object("Skeleton");
+    // Point ID, thickness, X Coord, Y Coord, Z Coord
+    unsigned int vertices_count = 0;
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        wordList = line.split(',');
+        unsigned int pID = atoi(wordList[0].data());
+        float x = atof(wordList[2].data())/199.0;
+        float y = atof(wordList[3].data())/199.0;
+        float z = atof(wordList[4].data())/(2.2249*449);
+        // to color points, each point has to have color!
+        obj->add_vertex(QVector3D(x, y, z));
+        vertices_count++;
+    }
+
+    objects.push_back(obj);
+
+    return vertices_count;
+}
