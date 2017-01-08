@@ -46,12 +46,14 @@ bool MainOpenGL::initShader(QOpenGLShaderProgram *program, const char *vshader, 
         return false;
     }
 
+
     // Link shader pipeline
     if (!program->link())
     {
         qDebug() << "Error in linking shader program:" << program->log();
         return false;
     }
+
 
     return true;
 }
@@ -355,7 +357,7 @@ unsigned int MainOpenGL::loadOBJ(QString path, std::vector<Object*> & objects)
                 QVector4D color = QVector4D(1.0, 0.0, 1.0, 1.0) ;
                 obj->setColor(color);
                 objects.push_back(obj);
-                if (objects.size() > 5) {
+                if (objects.size() > 2) {
                     break;
                 }
             }
@@ -435,9 +437,9 @@ unsigned int MainOpenGL::loadSkeletonPoints(QString path,  std::vector<Object*> 
         QByteArray line = file.readLine();
         wordList = line.split(',');
         unsigned int pID = atoi(wordList[0].data());
-        float x = atof(wordList[2].data());
-        float y = atof(wordList[3].data());
-        float z = atof(wordList[4].data());
+        float x = atof(wordList[2].data())/200.0;
+        float y = atof(wordList[3].data())/200.0;
+        float z = atof(wordList[4].data())/200.0;
         // to color points, each point has to have color!
         obj->add_vertex(QVector3D(x, y, z));
         vertices_count++;

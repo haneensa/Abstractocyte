@@ -52,7 +52,6 @@ void MousePad::initializeGL()
     if(res == false)
         return;
 
-    qDebug() << "Initializing curser VAO";
     // create vbos and vaos
     m_vao_circle.create();
     m_vao_circle.bind();
@@ -77,8 +76,6 @@ void MousePad::initializeGL()
     m_vbo_circle.release();
     m_vao_circle.release();
 
-
-    qDebug() << "Initializing selection VAO";
     // create vbos and vaos
     m_vao_selection.create();
     m_vao_selection.bind();

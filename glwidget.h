@@ -32,11 +32,16 @@ protected:
 
     /* mesh */
     QOpenGLVertexArrayObject    m_vao_mesh;
-    QOpenGLBuffer               m_vbo;
+    QOpenGLBuffer               m_vbo_mesh;
     unsigned int                m_vertices_size;
-
     QOpenGLShaderProgram        *m_program_mesh;
     std::vector<Object*>        m_objects;
+
+    QOpenGLVertexArrayObject    m_vao_skeleton;
+    QOpenGLBuffer               m_vbo_skeleton;
+    unsigned int                m_skeleton_vertices_size;
+    QOpenGLShaderProgram        *m_program_skeleton;
+    std::vector<Object*>        m_skeleton_obj;
 
     /* matrices */
     QMatrix4x4                  m_projection;

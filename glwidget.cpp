@@ -12,24 +12,20 @@
 
 GLWidget::GLWidget(QWidget *parent)
     :   QOpenGLWidget(parent),
-        m_vbo( QOpenGLBuffer::VertexBuffer ),
+        m_vbo_mesh( QOpenGLBuffer::VertexBuffer ),
         m_isRotatable(true),
         m_yaxis(0),
         m_xaxis(0),
         m_state(0)
 {
-    qDebug() << m_objects.size();
     QString path = "://data/mouse03_clean_faces.obj";
-    //m_vertices_size = loadOBJ(path, m_objects);
+    m_vertices_size = loadOBJ(path, m_objects);
+    qDebug() << "mesh size: " << m_objects.size();
 
     path = "://data/m3_points.csv";
-    m_vertices_size = loadSkeletonPoints(path, m_objects);
-    qDebug() << m_objects.size();
+    m_skeleton_vertices_size = loadSkeletonPoints(path, m_skeleton_obj);
+    qDebug() << "skeleton size: " << m_skeleton_obj.size();
 
-
-    for (std::size_t i = 0; i != m_objects.size(); i++) {
-        qDebug() << m_objects[i]->getName().data();
-    }
 
     m_distance = 0.2;
     m_rotation = QQuaternion();
@@ -49,8 +45,15 @@ GLWidget::~GLWidget()
     makeCurrent();
     delete m_program_mesh;
     m_vao_mesh.destroy();
-    m_vbo.destroy();
-    m_objects.clear();
+    m_vbo_mesh.destroy();
+    for (std::size_t i = 0; i != m_objects.size(); i++) {
+        delete m_objects[i];
+    }
+
+    for (std::size_t i = 0; i != m_skeleton_obj.size(); i++) {
+        delete m_skeleton_obj[i];
+    }
+
     doneCurrent();
 }
 
@@ -90,35 +93,31 @@ void GLWidget::initializeGL()
 
     /* start initializing mesh */
     m_program_mesh = new QOpenGLShaderProgram(this);
-//    bool res = initShader(m_program_mesh, ":/shaders/mesh.vert", ":/shaders/mesh.geom", ":/shaders/mesh.frag");
-    bool res = initShader(m_program_mesh, ":/shaders/skeleton_point.vert", ":/shaders/skeleton_point.geom", ":/shaders/skeleton_point.frag");
-
+    bool res = initShader(m_program_mesh, ":/shaders/mesh.vert", ":/shaders/mesh.geom", ":/shaders/mesh.frag");
     if(res == false)
         return;
 
-    qDebug() << "Initializing curser VAO";
+    qDebug() << "Initializing MESH";
     // create vbos and vaos
     m_vao_mesh.create();
     m_vao_mesh.bind();
-
 
     m_program_mesh->bind();
     setMVPAttrib(m_program_mesh);
     m_program_mesh->release();
 
-    m_vbo.create();
-    m_vbo.setUsagePattern( QOpenGLBuffer::StaticDraw);
-    if ( !m_vbo.bind() ) {
+    m_vbo_mesh.create();
+    m_vbo_mesh.setUsagePattern( QOpenGLBuffer::StaticDraw);
+    if ( !m_vbo_mesh.bind() ) {
         qDebug() << "Could not bind vertex buffer to the context.";
     }
 
-    m_vbo.allocate(NULL, /*m_vertices_size*/  m_objects[0]->getSize() * sizeof(QVector3D));
+    m_vbo_mesh.allocate(NULL, m_vertices_size * /* m_objects[0]->getSize() */ sizeof(QVector3D));
 
     int offset = 0;
     for (std::size_t i = 0; i != 1; i++) {
         qDebug() << "allocating: " << m_objects[i]->getName().data();
-        m_vbo.write(offset, &m_objects[i]->getVertices()[0], m_objects[i]->getSize() * sizeof(QVector3D));
-        offset += (m_objects[i]->getSize() * sizeof(QVector3D));
+        m_vbo_mesh.write(offset, &m_objects[i]->getVertices()[0], m_objects[i]->getSize() * sizeof(QVector3D));
         // should not be uniform!
         // have an ID for each cell type, and determine the color in the fragment based on ID
         // int per vertex
@@ -133,10 +132,58 @@ void GLWidget::initializeGL()
     m_program_mesh->setUniformValue("state", m_state);
 
     m_program_mesh->release();
-
-    m_vbo.release();
+    m_vbo_mesh.release();
     m_vao_mesh.release();
 
+    /********** START SKELETON **************/
+    qDebug() << "point";
+
+    m_program_skeleton = new QOpenGLShaderProgram(this);
+    res = initShader(m_program_skeleton, ":/shaders/skeleton_point.vert", ":/shaders/skeleton_point.geom", ":/shaders/skeleton_point.frag");
+
+    if(res == false)
+        return;
+
+
+
+    qDebug() << "Initializing SKELETON";
+
+    m_vao_skeleton.create();
+    m_vao_skeleton.bind();
+
+    m_program_skeleton->bind();
+    setMVPAttrib(m_program_skeleton);
+    m_program_skeleton->release();
+
+    m_vbo_skeleton.create();
+    m_vbo_skeleton.setUsagePattern( QOpenGLBuffer::StaticDraw);
+    if ( !m_vbo_skeleton.bind() ) {
+        qDebug() << "Could not bind vertex buffer to the context.";
+    }
+
+    m_vbo_skeleton.allocate(NULL, /*m_vertices_size*/  m_skeleton_obj[0]->getSize() * sizeof(QVector3D));
+
+    for (std::size_t i = 0; i != 1; i++) {
+        qDebug() << "allocating: " << m_skeleton_obj[i]->getName().data();
+        m_vbo_skeleton.write(offset, &m_skeleton_obj[i]->getVertices()[0], m_skeleton_obj[i]->getSize() * sizeof(QVector3D));
+        // should not be uniform!
+        // have an ID for each cell type, and determine the color in the fragment based on ID
+        // int per vertex
+   }
+
+    m_program_skeleton->bind();
+    m_program_skeleton->enableAttributeArray("posAttr");
+    m_program_skeleton->setAttributeBuffer("posAttr", GL_FLOAT, 0, 3);
+
+    m_program_skeleton->setUniformValue("y_axis", m_yaxis);
+    m_program_skeleton->setUniformValue("x_axis", m_xaxis);
+    m_program_skeleton->setUniformValue("state", m_state);
+
+    m_program_skeleton->release();
+    m_vbo_skeleton.release();
+    m_vao_skeleton.release();
+
+    /********** END SKELETON **************/
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
@@ -169,11 +216,25 @@ void GLWidget::paintGL()
     m_program_mesh->setUniformValue("x_axis", m_xaxis);
     m_program_mesh->setUniformValue("state", m_state);
 
-    //glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
-    glDrawArrays(GL_POINTS, 0,  m_vertices_size );
+    glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
 
     m_program_mesh->release();
     m_vao_mesh.release();
+
+    /************************/
+
+    m_vao_skeleton.bind();
+    m_program_skeleton->bind();
+    setMVPAttrib(m_program_skeleton);
+
+    m_program_skeleton->setUniformValue("y_axis", m_yaxis);
+    m_program_skeleton->setUniformValue("x_axis", m_xaxis);
+    m_program_skeleton->setUniformValue("state", m_state);
+
+    glDrawArrays(GL_POINTS, 0,  m_skeleton_vertices_size );
+
+    m_program_skeleton->release();
+    m_vao_skeleton.release();
 }
 
 void GLWidget::resizeGL(int w, int h)
