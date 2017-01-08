@@ -435,9 +435,9 @@ unsigned int MainOpenGL::loadSkeletonPoints(QString path,  std::vector<Object*> 
         QByteArray line = file.readLine();
         wordList = line.split(',');
         unsigned int pID = atoi(wordList[0].data());
-        float x = atof(wordList[2].data())/199.0;
-        float y = atof(wordList[3].data())/199.0;
-        float z = atof(wordList[4].data())/(2.2249*449);
+        float x = atof(wordList[2].data());
+        float y = atof(wordList[3].data());
+        float z = atof(wordList[4].data());
         // to color points, each point has to have color!
         obj->add_vertex(QVector3D(x, y, z));
         vertices_count++;
