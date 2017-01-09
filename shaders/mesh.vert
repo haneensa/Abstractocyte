@@ -20,5 +20,7 @@ void main(void)
 {
     posAttrV = posAttr;
     mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
+//    mat4 pvmMatrix = projection * view * mMatrix;
+
     gl_Position =  pvmMatrix * vec4(posAttr.xyz, 1.0);
 }

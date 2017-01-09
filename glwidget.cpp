@@ -99,9 +99,15 @@ void GLWidget::initializeGL()
 //    f.setPixelSize(50);
 //    initText(f);
 
+
     /* start initializing mesh */
+    m_program = glCreateProgram();
+    bool res = initShader(m_program, ":/shaders/mesh.vert", ":/shaders/mesh.geom", ":/shaders/mesh.frag");
+    if (res == false)
+        return;
+
     m_program_mesh = new QOpenGLShaderProgram(this);
-    bool res = initShader(m_program_mesh, ":/shaders/mesh.vert", ":/shaders/mesh.geom", ":/shaders/mesh.frag");
+    res = initShader(m_program_mesh, ":/shaders/mesh.vert", ":/shaders/mesh.geom", ":/shaders/mesh.frag");
     if(res == false)
         return;
 
@@ -112,6 +118,29 @@ void GLWidget::initializeGL()
 
     m_program_mesh->bind();
     setMVPAttrib(m_program_mesh);
+
+    /* Start UBO Example Initialization */
+
+    //---- this has to be per shader who want to use this ubo
+    GLuint matrices_index = glGetUniformBlockIndex(m_program_mesh->programId(), "Matrices");
+    glUniformBlockBinding(m_program_mesh->programId(), matrices_index, 0 /* binding point */);
+    //-----
+
+
+    glGenBuffers(1, &uboMatrices);
+    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(QMatrix4x4), NULL, GL_STATIC_DRAW); // allocate 150 bytes of memory
+    glBindBuffer(GL_UNIFORM_BUFFER, 0); // release buffer
+
+    glBindBufferRange(GL_UNIFORM_BUFFER, 2, uboMatrices, 0 /* binding point */, 2 * sizeof(QMatrix4x4));
+
+    //-- fill ubo
+    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(QMatrix4x4), &m_projection);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(QMatrix4x4), sizeof(QMatrix4x4), &m_vMatrix);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0); // release
+
+    /* End UBO Example Initialization */
 
     m_program_mesh->release();
 
@@ -267,35 +296,41 @@ void GLWidget::paintGL()
 //    float y = 0.5 / scaleY;
 //    renderText( x, y, scaleX, scaleY, text);
 
-//    m_vao_mesh.bind();
-//    m_program_mesh->bind();
-//    /*** setMVPAttrib(m_program_mesh); ***/
+    m_vao_mesh.bind();
+    m_program_mesh->bind();
+    /*** setMVPAttrib(m_program_mesh); ***/
 
-//    m_mMatrix.setToIdentity();
+    m_mMatrix.setToIdentity();
 
-//    // Scale
-//    m_mMatrix.translate(m_cameraPosition);
-//    m_mMatrix.scale(m_distance);
-//    m_mMatrix.translate(-1.0 * m_cameraPosition);
+    // Scale
+    m_mMatrix.translate(m_cameraPosition);
+    m_mMatrix.scale(m_distance);
+    m_mMatrix.translate(-1.0 * m_cameraPosition);
 
-//    // Translation
-//    m_mMatrix.translate(m_translation);
+    // Translation
+    m_mMatrix.translate(m_translation);
 
-//    // Rotation
+    // Rotation
 //    if (m_flag_mesh_rotation) {
-//        m_mMatrix.translate(m_cameraPosition);
-//        m_mMatrix.rotate(m_rotation);
-//        m_mMatrix.translate(-1.0 * m_cameraPosition);
-//        m_Oldrotation = m_rotation;
+        m_mMatrix.translate(m_cameraPosition);
+        m_mMatrix.rotate(m_rotation);
+        m_mMatrix.translate(-1.0 * m_cameraPosition);
+        m_Oldrotation = m_rotation;
 //    } else {
 //        m_mMatrix.translate(m_cameraPosition);
 //        m_mMatrix.rotate(m_Oldrotation);
 //        m_mMatrix.translate(-1.0 * m_cameraPosition);
 //    }
 
-//    m_program_mesh->setUniformValue("mMatrix",  m_mMatrix );
-//    m_program_mesh->setUniformValue("vMatrix",  m_vMatrix );
-//    m_program_mesh->setUniformValue("pMatrix",  m_projection );
+        //-- fill ubo
+//        glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+//        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(QMatrix4x4), &m_projection);
+//        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(QMatrix4x4), sizeof(QMatrix4x4), &m_vMatrix);
+//        glBindBuffer(GL_UNIFORM_BUFFER, 0); // release
+
+    m_program_mesh->setUniformValue("mMatrix",  m_mMatrix );
+    m_program_mesh->setUniformValue("vMatrix",  m_vMatrix );
+    m_program_mesh->setUniformValue("pMatrix",  m_projection );
 
     /****/
     m_program_mesh->setUniformValue("y_axis", m_yaxis);

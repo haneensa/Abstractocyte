@@ -38,6 +38,10 @@ protected:
     std::vector<Object*>        m_objects;
     bool                        m_flag_mesh_rotation;
 
+    // change to common opengl functions
+    GLuint                      m_program;
+
+
     QOpenGLVertexArrayObject    m_vao_skeleton;
     QOpenGLBuffer               m_vbo_skeleton;
     unsigned int                m_skeleton_vertices_size;
@@ -57,6 +61,7 @@ protected:
     QMatrix4x4                  m_vMatrix;
     QVector3D                   m_cameraPosition;
     QVector3D                   m_center;
+    GLuint                      uboMatrices; /* temp */
 
     /* rotation */
     QPoint                      m_lastPos;
