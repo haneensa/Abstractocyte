@@ -1,4 +1,4 @@
-#version 150
+#version 330 core
 out vec4        outcol;
 in vec4         posAttrG;
 uniform vec3    color;

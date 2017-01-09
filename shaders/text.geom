@@ -1,4 +1,4 @@
-#version 150
+#version 330 core
 
 in vec2 vertUV[];
 out vec2 vertUVg;

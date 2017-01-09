@@ -1,4 +1,5 @@
-#version 150
+#version 330 core
+
 out vec4  outcol;
 
 void main() {

@@ -1,4 +1,4 @@
-#version 150
+#version 330 core
 
 layout (points) in;
 layout (points, max_vertices = 1) out;

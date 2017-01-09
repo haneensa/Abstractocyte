@@ -1,7 +1,13 @@
-#version 150
+#version 330 core
 
 in vec4 posAttr;
 out vec4 posAttrV;
+
+layout (std140) uniform Matrices
+{
+    mat4 projection;
+    mat4 view;
+};
 
 // World transformation
 uniform mat4 mMatrix;
