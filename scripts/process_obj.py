@@ -5,6 +5,8 @@
 
 import re
 
+
+# todo: I need to subtract only if we are removing the object
 # open new obj file 
 f = open("mouse03_clean_faces.obj", 'w')
 flag = 0

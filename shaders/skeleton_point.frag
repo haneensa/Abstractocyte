@@ -1,7 +1,7 @@
 #version 150
 out vec4        outcol;
 in vec4         posAttrG;
-
+uniform vec3    color;
 void main() {
-    outcol = vec4(1.0, 0.0, 0.0, 1.0);
+    outcol = vec4(color.rgb, 1.0);
 }

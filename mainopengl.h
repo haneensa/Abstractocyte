@@ -39,7 +39,7 @@ public:
     void initText( const QFont &_f  );
     void renderText( float x, float y, float scaleX, float scaleY, const QString &text );
     unsigned int loadOBJ(QString path, std::vector<Object*> & objects);
-    unsigned int loadSkeletonPoints(QString path, std::vector<Object*> & objects);
+    unsigned int loadSkeletonPoints(QString path, std::vector<Object*> & objects, int flag);
 
 public:
     struct FontChar {

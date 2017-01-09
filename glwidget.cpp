@@ -13,6 +13,8 @@
 GLWidget::GLWidget(QWidget *parent)
     :   QOpenGLWidget(parent),
         m_vbo_mesh( QOpenGLBuffer::VertexBuffer ),
+        m_vbo_skeleton( QOpenGLBuffer::VertexBuffer ),
+        m_vbo_skeleton2( QOpenGLBuffer::VertexBuffer ),
         m_isRotatable(true),
         m_yaxis(0),
         m_xaxis(0),
@@ -22,9 +24,15 @@ GLWidget::GLWidget(QWidget *parent)
     m_vertices_size = loadOBJ(path, m_objects);
     qDebug() << "mesh size: " << m_objects.size();
 
-    path = "://data/m3_points.csv";
-    m_skeleton_vertices_size = loadSkeletonPoints(path, m_skeleton_obj);
+    path = "://data/m3_astrocytes_points.csv";
+    m_skeleton_vertices_size = loadSkeletonPoints(path, m_skeleton_obj, 0);
+
     qDebug() << "skeleton size: " << m_skeleton_obj.size();
+
+    path = "://data/m3_points_ids.csv";
+    m_skeleton_vertices_size2 = loadSkeletonPoints(path, m_skeleton_obj2, 1);
+
+    qDebug() << "skeleton size2: " << m_skeleton_obj2.size();
 
 
     m_distance = 0.2;
@@ -104,6 +112,7 @@ void GLWidget::initializeGL()
 
     m_program_mesh->bind();
     setMVPAttrib(m_program_mesh);
+
     m_program_mesh->release();
 
     m_vbo_mesh.create();
@@ -144,9 +153,7 @@ void GLWidget::initializeGL()
     if(res == false)
         return;
 
-
-
-    qDebug() << "Initializing SKELETON";
+    qDebug() << "Initializing SKELETON 1";
 
     m_vao_skeleton.create();
     m_vao_skeleton.bind();
@@ -184,10 +191,62 @@ void GLWidget::initializeGL()
     m_vao_skeleton.release();
 
     /********** END SKELETON **************/
+
+    /********** START SKELETON2 **************/
+    qDebug() << "point";
+
+    m_program_skeleton2 = new QOpenGLShaderProgram(this);
+    res = initShader(m_program_skeleton2, ":/shaders/skeleton_point.vert", ":/shaders/skeleton_point.geom", ":/shaders/skeleton_point.frag");
+
+    if(res == false)
+        return;
+
+    qDebug() << "Initializing SKELETON";
+
+    m_vao_skeleton2.create();
+    m_vao_skeleton2.bind();
+
+    m_program_skeleton2->bind();
+    setMVPAttrib(m_program_skeleton2);
+    m_program_skeleton2->release();
+
+    m_vbo_skeleton2.create();
+    m_vbo_skeleton2.setUsagePattern( QOpenGLBuffer::StaticDraw);
+    if ( !m_vbo_skeleton2.bind() ) {
+        qDebug() << "Could not bind vertex buffer to the context.";
+    }
+
+    m_vbo_skeleton2.allocate(NULL, /*m_vertices_size*/  m_skeleton_obj2[0]->getSize() * sizeof(QVector3D));
+
+    for (std::size_t i = 0; i != 1; i++) {
+        qDebug() << "allocating: " << m_skeleton_obj2[i]->getName().data();
+        m_vbo_skeleton2.write(offset, &m_skeleton_obj2[i]->getVertices()[0], m_skeleton_obj2[i]->getSize() * sizeof(QVector3D));
+        // should not be uniform!
+        // have an ID for each cell type, and determine the color in the fragment based on ID
+        // int per vertex
+   }
+
+    m_program_skeleton2->bind();
+    m_program_skeleton2->enableAttributeArray("posAttr");
+    m_program_skeleton2->setAttributeBuffer("posAttr", GL_FLOAT, 0, 3);
+
+    m_program_skeleton2->setUniformValue("y_axis", m_yaxis);
+    m_program_skeleton2->setUniformValue("x_axis", m_xaxis);
+    m_program_skeleton2->setUniformValue("state", m_state);
+    m_program_skeleton2->setUniformValue("color", QVector3D(1.0, 0.0, 0.0));
+
+    m_program_skeleton2->release();
+    m_vbo_skeleton2.release();
+    m_vao_skeleton2.release();
+
+    /********** END SKELETON **************/
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+    // to enable transparency
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
@@ -208,10 +267,37 @@ void GLWidget::paintGL()
 //    float y = 0.5 / scaleY;
 //    renderText( x, y, scaleX, scaleY, text);
 
-    m_vao_mesh.bind();
-    m_program_mesh->bind();
-    setMVPAttrib(m_program_mesh);
+//    m_vao_mesh.bind();
+//    m_program_mesh->bind();
+//    /*** setMVPAttrib(m_program_mesh); ***/
 
+//    m_mMatrix.setToIdentity();
+
+//    // Scale
+//    m_mMatrix.translate(m_cameraPosition);
+//    m_mMatrix.scale(m_distance);
+//    m_mMatrix.translate(-1.0 * m_cameraPosition);
+
+//    // Translation
+//    m_mMatrix.translate(m_translation);
+
+//    // Rotation
+//    if (m_flag_mesh_rotation) {
+//        m_mMatrix.translate(m_cameraPosition);
+//        m_mMatrix.rotate(m_rotation);
+//        m_mMatrix.translate(-1.0 * m_cameraPosition);
+//        m_Oldrotation = m_rotation;
+//    } else {
+//        m_mMatrix.translate(m_cameraPosition);
+//        m_mMatrix.rotate(m_Oldrotation);
+//        m_mMatrix.translate(-1.0 * m_cameraPosition);
+//    }
+
+//    m_program_mesh->setUniformValue("mMatrix",  m_mMatrix );
+//    m_program_mesh->setUniformValue("vMatrix",  m_vMatrix );
+//    m_program_mesh->setUniformValue("pMatrix",  m_projection );
+
+    /****/
     m_program_mesh->setUniformValue("y_axis", m_yaxis);
     m_program_mesh->setUniformValue("x_axis", m_xaxis);
     m_program_mesh->setUniformValue("state", m_state);
@@ -225,16 +311,73 @@ void GLWidget::paintGL()
 
     m_vao_skeleton.bind();
     m_program_skeleton->bind();
-    setMVPAttrib(m_program_skeleton);
+    /*** setMVPAttrib(m_program_skeleton); ***/
 
+    m_mMatrix.setToIdentity();
+
+    // Scale
+    m_mMatrix.translate(m_cameraPosition);
+    m_mMatrix.scale(m_distance);
+    m_mMatrix.translate(-1.0 * m_cameraPosition);
+
+    // Translation
+    m_mMatrix.translate(m_translation);
+
+    // Rotation
+    m_mMatrix.translate(m_cameraPosition);
+    m_mMatrix.rotate(m_rotation);
+    m_mMatrix.translate(-1.0 * m_cameraPosition);
+
+    m_program_skeleton->setUniformValue("mMatrix",  m_mMatrix );
+    m_program_skeleton->setUniformValue("vMatrix",  m_vMatrix );
+    m_program_skeleton->setUniformValue("pMatrix",  m_projection );
+
+    /****/
     m_program_skeleton->setUniformValue("y_axis", m_yaxis);
     m_program_skeleton->setUniformValue("x_axis", m_xaxis);
     m_program_skeleton->setUniformValue("state", m_state);
+    m_program_skeleton2->setUniformValue("color", QVector3D(0.0, 1.0, 0.0));
 
     glDrawArrays(GL_POINTS, 0,  m_skeleton_vertices_size );
 
     m_program_skeleton->release();
     m_vao_skeleton.release();
+
+
+//    /************************/
+    m_vao_skeleton2.bind();
+    m_program_skeleton2->bind();
+    /*** setMVPAttrib(m_program_skeleton2); ***/
+
+    m_mMatrix.setToIdentity();
+
+    // Scale
+    m_mMatrix.translate(m_cameraPosition);
+    m_mMatrix.scale(m_distance);
+    m_mMatrix.translate(-1.0 * m_cameraPosition);
+
+    // Translation
+    m_mMatrix.translate(m_translation);
+
+    // Rotation
+    m_mMatrix.translate(m_cameraPosition);
+    m_mMatrix.rotate(m_rotation);
+    m_mMatrix.translate(-1.0 * m_cameraPosition);
+
+    m_program_skeleton2->setUniformValue("mMatrix",  m_mMatrix );
+    m_program_skeleton2->setUniformValue("vMatrix",  m_vMatrix );
+    m_program_skeleton2->setUniformValue("pMatrix",  m_projection );
+
+    /****/
+    m_program_skeleton2->setUniformValue("y_axis", m_yaxis);
+    m_program_skeleton2->setUniformValue("x_axis", m_xaxis);
+    m_program_skeleton2->setUniformValue("state", m_state);
+    m_program_skeleton2->setUniformValue("color", QVector3D(1.0, 0.0, 0.0));
+
+    glDrawArrays(GL_POINTS, 0,  m_skeleton_vertices_size2 );
+
+    m_program_skeleton2->release();
+    m_vao_skeleton2.release();
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -324,6 +467,9 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             break;
         case(Qt::Key_T):
             m_isRotatable = !m_isRotatable;
+            break;
+        case(Qt::Key_0):
+            m_flag_mesh_rotation = !m_flag_mesh_rotation;
             break;
     }
 }

@@ -36,12 +36,20 @@ protected:
     unsigned int                m_vertices_size;
     QOpenGLShaderProgram        *m_program_mesh;
     std::vector<Object*>        m_objects;
+    bool                        m_flag_mesh_rotation;
 
     QOpenGLVertexArrayObject    m_vao_skeleton;
     QOpenGLBuffer               m_vbo_skeleton;
     unsigned int                m_skeleton_vertices_size;
     QOpenGLShaderProgram        *m_program_skeleton;
     std::vector<Object*>        m_skeleton_obj;
+
+
+    QOpenGLVertexArrayObject    m_vao_skeleton2;
+    QOpenGLBuffer               m_vbo_skeleton2;
+    unsigned int                m_skeleton_vertices_size2;
+    QOpenGLShaderProgram        *m_program_skeleton2;
+    std::vector<Object*>        m_skeleton_obj2;
 
     /* matrices */
     QMatrix4x4                  m_projection;
@@ -55,6 +63,7 @@ protected:
     double                      m_distance;
     bool                        m_isRotatable;
     QQuaternion                 m_rotation;
+    QQuaternion                  m_Oldrotation; /* temp */
     QVector3D                   m_rotationAxis;
     QVector3D                   m_translation;
 
