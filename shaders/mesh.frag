@@ -1,5 +1,9 @@
 #version 330 core
 
+//layout(std430, binding = 2) buffer ColorSSBO {
+//    vec3 color;
+//};
+
 out vec4        outcol;
 in vec4         posAttrG;
 in vec3         normal_out;

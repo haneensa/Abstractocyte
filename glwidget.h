@@ -6,6 +6,8 @@
 
 #include "mainopengl.h"
 #include "graph.h"
+#include <QtOpenGL>
+#define GL_GLEXT_PROTOTYPES
 
 class GLWidget : public QOpenGLWidget, MainOpenGL
 {

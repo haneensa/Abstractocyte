@@ -215,6 +215,27 @@ void GLWidget::paintGL()
     m_vao_mesh.bind();
     glUseProgram(m_program_mesh);
     setMVPAttrib(m_program_mesh);
+
+    GLuint bindingPoint = 1, blockIndex;
+    blockIndex = glGetUniformBlockIndex(m_program_mesh, "Matrices");
+    glUniformBlockBinding(m_program_mesh, blockIndex, bindingPoint);
+
+    glGenBuffers(1, &uboMatrices);
+    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+    QMatrix4x4 matrices[2];
+    matrices[0] = m_vMatrix;
+    matrices[1] = m_projection;
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(matrices), matrices, GL_DYNAMIC_DRAW);
+    qDebug() << "sizeof(matrices): " << sizeof(matrices);
+    qDebug() << "sizeof(QMatrix4x4): " << sizeof(m_projection);
+    qDebug() << "sizeof(GLfloat) * 4 * 4: " << sizeof(GLfloat) * 4 * 4;
+    glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, uboMatrices);
+
+
+
+//    GLuint ssbo;
+//    glGenBuffers(1, &ssbo);
+
     GLuint y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
     glUniform1iv(y_axis, 1, &m_yaxis);
 

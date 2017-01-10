@@ -2,6 +2,7 @@
 #define MAINOPENGL_H
 
 // OpenGL
+
 #include <QOpenGLFunctions>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>

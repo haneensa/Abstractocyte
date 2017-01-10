@@ -5,9 +5,10 @@ out vec4 posAttrV;
 
 layout (std140) uniform Matrices
 {
-    mat4 projection;
     mat4 view;
+    mat4 projection;
 };
+
 
 // World transformation
 uniform mat4 mMatrix;
@@ -20,7 +21,7 @@ void main(void)
 {
     posAttrV = posAttr;
 
-    mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
+    mat4 pvmMatrix = pMatrix * view * mMatrix;
 //    mat4 pvmMatrix = projection * view * mMatrix;
     gl_Position =  pvmMatrix * vec4(posAttr.xyz, 1.0);
 }
