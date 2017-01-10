@@ -19,7 +19,7 @@ GLWidget::GLWidget(QWidget *parent)
         m_xaxis(0),
         m_state(0)
 {
-    QString path = "://data/mouse03_clean_faces.obj";
+    QString path = "://data/mouse03_astro.obj";
     m_vertices_size = loadOBJ(path, m_objects);
     qDebug() << "mesh size: " << m_objects.size();
 
@@ -120,9 +120,9 @@ void GLWidget::initializeGL()
         qDebug() << "Could not bind vertex buffer to the context.";
     }
 
-    m_vbo_mesh.allocate(NULL, m_vertices_size * /* m_objects[0]->getSize() */ sizeof(QVector3D));
+    m_vbo_mesh.allocate(NULL, m_vertices_size * sizeof(QVector3D));
 
-    for (std::size_t i = 0; i != 1; i++) {
+    for (std::size_t i = 0; i != m_objects.size(); i++) {
         qDebug() << "allocating: " << m_objects[i]->getName().data();
         m_vbo_mesh.write(0, &m_objects[i]->getVertices()[0], m_objects[i]->getSize() * sizeof(QVector3D));
         // should not be uniform!
@@ -215,6 +215,27 @@ void GLWidget::paintGL()
     const qreal retinaScale = devicePixelRatio();
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
 
+
+
+    m_vao_skeleton.bind();
+    glUseProgram(m_program_skeleton);
+    setMVPAttrib(m_program_skeleton);
+
+    GLuint y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
+    glUniform1iv(y_axis, 1, &m_yaxis);
+
+    GLuint x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
+    glUniform1iv(x_axis, 1, &m_xaxis);
+
+    GLuint state = glGetUniformLocation(m_program_mesh, "state");
+    glUniform1iv(state, 1, &m_state);
+
+    glDrawArrays(GL_POINTS, 0,  m_skeleton_vertices_size );
+
+    m_vao_skeleton.release();
+
+    /************************/
+
     m_vao_mesh.bind();
     glUseProgram(m_program_mesh);
     setMVPAttrib(m_program_mesh);
@@ -229,32 +250,7 @@ void GLWidget::paintGL()
     matrices[0] = m_vMatrix;
     matrices[1] = m_projection;
     glBufferData(GL_UNIFORM_BUFFER, sizeof(matrices), matrices, GL_DYNAMIC_DRAW);
-    qDebug() << "sizeof(matrices): " << sizeof(matrices);
-    qDebug() << "sizeof(QMatrix4x4): " << sizeof(m_projection);
-    qDebug() << "sizeof(GLfloat) * 4 * 4: " << sizeof(GLfloat) * 4 * 4;
     glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, uboMatrices);
-
-//    GLuint ssbo;
-//    glGenBuffers(1, &ssbo);
-
-    GLuint y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
-    glUniform1iv(y_axis, 1, &m_yaxis);
-
-    GLuint x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
-    glUniform1iv(x_axis, 1, &m_xaxis);
-
-    GLuint state = glGetUniformLocation(m_program_mesh, "state");
-    glUniform1iv(state, 1, &m_state);
-
-    glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
-
-    m_vao_mesh.release();
-
-    /************************/
-
-    m_vao_skeleton.bind();
-    glUseProgram(m_program_skeleton);
-    setMVPAttrib(m_program_skeleton);
 
     y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
     glUniform1iv(y_axis, 1, &m_yaxis);
@@ -265,9 +261,11 @@ void GLWidget::paintGL()
     state = glGetUniformLocation(m_program_mesh, "state");
     glUniform1iv(state, 1, &m_state);
 
-    glDrawArrays(GL_POINTS, 0,  m_skeleton_vertices_size );
+    glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
 
-    m_vao_skeleton.release();
+    m_vao_mesh.release();
+
+
 }
 
 void GLWidget::resizeGL(int w, int h)

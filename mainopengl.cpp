@@ -410,16 +410,17 @@ unsigned int MainOpenGL::loadOBJ(QString path, std::vector<Object*> & objects)
                 QVector4D color = QVector4D(1.0, 0.0, 1.0, 1.0) ;
                 obj->setColor(color);
                 objects.push_back(obj);
-                if (objects.size() > 2) {
+                if (objects.size() > 5) {
+                    qDebug() << "Size limit";
                     break;
                 }
             }
+
             name  = wordList[1].data();
             vertexIndices.clear();
             temp_vertices.clear();
             flag_prev = true;
-        }
-        else if (wordList[0]  == "v") {
+        } else if (wordList[0]  == "v") {
             float x = atof(wordList[1].data());
             float y = atof(wordList[2].data());
             float z = atof(wordList[3].data());
@@ -450,6 +451,26 @@ unsigned int MainOpenGL::loadOBJ(QString path, std::vector<Object*> & objects)
         } else if (wordList[0] == "vn") {
             qDebug() << "To do compute the normals and read them from here";
         }
+    }
+
+    if (flag_prev) {
+        Object *obj = new Object(name);
+
+        // indexing
+        // for each vertex of each triangle
+        qDebug() << "vertexIndices: " << vertexIndices.size();
+        qDebug() << "temp_vertices: " << temp_vertices.size();
+        vertices_count += vertexIndices.size();
+
+        for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
+            unsigned int vertexIndex = vertexIndices[i];
+            QVector3D vertex = temp_vertices[vertexIndex - 1];
+            obj->add_vertex(vertex);
+        }
+        qDebug() << "done vertexIndices: " << vertexIndices.size();
+        QVector4D color = QVector4D(1.0, 0.0, 1.0, 1.0) ;
+        obj->setColor(color);
+        objects.push_back(obj);
     }
 
     file.close();
@@ -498,7 +519,7 @@ unsigned int MainOpenGL::loadSkeletonPoints(QString path,  std::vector<Object*> 
             vertices_count++;
         } else {
             int pID = atoi(wordList[5].data());
-            if (pID == 746 || pID == 745 || pID == 743 || pID == 742) {
+            if (pID == 746 || pID == 745) {
 //                qDebug() << pID;
             } else {
                 continue;
