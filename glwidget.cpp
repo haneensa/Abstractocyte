@@ -93,7 +93,10 @@ void GLWidget::setMVPAttrib(GLuint program)
 void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
+
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    qDebug() << "initializeGL";
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
@@ -230,8 +233,6 @@ void GLWidget::paintGL()
     qDebug() << "sizeof(QMatrix4x4): " << sizeof(m_projection);
     qDebug() << "sizeof(GLfloat) * 4 * 4: " << sizeof(GLfloat) * 4 * 4;
     glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, uboMatrices);
-
-
 
 //    GLuint ssbo;
 //    glGenBuffers(1, &ssbo);

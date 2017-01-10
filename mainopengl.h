@@ -23,14 +23,15 @@
 #include <unordered_map>
 #include <array>
 #include <QVector3D>
-
+#include <memory>
 // file manipulations
 #include <QString>
 #include <QFile>
 
 #include "object.h"
+#include <QOpenGLFunctions_3_3_Core>
 
-class MainOpenGL  : public QOpenGLFunctions
+class MainOpenGL  : public QOpenGLFunctions_3_3_Core
 {
 public:
     MainOpenGL();
