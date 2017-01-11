@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 
 // in: per vertex data
 in vec4 posAttr;

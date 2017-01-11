@@ -24,23 +24,20 @@ Object_t Object::getObjectType(std::string name)
 
 void Object::add_vertex(QVector3D vertex)
 {
-    m_vertices.push_back(vertex);
+    m_mesh_vertices.push_back(vertex);
+}
+
+void Object::add_ms_vertex(QVector3D mesh_vertex, QVector3D skeleton_vertex)
+{
+    struct VertexData vertex_data;
+    vertex_data.mesh_vertex = mesh_vertex;
+    vertex_data.skeleton_vertex = skeleton_vertex;
+    m_mesh_skeleton_vertices.push_back(vertex_data);
 }
 
 std::vector<QVector3D> Object::getVertices()
 {
-    return m_vertices;
-}
-
-bool Object::allocate_vbo(QOpenGLShaderProgram  *program_mesh)
-{
-
-
-    return true;
-}
-
-void Object::draw()
-{
+    return m_mesh_vertices;
 }
 
 std::string Object::getName()
@@ -50,7 +47,7 @@ std::string Object::getName()
 
 int Object::getSize()
 {
-    return m_vertices.size();
+    return m_mesh_vertices.size();
 }
 
 QVector4D Object::getColor()

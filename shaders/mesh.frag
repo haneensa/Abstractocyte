@@ -11,6 +11,7 @@ in vec3         normal_out;
 uniform int     y_axis;
 uniform int     x_axis;
 uniform int     state;
+
 // Cosine of the angle between the normal and the light direction,
 // clamped above 0
 //  - light is at the vertical of the triangle -> 1
@@ -69,5 +70,5 @@ void main() {
     // y_axis astrocyte, else if neurite use (x_axis)
     float val = translate(y_axis, 0, 20, 0.0, 1.0);
     outcol = toon_color * val +   (1.0 - val) * phong_color;
-    outcol.a = 0.5;
+    outcol.a = 0.0;
 }

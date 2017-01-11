@@ -21,7 +21,7 @@ input:
 '''
 
 DIMS = [999, 999, 449]
-hdf5 = h5py.File( '../data/slices_unflattened_skeleton_m3.h5', 'w' )
+hdf5 = h5py.File( '../data/slices_unflattened_skeleton.h5', 'w' )
 dataset = hdf5.get("/").create_dataset('channel10', (DIMS[0], DIMS[1], DIMS[2]))
 indices_i = []
 

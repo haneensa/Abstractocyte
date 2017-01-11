@@ -24,9 +24,15 @@ GLWidget::GLWidget(QWidget *parent)
     qDebug() << "mesh size: " << m_objects.size();
 
     path = "://data/m3_astrocytes_points.csv"; //m3_points_ids
-    m_skeleton_vertices_size = loadSkeletonPoints(path, m_skeleton_obj, 0);
 
+    m_skeleton_vertices_size = loadSkeletonPoints(path, m_skeleton_obj, 0);
     qDebug() << "skeleton size: " << m_skeleton_obj.size();
+
+   // path = "://data/skeleton_info_m3_new/points_ids.csv";
+    path = "://data/skeleton_astrocyte_m3/astro_points.csv";
+    m_skeleton_vertices_size2 = loadSkeletonPoints(path, m_skeleton_obj2, 1);
+    qDebug() << "skeleton size: " << m_skeleton_obj2.size();
+
 
     m_distance = 0.2;
     m_rotation = QQuaternion();
@@ -46,8 +52,8 @@ GLWidget::~GLWidget()
     makeCurrent();
     glDeleteProgram(m_program_mesh);
     glDeleteProgram(m_program_skeleton);
+    glDeleteProgram(m_program_skeleton2);
 
-    glDeleteBuffers(1, &uboMatrices);
     m_vao_mesh.destroy();
     m_vbo_mesh.destroy();
     for (std::size_t i = 0; i != m_objects.size(); i++) {
@@ -163,7 +169,7 @@ void GLWidget::initializeGL()
     setMVPAttrib(m_program_skeleton);
 
     GLuint color_idx = glGetUniformLocation(m_program_skeleton, "color");
-    QVector3D color = QVector3D(1.0, 1.0, 0.0);
+    QVector3D color = QVector3D(0.9, 0.0, 0.0);
     glUniform3fv(color_idx, 1, &color[0]);
 
     m_vbo_skeleton.create();
@@ -196,6 +202,55 @@ void GLWidget::initializeGL()
     m_vao_skeleton.release();
 
 
+
+    /********** START SKELETON 2 **************/
+    qDebug() << "point";
+
+    m_program_skeleton2 = glCreateProgram();
+    res = initShader(m_program_skeleton2, ":/shaders/skeleton_point.vert", ":/shaders/skeleton_point.geom", ":/shaders/skeleton_point.frag");
+    if (res == false)
+        return;
+
+    qDebug() << "Initializing SKELETON 1";
+    m_vao_skeleton2.create();
+    m_vao_skeleton2.bind();
+
+    glUseProgram(m_program_skeleton2); // m_program_mesh->bind();
+    setMVPAttrib(m_program_skeleton2);
+
+    color_idx = glGetUniformLocation(m_program_skeleton2, "color");
+    color = QVector3D(0.8, 0.9, 0.0);
+    glUniform3fv(color_idx, 1, &color[0]);
+
+    m_vbo_skeleton2.create();
+    m_vbo_skeleton2.setUsagePattern( QOpenGLBuffer::StaticDraw);
+    if ( !m_vbo_skeleton2.bind() ) {
+        qDebug() << "Could not bind vertex buffer to the context.";
+    }
+
+    m_vbo_skeleton2.allocate(NULL, /*m_vertices_size*/  m_skeleton_obj2[0]->getSize() * sizeof(QVector3D));
+
+    for (std::size_t i = 0; i != 1; i++) {
+        qDebug() << "allocating: " << m_skeleton_obj2[i]->getName().data();
+        m_vbo_skeleton.write(0, &m_skeleton_obj2[i]->getVertices()[0], m_skeleton_obj2[i]->getSize() * sizeof(QVector3D));
+   }
+
+    posAttr_name = "posAttr";
+    posAttr = glGetAttribLocation(m_program_skeleton2, posAttr_name);
+    qDebug() << "pos Attr: " << posAttr;
+    glEnableVertexAttribArray(posAttr);
+    if (posAttr == -1) {
+        qDebug() << "Could not bind attribute " << posAttr_name;
+        return;
+    }
+
+    // attribute, number of elements per vertex, here (x,y,z),
+    // the type of each element, stride, offset
+    glVertexAttribPointer(posAttr, 3, GL_FLOAT, GL_FALSE, 0,  0);
+
+    m_vbo_skeleton2.release();
+    m_vao_skeleton2.release();
+
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
@@ -216,23 +271,18 @@ void GLWidget::paintGL()
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
 
 
-
     m_vao_skeleton.bind();
     glUseProgram(m_program_skeleton);
     setMVPAttrib(m_program_skeleton);
-
-    GLuint y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
-    glUniform1iv(y_axis, 1, &m_yaxis);
-
-    GLuint x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
-    glUniform1iv(x_axis, 1, &m_xaxis);
-
-    GLuint state = glGetUniformLocation(m_program_mesh, "state");
-    glUniform1iv(state, 1, &m_state);
-
     glDrawArrays(GL_POINTS, 0,  m_skeleton_vertices_size );
-
     m_vao_skeleton.release();
+
+    /************************/
+//    m_vao_skeleton2.bind();
+//    glUseProgram(m_program_skeleton2);
+//    setMVPAttrib(m_program_skeleton2);
+//    glDrawArrays(GL_POINTS, 0,  m_skeleton_vertices_size2 );
+//    m_vao_skeleton2.release();
 
     /************************/
 
@@ -252,20 +302,18 @@ void GLWidget::paintGL()
     glBufferData(GL_UNIFORM_BUFFER, sizeof(matrices), matrices, GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, uboMatrices);
 
-    y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
+    GLuint y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
     glUniform1iv(y_axis, 1, &m_yaxis);
 
-    x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
+    GLuint x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
     glUniform1iv(x_axis, 1, &m_xaxis);
 
-    state = glGetUniformLocation(m_program_mesh, "state");
+    GLuint state = glGetUniformLocation(m_program_mesh, "state");
     glUniform1iv(state, 1, &m_state);
 
     glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
 
     m_vao_mesh.release();
-
-
 }
 
 void GLWidget::resizeGL(int w, int h)

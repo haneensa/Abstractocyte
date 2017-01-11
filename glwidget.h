@@ -48,6 +48,13 @@ protected:
     std::vector<Object*>        m_skeleton_obj;
 
 
+    QOpenGLVertexArrayObject    m_vao_skeleton2;
+    QOpenGLBuffer               m_vbo_skeleton2;
+    unsigned int                m_skeleton_vertices_size2;
+    GLuint                      m_program_skeleton2;
+    std::vector<Object*>        m_skeleton_obj2;
+
+
     /* matrices */
     QMatrix4x4                  m_projection;
     QMatrix4x4                  m_mMatrix;

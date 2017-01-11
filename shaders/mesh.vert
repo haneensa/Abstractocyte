@@ -1,6 +1,7 @@
 #version 330 core
 
 in vec4 posAttr;
+// I need posAttrSkeleton -> and then interpolate between posAttr and posAttrSkeleton
 out vec4 posAttrV;
 
 layout (std140) uniform Matrices
