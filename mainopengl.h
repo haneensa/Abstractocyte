@@ -44,7 +44,7 @@ public:
     void renderText( float x, float y, float scaleX, float scaleY, const QString &text );
     unsigned int loadOBJ(QString path, std::vector<Object*> & objects);
     unsigned int loadOBJ_skeleton(QString path, std::vector<Object*> & objects);
-    unsigned int loadSkeletonPoints(QString path, std::vector<Object*> & objects, int flag);
+    unsigned int loadSkeletonPoints(QString path, std::vector<Object*> & objects);
 
 public:
     struct FontChar {

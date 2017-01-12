@@ -39,13 +39,14 @@ void main() {
   for(int i = 0; i < 3; i++) {
     posAttrG = posAttrV[i];
     float val = translate(y_axis, 20, 100, 0.0, 1.0);
-    vec4 position2 = gl_in[i].gl_Position * 0.5;
+    vec4 position2 = posAttrV[i];
     position2.a = 1.0;
     vec4 new_position = mix(gl_in[i].gl_Position , position2, val);
     gl_Position = new_position;
     EmitVertex();
   }
   EndPrimitive();
+
 }
 
 

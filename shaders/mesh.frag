@@ -1,12 +1,8 @@
 #version 330 core
 
-//layout(std430, binding = 2) buffer ColorSSBO {
-//    vec3 color;
-//};
-
-out vec4        outcol;
 in vec4         posAttrG;
 in vec3         normal_out;
+out vec4        outcol;
 
 uniform int     y_axis;
 uniform int     x_axis;
@@ -52,7 +48,6 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 
 void main() {
     vec4 color = vec4(1.0, 0.0, 0.0, 1.0) * diffuseColor * diffuseIntersity + ambient;
-    //vec4 color = posAttrG;
     vec4 toon_color = vec4(color.r, color.g, color.b, 1.0);
     vec4 phong_color = vec4(color.r, color.g, color.b, 1.0) * cosTheta;
 
@@ -70,5 +65,6 @@ void main() {
     // y_axis astrocyte, else if neurite use (x_axis)
     float val = translate(y_axis, 0, 20, 0.0, 1.0);
     outcol = toon_color * val +   (1.0 - val) * phong_color;
-    outcol.a = 0.0;
+    val = translate(y_axis, 20, 100, 0.0, 1.0);
+    outcol.a = 1.0 - val;
 }

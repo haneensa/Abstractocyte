@@ -19,25 +19,38 @@ Object::~Object()
 
 Object_t Object::getObjectType(std::string name)
 {
+    // make it generic later
     return Object_t::ASTROCYTE;
 }
 
-void Object::add_vertex(QVector3D vertex)
+void Object::add_m_vertex(QVector3D vertex)
 {
     m_mesh_vertices.push_back(vertex);
 }
 
-void Object::add_ms_vertex(QVector3D mesh_vertex, QVector3D skeleton_vertex)
+void Object::add_s_vertex(QVector3D vertex)
 {
-    struct VertexData vertex_data;
-    vertex_data.mesh_vertex = mesh_vertex;
-    vertex_data.skeleton_vertex = skeleton_vertex;
+    m_skeleton_vertices.push_back(vertex);
+}
+
+void Object::add_ms_vertex(struct VertexData vertex_data)
+{
     m_mesh_skeleton_vertices.push_back(vertex_data);
 }
 
-std::vector<QVector3D> Object::getVertices()
+std::vector<QVector3D> Object::get_m_Vertices()
 {
     return m_mesh_vertices;
+}
+
+std::vector<QVector3D> Object::get_s_Vertices()
+{
+    return m_skeleton_vertices;
+}
+
+std::vector<struct VertexData> Object::get_ms_Vertices()
+{
+    return m_mesh_skeleton_vertices;
 }
 
 std::string Object::getName()
@@ -45,9 +58,19 @@ std::string Object::getName()
     return m_name;
 }
 
-int Object::getSize()
+int Object::get_m_Size()
 {
     return m_mesh_vertices.size();
+}
+
+int Object::get_s_Size()
+{
+    return m_skeleton_vertices.size();
+}
+
+int Object::get_ms_Size()
+{
+    return m_mesh_skeleton_vertices.size();
 }
 
 QVector4D Object::getColor()

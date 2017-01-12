@@ -37,7 +37,6 @@ protected:
     QOpenGLBuffer               m_vbo_mesh;
     unsigned int                m_vertices_size;
     std::vector<Object*>        m_objects;
-    bool                        m_flag_mesh_rotation;
     GLuint                      m_program_mesh;
 
 
@@ -46,14 +45,6 @@ protected:
     unsigned int                m_skeleton_vertices_size;
     GLuint                      m_program_skeleton;
     std::vector<Object*>        m_skeleton_obj;
-
-
-    QOpenGLVertexArrayObject    m_vao_skeleton2;
-    QOpenGLBuffer               m_vbo_skeleton2;
-    unsigned int                m_skeleton_vertices_size2;
-    GLuint                      m_program_skeleton2;
-    std::vector<Object*>        m_skeleton_obj2;
-
 
     /* matrices */
     QMatrix4x4                  m_projection;
