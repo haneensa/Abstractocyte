@@ -273,7 +273,7 @@ void GLWidget::paintGL()
 
     /************************/
 
-    if (m_yaxis < 43) {
+    if (m_yaxis < 53) {
         m_vao_mesh.bind();
         glUseProgram(m_program_mesh);
         setMVPAttrib(m_program_mesh);
@@ -292,7 +292,7 @@ void GLWidget::paintGL()
         m_vao_mesh.release();
     }
 
-    if (m_yaxis > 40) {
+    if (m_yaxis > 50) {
         m_vao_mesh_points.bind();
         glUseProgram(m_program_mesh_points);
         setMVPAttrib(m_program_mesh_points);
