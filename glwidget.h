@@ -40,6 +40,10 @@ protected:
     GLuint                      m_program_mesh;
 
 
+    QOpenGLVertexArrayObject    m_vao_mesh_points;
+    GLuint                      m_program_mesh_points;
+
+
     QOpenGLVertexArrayObject    m_vao_skeleton;
     QOpenGLBuffer               m_vbo_skeleton;
     unsigned int                m_skeleton_vertices_size;

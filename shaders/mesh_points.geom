@@ -5,7 +5,7 @@ out vec4 posAttrG;
 out vec3 normal_out;
 
 layout(triangles) in;
-layout(triangle_strip, max_vertices = 3) out;
+layout(points, max_vertices = 3) out;
 
 uniform int     y_axis;
 uniform int     x_axis;
@@ -44,10 +44,11 @@ void main() {
     position2.a = 1.0;
     vec4 new_position = mix(gl_in[i].gl_Position , position2, val);
     gl_Position = new_position;
+    gl_PointSize = 3;
     EmitVertex();
+    EndPrimitive();
   }
 
-  EndPrimitive();
 }
 
 

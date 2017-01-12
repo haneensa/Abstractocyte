@@ -149,6 +149,46 @@ void GLWidget::initializeGL()
     m_vbo_mesh.release();
     m_vao_mesh.release();
 
+
+    /***************************************/
+    m_program_mesh_points = glCreateProgram();
+    res = initShader(m_program_mesh_points, ":/shaders/mesh.vert", ":/shaders/mesh_points.geom", ":/shaders/mesh.frag");
+    if (res == false)
+        return;
+
+    // create vbos and vaos
+    m_vao_mesh_points.create();
+    m_vao_mesh_points.bind();
+
+
+    glUseProgram(m_program_mesh_points); // m_program_mesh->bind();
+
+    if ( !m_vbo_mesh.bind() ) {
+        qDebug() << "Could not bind vertex buffer to the context.";
+    }
+
+    setMVPAttrib(m_program_mesh_points);
+    posAttr = glGetAttribLocation(m_program_mesh_points, "posAttr1");
+    qDebug() << "pos Attr: " << posAttr;
+    if (posAttr == -1) {
+        qDebug() << "Could not bind attribute posAttr";
+        return;
+    }
+    glEnableVertexAttribArray(posAttr);
+    glVertexAttribPointer(posAttr, 3, GL_FLOAT, GL_FALSE, sizeof(m_objects[0]->get_ms_Vertices()[0]),  0);
+    posAttr = glGetAttribLocation(m_program_mesh_points, "posAttr2");
+    qDebug() << "pos Attr2: " << posAttr;
+    if (posAttr == -1) {
+        qDebug() << "Could not bind attribute posAttr";
+           return;
+    }
+
+    glEnableVertexAttribArray(posAttr);
+    glVertexAttribPointer(posAttr, 3, GL_FLOAT, GL_FALSE, sizeof(m_objects[0]->get_ms_Vertices()[0]), (GLvoid*)sizeof(QVector3D));
+
+    m_vbo_mesh.release();
+    m_vao_mesh_points.release();
+
     /********** START SKELETON **************/
     qDebug() << "point";
 
@@ -165,7 +205,7 @@ void GLWidget::initializeGL()
     setMVPAttrib(m_program_skeleton);
 
     GLuint color_idx = glGetUniformLocation(m_program_skeleton, "color");
-    QVector3D color = QVector3D(1.0, 0.0, 0.0);
+    QVector3D color = QVector3D(0.8, 0.0, 0.0);
     glUniform3fv(color_idx, 1, &color[0]);
 
     m_vbo_skeleton.create();
@@ -233,22 +273,43 @@ void GLWidget::paintGL()
 
     /************************/
 
-    m_vao_mesh.bind();
-    glUseProgram(m_program_mesh);
-    setMVPAttrib(m_program_mesh);
+    if (m_yaxis < 43) {
+        m_vao_mesh.bind();
+        glUseProgram(m_program_mesh);
+        setMVPAttrib(m_program_mesh);
 
-    y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
-    glUniform1iv(y_axis, 1, &m_yaxis);
+        y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
+        glUniform1iv(y_axis, 1, &m_yaxis);
 
-    x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
-    glUniform1iv(x_axis, 1, &m_xaxis);
+        x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
+        glUniform1iv(x_axis, 1, &m_xaxis);
 
-    state = glGetUniformLocation(m_program_mesh, "state");
-    glUniform1iv(state, 1, &m_state);
+        state = glGetUniformLocation(m_program_mesh, "state");
+        glUniform1iv(state, 1, &m_state);
 
-    glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
+        glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
 
-    m_vao_mesh.release();
+        m_vao_mesh.release();
+    }
+
+    if (m_yaxis > 40) {
+        m_vao_mesh_points.bind();
+        glUseProgram(m_program_mesh_points);
+        setMVPAttrib(m_program_mesh_points);
+
+        y_axis = glGetUniformLocation(m_program_mesh_points, "y_axis");
+        glUniform1iv(y_axis, 1, &m_yaxis);
+
+        x_axis = glGetUniformLocation(m_program_mesh_points, "x_axis");
+        glUniform1iv(x_axis, 1, &m_xaxis);
+
+        state = glGetUniformLocation(m_program_mesh_points, "state");
+        glUniform1iv(state, 1, &m_state);
+
+        glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
+
+        m_vao_mesh_points.release();
+    }
 }
 
 void GLWidget::resizeGL(int w, int h)
