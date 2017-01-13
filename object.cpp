@@ -1,14 +1,15 @@
 #include "object.h"
 #include <QDebug>
 
-Object::Object(std::string name)
+Object::Object(std::string name, int idx, int ID)
 {
     if (name[name.size()-1] == '\n') {
         name.erase(name.size()-1, name.size()-1);
     }
 
     m_name  = name;
-    m_ID    = 0;
+    m_ID    = ID;
+    m_idxID = idx;
     m_object_t = getObjectType(m_name);
     qDebug() << "create " << m_name.data();
 }

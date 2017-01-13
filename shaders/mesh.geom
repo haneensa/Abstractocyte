@@ -1,7 +1,7 @@
 #version 330 core
 
-in vec4 posAttrV[];
-out vec4 posAttrG;
+in vec4 Vskeleton_vx[];
+out vec4 Gskeleton_vx;
 out vec3 normal_out;
 
 layout(triangles) in;
@@ -29,20 +29,16 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 }
 
 void main() {
-    // precompute this once?
-    // face normal per triangle
-    vec3 A = gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz;
-    vec3 B = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
-    normal_out = normalize(cross(A,B));
+  // precompute this once?
+  // face normal per triangle
+  vec3 A = gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz;
+  vec3 B = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
+  normal_out = normalize(cross(A,B));
 
   for(int i = 0; i < 3; i++) {
-    posAttrG = (posAttrV[0] + posAttrV[1] + posAttrV[2])/3.0;
-   // posAttrG = posAttrV[i];
-
+    Gskeleton_vx = vec4(Vskeleton_vx[i].xyz, 1.0);
     float val = translate(y_axis, 20, 100, 0.0, 1.0);
-    vec4 position2 = posAttrV[i];
-    position2.a = 1.0;
-    vec4 new_position = mix(gl_in[i].gl_Position , position2, val);
+    vec4 new_position = mix(gl_in[i].gl_Position , Gskeleton_vx, val);
     gl_Position = new_position;
     EmitVertex();
   }

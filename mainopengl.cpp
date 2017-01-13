@@ -353,135 +353,9 @@ void MainOpenGL::renderText( float x, float y, float scaleX, float scaleY, const
     glEnable(GL_DEPTH_TEST);
 }
 
-// change this to pass the objects vector (done)
 // todo: make this efficient by writing the input as binary file and loading items at once
 // todo: get the ID from hvgx and add it to the obj objects names -> used later to map skeleton to objects
 // todo: combine skeleton and mesh information in one obj file
-unsigned int MainOpenGL::loadOBJ(QString path, std::vector<Object*> & objects)
-{
-    qDebug() << "Func: loadVertices";
-    unsigned int vertices_count = 0;
-
-    QFile file(path);
-    if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        qDebug() << "Could not open the file for reading";
-        return vertices_count;
-    }
-
-    QTextStream in(&file);
-    QList<QByteArray> wordList;
-
-
-    // temp containters
-    std::vector< unsigned int > vertexIndices;
-    std::vector< QVector3D > temp_vertices;
-    bool flag_prev = false;
-    float max_x, max_y, max_z;
-    max_x = INT_MIN;
-    max_y = INT_MIN;
-    max_z = INT_MIN;
-
-    float min_x, min_y, min_z;
-    min_x = INT_MAX;
-    min_y = INT_MAX;
-    min_z = INT_MAX;
-    std::string name;
-
-    // load all vertices once -> should be fast
-    // for each object "o", go through its faces, and substitute using vertices loaded at the start
-    while (!file.atEnd()) {
-        QByteArray line = file.readLine();
-        wordList = line.split(' ');
-        if (wordList[0] == "o") {
-            if (flag_prev) {
-                Object *obj = new Object(name);
-                // indexing
-                // for each vertex of each triangle
-                qDebug() << "vertexIndices: " << vertexIndices.size();
-                qDebug() << "temp_vertices: " << temp_vertices.size();
-                vertices_count += vertexIndices.size();
-
-                for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
-                    unsigned int vertexIndex = vertexIndices[i];
-                    QVector3D vertex = temp_vertices[vertexIndex - 1];
-                    obj->add_m_vertex(vertex);
-                }
-                qDebug() << "done vertexIndices: " << vertexIndices.size();
-                QVector4D color = QVector4D(1.0, 0.0, 1.0, 1.0) ;
-                obj->setColor(color);
-                objects.push_back(obj);
-                if (objects.size() > 5) {
-                    qDebug() << "Size limit";
-                    break;
-                }
-            }
-
-            name  = wordList[1].data();
-            vertexIndices.clear();
-            temp_vertices.clear();
-            flag_prev = true;
-        } else if (wordList[0]  == "v") {
-            float x = atof(wordList[1].data());
-            float y = atof(wordList[2].data());
-            float z = atof(wordList[3].data());
-            QVector3D vertex(x, y, z);
-
-            if (x < min_x)
-                min_x = x;
-            if (y < min_y)
-                min_y = y;
-            if (z < min_z)
-                min_z = z;
-
-            if (x > max_x)
-                max_x = x;
-            if (y > max_y)
-                max_y = y;
-            if (z > max_z)
-                max_z = z;
-
-            temp_vertices.push_back(vertex);
-        } else if (wordList[0]  == "f") {
-            unsigned int f1_index = atoi(wordList[1].data());
-            unsigned int f2_index = atoi(wordList[2].data());
-            unsigned int f3_index = atoi(wordList[3].data());
-            vertexIndices.push_back(f1_index);
-            vertexIndices.push_back(f2_index);
-            vertexIndices.push_back(f3_index);
-        } else if (wordList[0] == "vn") {
-            qDebug() << "To do compute the normals and read them from here";
-        }
-    }
-
-    if (flag_prev) {
-        Object *obj = new Object(name);
-
-        // indexing
-        // for each vertex of each triangle
-        qDebug() << "vertexIndices: " << vertexIndices.size();
-        qDebug() << "temp_vertices: " << temp_vertices.size();
-        vertices_count += vertexIndices.size();
-
-        for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
-            unsigned int vertexIndex = vertexIndices[i];
-            QVector3D vertex = temp_vertices[vertexIndex - 1];
-            obj->add_m_vertex(vertex);
-        }
-        qDebug() << "done vertexIndices: " << vertexIndices.size();
-        QVector4D color = QVector4D(1.0, 0.0, 1.0, 1.0) ;
-        obj->setColor(color);
-        objects.push_back(obj);
-    }
-
-    file.close();
-
-    qDebug() << "Done Func: loadVertices";
-    qDebug() << "MIN: " << min_x << " " << min_y << " " << min_z;
-    qDebug() << "MAX: " << max_x << " " << max_y << " " << max_z;
-
-    return vertices_count;
-}
-
 unsigned int MainOpenGL::loadOBJ_skeleton(QString path, std::vector<Object*> & objects)
 {
     qDebug() << "Func: loadVertices";
@@ -510,7 +384,8 @@ unsigned int MainOpenGL::loadOBJ_skeleton(QString path, std::vector<Object*> & o
         wordList = line.split(' ');
         if (wordList[0] == "o") {
             if (flag_prev) {
-                Object *obj = new Object(name);
+                int idx = objects.size();
+                Object *obj = new Object(name, idx);
                 // indexing
                 // for each vertex of each triangle
                 qDebug() << "vertexIndices: " << vertexIndices.size();
@@ -541,15 +416,18 @@ unsigned int MainOpenGL::loadOBJ_skeleton(QString path, std::vector<Object*> & o
             float y1 = atof(wordList[2].data());
             float z1 = atof(wordList[3].data());
             QVector3D mesh_vertex(x1, y1, z1);
-
-            float x2 = atof(wordList[4].data());
-            float y2 = atof(wordList[5].data());
-            float z2 = atof(wordList[6].data());
-            QVector3D skeleton_vertex(x2, y2, z2);
-
             struct VertexData v;
             v.mesh_vertex = mesh_vertex;
-            v.skeleton_vertex = skeleton_vertex;
+            if (wordList.size() < 6) {
+                // place wholder
+                v.skeleton_vertex = mesh_vertex;
+            } else {
+                float x2 = atof(wordList[4].data());
+                float y2 = atof(wordList[5].data());
+                float z2 = atof(wordList[6].data());
+                QVector3D skeleton_vertex(x2, y2, z2);
+                v.skeleton_vertex = skeleton_vertex;
+            }
             temp_vertices.push_back(v);
         } else if (wordList[0]  == "f") {
             unsigned int f1_index = atoi(wordList[1].data());
@@ -564,7 +442,8 @@ unsigned int MainOpenGL::loadOBJ_skeleton(QString path, std::vector<Object*> & o
     }
 
     if (flag_prev) {
-        Object *obj = new Object(name);
+        int idx = objects.size();
+        Object *obj = new Object(name, idx);
         // indexing
         // for each vertex of each triangle
         qDebug() << "vertexIndices: " << vertexIndices.size();
@@ -600,8 +479,8 @@ unsigned int MainOpenGL::loadSkeletonPoints(QString path, std::vector<Object*> &
 
     QTextStream in(&file);
     QList<QByteArray> wordList;
-
-    Object *obj = new Object("Skeleton");
+    int idx = objects.size();
+    Object *obj = new Object("Skeleton", idx);
     // Point ID, thickness, X Coord, Y Coord, Z Coord, Object ID
     unsigned int vertices_count = 0;
     while (!file.atEnd()) {

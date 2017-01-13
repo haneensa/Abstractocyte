@@ -1,6 +1,6 @@
 #version 330 core
 
-in vec4         posAttrG;
+in vec4         Gskeleton_vx;
 in vec3         normal_out;
 out vec4        outcol;
 
@@ -65,6 +65,6 @@ void main() {
     // y_axis astrocyte, else if neurite use (x_axis)
     float val = translate(y_axis, 0, 20, 0.0, 1.0);
     outcol = toon_color * val +   (1.0 - val) * phong_color;
-    val = translate(y_axis, 20, 100, 0.0, 1.0);
-    outcol.a = 1.0/* - val*/;
+    val = translate(y_axis, 70, 100, 0.0, 1.0);
+    outcol.a = 1.0 - val;
 }

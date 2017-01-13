@@ -15,7 +15,7 @@ struct VertexData {
 class Object
 {
 public:
-    Object(std::string name);
+    Object(std::string name, int idx, int ID = 0);
     ~Object();
 
     // add vertex to mesh only
@@ -42,6 +42,7 @@ private:
     Object_t                m_object_t;     /* object type */
     std::string             m_name;
     int                     m_ID;
+    int                     m_idxID;
     std::vector<QVector3D>  m_mesh_vertices;
     std::vector<QVector3D>  m_skeleton_vertices;
     std::vector< struct VertexData >  m_mesh_skeleton_vertices;
