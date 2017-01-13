@@ -405,7 +405,7 @@ unsigned int MainOpenGL::loadOBJ_skeleton(QString path, std::vector<Object*> & o
             name  = wordList[1].data();
             vertexIndices.clear();
             temp_vertices.clear();
-            if (objects.size() > 200) {
+            if (objects.size() > 205) {
                   flag_prev = false;
                   qDebug() << "Size limit";
                    break;

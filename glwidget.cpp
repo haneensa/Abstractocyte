@@ -129,7 +129,7 @@ void GLWidget::initializeGL()
     m_vbo_mesh.allocate(NULL, m_vertices_size  * sizeof(m_objects[0]->get_ms_Vertices()[0]));
     int offset = 0;
     int all = 0;
-    for (std::size_t i = 0; i != m_objects.size(); i++) {
+    for (std::size_t i = 0; i < m_objects.size(); i++) {
         all +=  m_objects[i]->get_ms_Size();
         int count = m_objects[i]->get_ms_Size() * sizeof(m_objects[0]->get_ms_Vertices()[0]);
         m_vbo_mesh.write(offset, &m_objects[i]->get_ms_Vertices()[0], count);
@@ -138,11 +138,12 @@ void GLWidget::initializeGL()
                     m_vertices_size  * sizeof(m_objects[0]->get_ms_Vertices()[0]) << " " <<  all;
 
    }
-
+    qDebug() << "done";
     offset = 0;
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
                           sizeof(m_objects[0]->get_ms_Vertices()[0]),  0);
+    qDebug() << "x1";
 
 
     offset +=  sizeof(QVector3D);
@@ -150,6 +151,7 @@ void GLWidget::initializeGL()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
                           sizeof(m_objects[0]->get_ms_Vertices()[0]), (GLvoid*)offset);
 
+    qDebug() << "x2";
 
     offset += sizeof(QVector3D);
     glEnableVertexAttribArray(2);
@@ -240,6 +242,8 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
+    qDebug() << "paint";
+
     // paint the text here
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -266,19 +270,25 @@ void GLWidget::paintGL()
 
    // if (m_yaxis < 99) {
         m_vao_mesh.bind();
+        qDebug() << "x1";
         glUseProgram(m_program_mesh);
         setMVPAttrib(m_program_mesh);
+        qDebug() << "x2";
 
         GLuint y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
         glUniform1iv(y_axis, 1, &m_yaxis);
+        qDebug() << "x3";
 
         GLuint x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
         glUniform1iv(x_axis, 1, &m_xaxis);
+        qDebug() << "x4";
 
         GLuint state = glGetUniformLocation(m_program_mesh, "state");
         glUniform1iv(state, 1, &m_state);
+        qDebug() << "x5";
 
         glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
+        qDebug() << "x6";
 
         m_vao_mesh.release();
    // }
