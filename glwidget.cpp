@@ -135,38 +135,20 @@ void GLWidget::initializeGL()
    }
 
     offset = 0;
-    GLint V_ID = glGetAttribLocation(m_program_mesh, "mesh_vx");
-    qDebug() << "V_ID Attr: " << V_ID;
-    if (V_ID == -1) {
-            qDebug() << "Could not bind attribute posAttr";
-            return;
-    }
-
-
-    glEnableVertexAttribArray(V_ID);
-    glVertexAttribPointer(V_ID, 3, GL_FLOAT, GL_FALSE,
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
                           sizeof(m_objects[0]->get_ms_Vertices()[0]),  0);
 
-    V_ID = glGetAttribLocation(m_program_mesh, "skeleton_vx");
-   qDebug() << "V_ID Attr: " << V_ID;
-   if (V_ID == -1) {
-           qDebug() << "Could not bind attribute posAttr";
-           return;
-   }
+
     offset +=  sizeof(QVector3D);
-    glEnableVertexAttribArray(V_ID);
-    glVertexAttribPointer(V_ID, 3, GL_FLOAT, GL_FALSE,
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
                           sizeof(m_objects[0]->get_ms_Vertices()[0]), (GLvoid*)offset);
 
-     V_ID = glGetAttribLocation(m_program_mesh, "ID");
-    qDebug() << "V_ID Attr: " << V_ID;
-    if (V_ID == -1) {
-            qDebug() << "Could not bind attribute posAttr";
-            return;
-    }
+
     offset += sizeof(QVector3D);
-    glEnableVertexAttribArray(V_ID);
-    glVertexAttribPointer(V_ID, 1, GL_INT, GL_FALSE,
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 1, GL_INT, GL_FALSE,
                           sizeof(m_objects[0]->get_ms_Vertices()[0]), (GLvoid*)offset);
 
     m_vbo_mesh.release();
