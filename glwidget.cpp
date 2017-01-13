@@ -21,14 +21,17 @@ GLWidget::GLWidget(QWidget *parent)
 {
     QString path = "://data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj";
     m_vertices_size = loadOBJ_skeleton(path, m_objects);
-    qDebug() << "mesh size: " << m_objects.size() << " m_vertices_size: " << m_vertices_size;
+    qDebug() << "mesh size: " << m_objects.size() << " m_vertices_size: " << m_vertices_size; // 7492836
 
     path = "://data/mouse03_neurites.obj";
-    m_vertices_size += loadOBJ_skeleton(path, m_objects);
-    qDebug() << "mesh updated size: " << m_objects.size() << " m_vertices_size: " << m_vertices_size;
+    int temp = loadOBJ_skeleton(path, m_objects);
+
+    qDebug() << "mesh updated size: " << m_objects.size() << " m_vertices_size: " << temp;
+    m_vertices_size += temp;
+    qDebug() << "mesh all size: " << m_objects.size() << " m_vertices_size: " << m_vertices_size;
 
     path = "://data/skeleton_astrocyte_m3/astro_points_200.csv";
-    m_skeleton_vertices_size = loadSkeletonPoints(path, m_skeleton_obj);
+    m_skeleton_vertices_size = loadSkeletonPoints(path, m_skeleton_obj); // 11638884, 19131720
     qDebug() << "skeleton size: " << m_skeleton_obj.size();
 
 
@@ -124,13 +127,15 @@ void GLWidget::initializeGL()
     }
 
     m_vbo_mesh.allocate(NULL, m_vertices_size  * sizeof(m_objects[0]->get_ms_Vertices()[0]));
-
     int offset = 0;
+    int all = 0;
     for (std::size_t i = 0; i != m_objects.size(); i++) {
-        int count = m_objects[i]->get_ms_Size() * sizeof(m_objects[i]->get_ms_Vertices()[0]);
+        all +=  m_objects[i]->get_ms_Size();
+        int count = m_objects[i]->get_ms_Size() * sizeof(m_objects[0]->get_ms_Vertices()[0]);
         m_vbo_mesh.write(offset, &m_objects[i]->get_ms_Vertices()[0], count);
         offset += count;
-        qDebug() << "allocating: " << m_objects[i]->getName().data() << " count: " << count;
+        qDebug() << i << " allocating: " << m_objects[i]->getName().data() << " count: " << count << "offset " << offset << " " <<
+                    m_vertices_size  * sizeof(m_objects[0]->get_ms_Vertices()[0]) << " " <<  all;
 
    }
 
@@ -184,43 +189,43 @@ void GLWidget::initializeGL()
 //    m_vbo_mesh.release();
 //    m_vao_mesh_points.release();
 
-    /********** START SKELETON **************/
-    qDebug() << "point";
+//    /********** START SKELETON **************/
+//    qDebug() << "point";
 
-    m_program_skeleton = glCreateProgram();
-    res = initShader(m_program_skeleton, ":/shaders/skeleton_point.vert", ":/shaders/skeleton_point.geom", ":/shaders/skeleton_point.frag");
-    if (res == false)
-        return;
+//    m_program_skeleton = glCreateProgram();
+//    res = initShader(m_program_skeleton, ":/shaders/skeleton_point.vert", ":/shaders/skeleton_point.geom", ":/shaders/skeleton_point.frag");
+//    if (res == false)
+//        return;
 
-    qDebug() << "Initializing SKELETON 1";
-    m_vao_skeleton.create();
-    m_vao_skeleton.bind();
+//    qDebug() << "Initializing SKELETON 1";
+//    m_vao_skeleton.create();
+//    m_vao_skeleton.bind();
 
-    glUseProgram(m_program_skeleton);
-    setMVPAttrib(m_program_skeleton);
+//    glUseProgram(m_program_skeleton);
+//    setMVPAttrib(m_program_skeleton);
 
-    GLuint color_idx = glGetUniformLocation(m_program_skeleton, "color");
-    QVector3D color = QVector3D(0.8, 0.0, 0.0);
-    glUniform3fv(color_idx, 1, &color[0]);
+//    GLuint color_idx = glGetUniformLocation(m_program_skeleton, "color");
+//    QVector3D color = QVector3D(0.8, 0.0, 0.0);
+//    glUniform3fv(color_idx, 1, &color[0]);
 
-    m_vbo_skeleton.create();
-    m_vbo_skeleton.setUsagePattern( QOpenGLBuffer::StaticDraw);
-    if ( !m_vbo_skeleton.bind() ) {
-        qDebug() << "Could not bind vertex buffer to the context.";
-    }
+//    m_vbo_skeleton.create();
+//    m_vbo_skeleton.setUsagePattern( QOpenGLBuffer::StaticDraw);
+//    if ( !m_vbo_skeleton.bind() ) {
+//        qDebug() << "Could not bind vertex buffer to the context.";
+//    }
 
-    m_vbo_skeleton.allocate(NULL, /*m_vertices_size*/  m_skeleton_obj[0]->get_s_Size() * sizeof(QVector3D));
+//    m_vbo_skeleton.allocate(NULL, /*m_vertices_size*/  m_skeleton_obj[0]->get_s_Size() * sizeof(QVector3D));
 
-    for (std::size_t i = 0; i != 1; i++) {
-        qDebug() << "allocating: " << m_skeleton_obj[i]->getName().data();
-        m_vbo_skeleton.write(0, &m_skeleton_obj[i]->get_s_Vertices()[0], m_skeleton_obj[i]->get_s_Size() * sizeof(QVector3D));
-   }
+//    for (std::size_t i = 0; i != 1; i++) {
+//       // qDebug() << "allocating: " << m_skeleton_obj[i]->getName().data();
+//        m_vbo_skeleton.write(0, &m_skeleton_obj[i]->get_s_Vertices()[0], m_skeleton_obj[i]->get_s_Size() * sizeof(QVector3D));
+//   }
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0,  0);
+//    glEnableVertexAttribArray(0);
+//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0,  0);
 
-    m_vbo_skeleton.release();
-    m_vao_skeleton.release();
+//    m_vbo_skeleton.release();
+//    m_vao_skeleton.release();
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
@@ -241,21 +246,21 @@ void GLWidget::paintGL()
     const qreal retinaScale = devicePixelRatio();
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
 
-    m_vao_skeleton.bind();
-    glUseProgram(m_program_skeleton);
-    setMVPAttrib(m_program_skeleton);
+//    m_vao_skeleton.bind();
+//    glUseProgram(m_program_skeleton);
+//    setMVPAttrib(m_program_skeleton);
 
-    GLuint y_axis = glGetUniformLocation(m_program_skeleton, "y_axis");
-    glUniform1iv(y_axis, 1, &m_yaxis);
+//    GLuint y_axis = glGetUniformLocation(m_program_skeleton, "y_axis");
+//    glUniform1iv(y_axis, 1, &m_yaxis);
 
-    GLuint x_axis = glGetUniformLocation(m_program_skeleton, "x_axis");
-    glUniform1iv(x_axis, 1, &m_xaxis);
+//    GLuint x_axis = glGetUniformLocation(m_program_skeleton, "x_axis");
+//    glUniform1iv(x_axis, 1, &m_xaxis);
 
-    GLuint state = glGetUniformLocation(m_program_skeleton, "state");
-    glUniform1iv(state, 1, &m_state);
+//    GLuint state = glGetUniformLocation(m_program_skeleton, "state");
+//    glUniform1iv(state, 1, &m_state);
 
-    glDrawArrays(GL_POINTS, 0,  m_skeleton_vertices_size );
-    m_vao_skeleton.release();
+//    glDrawArrays(GL_POINTS, 0,  m_skeleton_vertices_size );
+//    m_vao_skeleton.release();
 
     /************************/
 
@@ -264,13 +269,13 @@ void GLWidget::paintGL()
         glUseProgram(m_program_mesh);
         setMVPAttrib(m_program_mesh);
 
-        y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
+        GLuint y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
         glUniform1iv(y_axis, 1, &m_yaxis);
 
-        x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
+        GLuint x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
         glUniform1iv(x_axis, 1, &m_xaxis);
 
-        state = glGetUniformLocation(m_program_mesh, "state");
+        GLuint state = glGetUniformLocation(m_program_mesh, "state");
         glUniform1iv(state, 1, &m_state);
 
         glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );

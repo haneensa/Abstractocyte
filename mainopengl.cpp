@@ -65,6 +65,7 @@ bool MainOpenGL::initShader(GLuint program, const char *vshader, const char *gsh
     qDebug() << "Initializing shaders";
     QResource vs_resource(vshader);
     const char* vs_data = (const char *)vs_resource.data();
+
     GLint compile_ok = GL_FALSE, link_ok = GL_FALSE;
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vs, 1, &vs_data, NULL);
@@ -388,33 +389,28 @@ unsigned int MainOpenGL::loadOBJ_skeleton(QString path, std::vector<Object*> & o
             if (flag_prev) {
                 int idx = objects.size();
                 Object *obj = new Object(name, idx);
-                // indexing
-                // for each vertex of each triangle
-                qDebug() << "vertexIndices: " << vertexIndices.size();
-                qDebug() << "temp_vertices: " << temp_vertices.size();
-                vertices_count += vertexIndices.size();
-
                 for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
                     unsigned int vertexIndex = vertexIndices[i];
                     struct VertexData v = temp_vertices[vertexIndex - 1];
                     v.ID = idx;
                     obj->add_ms_vertex(v);
                 }
+                vertices_count += vertexIndices.size();
 
-                qDebug() << "done vertexIndices: " << vertexIndices.size();
                 QVector4D color = QVector4D(1.0, 0.0, 1.0, 1.0) ;
                 obj->setColor(color);
                 objects.push_back(obj);
-                if (objects.size() > 10) {
-                    flag_prev = false;
-                    qDebug() << "Size limit";
-                    break;
-                }
             }
 
             name  = wordList[1].data();
             vertexIndices.clear();
             temp_vertices.clear();
+            if (objects.size() > 200) {
+                  flag_prev = false;
+                  qDebug() << "Size limit";
+                   break;
+            }
+
             flag_prev = true;
         } else if (wordList[0]  == "v") {
             float x1 = atof(wordList[1].data());
@@ -449,18 +445,13 @@ unsigned int MainOpenGL::loadOBJ_skeleton(QString path, std::vector<Object*> & o
     if (flag_prev) {
         int idx = objects.size();
         Object *obj = new Object(name, idx);
-        // indexing
-        // for each vertex of each triangle
-        qDebug() << "vertexIndices: " << vertexIndices.size();
-        qDebug() << "temp_vertices: " << temp_vertices.size();
-        vertices_count += vertexIndices.size();
         for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
             unsigned int vertexIndex = vertexIndices[i];
             struct VertexData v = temp_vertices[vertexIndex - 1];
             v.ID = idx;
             obj->add_ms_vertex(v);
         }
-        qDebug() << "done vertexIndices: " << vertexIndices.size();
+        vertices_count += vertexIndices.size();
         QVector4D color = QVector4D(1.0, 0.0, 1.0, 1.0) ;
         obj->setColor(color);
         objects.push_back(obj);
