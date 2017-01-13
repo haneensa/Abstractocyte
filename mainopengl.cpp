@@ -1,5 +1,6 @@
 #include "mainopengl.h"
 #include <QResource>
+#include <chrono>
 
 MainOpenGL::MainOpenGL()
     : flag(false)
@@ -359,6 +360,8 @@ void MainOpenGL::renderText( float x, float y, float scaleX, float scaleY, const
 unsigned int MainOpenGL::loadOBJ_skeleton(QString path, std::vector<Object*> & objects)
 {
     qDebug() << "Func: loadVertices";
+    auto t1 = std::chrono::high_resolution_clock::now();
+
     unsigned int vertices_count = 0;
 
     QFile file(path);
@@ -466,6 +469,10 @@ unsigned int MainOpenGL::loadOBJ_skeleton(QString path, std::vector<Object*> & o
     file.close();
 
     qDebug() << "Done Func: loadVertices";
+    auto t2 = std::chrono::high_resolution_clock::now();
+    qDebug() << "f() took "
+                 << std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count()
+                 << " milliseconds\n";
 
     return vertices_count;
 }
