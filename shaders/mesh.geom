@@ -2,6 +2,10 @@
 
 in vec4 Vskeleton_vx[];
 out vec4 Gskeleton_vx;
+
+in int V_ID[];
+out float G_ID;
+
 out vec3 normal_out;
 
 layout(triangles) in;
@@ -36,6 +40,7 @@ void main() {
   normal_out = normalize(cross(A,B));
 
   for(int i = 0; i < 3; i++) {
+    G_ID = float(V_ID[i]);
     Gskeleton_vx = vec4(Vskeleton_vx[i].xyz, 1.0);
     float val = translate(y_axis, 20, 100, 0.0, 1.0);
     vec4 new_position = mix(gl_in[i].gl_Position , Gskeleton_vx, val);

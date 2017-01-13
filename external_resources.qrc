@@ -1,8 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>data/mouse03_astro.obj</file>
-        <file>data/skeleton_astrocyte_m3/astro_points.csv</file>
         <file>data/skeleton_astrocyte_m3/astro_points_200.csv</file>
         <file>data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj</file>
+        <file>data/mouse03_neurites.obj</file>
     </qresource>
 </RCC>

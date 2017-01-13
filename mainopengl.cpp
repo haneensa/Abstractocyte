@@ -370,7 +370,6 @@ unsigned int MainOpenGL::loadOBJ_skeleton(QString path, std::vector<Object*> & o
     QTextStream in(&file);
     QList<QByteArray> wordList;
 
-
     // temp containters
     std::vector< unsigned int > vertexIndices;
     std::vector< struct VertexData > temp_vertices;
@@ -395,13 +394,16 @@ unsigned int MainOpenGL::loadOBJ_skeleton(QString path, std::vector<Object*> & o
                 for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
                     unsigned int vertexIndex = vertexIndices[i];
                     struct VertexData v = temp_vertices[vertexIndex - 1];
+                    v.ID = idx;
                     obj->add_ms_vertex(v);
                 }
+
                 qDebug() << "done vertexIndices: " << vertexIndices.size();
                 QVector4D color = QVector4D(1.0, 0.0, 1.0, 1.0) ;
                 obj->setColor(color);
                 objects.push_back(obj);
-                if (objects.size() > 5) {
+                if (objects.size() > 10) {
+                    flag_prev = false;
                     qDebug() << "Size limit";
                     break;
                 }
@@ -419,7 +421,7 @@ unsigned int MainOpenGL::loadOBJ_skeleton(QString path, std::vector<Object*> & o
             struct VertexData v;
             v.mesh_vertex = mesh_vertex;
             if (wordList.size() < 6) {
-                // place wholder
+                // place holder
                 v.skeleton_vertex = mesh_vertex;
             } else {
                 float x2 = atof(wordList[4].data());
@@ -452,6 +454,7 @@ unsigned int MainOpenGL::loadOBJ_skeleton(QString path, std::vector<Object*> & o
         for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
             unsigned int vertexIndex = vertexIndices[i];
             struct VertexData v = temp_vertices[vertexIndex - 1];
+            v.ID = idx;
             obj->add_ms_vertex(v);
         }
         qDebug() << "done vertexIndices: " << vertexIndices.size();
