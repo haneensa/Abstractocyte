@@ -20,22 +20,10 @@ GLWidget::GLWidget(QWidget *parent)
         m_state(0)
 {
     QString path = "://data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj";
-<<<<<<< HEAD
     m_mesh.loadObj(path);
 
     path = "://data/mouse03_neurites.obj";
     m_mesh.loadObj(path);
-=======
-    m_vertices_size = loadOBJ_skeleton(path, m_objects);
-    qDebug() << "mesh size: " << m_objects.size() << " m_vertices_size: " << m_vertices_size; // 7492836
-
-    path = "://data/mouse03_neurites.obj";
-    int temp = loadOBJ_skeleton(path, m_objects);
-
-    qDebug() << "mesh updated size: " << m_objects.size() << " m_vertices_size: " << temp;
-    m_vertices_size += temp;
-    qDebug() << "mesh all size: " << m_objects.size() << " m_vertices_size: " << m_vertices_size;
->>>>>>> ff1dada6bc8204f1f8353717db947958fb1949b2
 
     path = "://data/skeleton_astrocyte_m3/astro_points_200.csv";
     m_skeleton_vertices_size = loadSkeletonPoints(path, m_skeleton_obj); // 11638884, 19131720
@@ -280,12 +268,7 @@ void GLWidget::paintGL()
         glUniform1iv(state, 1, &m_state);
         qDebug() << "x5";
 
-<<<<<<< HEAD
         glDrawArrays(GL_TRIANGLES, 0,   m_mesh.getVertixCount() );
-=======
-        glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
-        qDebug() << "x6";
->>>>>>> ff1dada6bc8204f1f8353717db947958fb1949b2
 
         m_vao_mesh.release();
    // }
