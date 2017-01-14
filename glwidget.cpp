@@ -22,7 +22,7 @@ GLWidget::GLWidget(QWidget *parent)
     QString path = "://data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj";
     m_mesh.loadObj(path);
 
-    path = "://data/mouse03_neurites.obj";
+    path = "://data/mouse03_neurites_avg.obj";
     m_mesh.loadObj(path);
 
     path = "://data/skeleton_astrocyte_m3/astro_points_200.csv";
@@ -274,6 +274,7 @@ void GLWidget::paintGL()
         m_vao_mesh.release();
 
 
+    if (m_yaxis < 99) {
         m_vao_mesh_points.bind();
         glUseProgram(m_program_mesh_points);
         setMVPAttrib(m_program_mesh_points);
@@ -290,7 +291,7 @@ void GLWidget::paintGL()
         glDrawArrays(GL_TRIANGLES, 0,  m_mesh.getVertixCount() );
 
         m_vao_mesh_points.release();
-
+    }
 }
 
 void GLWidget::resizeGL(int w, int h)

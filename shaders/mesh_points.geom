@@ -44,7 +44,12 @@ void main() {
     for(int i = 0; i < 3; i++) {
       G_ID = float(V_ID[i]);
       Gskeleton_vx = vec4(Vskeleton_vx[i].xyz, 1.0);
-      float val = translate(y_axis, 20, 100, 0.0, 1.0);
+      float val;
+      if (G_ID <= 0.0)
+          val = translate(y_axis, 20, 100, 0.0, 1.0);
+      else
+          val = translate(x_axis, 20, 100, 0.0, 1.0);
+
       vec4 new_position = mix(gl_in[i].gl_Position , Gskeleton_vx, val);
       gl_Position = new_position;
       gl_PointSize = 3;
