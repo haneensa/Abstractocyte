@@ -7,7 +7,7 @@ in int V_ID[];
 out float G_ID;
 
 out vec3 normal_out;
-
+out float alpha;
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
@@ -45,6 +45,10 @@ void main() {
     float val = translate(y_axis, 20, 100, 0.0, 1.0);
     vec4 new_position = mix(gl_in[i].gl_Position , Gskeleton_vx, val);
     gl_Position = new_position;
+    if (G_ID <= 0.0)
+        alpha =  translate(y_axis, 70, 80, 1.0, 0.0);
+    else
+        alpha = 1.0;
     EmitVertex();
   }
 

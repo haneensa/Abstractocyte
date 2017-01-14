@@ -4,6 +4,7 @@ in vec4         Gskeleton_vx;
 in vec3         normal_out;
 in float        G_ID;
 
+in float        alpha;
 out vec4        outcol;
 
 uniform int     y_axis;
@@ -49,8 +50,8 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 }
 
 void main() {
-    float b = G_ID/7.0;
-    vec4 color = vec4(1.0, b, 0.0, 1.0) * diffuseColor * diffuseIntersity + ambient;
+    float b = G_ID/1275.0;
+    vec4 color = vec4(1.0, b, Gskeleton_vx.x, 1.0) * diffuseColor * diffuseIntersity + ambient;
     vec4 toon_color = vec4(color.r, color.g, color.b, 1.0);
     vec4 phong_color = vec4(color.r, color.g, color.b, 1.0) * cosTheta;
 
@@ -68,6 +69,5 @@ void main() {
     // y_axis astrocyte, else if neurite use (x_axis)
     float val = translate(y_axis, 0, 20, 0.0, 1.0);
     outcol = toon_color * val +   (1.0 - val) * phong_color;
-    val = translate(y_axis, 90, 100, 0.0, 1.0);
-    outcol.a = 1.0 - val;
+    outcol.a = alpha;
 }

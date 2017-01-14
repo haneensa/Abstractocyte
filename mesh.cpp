@@ -4,7 +4,7 @@
 Mesh::Mesh()
 {
     m_vertices_size = 0;
-    m_limit = 200;
+    m_limit = 20000;
 }
 
 Mesh::~Mesh()
@@ -44,7 +44,7 @@ bool Mesh::loadObj(QString path)
         QByteArray line = file.readLine();
         wordList = line.split(' ');
         if (wordList[0] == "o") {
-            if (flag_prev) {
+            if (flag_prev & vertexIndices.size() > 0) {
                 int idx = m_objects.size();
                 Object *obj = new Object(name, idx);
                 m_vertices_size += vertexIndices.size();
@@ -99,7 +99,7 @@ bool Mesh::loadObj(QString path)
         }
     }
 
-    if (flag_prev) {
+    if (flag_prev & vertexIndices.size() > 0) {
         int idx = m_objects.size();
         Object *obj = new Object(name, idx);
         m_vertices_size += vertexIndices.size();
@@ -133,11 +133,13 @@ int Mesh::getVertixCount()
 bool Mesh::initVBO(QOpenGLBuffer vbo)
 {
     int offset = 0;
-    for (std::size_t i = 0; i != m_objects.size(); i++) {
+    int vertices = 0;
+    for (std::size_t i = 0; i < m_objects.size(); i++) {
+        vertices +=  m_objects[i]->get_ms_Size();
         int count = m_objects[i]->get_ms_Size() * sizeof(VertexData);
+        qDebug() << i << " allocating: " << m_objects[i]->getName().data() <<  " " << m_objects.size() <<" m_vertices_size: " << m_vertices_size << " all bytes: " <<  m_vertices_size * sizeof(VertexData) << " vertices: " << vertices << " count: " << count << " offset: " << offset;
         vbo.write(offset, &m_objects[i]->get_ms_Vertices()[0], count);
         offset += count;
-        qDebug() << "allocating: " << m_objects[i]->getName().data() << " count: " << count;
 
    }
 

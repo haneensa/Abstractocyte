@@ -46,6 +46,7 @@ GLWidget::~GLWidget()
 
     makeCurrent();
     glDeleteProgram(m_program_skeleton);
+    glDeleteProgram(m_program_mesh);
 
     m_vao_mesh.destroy();
     m_vbo_mesh.destroy();
@@ -132,7 +133,6 @@ void GLWidget::initializeGL()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
                           sizeof(VertexData), (GLvoid*)offset);
 
-    qDebug() << "x2";
 
     offset += sizeof(QVector3D);
     glEnableVertexAttribArray(2);
@@ -142,73 +142,81 @@ void GLWidget::initializeGL()
     m_vbo_mesh.release();
     m_vao_mesh.release();
 
-//    /***************************************/
-//    m_program_mesh_points = glCreateProgram();
-//    res = initShader(m_program_mesh_points, ":/shaders/mesh.vert", ":/shaders/mesh_points.geom", ":/shaders/mesh.frag");
-//    if (res == false)
-//        return;
+    /***************************************/
+    m_program_mesh_points = glCreateProgram();
+    res = initShader(m_program_mesh_points, ":/shaders/mesh.vert", ":/shaders/mesh_points.geom", ":/shaders/mesh.frag");
+    if (res == false)
+        return;
 
-//    // create vbos and vaos
-//    m_vao_mesh_points.create();
-//    m_vao_mesh_points.bind();
+    // create vbos and vaos
+    m_vao_mesh_points.create();
+    m_vao_mesh_points.bind();
 
-//    glUseProgram(m_program_mesh_points); // m_program_mesh->bind();
+    glUseProgram(m_program_mesh_points); // m_program_mesh->bind();
 
-//    if ( !m_vbo_mesh.bind() ) {
-//        qDebug() << "Could not bind vertex buffer to the context.";
-//    }
+    if ( !m_vbo_mesh.bind() ) {
+        qDebug() << "Could not bind vertex buffer to the context.";
+    }
 
-//    setMVPAttrib(m_program_mesh_points);
-//    glEnableVertexAttribArray(0);
-//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-//                          sizeof(m_objects[0]->get_ms_Vertices()[0]),  0);
-//    glEnableVertexAttribArray(1);
-//    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
-//                          sizeof(m_objects[0]->get_ms_Vertices()[0]), (GLvoid*)sizeof(QVector3D));
-//    glEnableVertexAttribArray(2);
-//    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE,
-//                          sizeof(m_objects[0]->get_ms_Vertices()[0]), (GLvoid*)sizeof(int));
+    setMVPAttrib(m_program_mesh_points);
 
-//    m_vbo_mesh.release();
-//    m_vao_mesh_points.release();
+    offset = 0;
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexData),  0);
 
-//    /********** START SKELETON **************/
-//    qDebug() << "point";
 
-//    m_program_skeleton = glCreateProgram();
-//    res = initShader(m_program_skeleton, ":/shaders/skeleton_point.vert", ":/shaders/skeleton_point.geom", ":/shaders/skeleton_point.frag");
-//    if (res == false)
-//        return;
+    offset +=  sizeof(QVector3D);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexData), (GLvoid*)offset);
 
-//    qDebug() << "Initializing SKELETON 1";
-//    m_vao_skeleton.create();
-//    m_vao_skeleton.bind();
 
-//    glUseProgram(m_program_skeleton);
-//    setMVPAttrib(m_program_skeleton);
+    offset += sizeof(QVector3D);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 1, GL_INT, GL_FALSE,
+                          sizeof(VertexData), (GLvoid*)offset);
 
-//    GLuint color_idx = glGetUniformLocation(m_program_skeleton, "color");
-//    QVector3D color = QVector3D(0.8, 0.0, 0.0);
-//    glUniform3fv(color_idx, 1, &color[0]);
+    m_vbo_mesh.release();
+    m_vao_mesh_points.release();
 
-//    m_vbo_skeleton.create();
-//    m_vbo_skeleton.setUsagePattern( QOpenGLBuffer::StaticDraw);
-//    if ( !m_vbo_skeleton.bind() ) {
-//        qDebug() << "Could not bind vertex buffer to the context.";
-//    }
+    /********** START SKELETON **************/
+    qDebug() << "point";
 
-//    m_vbo_skeleton.allocate(NULL, /*m_vertices_size*/  m_skeleton_obj[0]->get_s_Size() * sizeof(QVector3D));
+    m_program_skeleton = glCreateProgram();
+    res = initShader(m_program_skeleton, ":/shaders/skeleton_point.vert", ":/shaders/skeleton_point.geom", ":/shaders/skeleton_point.frag");
+    if (res == false)
+        return;
 
-//    for (std::size_t i = 0; i != 1; i++) {
-//       // qDebug() << "allocating: " << m_skeleton_obj[i]->getName().data();
-//        m_vbo_skeleton.write(0, &m_skeleton_obj[i]->get_s_Vertices()[0], m_skeleton_obj[i]->get_s_Size() * sizeof(QVector3D));
-//   }
+    qDebug() << "Initializing SKELETON 1";
+    m_vao_skeleton.create();
+    m_vao_skeleton.bind();
 
-//    glEnableVertexAttribArray(0);
-//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0,  0);
+    glUseProgram(m_program_skeleton);
+    setMVPAttrib(m_program_skeleton);
 
-//    m_vbo_skeleton.release();
-//    m_vao_skeleton.release();
+    GLuint color_idx = glGetUniformLocation(m_program_skeleton, "color");
+    QVector3D color = QVector3D(0.8, 0.0, 0.0);
+    glUniform3fv(color_idx, 1, &color[0]);
+
+    m_vbo_skeleton.create();
+    m_vbo_skeleton.setUsagePattern( QOpenGLBuffer::StaticDraw);
+    if ( !m_vbo_skeleton.bind() ) {
+        qDebug() << "Could not bind vertex buffer to the context.";
+    }
+
+    m_vbo_skeleton.allocate(NULL, m_skeleton_obj[0]->get_s_Size() * sizeof(QVector3D));
+
+    for (std::size_t i = 0; i != 1; i++) {
+       // qDebug() << "allocating: " << m_skeleton_obj[i]->getName().data();
+        m_vbo_skeleton.write(0, &m_skeleton_obj[i]->get_s_Vertices()[0], m_skeleton_obj[i]->get_s_Size() * sizeof(QVector3D));
+   }
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0,  0);
+
+    m_vbo_skeleton.release();
+    m_vao_skeleton.release();
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
@@ -223,74 +231,66 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
-    qDebug() << "paint";
-
     // paint the text here
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     const qreal retinaScale = devicePixelRatio();
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
 
-//    m_vao_skeleton.bind();
-//    glUseProgram(m_program_skeleton);
-//    setMVPAttrib(m_program_skeleton);
+    m_vao_skeleton.bind();
+    glUseProgram(m_program_skeleton);
+    setMVPAttrib(m_program_skeleton);
 
-//    GLuint y_axis = glGetUniformLocation(m_program_skeleton, "y_axis");
-//    glUniform1iv(y_axis, 1, &m_yaxis);
+    GLuint y_axis = glGetUniformLocation(m_program_skeleton, "y_axis");
+    glUniform1iv(y_axis, 1, &m_yaxis);
 
-//    GLuint x_axis = glGetUniformLocation(m_program_skeleton, "x_axis");
-//    glUniform1iv(x_axis, 1, &m_xaxis);
+    GLuint x_axis = glGetUniformLocation(m_program_skeleton, "x_axis");
+    glUniform1iv(x_axis, 1, &m_xaxis);
 
-//    GLuint state = glGetUniformLocation(m_program_skeleton, "state");
-//    glUniform1iv(state, 1, &m_state);
+    GLuint state = glGetUniformLocation(m_program_skeleton, "state");
+    glUniform1iv(state, 1, &m_state);
 
-//    glDrawArrays(GL_POINTS, 0,  m_skeleton_vertices_size );
-//    m_vao_skeleton.release();
+    glDrawArrays(GL_POINTS, 0,  m_skeleton_vertices_size );
+    m_vao_skeleton.release();
 
     /************************/
+//
 
-   // if (m_yaxis < 99) {
         m_vao_mesh.bind();
-        qDebug() << "x1";
         glUseProgram(m_program_mesh);
         setMVPAttrib(m_program_mesh);
-        qDebug() << "x2";
 
-        GLuint y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
+        y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
         glUniform1iv(y_axis, 1, &m_yaxis);
-        qDebug() << "x3";
 
-        GLuint x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
+        x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
         glUniform1iv(x_axis, 1, &m_xaxis);
-        qDebug() << "x4";
 
-        GLuint state = glGetUniformLocation(m_program_mesh, "state");
+        state = glGetUniformLocation(m_program_mesh, "state");
         glUniform1iv(state, 1, &m_state);
-        qDebug() << "x5";
 
         glDrawArrays(GL_TRIANGLES, 0,   m_mesh.getVertixCount() );
 
         m_vao_mesh.release();
-   // }
 
-//    if (m_yaxis > 70) {
-//        m_vao_mesh_points.bind();
-//        glUseProgram(m_program_mesh_points);
-//        setMVPAttrib(m_program_mesh_points);
 
-//        y_axis = glGetUniformLocation(m_program_mesh_points, "y_axis");
-//        glUniform1iv(y_axis, 1, &m_yaxis);
+        m_vao_mesh_points.bind();
+        glUseProgram(m_program_mesh_points);
+        setMVPAttrib(m_program_mesh_points);
 
-//        x_axis = glGetUniformLocation(m_program_mesh_points, "x_axis");
-//        glUniform1iv(x_axis, 1, &m_xaxis);
+        y_axis = glGetUniformLocation(m_program_mesh_points, "y_axis");
+        glUniform1iv(y_axis, 1, &m_yaxis);
 
-//        state = glGetUniformLocation(m_program_mesh_points, "state");
-//        glUniform1iv(state, 1, &m_state);
+        x_axis = glGetUniformLocation(m_program_mesh_points, "x_axis");
+        glUniform1iv(x_axis, 1, &m_xaxis);
 
-//        glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
+        state = glGetUniformLocation(m_program_mesh_points, "state");
+        glUniform1iv(state, 1, &m_state);
 
-//        m_vao_mesh_points.release();
-//    }
+        glDrawArrays(GL_TRIANGLES, 0,  m_mesh.getVertixCount() );
+
+        m_vao_mesh_points.release();
+
 }
 
 void GLWidget::resizeGL(int w, int h)
