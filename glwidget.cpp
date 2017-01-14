@@ -20,17 +20,14 @@ GLWidget::GLWidget(QWidget *parent)
         m_state(0)
 {
     QString path = "://data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj";
-    m_vertices_size = loadOBJ_skeleton(path, m_objects);
-    qDebug() << "mesh size: " << m_objects.size() << " m_vertices_size: " << m_vertices_size;
+    m_mesh.loadObj(path);
 
     path = "://data/mouse03_neurites.obj";
-    m_vertices_size += loadOBJ_skeleton(path, m_objects);
-    qDebug() << "mesh updated size: " << m_objects.size() << " m_vertices_size: " << m_vertices_size;
+    m_mesh.loadObj(path);
 
     path = "://data/skeleton_astrocyte_m3/astro_points_200.csv";
     m_skeleton_vertices_size = loadSkeletonPoints(path, m_skeleton_obj);
     qDebug() << "skeleton size: " << m_skeleton_obj.size();
-
 
     m_distance = 0.2;
     m_rotation = QQuaternion();
@@ -48,14 +45,11 @@ GLWidget::~GLWidget()
     qDebug() << "~GLWidget()";
 
     makeCurrent();
-    glDeleteProgram(m_program_mesh);
     glDeleteProgram(m_program_skeleton);
 
     m_vao_mesh.destroy();
     m_vbo_mesh.destroy();
-    for (std::size_t i = 0; i != m_objects.size(); i++) {
-        delete m_objects[i];
-    }
+
 
     for (std::size_t i = 0; i != m_skeleton_obj.size(); i++) {
         delete m_skeleton_obj[i];
@@ -95,10 +89,10 @@ void GLWidget::setMVPAttrib(GLuint program)
 
 void GLWidget::initializeGL()
 {
+    qDebug() << "initializeGL";
     initializeOpenGLFunctions();
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    qDebug() << "initializeGL";
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -123,33 +117,26 @@ void GLWidget::initializeGL()
         qDebug() << "Could not bind vertex buffer to the context.";
     }
 
-    m_vbo_mesh.allocate(NULL, m_vertices_size  * sizeof(m_objects[0]->get_ms_Vertices()[0]));
+    m_vbo_mesh.allocate(NULL, m_mesh.getVertixCount()  * sizeof(VertexData));
+
+    m_mesh.initVBO(m_vbo_mesh);
 
     int offset = 0;
-    for (std::size_t i = 0; i != m_objects.size(); i++) {
-        int count = m_objects[i]->get_ms_Size() * sizeof(m_objects[i]->get_ms_Vertices()[0]);
-        m_vbo_mesh.write(offset, &m_objects[i]->get_ms_Vertices()[0], count);
-        offset += count;
-        qDebug() << "allocating: " << m_objects[i]->getName().data() << " count: " << count;
-
-   }
-
-    offset = 0;
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(m_objects[0]->get_ms_Vertices()[0]),  0);
+                          sizeof(VertexData),  0);
 
 
     offset +=  sizeof(QVector3D);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(m_objects[0]->get_ms_Vertices()[0]), (GLvoid*)offset);
+                          sizeof(VertexData), (GLvoid*)offset);
 
 
     offset += sizeof(QVector3D);
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 1, GL_INT, GL_FALSE,
-                          sizeof(m_objects[0]->get_ms_Vertices()[0]), (GLvoid*)offset);
+                          sizeof(VertexData), (GLvoid*)offset);
 
     m_vbo_mesh.release();
     m_vao_mesh.release();
@@ -273,7 +260,7 @@ void GLWidget::paintGL()
         state = glGetUniformLocation(m_program_mesh, "state");
         glUniform1iv(state, 1, &m_state);
 
-        glDrawArrays(GL_TRIANGLES, 0,  m_vertices_size );
+        glDrawArrays(GL_TRIANGLES, 0,   m_mesh.getVertixCount() );
 
         m_vao_mesh.release();
    // }

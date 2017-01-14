@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     edge.cpp \
     graph.cpp \
     mpstate.cpp \
-    statesrelations.cpp
+    statesrelations.cpp \
+    mesh.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -36,7 +37,8 @@ HEADERS  += mainwindow.h \
     edge.h \
     graph.h \
     mpstate.h \
-    statesrelations.h
+    statesrelations.h \
+    mesh.h
 
 FORMS    += mainwindow.ui
 

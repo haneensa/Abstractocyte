@@ -3,10 +3,12 @@
 
 #include <QOpenGLWidget>
 #include <QWidget>
+#include <QtOpenGL>
 
 #include "mainopengl.h"
 #include "graph.h"
-#include <QtOpenGL>
+#include "mesh.h"
+
 #define GL_GLEXT_PROTOTYPES
 
 class GLWidget : public QOpenGLWidget, MainOpenGL
@@ -33,10 +35,9 @@ protected:
     void loadMesh();
 
     /* mesh */
+    Mesh                        m_mesh;
     QOpenGLVertexArrayObject    m_vao_mesh;
     QOpenGLBuffer               m_vbo_mesh;
-    unsigned int                m_vertices_size;
-    std::vector<Object*>        m_objects;
     GLuint                      m_program_mesh;
 
 
