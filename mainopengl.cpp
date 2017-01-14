@@ -65,6 +65,7 @@ bool MainOpenGL::initShader(GLuint program, const char *vshader, const char *gsh
     qDebug() << "Initializing shaders";
     QResource vs_resource(vshader);
     const char* vs_data = (const char *)vs_resource.data();
+
     GLint compile_ok = GL_FALSE, link_ok = GL_FALSE;
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vs, 1, &vs_data, NULL);
