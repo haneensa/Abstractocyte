@@ -4,7 +4,7 @@
 Mesh::Mesh()
 {
     m_vertices_size = 0;
-    m_limit = 20;
+    m_limit = 200;
 }
 
 Mesh::~Mesh()
@@ -49,6 +49,8 @@ bool Mesh::loadObj(QString path)
                 Object *obj = new Object(name, idx);
                 m_vertices_size += vertexIndices.size();
 
+                // todo: move this to "f" so instead of looping again on faces insert them once
+                // todo: use vertix buffer and index buffer
                 for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
                     unsigned int vertexIndex = vertexIndices[i];
                     struct VertexData v = temp_vertices[vertexIndex - 1];

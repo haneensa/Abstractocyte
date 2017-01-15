@@ -10,7 +10,7 @@ out vec3 normal_out;
 out float alpha;
 
 layout(triangles) in;
-layout(points, max_vertices = 3) out;
+layout(points, max_vertices = 1) out;
 
 uniform int     y_axis;
 uniform int     x_axis;
@@ -41,24 +41,24 @@ void main() {
     normal_out = normalize(cross(A,B));
 
 
-    for(int i = 0; i < 3; i++) {
+ //   for(int i = 0; i < 3; i++) {
+ int i = 0;
       G_ID = float(V_ID[i]);
       Gskeleton_vx = vec4(Vskeleton_vx[i].xyz, 1.0);
       float val;
-      if (G_ID <= 0.0)
+      if (G_ID <= 0.0) {
           val = translate(y_axis, 20, 100, 0.0, 1.0);
-      else
+          alpha = translate(y_axis, 50, 80, 0.0, 1.0);
+      } else {
           val = translate(x_axis, 20, 100, 0.0, 1.0);
-
+          alpha = 0.0;
+      }
       vec4 new_position = mix(gl_in[i].gl_Position , Gskeleton_vx, val);
       gl_Position = new_position;
       gl_PointSize = 3;
-      if (G_ID <= 0.0)
-         alpha = translate(y_axis, 50, 80, 0.0, 1.0);
-      else
-        alpha = 0.0;
       EmitVertex();
-    }
+      EndPrimitive();
+   // }
 
 }
 

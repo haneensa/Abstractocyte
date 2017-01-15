@@ -355,6 +355,8 @@ void MainOpenGL::renderText( float x, float y, float scaleX, float scaleY, const
     glEnable(GL_DEPTH_TEST);
 }
 
+
+// todo: combine this with the mesh class
 unsigned int MainOpenGL::loadSkeletonPoints(QString path, std::vector<Object*> & objects)
 {
     qDebug() << "Func: loadSkeletonPoints";
