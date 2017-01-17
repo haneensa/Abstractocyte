@@ -5,6 +5,8 @@ out vec4 Gskeleton_vx;
 
 in int V_ID[];
 out float G_ID;
+out float   color_intp;
+out vec4        color_val;
 
 out vec3 normal_out;
 out float alpha;
@@ -45,10 +47,16 @@ void main() {
     float val;
     if (G_ID <= 0.0) {
         val = translate(y_axis, 20, 100, 0.0, 1.0);
-        alpha =  translate(y_axis, 70, 80, 1.0, 0.0);
+        alpha =  translate(y_axis, 60, 100, 1.0, 0.0);
+        color_intp = translate(y_axis, 0, 20, 0.0, 1.0);
+        color_val = vec4(1.0,  0.0, 0.0, 1.0);
+        if (alpha <= 0.8)
+            break;
     } else {
         val = translate(x_axis, 20, 100, 0.0, 1.0);
+        color_intp = translate(x_axis, 0, 20, 0.0, 1.0);
         alpha = 1.0;
+        color_val = vec4(1.0,  0.47, 0.8, 1.0);
     }
     vec4 new_position = mix(gl_in[i].gl_Position , Gskeleton_vx, val);
     gl_Position = new_position;

@@ -5,6 +5,8 @@ in vec3         normal_out;
 in float        G_ID;
 
 in float        alpha;
+in float        color_intp;
+in vec4        color_val;
 out vec4        outcol;
 
 uniform int     y_axis;
@@ -50,8 +52,7 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 }
 
 void main() {
-    float b = G_ID/1275.0;
-    vec4 color = vec4(1.0, b, Gskeleton_vx.x, 1.0) * diffuseColor * diffuseIntersity + ambient;
+    vec4 color = color_val * diffuseColor * diffuseIntersity + ambient;
     vec4 toon_color = vec4(color.r, color.g, color.b, 1.0);
     vec4 phong_color = vec4(color.r, color.g, color.b, 1.0) * cosTheta;
 
@@ -67,7 +68,6 @@ void main() {
     // interpolate between two colors
     // todo: based on the mesh type (astro, neurite)
     // y_axis astrocyte, else if neurite use (x_axis)
-    float val = translate(y_axis, 0, 20, 0.0, 1.0);
-    outcol = toon_color * val +   (1.0 - val) * phong_color;
+    outcol = toon_color * color_intp +   (1.0 - color_intp) * phong_color;
     outcol.a = alpha;
 }

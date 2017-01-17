@@ -273,7 +273,6 @@ void GLWidget::paintGL()
 
         m_vao_mesh.release();
 
-
     if (m_yaxis < 99) {
         m_vao_mesh_points.bind();
         glUseProgram(m_program_mesh_points);
