@@ -17,9 +17,10 @@ GLWidget::GLWidget(QWidget *parent)
         m_isRotatable(true),
         m_yaxis(0),
         m_xaxis(0),
-        m_state(0)
+        m_state(0),
+        m_ssbo(0)
 {
-    QString path = "://data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj";
+    QString path= "://data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj";
     m_mesh.loadObj(path);
 
     path = "://data/mouse03_neurites_avg.obj";
@@ -218,6 +219,23 @@ void GLWidget::initializeGL()
     m_vbo_skeleton.release();
     m_vao_skeleton.release();
 
+
+    /******************** SSBO test ***************************/
+
+    //struct shader_data_t shader_data;
+    glGenBuffers(1, &m_ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER,  m_mesh.getSSBOSize() , m_mesh.getSSBOData(), GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
+    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    memcpy(p,  m_mesh.getSSBOData(), m_mesh.getSSBOSize());
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+
+    /******************** END *********************************/
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);

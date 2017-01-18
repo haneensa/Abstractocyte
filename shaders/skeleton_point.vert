@@ -1,4 +1,4 @@
-#version 330 core
+#version 430
 
 in vec4 posAttr;
 out vec4 posAttrV;

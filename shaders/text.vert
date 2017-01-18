@@ -1,5 +1,4 @@
-#version 330 core
-
+#version 430
 // in: per vertex data
 in vec2 vertIn;
 

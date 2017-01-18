@@ -4,7 +4,7 @@
 Mesh::Mesh()
 {
     m_vertices_size = 0;
-    m_limit = 500;
+    m_limit = 20;
 }
 
 Mesh::~Mesh()
@@ -46,6 +46,7 @@ bool Mesh::loadObj(QString path)
         if (wordList[0] == "o") {
             if (flag_prev & vertexIndices.size() > 0) {
                 int idx = m_objects.size();
+                qDebug() << "Idx: " << idx;
                 Object *obj = new Object(name, idx);
                 m_vertices_size += vertexIndices.size();
 
@@ -57,8 +58,9 @@ bool Mesh::loadObj(QString path)
                     v.ID = idx;
                     obj->add_ms_vertex(v);
                 }
-                QVector4D color = QVector4D(1.0, 0.0, 1.0, 1.0) ;
-                obj->setColor(color);
+                QVector3D color = QVector3D(1.0, 0.0, 1.0) ;
+                m_ssbo_data.push_back(color);
+                obj->setColor(QVector4D(color, 1.0));
                 m_objects.push_back(obj);
                 if (m_objects.size() > m_limit) {
                     flag_prev = false;
@@ -104,6 +106,7 @@ bool Mesh::loadObj(QString path)
     if (flag_prev & vertexIndices.size() > 0) {
         int idx = m_objects.size();
         Object *obj = new Object(name, idx);
+        qDebug() << "Idx: " << idx;
         m_vertices_size += vertexIndices.size();
         for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
             unsigned int vertexIndex = vertexIndices[i];
@@ -111,8 +114,9 @@ bool Mesh::loadObj(QString path)
             v.ID = idx;
             obj->add_ms_vertex(v);
         }
-        QVector4D color = QVector4D(1.0, 0.0, 1.0, 1.0) ;
-        obj->setColor(color);
+        QVector3D color = QVector3D(1.0, 0.0, 0.0) ;
+        m_ssbo_data.push_back(color);
+        obj->setColor(QVector4D(color, 1.0));
         m_objects.push_back(obj);
     }
 
@@ -146,4 +150,20 @@ bool Mesh::initVBO(QOpenGLBuffer vbo)
    }
 
     return true;
+}
+
+
+void Mesh::addSSBOData(QVector3D d)
+{
+    m_ssbo_data.push_back(d);
+}
+
+int Mesh::getSSBOSize()
+{
+    return (sizeof(m_ssbo_data) * m_ssbo_data.size());
+}
+
+void* Mesh::getSSBOData()
+{
+    return m_ssbo_data.data();
 }

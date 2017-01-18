@@ -15,11 +15,23 @@ public:
     bool loadObj(QString path);
     int getVertixCount();
     bool initVBO(QOpenGLBuffer vbo);
+    void addSSBOData(QVector3D d);
+    int getSSBOSize();
+    void* getSSBOData();
+
 
 protected:
     int                         m_vertices_size;
     int                         m_limit;
+
+    // instead of storing the vertices for each object,
+    // store all the vertices at once
+    // use global index for each object
+    // use that index to render the object or not
+    // pros: storage for vertices,
+    // cons: global index to objects faces
     std::vector<Object*>        m_objects;
+    std::vector<QVector3D>      m_ssbo_data; // Color
 };
 
 #endif // MESH_H

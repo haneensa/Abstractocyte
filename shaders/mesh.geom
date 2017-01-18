@@ -1,17 +1,19 @@
-#version 330 core
+#version 430
 
 in vec4 Vskeleton_vx[];
 out vec4 Gskeleton_vx;
 
-in int V_ID[];
-out float G_ID;
+in int      V_ID[];
+in vec4     V_color[];
+out float   G_ID;
 out float   color_intp;
-out vec4        color_val;
+out vec4    color_val;
 
 out vec3 normal_out;
 out float alpha;
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
+
 
 uniform int     y_axis;
 uniform int     x_axis;
@@ -43,20 +45,20 @@ void main() {
 
   for(int i = 0; i < 3; i++) {
     G_ID = float(V_ID[i]);
+    color_val = V_color[i];
+
     Gskeleton_vx = vec4(Vskeleton_vx[i].xyz, 1.0);
     float val;
     if (G_ID <= 0.0) {
         val = translate(y_axis, 20, 100, 0.0, 1.0);
         alpha =  translate(y_axis, 60, 100, 1.0, 0.0);
         color_intp = translate(y_axis, 0, 20, 0.0, 1.0);
-        color_val = vec4(1.0,  0.0, 0.0, 1.0);
         if (alpha <= 0.8)
             break;
     } else {
         val = translate(x_axis, 20, 100, 0.0, 1.0);
         color_intp = translate(x_axis, 0, 20, 0.0, 1.0);
         alpha = 1.0;
-        color_val = vec4(1.0,  0.47, 0.8, 1.0);
     }
     vec4 new_position = mix(gl_in[i].gl_Position , Gskeleton_vx, val);
     gl_Position = new_position;

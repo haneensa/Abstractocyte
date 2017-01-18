@@ -51,6 +51,9 @@ protected:
     GLuint                      m_program_skeleton;
     std::vector<Object*>        m_skeleton_obj;
 
+    /* SSBO */
+    GLuint                      m_ssbo;
+
     /* matrices */
     QMatrix4x4                  m_projection;
     QMatrix4x4                  m_mMatrix;

@@ -29,9 +29,9 @@
 #include <QFile>
 
 #include "object.h"
-#include <QOpenGLFunctions_3_3_Core>
+#include <QOpenGLFunctions_4_3_Core>
 
-class MainOpenGL  : public QOpenGLFunctions_3_3_Core
+class MainOpenGL  : public QOpenGLFunctions_4_3_Core
 {
 public:
     MainOpenGL();

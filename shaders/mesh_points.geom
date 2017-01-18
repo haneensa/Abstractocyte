@@ -1,9 +1,10 @@
-#version 330 core
+#version 430
 
 in vec4 Vskeleton_vx[];
 out vec4 Gskeleton_vx;
 
 in int V_ID[];
+in vec4     V_color[];
 out float G_ID;
 
 out vec4        color_val;
@@ -42,6 +43,7 @@ void main() {
     vec3 B = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
     normal_out = normalize(cross(A,B));
     int i = 0;
+    color_val = V_color[i];
       G_ID = float(V_ID[i]);
       Gskeleton_vx = vec4(Vskeleton_vx[i].xyz, 1.0);
       float val;
