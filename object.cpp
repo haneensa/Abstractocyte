@@ -8,8 +8,8 @@ Object::Object(std::string name, int idx, int ID)
     }
 
     m_name  = name;
-    m_ID    = ID;
     m_idxID = idx;
+    m_ID    = ID;
     m_object_t = getObjectType(m_name);
     qDebug() << "create " << m_name.data();
 }

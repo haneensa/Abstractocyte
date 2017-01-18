@@ -45,8 +45,8 @@ bool Mesh::loadObj(QString path)
         wordList = line.split(' ');
         if (wordList[0] == "o") {
             if (flag_prev & vertexIndices.size() > 0) {
-                int idx = m_objects.size();
-                qDebug() << "Idx: " << idx;
+                GLint idx = m_objects.size();
+                idx  = 1;
                 Object *obj = new Object(name, idx);
                 m_vertices_size += vertexIndices.size();
 
@@ -98,15 +98,15 @@ bool Mesh::loadObj(QString path)
             vertexIndices.push_back(f1_index);
             vertexIndices.push_back(f2_index);
             vertexIndices.push_back(f3_index);
+            // insert into vertexIndices here
         } else if (wordList[0] == "vn") {
             qDebug() << "To do compute the normals and read them from here";
         }
     }
 
     if (flag_prev & vertexIndices.size() > 0) {
-        int idx = m_objects.size();
+        GLint idx = m_objects.size();
         Object *obj = new Object(name, idx);
-        qDebug() << "Idx: " << idx;
         m_vertices_size += vertexIndices.size();
         for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
             unsigned int vertexIndex = vertexIndices[i];

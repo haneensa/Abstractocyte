@@ -28,7 +28,7 @@ void main(void)
     Vskeleton_vx = pvmMatrix * vec4(skeleton_vx.xyz, 1.0);
     V_ID = ID;
 
-    if ((ID <= 10))
+    if (ID <= 10)
         V_color = vec4(1.0, 1.0, 0.0, 1.0);
     else
         V_color = vec4(colors[ID].rgb, 1.0);

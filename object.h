@@ -10,7 +10,7 @@ enum class Object_t { AXON, DENDRITE, BOUTON, SPINE, MITO, SYNAPSE, ASTROCYTE, G
 struct VertexData {
     QVector3D mesh_vertex;
     QVector3D skeleton_vertex;
-    int       ID;
+    GLint       ID;
 };
 
 class Object

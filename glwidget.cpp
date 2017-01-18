@@ -39,6 +39,15 @@ GLWidget::GLWidget(QWidget *parent)
     m_rotation.setZ(0.0f);
     //reset translation
     m_translation = QVector3D(0.0, 0.0, 0.0);
+    struct test {
+        float x;
+        float y;
+        float z;
+    };
+
+    qDebug() << "size of (QVector3D) " << sizeof(QVector3D);
+    qDebug() << "size of (test) " << sizeof(struct test);
+
 }
 
 GLWidget::~GLWidget()
@@ -98,7 +107,22 @@ void GLWidget::initializeGL()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    /******************** SSBO test ***************************/
 
+    //struct shader_data_t shader_data;
+    glGenBuffers(1, &m_ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER,  m_mesh.getSSBOSize() , m_mesh.getSSBOData(), GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
+    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    memcpy(p,  m_mesh.getSSBOData(), m_mesh.getSSBOSize());
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+
+    /******************** END *********************************/
     /* start initializing mesh */
     qDebug() << "Initializing MESH";
     m_program_mesh = glCreateProgram();
@@ -137,8 +161,8 @@ void GLWidget::initializeGL()
 
     offset += sizeof(QVector3D);
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 1, GL_INT, GL_FALSE,
-                          sizeof(VertexData), (GLvoid*)offset);
+    glVertexAttribIPointer(2, 1, GL_INT, sizeof(VertexData), (GLvoid*)offset);
+
 
     m_vbo_mesh.release();
     m_vao_mesh.release();
@@ -175,8 +199,7 @@ void GLWidget::initializeGL()
 
     offset += sizeof(QVector3D);
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 1, GL_INT, GL_FALSE,
-                          sizeof(VertexData), (GLvoid*)offset);
+    glVertexAttribIPointer(2, 1, GL_INT, sizeof(VertexData), (GLvoid*)offset);
 
     m_vbo_mesh.release();
     m_vao_mesh_points.release();
@@ -220,22 +243,7 @@ void GLWidget::initializeGL()
     m_vao_skeleton.release();
 
 
-    /******************** SSBO test ***************************/
 
-    //struct shader_data_t shader_data;
-    glGenBuffers(1, &m_ssbo);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
-    glBufferData(GL_SHADER_STORAGE_BUFFER,  m_mesh.getSSBOSize() , m_mesh.getSSBOData(), GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_ssbo);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
-    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-    memcpy(p,  m_mesh.getSSBOData(), m_mesh.getSSBOSize());
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-
-
-    /******************** END *********************************/
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
