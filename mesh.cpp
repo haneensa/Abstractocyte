@@ -4,7 +4,7 @@
 Mesh::Mesh()
 {
     m_vertices_size = 0;
-    m_limit = 20;
+    m_limit = 1050;
 }
 
 Mesh::~Mesh()
@@ -17,7 +17,6 @@ Mesh::~Mesh()
 // 75892 ----(remove debug msgs)---> 63610
 // todo: make this efficient by writing the input as binary file and loading items at once
 // todo: get the ID from hvgx and add it to the obj objects names -> used later to map skeleton to objects
-// todo: combine skeleton and mesh information in one obj file
 bool Mesh::loadObj(QString path)
 {
     qDebug() << "Func: loadVertices";
@@ -35,10 +34,11 @@ bool Mesh::loadObj(QString path)
     // temp containters
     std::vector< unsigned int > vertexIndices;
     std::vector< struct VertexData > temp_vertices;
-    bool flag_prev = false;
+    int flag_prev = 0;
     std::string name;
     GLint idx = -1;
     Object *obj = NULL;
+    QVector4D color = QVector4D(0.0, 0.0, 0.0, 1.0);
     // load all vertices once -> should be fast
     // for each object "o", go through its faces, and substitute using vertices loaded at the start
     while (!file.atEnd()) {
@@ -48,25 +48,24 @@ bool Mesh::loadObj(QString path)
             vertexIndices.clear();
             temp_vertices.clear();
 
-            if (m_objects.size() > m_limit) {
-                flag_prev = false;
-                qDebug() << "Size limit";
-                break;
+            if (flag_prev == 3) {
+                m_ssbo_data.push_back(color);
+                m_objects.push_back(obj);
             }
 
-            if (flag_prev == true) {
-                QVector4D color = QVector4D(1.0, 0.0, 1.0, 1.0) ;
-                m_ssbo_data.push_back(color);
-                obj->setColor(color);
-                m_objects.push_back(obj);
+            if (m_objects.size() > m_limit) {
+                flag_prev = 0;
+                qDebug() << "Size limit";
+                break;
             }
 
             name  = wordList[1].data();
             idx = m_objects.size();
             obj = new Object(name, idx);
-            flag_prev = false;
-
-        } else if (wordList[0]  == "v" && idx > -1 ) {
+            // get objet color based on type
+            color = obj->getColor();
+            flag_prev = 1;
+        } else if (wordList[0]  == "v" && flag_prev >= 1 ) {
             float x1 = atof(wordList[1].data());
             float y1 = atof(wordList[2].data());
             float z1 = atof(wordList[3].data());
@@ -85,8 +84,8 @@ bool Mesh::loadObj(QString path)
                 v.skeleton_vertex = skeleton_vertex;
             }
             temp_vertices.push_back(v);
-        } else if (wordList[0]  == "f"  && idx > -1) {
-            flag_prev = true;
+            flag_prev = 2;
+        } else if (wordList[0]  == "f"  && flag_prev >= 2) {
             unsigned int f1_index = atoi(wordList[1].data());
             unsigned int f2_index = atoi(wordList[2].data());
             unsigned int f3_index = atoi(wordList[3].data());
@@ -95,7 +94,7 @@ bool Mesh::loadObj(QString path)
                 // error, break
                 qDebug() << "Error in obj file! " << name.data() << " " << idx << " " << temp_vertices.size() << " " << f1_index << " " << f2_index << " " << f3_index ;
                 delete obj;
-                flag_prev = false;
+                flag_prev = 0;
                 break;
             }
 
@@ -110,22 +109,21 @@ bool Mesh::loadObj(QString path)
             obj->add_ms_vertex(v3);
 
             m_vertices_size += 3;
+            flag_prev = 3;
         } else if (wordList[0] == "vn") {
             qDebug() << "To do compute the normals and read them from here";
         }
     }
 
 
-    if (flag_prev == true) {
-        QVector4D color = QVector4D(1.0, 0.0, 0.0, 0.0) ;
+    if (flag_prev == 3) {
         m_ssbo_data.push_back(color);
-        obj->setColor(color);
         m_objects.push_back(obj);
     }
 
     file.close();
 
-    qDebug() << "Done Func: loadVertices " <<   m_ssbo_data.size();
+    qDebug() << "Done Func: loadVertices, m_ssbo_data size : " <<   m_ssbo_data.size();
     auto t2 = std::chrono::high_resolution_clock::now();
     qDebug() << "f() took "
                  << std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count()
@@ -168,5 +166,6 @@ int Mesh::getSSBOSize()
 
 void* Mesh::getSSBOData()
 {
-    return m_ssbo_data.data();
+    return &m_ssbo_data[0];
+    //return m_ssbo_data.data();
 }

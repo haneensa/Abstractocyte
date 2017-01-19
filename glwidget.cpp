@@ -44,10 +44,6 @@ GLWidget::GLWidget(QWidget *parent)
         float y;
         float z;
     };
-
-    qDebug() << "size of (QVector3D) " << sizeof(QVector3D);
-    qDebug() << "size of (test) " << sizeof(struct test);
-
 }
 
 GLWidget::~GLWidget()
@@ -110,17 +106,25 @@ void GLWidget::initializeGL()
     /******************** SSBO test ***************************/
 
     //struct shader_data_t shader_data;
+    qDebug() << " m_mesh.getSSBOSize(): " << m_mesh.getSSBOSize();
     glGenBuffers(1, &m_ssbo);
+    qDebug() << "x1";
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
+    qDebug() << "x2";
     glBufferData(GL_SHADER_STORAGE_BUFFER,  m_mesh.getSSBOSize() , m_mesh.getSSBOData(), GL_DYNAMIC_COPY);
+    qDebug() << "x3";
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_ssbo);
+    qDebug() << "x4";
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
+    qDebug() << "x5";
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
+    qDebug() << "x6";
     GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    qDebug() << "x7";
     memcpy(p,  m_mesh.getSSBOData(), m_mesh.getSSBOSize());
-
+    qDebug() << "x8";
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+    qDebug() << "x9";
 
 
     /******************** END *********************************/
@@ -221,7 +225,7 @@ void GLWidget::initializeGL()
     setMVPAttrib(m_program_skeleton);
 
     GLuint color_idx = glGetUniformLocation(m_program_skeleton, "color");
-    QVector3D color = QVector3D(0.8, 0.0, 0.0);
+    QVector3D color =  QVector3D(0.545, 0.0, 0.0);
     glUniform3fv(color_idx, 1, &color[0]);
 
     m_vbo_skeleton.create();

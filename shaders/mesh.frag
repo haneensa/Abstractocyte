@@ -19,7 +19,7 @@ uniform int     state;
 //  - light is behind the triangle -> 0
 
 //-------------------- AMBIENT LIGHT PROPERTIES --------------------
-vec4 ambient = vec4(0.10, 0.10, 0.10, 1.0); // sets lighting level, same across many vertices
+vec4 ambient = vec4(0.0, 0.0, 0.0, 1.0); // sets lighting level, same across many vertices
 
 //-------------------- DIFFUSE LIGHT PROPERTIES --------------------
 vec3 diffuseLightDirection  = vec3(-1.5f, 1.0f, -0.4f);

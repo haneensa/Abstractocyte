@@ -5,7 +5,7 @@
 #include <QOpenGLBuffer>
 #include <QOpenGLShaderProgram>
 
-enum class Object_t { AXON, DENDRITE, BOUTON, SPINE, MITO, SYNAPSE, ASTROCYTE, GLYCOGEN };
+enum class Object_t { AXON, DENDRITE, BOUTON, SPINE, MITO, SYNAPSE, ASTROCYTE, GLYCOGEN, UNKNOWN };
 
 struct VertexData {
     QVector3D mesh_vertex;
@@ -30,9 +30,9 @@ public:
     std::vector<QVector3D> get_s_Vertices();
     std::vector<struct VertexData> get_ms_Vertices();
 
-    int get_m_Size();
-    int get_s_Size();
-    int get_ms_Size();
+    size_t get_m_Size();
+    size_t get_s_Size();
+    size_t get_ms_Size();
 
     Object_t getObjectType(std::string name);
     std::string getName();
