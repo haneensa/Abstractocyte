@@ -37,48 +37,42 @@ bool Mesh::loadObj(QString path)
     std::vector< struct VertexData > temp_vertices;
     bool flag_prev = false;
     std::string name;
-
+    GLint idx = -1;
+    Object *obj = NULL;
     // load all vertices once -> should be fast
     // for each object "o", go through its faces, and substitute using vertices loaded at the start
     while (!file.atEnd()) {
         QByteArray line = file.readLine();
         wordList = line.split(' ');
-        if (wordList[0] == "o") {
-            if (flag_prev & vertexIndices.size() > 0) {
-                GLint idx = m_objects.size();
-                idx  = 1;
-                Object *obj = new Object(name, idx);
-                m_vertices_size += vertexIndices.size();
+        if (wordList[0] == "o") { 
+            vertexIndices.clear();
+            temp_vertices.clear();
 
-                // todo: move this to "f" so instead of looping again on faces insert them once
-                // todo: use vertix buffer and index buffer
-                for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
-                    unsigned int vertexIndex = vertexIndices[i];
-                    struct VertexData v = temp_vertices[vertexIndex - 1];
-                    v.ID = idx;
-                    obj->add_ms_vertex(v);
-                }
-                QVector3D color = QVector3D(1.0, 0.0, 1.0) ;
+            if (m_objects.size() > m_limit) {
+                flag_prev = false;
+                qDebug() << "Size limit";
+                break;
+            }
+
+            if (flag_prev == true) {
+                QVector4D color = QVector4D(1.0, 0.0, 1.0, 1.0) ;
                 m_ssbo_data.push_back(color);
-                obj->setColor(QVector4D(color, 1.0));
+                obj->setColor(color);
                 m_objects.push_back(obj);
-                if (m_objects.size() > m_limit) {
-                    flag_prev = false;
-                    qDebug() << "Size limit";
-                    break;
-                }
             }
 
             name  = wordList[1].data();
-            vertexIndices.clear();
-            temp_vertices.clear();
-            flag_prev = true;
-        } else if (wordList[0]  == "v") {
+            idx = m_objects.size();
+            obj = new Object(name, idx);
+            flag_prev = false;
+
+        } else if (wordList[0]  == "v" && idx > -1 ) {
             float x1 = atof(wordList[1].data());
             float y1 = atof(wordList[2].data());
             float z1 = atof(wordList[3].data());
             QVector3D mesh_vertex(x1, y1, z1);
             struct VertexData v;
+            v.ID = idx;
             v.mesh_vertex = mesh_vertex;
             if (wordList.size() < 6) {
                 // place holder
@@ -91,38 +85,47 @@ bool Mesh::loadObj(QString path)
                 v.skeleton_vertex = skeleton_vertex;
             }
             temp_vertices.push_back(v);
-        } else if (wordList[0]  == "f") {
+        } else if (wordList[0]  == "f"  && idx > -1) {
+            flag_prev = true;
             unsigned int f1_index = atoi(wordList[1].data());
             unsigned int f2_index = atoi(wordList[2].data());
             unsigned int f3_index = atoi(wordList[3].data());
-            vertexIndices.push_back(f1_index);
-            vertexIndices.push_back(f2_index);
-            vertexIndices.push_back(f3_index);
-            // insert into vertexIndices here
+
+            if (f1_index > temp_vertices.size() || f2_index > temp_vertices.size() || f3_index > temp_vertices.size()  ) {
+                // error, break
+                qDebug() << "Error in obj file! " << name.data() << " " << idx << " " << temp_vertices.size() << " " << f1_index << " " << f2_index << " " << f3_index ;
+                delete obj;
+                flag_prev = false;
+                break;
+            }
+
+            /* vertex 1 */
+            struct VertexData v1 = temp_vertices[f1_index - 1];
+            obj->add_ms_vertex(v1);
+            /* vertex 2 */
+            struct VertexData v2 = temp_vertices[f2_index - 1];
+            obj->add_ms_vertex(v2);
+            /* vertex 3 */
+            struct VertexData v3 = temp_vertices[f3_index - 1];
+            obj->add_ms_vertex(v3);
+
+            m_vertices_size += 3;
         } else if (wordList[0] == "vn") {
             qDebug() << "To do compute the normals and read them from here";
         }
     }
 
-    if (flag_prev & vertexIndices.size() > 0) {
-        GLint idx = m_objects.size();
-        Object *obj = new Object(name, idx);
-        m_vertices_size += vertexIndices.size();
-        for ( unsigned int i = 0; i < vertexIndices.size(); ++i ) {
-            unsigned int vertexIndex = vertexIndices[i];
-            struct VertexData v = temp_vertices[vertexIndex - 1];
-            v.ID = idx;
-            obj->add_ms_vertex(v);
-        }
-        QVector3D color = QVector3D(1.0, 0.0, 0.0) ;
+
+    if (flag_prev == true) {
+        QVector4D color = QVector4D(1.0, 0.0, 0.0, 0.0) ;
         m_ssbo_data.push_back(color);
-        obj->setColor(QVector4D(color, 1.0));
+        obj->setColor(color);
         m_objects.push_back(obj);
     }
 
     file.close();
 
-    qDebug() << "Done Func: loadVertices";
+    qDebug() << "Done Func: loadVertices " <<   m_ssbo_data.size();
     auto t2 = std::chrono::high_resolution_clock::now();
     qDebug() << "f() took "
                  << std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count()
@@ -153,7 +156,7 @@ bool Mesh::initVBO(QOpenGLBuffer vbo)
 }
 
 
-void Mesh::addSSBOData(QVector3D d)
+void Mesh::addSSBOData(QVector4D d)
 {
     m_ssbo_data.push_back(d);
 }

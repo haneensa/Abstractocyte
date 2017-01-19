@@ -119,6 +119,7 @@ void GLWidget::initializeGL()
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
     GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
     memcpy(p,  m_mesh.getSSBOData(), m_mesh.getSSBOSize());
+
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
 
@@ -241,7 +242,6 @@ void GLWidget::initializeGL()
 
     m_vbo_skeleton.release();
     m_vao_skeleton.release();
-
 
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
