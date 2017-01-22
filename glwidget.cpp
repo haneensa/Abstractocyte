@@ -142,6 +142,10 @@ void GLWidget::initializeGL()
     glUseProgram(m_program_mesh); // m_program_mesh->bind();
     setMVPAttrib(m_program_mesh);
 
+    QVector3D lightDir = QVector3D(-1.0f, -1.0f, -1.0f);
+    GLuint lightDir_loc = glGetUniformLocation(m_program_mesh, "diffuseLightDirection");
+    glUniform3fv(lightDir_loc, 1, &lightDir[0]);
+
     m_vbo_mesh.create();
     m_vbo_mesh.setUsagePattern( QOpenGLBuffer::StaticDraw );
     if ( !m_vbo_mesh.bind() ) {
@@ -173,8 +177,9 @@ void GLWidget::initializeGL()
     m_vao_mesh.release();
 
     /***************************************/
+    qDebug() << "Initializing MESH POINTS";
     m_program_mesh_points = glCreateProgram();
-    res = initShader(m_program_mesh_points, ":/shaders/mesh.vert", ":/shaders/mesh_points.geom", ":/shaders/mesh.frag");
+    res = initShader(m_program_mesh_points, ":/shaders/mesh.vert", ":/shaders/mesh_points.geom", ":/shaders/mesh_points.frag");
     if (res == false)
         return;
 
@@ -182,7 +187,11 @@ void GLWidget::initializeGL()
     m_vao_mesh_points.create();
     m_vao_mesh_points.bind();
 
-    glUseProgram(m_program_mesh_points); // m_program_mesh->bind();
+    glUseProgram(m_program_mesh_points);
+
+    lightDir_loc = glGetUniformLocation(m_program_mesh_points, "diffuseLightDirection");
+    glUniform3fv(lightDir_loc, 1, &lightDir[0]);
+
 
     if ( !m_vbo_mesh.bind() ) {
         qDebug() << "Could not bind vertex buffer to the context.";
@@ -225,7 +234,7 @@ void GLWidget::initializeGL()
     setMVPAttrib(m_program_skeleton);
 
     GLuint color_idx = glGetUniformLocation(m_program_skeleton, "color");
-    QVector3D color =  QVector3D(0.545, 0.0, 0.0);
+    QVector3D color =  QVector3D(0.69f, 0.878f, 0.902f);
     glUniform3fv(color_idx, 1, &color[0]);
 
     m_vbo_skeleton.create();
@@ -284,43 +293,41 @@ void GLWidget::paintGL()
     m_vao_skeleton.release();
 
     /************************/
-//
+    m_vao_mesh.bind();
+    glUseProgram(m_program_mesh);
+    setMVPAttrib(m_program_mesh);
 
-        m_vao_mesh.bind();
-        glUseProgram(m_program_mesh);
-        setMVPAttrib(m_program_mesh);
+    y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
+    glUniform1iv(y_axis, 1, &m_yaxis);
 
-        y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
-        glUniform1iv(y_axis, 1, &m_yaxis);
+    x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
+    glUniform1iv(x_axis, 1, &m_xaxis);
 
-        x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
-        glUniform1iv(x_axis, 1, &m_xaxis);
+    state = glGetUniformLocation(m_program_mesh, "state");
+    glUniform1iv(state, 1, &m_state);
 
-        state = glGetUniformLocation(m_program_mesh, "state");
-        glUniform1iv(state, 1, &m_state);
+    glDrawArrays(GL_TRIANGLES, 0,   m_mesh.getVertixCount() );
 
-        glDrawArrays(GL_TRIANGLES, 0,   m_mesh.getVertixCount() );
+    m_vao_mesh.release();
+    /************************/
 
-        m_vao_mesh.release();
+    m_vao_mesh_points.bind();
+    glUseProgram(m_program_mesh_points);
+    setMVPAttrib(m_program_mesh_points);
 
-    if (m_yaxis < 99) {
-        m_vao_mesh_points.bind();
-        glUseProgram(m_program_mesh_points);
-        setMVPAttrib(m_program_mesh_points);
+    y_axis = glGetUniformLocation(m_program_mesh_points, "y_axis");
+    glUniform1iv(y_axis, 1, &m_yaxis);
 
-        y_axis = glGetUniformLocation(m_program_mesh_points, "y_axis");
-        glUniform1iv(y_axis, 1, &m_yaxis);
+    x_axis = glGetUniformLocation(m_program_mesh_points, "x_axis");
+    glUniform1iv(x_axis, 1, &m_xaxis);
 
-        x_axis = glGetUniformLocation(m_program_mesh_points, "x_axis");
-        glUniform1iv(x_axis, 1, &m_xaxis);
+    state = glGetUniformLocation(m_program_mesh_points, "state");
+    glUniform1iv(state, 1, &m_state);
 
-        state = glGetUniformLocation(m_program_mesh_points, "state");
-        glUniform1iv(state, 1, &m_state);
+    glDrawArrays(GL_TRIANGLES, 0,  m_mesh.getVertixCount() );
 
-        glDrawArrays(GL_TRIANGLES, 0,  m_mesh.getVertixCount() );
+    m_vao_mesh_points.release();
 
-        m_vao_mesh_points.release();
-    }
 }
 
 void GLWidget::resizeGL(int w, int h)

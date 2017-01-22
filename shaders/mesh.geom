@@ -58,8 +58,11 @@ void main() {
     } else {
         val = translate(x_axis, 20, 100, 0.0, 1.0);
         color_intp = translate(x_axis, 0, 20, 0.0, 1.0);
-        alpha = 1.0;
+        alpha =  translate(x_axis, 60, 100, 1.0, 0.0);
+        if (alpha <= 0.8)
+            break;
     }
+
     vec4 new_position = mix(gl_in[i].gl_Position , Gskeleton_vx, val);
     gl_Position = new_position;
     EmitVertex();

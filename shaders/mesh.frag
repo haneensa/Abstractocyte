@@ -18,13 +18,8 @@ uniform int     state;
 //  - light is perpendicular to the triangle -> 0
 //  - light is behind the triangle -> 0
 
-//-------------------- AMBIENT LIGHT PROPERTIES --------------------
-vec4 ambient = vec4(0.0, 0.0, 0.0, 1.0); // sets lighting level, same across many vertices
-
 //-------------------- DIFFUSE LIGHT PROPERTIES --------------------
-vec3 diffuseLightDirection  = vec3(-1.5f, 1.0f, -0.4f);
-vec4 diffuseColor = vec4(1.0, 1.0, 1.0, 1.0);
-float diffuseIntersity = 1.0;
+uniform vec3 diffuseLightDirection;
 
 // ------------------- TOON SHADER PROPERTIES ----------------------
 // vec3 lineColor = vec4(0.0, 0.0,  0.0, 1.0); -> color to draw the lines in  (black)
@@ -51,7 +46,7 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 }
 
 void main() {
-    vec4 color = color_val * diffuseColor * diffuseIntersity + ambient;
+    vec4 color = color_val;
     vec4 toon_color = vec4(color.r, color.g, color.b, 1.0);
     vec4 phong_color = vec4(color.r, color.g, color.b, 1.0) * cosTheta;
 

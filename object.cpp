@@ -2,6 +2,8 @@
 #include <QDebug>
 #include <algorithm>
 
+#define red QVector4D(0.69f, 0.878f, 0.902f, 1.0f)
+
 Object::Object(std::string name, int idx, int ID)
 {
     if (name[name.size()-1] == '\n') {
@@ -99,7 +101,7 @@ QVector4D Object::getColor()
 {
     switch (m_object_t) {
     case Object_t::ASTROCYTE:
-        m_color = QVector4D(1.0f, 0.0f, 0.0f, 1.0f);
+        m_color = red; // Powder Blue
         break;
     case Object_t::AXON:
         m_color = QVector4D(1.0f, 0.388f, 0.278f, 1.0f);  // Forest Green

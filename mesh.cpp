@@ -4,7 +4,7 @@
 Mesh::Mesh()
 {
     m_vertices_size = 0;
-    m_limit = 1050;
+    m_limit = 50;
 }
 
 Mesh::~Mesh()
