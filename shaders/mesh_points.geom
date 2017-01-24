@@ -1,11 +1,13 @@
 #version 430
 
-in vec4     Vskeleton_vx[];
-out vec4    Gskeleton_vx;
+in vec4         Vskeleton_vx[];
 
-in int      V_ID[];
-in vec4     V_color[];
-out float   G_ID;
+in int          V_ID[];
+in vec4         V_color[];
+in vec4         V_center[];
+vec4            pos2;
+
+out float       G_ID;
 
 out vec4        color_val;
 out float       color_intp;
@@ -39,27 +41,40 @@ void main() {
     vec3 A = gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz;
     vec3 B = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
     normal_out = normalize(cross(A,B));
+
     int i = 0;
     color_val = V_color[i];
     G_ID = float(V_ID[i]);
-    Gskeleton_vx = vec4(Vskeleton_vx[i].xyz, 1.0);
     float val;
+    vec4 pos1 = gl_in[i].gl_Position;
+    pos2 = vec4(Vskeleton_vx[i].xyz, 1.0);
+
     if (G_ID <= 0.0) {
         val = translate(y_axis, 20, 100, 0.0, 1.0);
         alpha = translate(y_axis, 90, 100, 0.0, 1.0);
         color_intp = translate(y_axis, 0, 20, 0.0, 1.0);
-        vec4 new_position = mix(gl_in[i].gl_Position , Gskeleton_vx, val);
+        vec4 new_position = pos2 * val + (1.0 - val) * pos1;
         gl_Position = new_position;
         gl_PointSize = 4;
         EmitVertex();
         EndPrimitive();
    } else {
-        val = translate(x_axis, 0, 100, 0.0, 1.0);
-        alpha = translate(x_axis, 50, 100, 0.0, 1.0);
-        color_intp = translate(x_axis, 0, 90, 0.0, 1.0);
-        vec4 new_position = Gskeleton_vx * val + (1.0 - val) * gl_in[i].gl_Position;
+        int div = 50;
+        if (x_axis < div) {
+            gl_PointSize =  5;
+            val = translate(x_axis, 0, div, 0.0, 1.0);
+            alpha = translate(x_axis, 20, div, 0.0, 1.0);
+        } else {
+            pos1 = vec4(Vskeleton_vx[i].xyz, 1.0);
+            pos2 = vec4(V_center[i].xyz, 1.0);
+            gl_PointSize =  translate(x_axis, div, 100, 5, 15);
+            val = translate(x_axis, div, 100, 0.0, 1.0);
+            alpha = 1.0;
+        }
+
+        color_intp = translate(x_axis, 0, 20, 0.0, 1.0);
+        vec4 new_position = pos2 * val + (1.0 - val) * pos1;
         gl_Position = new_position;
-        gl_PointSize =  translate(x_axis, 50, 100, 0, 20);
         EmitVertex();
         EndPrimitive();
    }

@@ -39,6 +39,8 @@ bool Mesh::loadObj(QString path)
     GLint idx = -1;
     Object *obj = NULL;
     QVector4D color = QVector4D(0.0, 0.0, 0.0, 1.0);
+    QVector4D center = QVector4D(0.0, 0.0, 0.0, 0.0);
+    struct ssbo_element ssbo_object_data;
     // load all vertices once -> should be fast
     // for each object "o", go through its faces, and substitute using vertices loaded at the start
     while (!file.atEnd()) {
@@ -49,7 +51,7 @@ bool Mesh::loadObj(QString path)
             temp_vertices.clear();
 
             if (flag_prev == 3) {
-                m_ssbo_data.push_back(color);
+                m_ssbo_data.push_back(ssbo_object_data);
                 m_objects.push_back(obj);
             }
 
@@ -62,9 +64,19 @@ bool Mesh::loadObj(QString path)
             name  = wordList[1].data();
             idx = m_objects.size();
             obj = new Object(name, idx);
+            if (obj->getObjectType(name) == Object_t::BOUTON) {
+                continue;
+            }
             // get objet color based on type
             color = obj->getColor();
+            ssbo_object_data.color = color;
             flag_prev = 1;
+        } else if (wordList[0]  == "p" && flag_prev >= 1 ) {
+            float x = atof(wordList[1].data());
+            float y = atof(wordList[2].data());
+            float z = atof(wordList[3].data());
+            center = QVector4D(x, y, z, 1.0);
+            ssbo_object_data.center = center;
         } else if (wordList[0]  == "v" && flag_prev >= 1 ) {
             float x1 = atof(wordList[1].data());
             float y1 = atof(wordList[2].data());
@@ -117,7 +129,7 @@ bool Mesh::loadObj(QString path)
 
 
     if (flag_prev == 3) {
-        m_ssbo_data.push_back(color);
+        m_ssbo_data.push_back(ssbo_object_data);
         m_objects.push_back(obj);
     }
 
@@ -154,14 +166,9 @@ bool Mesh::initVBO(QOpenGLBuffer vbo)
 }
 
 
-void Mesh::addSSBOData(QVector4D d)
-{
-    m_ssbo_data.push_back(d);
-}
-
 int Mesh::getSSBOSize()
 {
-    return  m_ssbo_data.size() * sizeof(QVector4D);
+    return  m_ssbo_data.size() * sizeof(struct ssbo_element);
 }
 
 void* Mesh::getSSBOData()

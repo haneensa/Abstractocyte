@@ -1,5 +1,4 @@
 #version 430
-in vec4         Gskeleton_vx;
 in vec3         normal_out;
 in float        G_ID;
 
@@ -10,12 +9,6 @@ out vec4        outcol;
 
 uniform int     y_axis;
 uniform int     x_axis;
-
-// Cosine of the angle between the normal and the light direction,
-// clamped above 0
-//  - light is at the vertical of the triangle -> 1
-//  - light is perpendicular to the triangle -> 0
-//  - light is behind the triangle -> 0
 
 //-------------------- DIFFUSE LIGHT PROPERTIES --------------------
 uniform vec3 diffuseLightDirection;

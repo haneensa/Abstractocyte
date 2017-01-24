@@ -17,6 +17,7 @@ public:
     Mesh();
     ~Mesh();
     bool loadObj(QString path);
+    bool loadSkeletonPoints(QString path);
     int getVertixCount();
     bool initVBO(QOpenGLBuffer vbo);
     int getSSBOSize();
@@ -33,8 +34,8 @@ protected:
     // use that index to render the object or not
     // pros: storage for vertices,
     // cons: global index to objects faces
-    std::vector<Object*>        m_objects;
-    std::vector<struct ssbo_element>      m_ssbo_data; // Color
+    std::vector<Object*>                m_objects;
+    std::vector<struct ssbo_element>    m_ssbo_data; // Color
 };
 
 #endif // MESH_H

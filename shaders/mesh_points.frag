@@ -1,6 +1,5 @@
 #version 430
 
-in vec4         Gskeleton_vx;
 in vec3         normal_out;
 in float        G_ID;
 
@@ -9,9 +8,9 @@ in float        color_intp;
 in vec4         color_val;
 out vec4        outcol;
 
-float Ns = 250;
-vec4 mat_specular = vec4(1);
-vec4 light_specular = vec4(1);
+float           Ns = 250;
+vec4            mat_specular = vec4(1);
+vec4            light_specular = vec4(1);
 
 void main() {
         vec3 lightDir =  vec3(0.5, 0.0, -0.9);
