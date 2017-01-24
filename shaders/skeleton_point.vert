@@ -10,6 +10,8 @@ uniform mat4 vMatrix;
 // Projection transformation
 uniform mat4 pMatrix;
 
+// get ID, to color this thing
+
 void main(void)
 {
     posAttrV = posAttr;
