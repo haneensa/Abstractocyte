@@ -17,7 +17,6 @@ layout(triangle_strip, max_vertices = 3) out;
 
 uniform int     y_axis;
 uniform int     x_axis;
-uniform int     state;
 
 float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
 {
@@ -51,7 +50,7 @@ void main() {
     float val;
     if (G_ID <= 0.0) {
         val = translate(y_axis, 20, 100, 0.0, 1.0);
-        alpha =  translate(y_axis, 60, 100, 1.0, 0.0);
+        alpha =  translate(y_axis, 90, 100, 1.0, 0.0);
         color_intp = translate(y_axis, 0, 20, 0.0, 1.0);
         if (alpha <= 0.8)
             break;

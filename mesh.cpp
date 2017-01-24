@@ -4,7 +4,7 @@
 Mesh::Mesh()
 {
     m_vertices_size = 0;
-    m_limit = 50;
+    m_limit = 200;
 }
 
 Mesh::~Mesh()
@@ -161,7 +161,7 @@ void Mesh::addSSBOData(QVector4D d)
 
 int Mesh::getSSBOSize()
 {
-    return (sizeof(m_ssbo_data) * m_ssbo_data.size());
+    return  m_ssbo_data.size() * sizeof(QVector4D);
 }
 
 void* Mesh::getSSBOData()
@@ -169,3 +169,4 @@ void* Mesh::getSSBOData()
     return &m_ssbo_data[0];
     //return m_ssbo_data.data();
 }
+

@@ -4,5 +4,6 @@
         <file>data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj</file>
         <file>data/mouse03_neurites.obj</file>
         <file>data/mouse03_neurites_avg.obj</file>
+        <file>data/mouse03_skeleton_centroid.obj</file>
     </qresource>
 </RCC>

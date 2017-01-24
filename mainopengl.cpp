@@ -22,6 +22,23 @@ MainOpenGL::~MainOpenGL()
     }
 }
 
+void MainOpenGL::GL_Error()
+{
+    GLenum glerr = glGetError();
+    if (glerr == GL_NO_ERROR) {
+        qDebug() << "GL_NO_ERROR";
+        return;
+    }
+
+    if (glerr == GL_OUT_OF_MEMORY) {
+        qDebug() << "GL_OUT_OF_MEMORY";
+        return;
+    }
+
+    // todo: handle errors
+    qDebug() << "GL error is : " << glerr;
+
+}
 
 bool MainOpenGL::initShader(QOpenGLShaderProgram *program, const char *vshader, const char *gshader, const char *fshader)
 {

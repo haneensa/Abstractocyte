@@ -17,7 +17,6 @@ layout(points, max_vertices = 1) out;
 
 uniform int     y_axis;
 uniform int     x_axis;
-uniform int     state;
 
 float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
 {
@@ -47,11 +46,11 @@ void main() {
     float val;
     if (G_ID <= 0.0) {
         val = translate(y_axis, 20, 100, 0.0, 1.0);
-        alpha = translate(y_axis, 40, 60, 0.0, 1.0);
+        alpha = translate(y_axis, 90, 100, 0.0, 1.0);
         color_intp = translate(y_axis, 0, 20, 0.0, 1.0);
         vec4 new_position = mix(gl_in[i].gl_Position , Gskeleton_vx, val);
         gl_Position = new_position;
-        gl_PointSize = 3;
+        gl_PointSize = 4;
         EmitVertex();
         EndPrimitive();
    } else {
@@ -60,7 +59,7 @@ void main() {
         color_intp = translate(x_axis, 0, 90, 0.0, 1.0);
         vec4 new_position = Gskeleton_vx * val + (1.0 - val) * gl_in[i].gl_Position;
         gl_Position = new_position;
-        gl_PointSize =  translate(x_axis, 50, 100, 0, 30);
+        gl_PointSize =  translate(x_axis, 50, 100, 0, 20);
         EmitVertex();
         EndPrimitive();
    }

@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <algorithm>
 
-#define red QVector4D(0.69f, 0.878f, 0.902f, 1.0f)
+#include "colors.h"
 
 Object::Object(std::string name, int idx, int ID)
 {
@@ -36,7 +36,7 @@ Object_t Object::getObjectType(std::string name)
         return Object_t::DENDRITE;
     } else if (code.compare("spi") == 0) {
         return Object_t::SPINE;
-    } else if (code.compare("bou") == 0) {
+    } else if (code.compare("bou") == 0 || code.compare("buo") == 0 ) {
         return Object_t::BOUTON;
     } else if (code.compare(0, 1, "m") == 0) {
         return Object_t::MITO;
@@ -101,31 +101,32 @@ QVector4D Object::getColor()
 {
     switch (m_object_t) {
     case Object_t::ASTROCYTE:
-        m_color = red; // Powder Blue
+        m_color = firebrick;
         break;
     case Object_t::AXON:
-        m_color = QVector4D(1.0f, 0.388f, 0.278f, 1.0f);  // Forest Green
+        m_color = lightseagreen;
         break;
     case Object_t::DENDRITE:
-        m_color = QVector4D(0.125f, 0.698f, 0.667f, 1.0f);  // Tomato
+        m_color = gold;
         break;
     case Object_t::SPINE:
-        m_color = QVector4D(1.0f, 0.549f, 0.0f, 1.0f);     // Dark Orange
+        m_color = orange;
         break;
     case Object_t::BOUTON:
-        m_color = QVector4D(0.196f, 0.804f, 0.196f, 1.0f);  // Lime Green
+        m_color = mediumaquamarine;
         break;
     case Object_t::MITO:
-        m_color = QVector4D(1.0f, 0.078f, 0.576f, 1.0f);
+        m_color = darkcyan;
         break;
     case Object_t::SYNAPSE:
-        m_color = QVector4D(1.0f, 1.0f, 0.0f, 1.0f);
+        m_color = lightgoldenrodyellow;
         break;
     case Object_t::GLYCOGEN:
-        m_color = QVector4D(1.0f, 0.0f, 1.0f, 1.0f);
+        m_color = red;
         break;
     default:
-        m_color = QVector4D(0.0f, 0.0f, 0.0f, 1.0f);
+        qDebug() << m_name.data();
+        m_color = gray;
         break;
     };
 

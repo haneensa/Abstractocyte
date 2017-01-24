@@ -38,7 +38,7 @@ public:
     ~MainOpenGL();
     bool initShader(QOpenGLShaderProgram *program, const char *vshader, const char *gshader, const char *fshader);
     bool initShader(GLuint program, const char *vshader, const char *gshader, const char *fshader);
-
+    void GL_Error();
     unsigned int nearestPowerOfTwo ( unsigned int _num );
     void initText( const QFont &_f  );
     void renderText( float x, float y, float scaleX, float scaleY, const QString &text );

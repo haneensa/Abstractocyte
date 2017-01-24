@@ -5,12 +5,11 @@ in float        G_ID;
 
 in float        alpha;
 in float        color_intp;
-in vec4        color_val;
+in vec4         color_val;
 out vec4        outcol;
 
 uniform int     y_axis;
 uniform int     x_axis;
-uniform int     state;
 
 // Cosine of the angle between the normal and the light direction,
 // clamped above 0

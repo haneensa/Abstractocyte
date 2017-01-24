@@ -9,6 +9,8 @@
  */
 #include "glwidget.h"
 #include <QResource>
+#include "colors.h"
+
 
 GLWidget::GLWidget(QWidget *parent)
     :   QOpenGLWidget(parent),
@@ -23,7 +25,7 @@ GLWidget::GLWidget(QWidget *parent)
     QString path= "://data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj";
     m_mesh.loadObj(path);
 
-    path = "://data/mouse03_neurites_avg.obj";
+    path = "://data/mouse03_skeleton_centroid.obj";
     m_mesh.loadObj(path);
 
     path = "://data/skeleton_astrocyte_m3/astro_points_200.csv";
@@ -39,11 +41,6 @@ GLWidget::GLWidget(QWidget *parent)
     m_rotation.setZ(0.0f);
     //reset translation
     m_translation = QVector3D(0.0, 0.0, 0.0);
-    struct test {
-        float x;
-        float y;
-        float z;
-    };
 }
 
 GLWidget::~GLWidget()
@@ -103,31 +100,7 @@ void GLWidget::initializeGL()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    /******************** SSBO test ***************************/
 
-    //struct shader_data_t shader_data;
-    qDebug() << " m_mesh.getSSBOSize(): " << m_mesh.getSSBOSize();
-    glGenBuffers(1, &m_ssbo);
-    qDebug() << "x1";
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
-    qDebug() << "x2";
-    glBufferData(GL_SHADER_STORAGE_BUFFER,  m_mesh.getSSBOSize() , m_mesh.getSSBOData(), GL_DYNAMIC_COPY);
-    qDebug() << "x3";
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_ssbo);
-    qDebug() << "x4";
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    qDebug() << "x5";
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
-    qDebug() << "x6";
-    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-    qDebug() << "x7";
-    memcpy(p,  m_mesh.getSSBOData(), m_mesh.getSSBOSize());
-    qDebug() << "x8";
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-    qDebug() << "x9";
-
-
-    /******************** END *********************************/
     /* start initializing mesh */
     qDebug() << "Initializing MESH";
     m_program_mesh = glCreateProgram();
@@ -142,7 +115,7 @@ void GLWidget::initializeGL()
     glUseProgram(m_program_mesh); // m_program_mesh->bind();
     setMVPAttrib(m_program_mesh);
 
-    QVector3D lightDir = QVector3D(-1.0f, -1.0f, -1.0f);
+    QVector3D lightDir = QVector3D(-2.5f, -2.5f, -0.9f);
     GLuint lightDir_loc = glGetUniformLocation(m_program_mesh, "diffuseLightDirection");
     glUniform3fv(lightDir_loc, 1, &lightDir[0]);
 
@@ -234,7 +207,7 @@ void GLWidget::initializeGL()
     setMVPAttrib(m_program_skeleton);
 
     GLuint color_idx = glGetUniformLocation(m_program_skeleton, "color");
-    QVector3D color =  QVector3D(0.69f, 0.878f, 0.902f);
+    QVector3D color =  firebrick;
     glUniform3fv(color_idx, 1, &color[0]);
 
     m_vbo_skeleton.create();
@@ -256,7 +229,24 @@ void GLWidget::initializeGL()
     m_vbo_skeleton.release();
     m_vao_skeleton.release();
 
+    /******************** SSBO test ***************************/
+    // use textutes instead
+    //struct shader_data_t shader_data;
+    qDebug() << " m_mesh.getSSBOSize(): " << m_mesh.getSSBOSize();
+    glGenBuffers(1, &m_ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER,  m_mesh.getSSBOSize() , NULL, GL_DYNAMIC_COPY);
+    GL_Error();
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_ssbo);
+    qDebug() << "ssbo size: " << m_mesh.getSSBOSize();
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
+    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    memcpy(p,  m_mesh.getSSBOData(),  m_mesh.getSSBOSize());
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
+
+    /******************** END *********************************/
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
@@ -276,22 +266,21 @@ void GLWidget::paintGL()
     const qreal retinaScale = devicePixelRatio();
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
 
-    m_vao_skeleton.bind();
-    glUseProgram(m_program_skeleton);
-    setMVPAttrib(m_program_skeleton);
+    GLuint y_axis, x_axis;
+    if (m_yaxis > 99) {
+        m_vao_skeleton.bind();
+        glUseProgram(m_program_skeleton);
+        setMVPAttrib(m_program_skeleton);
 
-    GLuint y_axis = glGetUniformLocation(m_program_skeleton, "y_axis");
-    glUniform1iv(y_axis, 1, &m_yaxis);
+        y_axis = glGetUniformLocation(m_program_skeleton, "y_axis");
+        glUniform1iv(y_axis, 1, &m_yaxis);
 
-    GLuint x_axis = glGetUniformLocation(m_program_skeleton, "x_axis");
-    glUniform1iv(x_axis, 1, &m_xaxis);
+        x_axis = glGetUniformLocation(m_program_skeleton, "x_axis");
+        glUniform1iv(x_axis, 1, &m_xaxis);
 
-    GLuint state = glGetUniformLocation(m_program_skeleton, "state");
-    glUniform1iv(state, 1, &m_state);
-
-    glDrawArrays(GL_POINTS, 0,  m_skeleton_vertices_size );
-    m_vao_skeleton.release();
-
+        glDrawArrays(GL_POINTS, 0,  m_skeleton_vertices_size );
+        m_vao_skeleton.release();
+    }
     /************************/
     m_vao_mesh.bind();
     glUseProgram(m_program_mesh);
@@ -302,9 +291,6 @@ void GLWidget::paintGL()
 
     x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
     glUniform1iv(x_axis, 1, &m_xaxis);
-
-    state = glGetUniformLocation(m_program_mesh, "state");
-    glUniform1iv(state, 1, &m_state);
 
     glDrawArrays(GL_TRIANGLES, 0,   m_mesh.getVertixCount() );
 
@@ -320,9 +306,6 @@ void GLWidget::paintGL()
 
     x_axis = glGetUniformLocation(m_program_mesh_points, "x_axis");
     glUniform1iv(x_axis, 1, &m_xaxis);
-
-    state = glGetUniformLocation(m_program_mesh_points, "state");
-    glUniform1iv(state, 1, &m_state);
 
     glDrawArrays(GL_TRIANGLES, 0,  m_mesh.getVertixCount() );
 

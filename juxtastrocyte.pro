@@ -38,7 +38,8 @@ HEADERS  += mainwindow.h \
     graph.h \
     mpstate.h \
     statesrelations.h \
-    mesh.h
+    mesh.h \
+    colors.h
 
 FORMS    += mainwindow.ui
 
