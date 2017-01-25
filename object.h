@@ -13,6 +13,11 @@ struct VertexData {
     GLint       ID;
 };
 
+struct SkeletonVertex {
+    QVector3D skeleton_vertex;
+    GLint       ID;
+};
+
 class Object
 {
 public:
@@ -22,12 +27,12 @@ public:
     // add vertex to mesh only
     void add_m_vertex(QVector3D vertex);
     // add vertex to skeleton only
-    void add_s_vertex(QVector3D vertex);
+    void add_s_vertex(struct SkeletonVertex vertex);
     // add mesh and skeleton vertices together using VertexData
     void add_ms_vertex(struct VertexData vertex_data);
 
     std::vector<QVector3D> get_m_Vertices();
-    std::vector<QVector3D> get_s_Vertices();
+    std::vector<struct SkeletonVertex> get_s_Vertices();
     std::vector<struct VertexData> get_ms_Vertices();
 
     size_t get_m_Size();
@@ -45,7 +50,7 @@ private:
     int                     m_ID;
     int                     m_idxID;
     std::vector<QVector3D>  m_mesh_vertices;
-    std::vector<QVector3D>  m_skeleton_vertices;
+    std::vector<struct SkeletonVertex>  m_skeleton_vertices;
     std::vector< struct VertexData >  m_mesh_skeleton_vertices;
     QVector4D               m_color;
 };

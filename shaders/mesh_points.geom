@@ -52,7 +52,7 @@ void main() {
     if (G_ID <= 0.0) {
         if (y_axis < 99) {
             val = translate(y_axis, 20, 100, 0.0, 1.0);
-            alpha = translate(y_axis, 90, 100, 0.0, 1.0);
+            alpha = translate(y_axis, 80, 100, 0.0, 1.0);
             color_intp = translate(y_axis, 0, 20, 0.0, 1.0);
             vec4 new_position = pos2 * val + (1.0 - val) * pos1;
             gl_Position = new_position;
@@ -63,13 +63,13 @@ void main() {
    } else {
         int div = 50;
         if (x_axis < div) {
-            gl_PointSize =  4;
-            val = translate(x_axis, 0, div, 0.0, 1.0);
+            gl_PointSize =  8;
+            val = translate(x_axis, 20, div, 0.0, 1.0);
             alpha = translate(x_axis, 20, div, 0.0, 1.0);
         } else {
             pos1 = vec4(Vskeleton_vx[i].xyz, 1.0);
             pos2 = vec4(V_center[i].xyz, 1.0);
-            gl_PointSize =  translate(x_axis, div, 100, 5, 25);
+            gl_PointSize =  translate(x_axis, div, 100, 5, 30);
             val = translate(x_axis, div, 100, 0.0, 1.0);
             alpha = 1.0;
         }

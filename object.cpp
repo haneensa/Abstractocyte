@@ -52,7 +52,7 @@ void Object::add_m_vertex(QVector3D vertex)
     m_mesh_vertices.push_back(vertex);
 }
 
-void Object::add_s_vertex(QVector3D vertex)
+void Object::add_s_vertex(struct SkeletonVertex vertex)
 {
     m_skeleton_vertices.push_back(vertex);
 }
@@ -67,7 +67,7 @@ std::vector<QVector3D> Object::get_m_Vertices()
     return m_mesh_vertices;
 }
 
-std::vector<QVector3D> Object::get_s_Vertices()
+std::vector<struct SkeletonVertex> Object::get_s_Vertices()
 {
     return m_skeleton_vertices;
 }

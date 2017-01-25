@@ -4,7 +4,8 @@
 Mesh::Mesh()
 {
     m_vertices_size = 0;
-    m_limit = 200;
+    m_skeleton_nodes_size = 0;
+    m_limit = 100;
 }
 
 Mesh::~Mesh()
@@ -64,9 +65,9 @@ bool Mesh::loadObj(QString path)
             name  = wordList[1].data();
             idx = m_objects.size();
             obj = new Object(name, idx);
-            if (obj->getObjectType(name) == Object_t::BOUTON) {
-                continue;
-            }
+           if (obj->getObjectType(name) == Object_t::BOUTON) {
+               continue;
+           }
             // get objet color based on type
             color = obj->getColor();
             ssbo_object_data.color = color;
@@ -149,14 +150,14 @@ int Mesh::getVertixCount()
     return m_vertices_size;
 }
 
+
+
 bool Mesh::initVBO(QOpenGLBuffer vbo)
 {
     int offset = 0;
-    int vertices = 0;
     for (std::size_t i = 0; i < m_objects.size(); i++) {
-        vertices +=  m_objects[i]->get_ms_Size();
         int count = m_objects[i]->get_ms_Size() * sizeof(VertexData);
-        qDebug() << i << " allocating: " << m_objects[i]->getName().data() <<  " " << m_objects.size() <<" m_vertices_size: " << m_vertices_size << " all bytes: " <<  m_vertices_size * sizeof(VertexData) << " vertices: " << vertices << " count: " << count << " offset: " << offset;
+        qDebug() << i << " allocating: " << m_objects[i]->getName().data();
         vbo.write(offset, &m_objects[i]->get_ms_Vertices()[0], count);
         offset += count;
 
@@ -175,5 +176,62 @@ void* Mesh::getSSBOData()
 {
     return &m_ssbo_data[0];
     //return m_ssbo_data.data();
+}
+
+
+
+
+// todo: combine this with the mesh class
+bool Mesh::loadSkeletonPoints(QString path)
+{
+    qDebug() << "Func: loadSkeletonPoints";
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        qDebug() << "Could not open the file for reading";
+        return 0;
+    }
+
+    QTextStream in(&file);
+    QList<QByteArray> wordList;
+    int idx = m_skeletons.size();
+    struct SkeletonVertex vertex;
+    Object *obj = new Object("Skeleton", idx);
+    vertex.ID = idx;
+
+    // Point ID, thickness, X Coord, Y Coord, Z Coord, Object ID
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        wordList = line.split(',');
+        float x = atof(wordList[2].data());
+        float y = atof(wordList[3].data());
+        float z = atof(wordList[4].data());
+        vertex.skeleton_vertex = QVector3D(x, y, z);
+        obj->add_s_vertex(vertex);
+        m_skeleton_nodes_size++;
+    }
+
+    m_skeletons.push_back(obj);
+
+    return true;
+}
+
+// temp functions until we think of way to represent the data
+int Mesh::getNodesCount()
+{
+    return m_skeleton_nodes_size;
+}
+
+
+bool Mesh::initSkeletonVBO(QOpenGLBuffer vbo)
+{
+    int offset = 0;
+    for (std::size_t i = 0; i < m_skeletons.size(); i++) {
+        int count = m_skeletons[i]->get_s_Size() * sizeof(SkeletonVertex);
+        vbo.write(offset, &m_skeletons[i]->get_s_Vertices()[0], count);
+        qDebug() << i << " allocating: " << m_skeletons[i]->getName().data() << " count: " << count;
+        offset += count;
+   }
+
+    return true;
 }
 

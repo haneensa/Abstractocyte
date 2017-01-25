@@ -29,8 +29,7 @@ GLWidget::GLWidget(QWidget *parent)
     m_mesh.loadObj(path);
 
     path = "://data/skeleton_astrocyte_m3/astro_points_200.csv";
-    m_skeleton_vertices_size = loadSkeletonPoints(path, m_skeleton_obj); // 11638884, 19131720
-    qDebug() << "skeleton size: " << m_skeleton_obj.size();
+    m_mesh.loadSkeletonPoints(path); // 11638884, 19131720
 
     m_distance = 0.2;
     m_rotation = QQuaternion();
@@ -206,25 +205,29 @@ void GLWidget::initializeGL()
     glUseProgram(m_program_skeleton);
     setMVPAttrib(m_program_skeleton);
 
-    GLuint color_idx = glGetUniformLocation(m_program_skeleton, "color");
-    QVector3D color =  firebrick;
-    glUniform3fv(color_idx, 1, &color[0]);
-
     m_vbo_skeleton.create();
     m_vbo_skeleton.setUsagePattern( QOpenGLBuffer::StaticDraw);
     if ( !m_vbo_skeleton.bind() ) {
         qDebug() << "Could not bind vertex buffer to the context.";
     }
 
-    m_vbo_skeleton.allocate(NULL, m_skeleton_obj[0]->get_s_Size() * sizeof(QVector3D));
+    m_vbo_skeleton.allocate(NULL, m_mesh.getNodesCount() * sizeof(SkeletonVertex));
+    m_mesh.initSkeletonVBO(m_vbo_skeleton);
 
-    for (std::size_t i = 0; i != 1; i++) {
-       // qDebug() << "allocating: " << m_skeleton_obj[i]->getName().data();
-        m_vbo_skeleton.write(0, &m_skeleton_obj[i]->get_s_Vertices()[0], m_skeleton_obj[i]->get_s_Size() * sizeof(QVector3D));
-   }
+    qDebug() << " m_mesh.getNodesCount(): " << m_mesh.getNodesCount();
+    qDebug() << " m_mesh.getNodesCount()* sizeof(QVector3D): " << m_mesh.getNodesCount()* sizeof(SkeletonVertex);
 
+    GL_Error();
+
+    offset = 0;
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0,  0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(SkeletonVertex),  0);
+
+    offset += sizeof(QVector3D);
+    glEnableVertexAttribArray(1);
+    glVertexAttribIPointer(1, 1, GL_INT, sizeof(SkeletonVertex), (GLvoid*)offset);
+
+    GL_Error();
 
     m_vbo_skeleton.release();
     m_vao_skeleton.release();
@@ -278,10 +281,12 @@ void GLWidget::paintGL()
         x_axis = glGetUniformLocation(m_program_skeleton, "x_axis");
         glUniform1iv(x_axis, 1, &m_xaxis);
 
-        glDrawArrays(GL_POINTS, 0,  m_skeleton_vertices_size );
+        glDrawArrays(GL_POINTS, 0,  m_mesh.getNodesCount() );
         m_vao_skeleton.release();
     }
     /************************/
+
+
     m_vao_mesh.bind();
     glUseProgram(m_program_mesh);
     setMVPAttrib(m_program_mesh);
@@ -295,7 +300,6 @@ void GLWidget::paintGL()
     glDrawArrays(GL_TRIANGLES, 0,   m_mesh.getVertixCount() );
 
     m_vao_mesh.release();
-    /************************/
 
     m_vao_mesh_points.bind();
     glUseProgram(m_program_mesh_points);
@@ -308,8 +312,10 @@ void GLWidget::paintGL()
     glUniform1iv(x_axis, 1, &m_xaxis);
 
     glDrawArrays(GL_TRIANGLES, 0,  m_mesh.getVertixCount() );
-
     m_vao_mesh_points.release();
+
+
+    /************************/
 
 }
 

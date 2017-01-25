@@ -2,11 +2,10 @@
 
 out vec4        outcol;
 in vec4         posAttrG;
-uniform vec3    color;
 
 uniform int     y_axis;
 uniform int     x_axis;
-uniform int     state;
+in vec4        color_val;
 
 float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
 {
@@ -26,9 +25,8 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 }
 
 void main() {
-    outcol = vec4(color.rgb, 1.0);
-    float val = translate(y_axis, 20, 100, 0.0, 1.0);
-    outcol.a = val;
+    outcol = vec4(color_val.rgb, 1.0);
+    float val = translate(y_axis, 50, 100, 0.0, 1.0);
 
     if (outcol.a < 0.5)
         discard;

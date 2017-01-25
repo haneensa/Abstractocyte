@@ -53,15 +53,15 @@ void main() {
 
     if (G_ID <= 0.0) {
         val = translate(y_axis, 20, 100, 0.0, 1.0);
-        alpha =  translate(y_axis, 90, 100, 1.0, 0.0);
+        alpha =  translate(y_axis, 80, 90, 1.0, 0.0);
         color_intp = translate(y_axis, 0, 20, 0.0, 1.0);
-        if (alpha <= 0.8)
+        if (alpha <= 0.1)
             break;
     } else {
         int div = 50;
         if (x_axis < div) {
             pos2 = vec4(Vskeleton_vx[i].xyz, 1.0);
-            val = translate(x_axis, 0, div, 0.0, 1.0);
+            val = translate(x_axis, 20, div, 0.0, 1.0);
             alpha = translate(x_axis, 20, div, 1.0, 0.0);
         } else {
             pos1 = vec4(Vskeleton_vx[i].xyz, 1.0);
