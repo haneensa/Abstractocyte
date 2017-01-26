@@ -11,7 +11,6 @@
 #include <QResource>
 #include "colors.h"
 
-
 GLWidget::GLWidget(QWidget *parent)
     :   QOpenGLWidget(parent),
         m_vbo_mesh( QOpenGLBuffer::VertexBuffer ),
@@ -22,13 +21,16 @@ GLWidget::GLWidget(QWidget *parent)
         m_state(0),
         m_ssbo(0)
 {
+    m_asbtraction_space = new AbstractionSpace(100, 100);
     QString path= "://data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj";
     m_mesh.loadObj(path);
 
     path = "://data/mouse03_skeleton_centroid.obj";
     m_mesh.loadObj(path);
 
-    path = "://data/skeleton_astrocyte_m3/astro_points_200.csv";
+    path = "://data/mouse03_astro_skeleton.sk";
+    m_mesh.loadSkeletonPoints(path); // 11638884, 19131720
+    path = "://data/mouse03_skeletons.sk";
     m_mesh.loadSkeletonPoints(path); // 11638884, 19131720
 
     m_distance = 0.2;
@@ -270,8 +272,7 @@ void GLWidget::paintGL()
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
 
     GLuint y_axis, x_axis;
-    if (m_yaxis > 99) {
-        m_vao_skeleton.bind();
+         m_vao_skeleton.bind();
         glUseProgram(m_program_skeleton);
         setMVPAttrib(m_program_skeleton);
 
@@ -283,7 +284,7 @@ void GLWidget::paintGL()
 
         glDrawArrays(GL_POINTS, 0,  m_mesh.getNodesCount() );
         m_vao_skeleton.release();
-    }
+
     /************************/
 
 

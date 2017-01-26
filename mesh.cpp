@@ -5,7 +5,7 @@ Mesh::Mesh()
 {
     m_vertices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 100;
+    m_limit = 10000;
 }
 
 Mesh::~Mesh()
@@ -65,7 +65,7 @@ bool Mesh::loadObj(QString path)
             name  = wordList[1].data();
             idx = m_objects.size();
             obj = new Object(name, idx);
-           if (obj->getObjectType(name) == Object_t::BOUTON) {
+           if (obj->getObjectType(name) == Object_t::AXON ||obj->getObjectType(name) == Object_t::DENDRITE ) {
                continue;
            }
             // get objet color based on type
@@ -193,24 +193,50 @@ bool Mesh::loadSkeletonPoints(QString path)
 
     QTextStream in(&file);
     QList<QByteArray> wordList;
-    int idx = m_skeletons.size();
-    struct SkeletonVertex vertex;
-    Object *obj = new Object("Skeleton", idx);
-    vertex.ID = idx;
+    std::string name;
+    GLint idx = -1;
 
+
+    struct SkeletonVertex vertex;
+    Object *obj = NULL;
+    int flag_prev = 0;
     // Point ID, thickness, X Coord, Y Coord, Z Coord, Object ID
     while (!file.atEnd()) {
         QByteArray line = file.readLine();
-        wordList = line.split(',');
-        float x = atof(wordList[2].data());
-        float y = atof(wordList[3].data());
-        float z = atof(wordList[4].data());
-        vertex.skeleton_vertex = QVector3D(x, y, z);
-        obj->add_s_vertex(vertex);
-        m_skeleton_nodes_size++;
+        wordList = line.split(' ');
+        if (wordList[0] == "o") {
+            if (flag_prev == 1) {
+                m_skeletons.push_back(obj);
+            }
+
+            if (m_skeletons.size() > m_limit) {
+                flag_prev = 0;
+                qDebug() << "Size limit";
+                break;
+            }
+
+            name  = wordList[1].data();
+            idx = m_skeletons.size();
+            obj = new Object(name, idx);
+            if (obj->getObjectType(name) == Object_t::AXON ||obj->getObjectType(name) == Object_t::DENDRITE ) {
+                flag_prev = 0;
+                continue;
+            }
+            vertex.ID = idx;
+            flag_prev = 1;
+        } else if (wordList[0] == "p" && flag_prev >= 1) {
+            float x = atof(wordList[2].data());
+            float y = atof(wordList[3].data());
+            float z = atof(wordList[4].data());
+            vertex.skeleton_vertex = QVector3D(x, y, z);
+            obj->add_s_vertex(vertex);
+            m_skeleton_nodes_size++;
+        }
     }
 
-    m_skeletons.push_back(obj);
+    if (flag_prev == 1) {
+        m_skeletons.push_back(obj);
+    }
 
     return true;
 }

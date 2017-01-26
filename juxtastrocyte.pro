@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     graph.cpp \
     mpstate.cpp \
     statesrelations.cpp \
-    mesh.cpp
+    mesh.cpp \
+    abstractionspace.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -39,7 +40,8 @@ HEADERS  += mainwindow.h \
     mpstate.h \
     statesrelations.h \
     mesh.h \
-    colors.h
+    colors.h \
+    abstractionspace.h
 
 FORMS    += mainwindow.ui
 

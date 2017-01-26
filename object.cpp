@@ -116,7 +116,7 @@ QVector4D Object::getColor()
         m_color = mediumaquamarine;
         break;
     case Object_t::MITO:
-        m_color = darkcyan;
+        m_color = mediumslateblue;
         break;
     case Object_t::SYNAPSE:
         m_color = lightgoldenrodyellow;

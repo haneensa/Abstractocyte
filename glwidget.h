@@ -8,6 +8,7 @@
 #include "mainopengl.h"
 #include "graph.h"
 #include "mesh.h"
+#include "abstractionspace.h"
 
 #define GL_GLEXT_PROTOTYPES
 
@@ -33,6 +34,8 @@ protected:
 
     void setMVPAttrib(GLuint program);
     void loadMesh();
+
+    AbstractionSpace            *m_asbtraction_space;
 
     /* mesh */
     Mesh                        m_mesh;
