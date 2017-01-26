@@ -124,13 +124,6 @@ void GLWidget::initializeGL()
     p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
     memcpy(p,  m_abstraction_space->getSSBOData(),  m_abstraction_space->getSSBOSize());
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-/*
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 100, 100, 0, GL_RB, GL_UNSIGNED_BYTE, image);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    */
     /******************** END *********************************/
 
     /* start initializing mesh */
@@ -286,22 +279,21 @@ void GLWidget::paintGL()
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
 
     GLuint y_axis, x_axis;
-         m_vao_skeleton.bind();
-        glUseProgram(m_program_skeleton);
-        setMVPAttrib(m_program_skeleton);
 
-        y_axis = glGetUniformLocation(m_program_skeleton, "y_axis");
-        glUniform1iv(y_axis, 1, &m_yaxis);
+    m_vao_skeleton.bind();
+    glUseProgram(m_program_skeleton);
+    setMVPAttrib(m_program_skeleton);
 
-        x_axis = glGetUniformLocation(m_program_skeleton, "x_axis");
-        glUniform1iv(x_axis, 1, &m_xaxis);
+    y_axis = glGetUniformLocation(m_program_skeleton, "y_axis");
+    glUniform1iv(y_axis, 1, &m_yaxis);
 
-        glDrawArrays(GL_POINTS, 0,  m_mesh.getNodesCount() );
-        m_vao_skeleton.release();
+    x_axis = glGetUniformLocation(m_program_skeleton, "x_axis");
+    glUniform1iv(x_axis, 1, &m_xaxis);
+
+    glDrawArrays(GL_POINTS, 0,  m_mesh.getNodesCount() );
+    m_vao_skeleton.release();
 
     /************************/
-
-
     m_vao_mesh.bind();
     glUseProgram(m_program_mesh);
     setMVPAttrib(m_program_mesh);
@@ -315,7 +307,7 @@ void GLWidget::paintGL()
     glDrawArrays(GL_TRIANGLES, 0,   m_mesh.getVertixCount() );
 
     m_vao_mesh.release();
-
+    /************************/
     m_vao_mesh_points.bind();
     glUseProgram(m_program_mesh_points);
     setMVPAttrib(m_program_mesh_points);
@@ -326,10 +318,8 @@ void GLWidget::paintGL()
     x_axis = glGetUniformLocation(m_program_mesh_points, "x_axis");
     glUniform1iv(x_axis, 1, &m_xaxis);
 
-    glDrawArrays(GL_TRIANGLES, 0,  m_mesh.getVertixCount() );
+    glDrawArrays(GL_POINTS, 0,  m_mesh.getVertixCount() );
     m_vao_mesh_points.release();
-
-
     /************************/
 
 }

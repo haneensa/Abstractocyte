@@ -1,17 +1,14 @@
 #version 430
 
 in vec4         Vskeleton_vx[];
-vec4            pos2;
-
 in  int         V_ID[];
 in  vec4        V_center[];
 
-out float       G_ID;
 out float       color_intp;
 out vec4        color_val;
-
 out vec3        normal_out;
 out float       alpha;
+
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
@@ -32,7 +29,7 @@ layout (std430, binding=2) buffer mesh_data
 
 layout (std430, binding=3) buffer space2d_data
 {
-    int space2d[2][100];
+    vec4 space2d[2][4];
 };
 
 float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
@@ -53,8 +50,6 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 }
 
 void main() {
-  // precompute this once?
-  // face normal per triangle
   vec3 A = gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz;
   vec3 B = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
   normal_out = normalize(cross(A,B));
@@ -63,43 +58,19 @@ void main() {
     int ID = V_ID[i];
     int type = int(SSBO_data[ID].center.w);
     color_val = SSBO_data[ID].color;
-    float val;
     vec4 pos1 = gl_in[i].gl_Position;
-    pos2 = vec4(Vskeleton_vx[i].xyz, 1.0);
+    vec4 pos2 = vec4(Vskeleton_vx[i].xyz, 1.0);
 
-    // we have to define:
-    // pos1, pos2
-    // val the interpoltion factor between the two defined positions
-    // alpha
+    int slider = (type == 0) ? y_axis : x_axis;
+    vec4 alpha1 = space2d[type][0];
+    vec4 alpha2 = space2d[type][1];
+    vec4 alpha3 = space2d[type][2];
+    vec4 alpha4 = space2d[type][3];
 
-    if (type == 0) {
-        val = translate(y_axis, 20, 100, 0.0, 1.0);
-        alpha =  translate(y_axis, 20, 40, 1.0, 0.0);
-        color_intp = translate(y_axis, 0, 20, 0.0, 1.0);
-        if (alpha <= 0.05)
-            break;
-    } else {
-        int div = 50;
-        if (x_axis < div) {
-            pos2 = vec4(Vskeleton_vx[i].xyz, 1.0);
-            val = translate(x_axis, 20, div, 0.0, 1.0);
-            alpha = translate(x_axis, 40, div, 1.0, 0.0);
-        } else {
-            pos1 = vec4(Vskeleton_vx[i].xyz, 1.0);
-            pos2 = vec4(V_center[i].xyz, 1.0);
-            val = translate(x_axis, div, 100, 0.0, 1.0);
-            alpha =0.0;
-        }
+    float val = translate(slider, alpha1.x, alpha1.y, alpha1.z, alpha1.w);
+    alpha =  translate(slider, alpha2.x, alpha2.y, alpha2.z, alpha2.w);
 
-        color_intp = translate(x_axis, 0, 20, 0.0, 1.0);
-        val = space2d[type][x_axis]/100.0;
-
-        if (alpha <= 0.9)
-            break;
-
-    }
-
-
+    color_intp = translate(slider, alpha3.x, alpha3.y, alpha3.z, alpha3.w);
     vec4 new_position = mix(pos1 , pos2, val);
     gl_Position = new_position;
     EmitVertex();

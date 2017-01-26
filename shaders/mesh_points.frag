@@ -1,7 +1,5 @@
 #version 430
 
-in float        G_ID;
-
 in float        alpha;
 in float        color_intp;
 in vec4         color_val;

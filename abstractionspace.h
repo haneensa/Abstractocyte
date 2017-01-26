@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <QVector4D>
 
 struct ssbo_absSpace {
 
@@ -23,7 +24,7 @@ private:
     int                                 m_xdim;
     int                                 m_ydim;
     std::vector<int>                    m_absStates;
-    int                                 space2d[2][100];
+    QVector4D                           space2d[2][4]; // val, alpha, color_intp, point_size, additional infos
 };
 
 #endif // ABSTRACTIONSPACE_H
