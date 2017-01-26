@@ -6,7 +6,6 @@ layout(location = 2) in int ID;
 
 out vec4        Vskeleton_vx;
 out int         V_ID;
-out vec4        V_color;
 out vec4        V_center;
 
 struct SSBO_datum {
@@ -14,7 +13,7 @@ struct SSBO_datum {
     vec4 center;
 };
 
-layout (std430, binding=2) buffer shader_data
+layout (std430, binding=2) buffer mesh_data
 {
     SSBO_datum SSBO_data[];
 };
@@ -32,6 +31,6 @@ void main(void)
     gl_Position =  pvmMatrix * vec4(mesh_vx.xyz , 1.0);
     Vskeleton_vx = pvmMatrix * vec4(skeleton_vx.xyz, 1.0);
     V_ID = ID;
-    V_color = SSBO_data[ID].color;
-    V_center =  pvmMatrix * vec4(SSBO_data[ID].center.xyz, 1.0);
+    vec3 center3d = SSBO_data[ID].center.xyz;
+    V_center =  pvmMatrix * vec4(center3d, 1.0);
 }

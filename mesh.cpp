@@ -5,7 +5,7 @@ Mesh::Mesh()
 {
     m_vertices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 10000;
+    m_limit = 10;
 }
 
 Mesh::~Mesh()
@@ -41,7 +41,7 @@ bool Mesh::loadObj(QString path)
     Object *obj = NULL;
     QVector4D color = QVector4D(0.0, 0.0, 0.0, 1.0);
     QVector4D center = QVector4D(0.0, 0.0, 0.0, 0.0);
-    struct ssbo_element ssbo_object_data;
+    struct ssbo_mesh ssbo_object_data;
     // load all vertices once -> should be fast
     // for each object "o", go through its faces, and substitute using vertices loaded at the start
     while (!file.atEnd()) {
@@ -76,7 +76,11 @@ bool Mesh::loadObj(QString path)
             float x = atof(wordList[1].data());
             float y = atof(wordList[2].data());
             float z = atof(wordList[3].data());
-            center = QVector4D(x, y, z, 1.0);
+            if (obj->getObjectType(name) == Object_t::ASTROCYTE ) {
+                center = QVector4D(x, y, z, 0);
+            } else {
+                center = QVector4D(x, y, z, 1);
+            }
             ssbo_object_data.center = center;
         } else if (wordList[0]  == "v" && flag_prev >= 1 ) {
             float x1 = atof(wordList[1].data());
@@ -169,7 +173,7 @@ bool Mesh::initVBO(QOpenGLBuffer vbo)
 
 int Mesh::getSSBOSize()
 {
-    return  m_ssbo_data.size() * sizeof(struct ssbo_element);
+    return  m_ssbo_data.size() * sizeof(struct ssbo_mesh);
 }
 
 void* Mesh::getSSBOData()

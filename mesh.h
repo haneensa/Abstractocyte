@@ -6,7 +6,7 @@
 #include <QFile>
 
 #include "object.h"
-struct ssbo_element {
+struct ssbo_mesh {
     QVector4D color;
     QVector4D center;
 };
@@ -44,7 +44,7 @@ protected:
     // cons: global index to objects faces
     std::vector<Object*>                m_objects;
     std::vector<Object*>                m_skeletons;
-    std::vector<struct ssbo_element>    m_ssbo_data; // Color
+    std::vector<struct ssbo_mesh>    m_ssbo_data; // Color, Cenert, Type
 };
 
 #endif // MESH_H

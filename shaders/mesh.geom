@@ -4,7 +4,6 @@ in vec4         Vskeleton_vx[];
 vec4            pos2;
 
 in  int         V_ID[];
-in  vec4        V_color[];
 in  vec4        V_center[];
 
 out float       G_ID;
@@ -19,6 +18,22 @@ layout(triangle_strip, max_vertices = 3) out;
 
 uniform int     y_axis;
 uniform int     x_axis;
+
+
+struct SSBO_datum {
+    vec4 color;
+    vec4 center;
+};
+
+layout (std430, binding=2) buffer mesh_data
+{
+    SSBO_datum SSBO_data[];
+};
+
+layout (std430, binding=3) buffer space2d_data
+{
+    int space2d[2][100];
+};
 
 float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
 {
@@ -45,13 +60,19 @@ void main() {
   normal_out = normalize(cross(A,B));
 
   for(int i = 0; i < 3; i++) {
-    G_ID = float(V_ID[i]);
-    color_val = V_color[i];
+    int ID = V_ID[i];
+    int type = int(SSBO_data[ID].center.w);
+    color_val = SSBO_data[ID].color;
     float val;
     vec4 pos1 = gl_in[i].gl_Position;
     pos2 = vec4(Vskeleton_vx[i].xyz, 1.0);
 
-    if (G_ID <= 0.0) {
+    // we have to define:
+    // pos1, pos2
+    // val the interpoltion factor between the two defined positions
+    // alpha
+
+    if (type == 0) {
         val = translate(y_axis, 20, 100, 0.0, 1.0);
         alpha =  translate(y_axis, 20, 30, 1.0, 0.0);
         color_intp = translate(y_axis, 0, 20, 0.0, 1.0);
@@ -67,7 +88,7 @@ void main() {
             pos1 = vec4(Vskeleton_vx[i].xyz, 1.0);
             pos2 = vec4(V_center[i].xyz, 1.0);
             val = translate(x_axis, div, 100, 0.0, 1.0);
-            alpha = 0.0;
+            alpha = space2d[type][x_axis];
         }
 
         color_intp = translate(x_axis, 0, 20, 0.0, 1.0);

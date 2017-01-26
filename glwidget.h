@@ -35,7 +35,7 @@ protected:
     void setMVPAttrib(GLuint program);
     void loadMesh();
 
-    AbstractionSpace            *m_asbtraction_space;
+    AbstractionSpace            *m_abstraction_space;
 
     /* mesh */
     Mesh                        m_mesh;
@@ -55,7 +55,7 @@ protected:
     std::vector<Object*>        m_skeleton_obj;
 
     /* SSBO */
-    GLuint                      m_ssbo;
+    GLuint                      m_ssbo[2];
 
     /* matrices */
     QMatrix4x4                  m_projection;

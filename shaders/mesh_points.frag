@@ -1,6 +1,5 @@
 #version 430
 
-in vec3         normal_out;
 in float        G_ID;
 
 in float        alpha;

@@ -3,7 +3,6 @@
 in vec4         Vskeleton_vx[];
 
 in int          V_ID[];
-in vec4         V_color[];
 in vec4         V_center[];
 vec4            pos2;
 
@@ -11,7 +10,6 @@ out float       G_ID;
 
 out vec4        color_val;
 out float       color_intp;
-out vec3        normal_out;
 out float       alpha;
 
 layout(triangles) in;
@@ -37,19 +35,31 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
     return rightMin + (valueScaled * rightSpan);
 }
 
-void main() {
-    vec3 A = gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz;
-    vec3 B = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
-    normal_out = normalize(cross(A,B));
+struct SSBO_datum {
+    vec4 color;
+    vec4 center;
+};
 
+layout (std430, binding=2) buffer mesh_data
+{
+    SSBO_datum SSBO_data[];
+};
+
+layout (std430, binding=3) buffer space2d_data
+{
+    int space2d[2][100];
+};
+
+void main() {
     int i = 0;
-    color_val = V_color[i];
-    G_ID = float(V_ID[i]);
+    int ID = V_ID[i];
+    int type = int(SSBO_data[ID].center.w);
+    color_val = SSBO_data[ID].color;
     float val;
     vec4 pos1 = gl_in[i].gl_Position;
     pos2 = vec4(Vskeleton_vx[i].xyz, 1.0);
 
-    if (G_ID <= 0.0) {
+    if (type == 0) {
         if (y_axis < 99) {
             val = translate(y_axis, 20, 100, 0.0, 1.0);
             alpha = translate(y_axis, 20, 30, 0.0, 1.0);
