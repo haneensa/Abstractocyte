@@ -29,7 +29,7 @@ layout (std430, binding=2) buffer mesh_data
 
 layout (std430, binding=3) buffer space2d_data
 {
-    vec4 space2d[2][4];
+    vec4 space2d[2][5];
 };
 
 float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
@@ -58,19 +58,37 @@ void main() {
     int ID = V_ID[i];
     int type = int(SSBO_data[ID].center.w);
     color_val = SSBO_data[ID].color;
-    vec4 pos1 = gl_in[i].gl_Position;
-    vec4 pos2 = vec4(Vskeleton_vx[i].xyz, 1.0);
+    vec4 pos1, pos2;
 
     int slider = (type == 0) ? y_axis : x_axis;
     vec4 alpha1 = space2d[type][0];
     vec4 alpha2 = space2d[type][1];
     vec4 alpha3 = space2d[type][2];
     vec4 alpha4 = space2d[type][3];
+    vec4 alpha5 = space2d[type][4];
+
+    alpha =  translate(slider, alpha2.x, alpha2.y, alpha2.z, alpha2.w);
+    if (alpha < alpha5.x){
+        return;
+    }
 
     float val = translate(slider, alpha1.x, alpha1.y, alpha1.z, alpha1.w);
-    alpha =  translate(slider, alpha2.x, alpha2.y, alpha2.z, alpha2.w);
-
     color_intp = translate(slider, alpha3.x, alpha3.y, alpha3.z, alpha3.w);
+
+    switch(int(alpha5.z))
+    {
+    case 1: pos1 = gl_in[i].gl_Position; break;
+    case 2: pos1 = vec4(Vskeleton_vx[i].xyz, 1.0); break;
+    case 3: pos1 = vec4(V_center[i].xyz, 1.0); break;
+    }
+
+    switch(int(alpha5.w))
+    {
+    case 1: pos2 = gl_in[i].gl_Position; break;
+    case 2: pos2 = vec4(Vskeleton_vx[i].xyz, 1.0); break;
+    case 3: pos2 = vec4(V_center[i].xyz, 1.0); break;
+    }
+
     vec4 new_position = mix(pos1 , pos2, val);
     gl_Position = new_position;
     EmitVertex();

@@ -24,8 +24,6 @@ SOURCES += main.cpp\
     node.cpp \
     edge.cpp \
     graph.cpp \
-    mpstate.cpp \
-    statesrelations.cpp \
     mesh.cpp \
     abstractionspace.cpp
 
@@ -37,8 +35,6 @@ HEADERS  += mainwindow.h \
     node.h \
     edge.h \
     graph.h \
-    mpstate.h \
-    statesrelations.h \
     mesh.h \
     colors.h \
     abstractionspace.h

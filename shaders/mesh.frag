@@ -55,7 +55,7 @@ void main() {
     // y_axis astrocyte, else if neurite use (x_axis)
     outcol = toon_color * color_intp +   (1.0 - color_intp) *phong_color;
     outcol.a = alpha;
-    if (alpha < 0.1) {
-        discard;
-    }
+//    if (alpha < 0.1) {
+//        discard;
+//    }
 }

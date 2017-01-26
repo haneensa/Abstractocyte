@@ -24,7 +24,7 @@ private:
     int                                 m_xdim;
     int                                 m_ydim;
     std::vector<int>                    m_absStates;
-    QVector4D                           space2d[2][4]; // val, alpha, color_intp, point_size, additional infos
+    QVector4D                           space2d[2][5]; // val, alpha, color_intp, point_size, additional infos
 };
 
 #endif // ABSTRACTIONSPACE_H

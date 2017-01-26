@@ -183,8 +183,6 @@ void* Mesh::getSSBOData()
 }
 
 
-
-
 // todo: combine this with the mesh class
 bool Mesh::loadSkeletonPoints(QString path)
 {
