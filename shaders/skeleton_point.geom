@@ -14,7 +14,7 @@ layout (points, max_vertices = 1) out;
 void main() {
 color_val = V_color[0];
 gl_Position = gl_in[0].gl_Position;
-gl_PointSize = 7;
+gl_PointSize = 6;
 G_ID = float(V_ID[0]);
 EmitVertex();
 EndPrimitive();

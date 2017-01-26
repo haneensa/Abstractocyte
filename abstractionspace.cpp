@@ -6,7 +6,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
 {
     for ( int i = 0; i < 2; i++) {
         for (int j = 0; j < 100; j++ ) {
-            space2d[i][j] = 0;
+            space2d[i][j] = j;
         }
     }
 }

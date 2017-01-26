@@ -88,7 +88,7 @@ void main() {
             pos1 = vec4(Vskeleton_vx[i].xyz, 1.0);
             pos2 = vec4(V_center[i].xyz, 1.0);
             val = translate(x_axis, div, 100, 0.0, 1.0);
-            alpha =0.0;
+            alpha = 0.0;
         }
 
         color_intp = translate(x_axis, 0, 20, 0.0, 1.0);

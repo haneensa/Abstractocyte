@@ -62,18 +62,18 @@ void main() {
     if (type == 0) {
         if (y_axis < 99) {
             val = translate(y_axis, 20, 100, 0.0, 1.0);
-            alpha = translate(y_axis, 20, 30, 0.0, 1.0);
+            alpha = translate(y_axis, 20, 40, 0.0, 1.0);
             color_intp = translate(y_axis, 0, 20, 0.0, 1.0);
             vec4 new_position = pos2 * val + (1.0 - val) * pos1;
             gl_Position = new_position;
-            gl_PointSize = 7;
+            gl_PointSize =  translate(y_axis, 20, 40, 1, 6);
             EmitVertex();
             EndPrimitive();
         }
    } else {
         int div = 50;
         if (x_axis < div) {
-            gl_PointSize =  7;
+            gl_PointSize =  translate(x_axis, 20, div, 1, 7);
             val = translate(x_axis, 20, div, 0.0, 1.0);
             alpha = translate(x_axis, 20, div, 0.0, 1.0);
         } else {
