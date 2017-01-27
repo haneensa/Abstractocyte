@@ -7,6 +7,10 @@ GraphManager::GraphManager()
     m_graph1->loadEdges("://data/skeleton_astrocyte_m3/skeleton_astro_segments.csv");
 
 }
+GraphManager::~GraphManager()
+{
+
+}
 
 void GraphManager::drawNodes()
 {

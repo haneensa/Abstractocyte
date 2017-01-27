@@ -5,10 +5,12 @@
 #include "edge.h"
 #include <QDebug>
 #include <QFile>
+#include <QVector2D>
+#include <QVector3D>
 
 // store graph per object?
 
-struct GraphNode
+struct BufferNode
 {
     QVector3D coord3D;
     QVector2D coord2D;
@@ -46,7 +48,7 @@ protected:
     std::map<int, Edge*> m_edges;
 
     // for opengl buffer
-    std::vector<struct GraphNode> m_graphNodes;
+    std::vector<struct BufferNode> m_bufferNodes;
 
     int m_nodesCounter;
     int m_edgesCounter;
