@@ -5,8 +5,8 @@
 #include <QWidget>
 #include <QtOpenGL>
 
+#include "graphmanager.h"
 #include "mainopengl.h"
-#include "graph.h"
 #include "mesh.h"
 #include "abstractionspace.h"
 

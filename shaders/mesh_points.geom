@@ -66,8 +66,6 @@ void main() {
     color_intp = translate(slider, alpha3.x, alpha3.y, alpha3.z, alpha3.w);
     gl_PointSize =  translate(slider, alpha4.x, alpha4.y, alpha4.z, alpha4.w);
 
-
-
     int pos1_flag = int(alpha5.z);
     int pos2_flag = int(alpha5.w);
 

@@ -13,3 +13,18 @@ Node::~Node()
 {
 
 }
+
+void Node::addEdge(Edge *e)
+{
+    if (e == NULL)
+        return;
+
+    // check if and end of this edge is this node
+    if (e->getNode1Id() == m_nID) {
+        if (m_adjEdges.count(e->getNode2Id()) == 0)
+            m_adjEdges[e->getNode2Id()] = e;
+    } else {
+        if (m_adjEdges.count(e->getNode1Id()) == 0)
+            m_adjEdges[e->getNode1Id()] = e;
+    }
+}

@@ -5,6 +5,7 @@
 
 enum class Edge_t { ASTRO_SKELETON, NEURITE_SKELETON, NEURITE_NEURITE };
 
+class Node;
 class Edge
 {
 public:
@@ -16,6 +17,7 @@ public:
     int getNode2Id();
     int getNode1Id();
     Edge_t getEdgeType();
+
 
 protected:
     int     m_eID;

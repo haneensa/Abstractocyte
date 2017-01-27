@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     edge.cpp \
     graph.cpp \
     mesh.cpp \
-    abstractionspace.cpp
+    abstractionspace.cpp \
+    graphmanager.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -37,7 +38,8 @@ HEADERS  += mainwindow.h \
     graph.h \
     mesh.h \
     colors.h \
-    abstractionspace.h
+    abstractionspace.h \
+    graphmanager.h
 
 FORMS    += mainwindow.ui
 

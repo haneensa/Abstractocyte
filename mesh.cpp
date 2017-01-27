@@ -6,7 +6,7 @@ Mesh::Mesh()
 {
     m_vertices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 10;
+    m_limit = 2;
 }
 
 Mesh::~Mesh()

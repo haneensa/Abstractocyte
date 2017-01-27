@@ -22,10 +22,7 @@ GLWidget::GLWidget(QWidget *parent)
 {
     m_2dspace = new AbstractionSpace(100, 100);
 
-    Graph *m_graph = new Graph();
-    m_graph->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_nodes.csv");
-    m_graph->loadEdges("://data/skeleton_astrocyte_m3/skeleton_astro_segments.csv");
-
+   
     // to do: combine all these files in one .obj file
     QString path= "://data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj";
     m_mesh.loadObj(path);
