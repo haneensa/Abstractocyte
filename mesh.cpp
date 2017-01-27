@@ -2,6 +2,7 @@
 #include "mesh.h"
 
 Mesh::Mesh()
+    :  m_bindIdx(2)
 {
     m_vertices_size = 0;
     m_skeleton_nodes_size = 0;
@@ -52,7 +53,7 @@ bool Mesh::loadObj(QString path)
             temp_vertices.clear();
 
             if (flag_prev == 3) {
-                m_ssbo_data.push_back(ssbo_object_data);
+                m_buffer_data.push_back(ssbo_object_data);
                 m_objects.push_back(obj);
             }
 
@@ -134,13 +135,13 @@ bool Mesh::loadObj(QString path)
 
 
     if (flag_prev == 3) {
-        m_ssbo_data.push_back(ssbo_object_data);
+        m_buffer_data.push_back(ssbo_object_data);
         m_objects.push_back(obj);
     }
 
     file.close();
 
-    qDebug() << "Done Func: loadVertices, m_ssbo_data size : " <<   m_ssbo_data.size();
+    qDebug() << "Done Func: loadVertices, m_ssbo_data size : " <<   m_buffer_data.size();
     auto t2 = std::chrono::high_resolution_clock::now();
     qDebug() << "f() took "
                  << std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count()
@@ -171,17 +172,36 @@ bool Mesh::initVBO(QOpenGLBuffer vbo)
 }
 
 
-int Mesh::getSSBOSize()
+int Mesh::getBufferSize()
 {
-    return  m_ssbo_data.size() * sizeof(struct ssbo_mesh);
+    return  m_buffer_data.size() * sizeof(struct ssbo_mesh);
 }
 
-void* Mesh::getSSBOData()
+void* Mesh::getBufferData()
 {
-    return &m_ssbo_data[0];
+    return &m_buffer_data[0];
     //return m_ssbo_data.data();
 }
 
+void Mesh::initOpenGLFunctions()
+{
+    initializeOpenGLFunctions();
+}
+
+bool Mesh::initBuffer()
+{
+    glGenBuffers(1, &m_buffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, getBufferSize() , NULL, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_bindIdx, m_buffer);
+    qDebug() << "mesh buffer size: " << getBufferSize();
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
+    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    memcpy(p,  getBufferData(),  getBufferSize());
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+    return true;
+}
 
 // todo: combine this with the mesh class
 bool Mesh::loadSkeletonPoints(QString path)

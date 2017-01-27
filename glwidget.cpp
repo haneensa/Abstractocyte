@@ -20,7 +20,8 @@ GLWidget::GLWidget(QWidget *parent)
         m_xaxis(0),
         m_state(0)
 {
-    m_abstraction_space = new AbstractionSpace(100, 100);
+    m_2dspace = new AbstractionSpace(100, 100);
+
     // to do: combine all these files in one .obj file
     QString path= "://data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj";
     m_mesh.loadObj(path);
@@ -58,7 +59,7 @@ GLWidget::~GLWidget()
         delete m_skeleton_obj[i];
     }
 
-    delete m_abstraction_space;
+    delete m_2dspace;
 
     doneCurrent();
 }
@@ -95,35 +96,19 @@ void GLWidget::setMVPAttrib(GLuint program)
 void GLWidget::initializeGL()
 {
     qDebug() << "initializeGL";
+
     initializeOpenGLFunctions();
+    m_2dspace->initOpenGLFunctions();
+    m_mesh.initOpenGLFunctions();
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     /******************** SSBO Data ***************************/
-    qDebug() << " m_mesh.getSSBOSize(): " << m_mesh.getSSBOSize();
-    glGenBuffers(2, m_ssbo);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo[0]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER,  m_mesh.getSSBOSize() , NULL, GL_DYNAMIC_COPY);
-    GL_Error();
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_ssbo[0]);
-    qDebug() << "ssbo size: " << m_mesh.getSSBOSize();
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo[0]);
-    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-    memcpy(p,  m_mesh.getSSBOData(),  m_mesh.getSSBOSize());
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+    qDebug() << " m_mesh.getSSBOSize(): " << m_mesh.getBufferSize();
+    m_mesh.initBuffer();
     /******************** Abstraction Space ********************/
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo[1]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER,  m_abstraction_space->getSSBOSize() , NULL, GL_DYNAMIC_COPY);
-    GL_Error();
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_ssbo[1]);
-    qDebug() << "ssbo size: " <<m_abstraction_space->getSSBOSize();
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo[1]);
-    p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-    memcpy(p,  m_abstraction_space->getSSBOData(),  m_abstraction_space->getSSBOSize());
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+    m_2dspace->initBuffer();
     /******************** END *********************************/
 
     /* start initializing mesh */

@@ -4,6 +4,7 @@
 // file manipulations
 #include <QString>
 #include <QFile>
+#include <QOpenGLFunctions_4_3_Core>
 
 #include "object.h"
 struct ssbo_mesh {
@@ -11,7 +12,7 @@ struct ssbo_mesh {
     QVector4D center;
 };
 
-class Mesh
+class Mesh : protected QOpenGLFunctions_4_3_Core
 {
 public:
     Mesh();
@@ -25,15 +26,16 @@ public:
     bool initSkeletonVBO(QOpenGLBuffer vbo);
 
     // ssbo buffer data
-    int getSSBOSize();
-    void* getSSBOData();
-
+    int getBufferSize();
+    void* getBufferData();
+    bool initBuffer();
+    void initOpenGLFunctions();
 
 protected:
-    int                         m_vertices_size;
-    int                         m_skeleton_nodes_size;
+    int                                 m_vertices_size;
+    int                                 m_skeleton_nodes_size;
 
-    int                         m_limit;
+    int                                 m_limit;
 
     // instead of storing the vertices for each object,
     // store all the vertices at once
@@ -43,7 +45,9 @@ protected:
     // cons: global index to objects faces
     std::vector<Object*>                m_objects;
     std::vector<Object*>                m_skeletons;
-    std::vector<struct ssbo_mesh>    m_ssbo_data; // Color, Cenert, Type
+    std::vector<struct ssbo_mesh>       m_buffer_data; // Color, Cenert, Type
+    GLuint                              m_buffer;
+    GLuint                              m_bindIdx;
 };
 
 #endif // MESH_H
