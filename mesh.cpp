@@ -3,7 +3,9 @@
 
 Mesh::Mesh()
     :  m_bindIdx(2),
-       m_glFunctionsSet(false)
+       m_glFunctionsSet(false),
+       m_vbo_mesh( QOpenGLBuffer::VertexBuffer ),
+       m_vbo_skeleton( QOpenGLBuffer::VertexBuffer )
 {
     m_vertices_size = 0;
     m_skeleton_nodes_size = 0;
@@ -15,6 +17,12 @@ Mesh::~Mesh()
     for (std::size_t i = 0; i != m_objects.size(); i++) {
         delete m_objects[i];
     }
+
+    glDeleteProgram(m_program_skeleton);
+    glDeleteProgram(m_program_mesh);
+
+    m_vao_mesh.destroy();
+    m_vbo_mesh.destroy();
 }
 
 // 75892 ----(remove debug msgs)---> 63610
@@ -198,41 +206,6 @@ bool Mesh::initVertexAttrib()
 
 }
 
-int Mesh::getBufferSize()
-{
-    return  m_buffer_data.size() * sizeof(struct ssbo_mesh);
-}
-
-void* Mesh::getBufferData()
-{
-    return &m_buffer_data[0];
-    //return m_ssbo_data.data();
-}
-
-void Mesh::initOpenGLFunctions()
-{
-    m_glFunctionsSet = true;
-    initializeOpenGLFunctions();
-}
-
-bool Mesh::initBuffer()
-{
-    if (m_glFunctionsSet == false)
-        return false;
-
-    glGenBuffers(1, &m_buffer);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, getBufferSize() , NULL, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_bindIdx, m_buffer);
-    qDebug() << "mesh buffer size: " << getBufferSize();
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
-    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-    memcpy(p,  getBufferData(),  getBufferSize());
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-    return true;
-}
-
 // todo: combine this with the mesh class
 bool Mesh::loadSkeletonPoints(QString path)
 {
@@ -316,3 +289,247 @@ bool Mesh::initSkeletonVBO(QOpenGLBuffer vbo)
     return true;
 }
 
+bool Mesh::initMeshShaders()
+{
+    /* start initializing mesh */
+    qDebug() << "Initializing MESH";
+    m_program_mesh = glCreateProgram();
+    bool res = initShader(m_program_mesh, ":/shaders/mesh.vert", ":/shaders/mesh.geom", ":/shaders/mesh.frag");
+    if (res == false)
+        return res;
+
+    // create vbos and vaos
+    m_vao_mesh.create();
+    m_vao_mesh.bind();
+
+    glUseProgram(m_program_mesh); // m_program_mesh->bind();
+
+    GLuint mMatrix = glGetUniformLocation(m_program_mesh, "mMatrix");
+    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+    GLuint vMatrix = glGetUniformLocation(m_program_mesh, "vMatrix");
+    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    GLuint pMatrix = glGetUniformLocation(m_program_mesh, "pMatrix");
+    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+
+    QVector3D lightDir = QVector3D(-2.5f, -2.5f, -0.9f);
+    GLuint lightDir_loc = glGetUniformLocation(m_program_mesh, "diffuseLightDirection");
+    glUniform3fv(lightDir_loc, 1, &lightDir[0]);
+
+    m_vbo_mesh.create();
+    m_vbo_mesh.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    if ( !m_vbo_mesh.bind() ) {
+        qDebug() << "Could not bind vertex buffer to the context.";
+    }
+
+    initVBO(m_vbo_mesh);
+    initVertexAttrib();
+
+    m_vbo_mesh.release();
+    m_vao_mesh.release();
+
+}
+
+bool Mesh::initMeshPointsShaders()
+{
+    /***************************************/
+    qDebug() << "Initializing MESH POINTS";
+    m_program_mesh_points = glCreateProgram();
+    bool res = initShader(m_program_mesh_points, ":/shaders/mesh.vert", ":/shaders/mesh_points.geom", ":/shaders/mesh_points.frag");
+    if (res == false)
+        return res;
+
+    // create vbos and vaos
+    m_vao_mesh_points.create();
+    m_vao_mesh_points.bind();
+
+    glUseProgram(m_program_mesh_points);
+
+    QVector3D lightDir = QVector3D(-2.5f, -2.5f, -0.9f);
+    GLuint lightDir_loc = glGetUniformLocation(m_program_mesh_points, "diffuseLightDirection");
+    glUniform3fv(lightDir_loc, 1, &lightDir[0]);
+
+
+    if ( !m_vbo_mesh.bind() ) {
+        qDebug() << "Could not bind vertex buffer to the context.";
+    }
+
+    GLuint mMatrix = glGetUniformLocation(m_program_mesh_points, "mMatrix");
+    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+    GLuint vMatrix = glGetUniformLocation(m_program_mesh_points, "vMatrix");
+    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    GLuint pMatrix = glGetUniformLocation(m_program_mesh_points, "pMatrix");
+    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+
+    initVertexAttrib();
+
+    m_vbo_mesh.release();
+    m_vao_mesh_points.release();
+}
+
+bool Mesh::initSkeletonShaders()
+{
+    /********** START SKELETON **************/
+    qDebug() << "point";
+
+    m_program_skeleton = glCreateProgram();
+    bool res = initShader(m_program_skeleton, ":/shaders/skeleton_point.vert", ":/shaders/skeleton_point.geom", ":/shaders/skeleton_point.frag");
+    if (res == false)
+        return res;
+
+    qDebug() << "Initializing SKELETON 1";
+    m_vao_skeleton.create();
+    m_vao_skeleton.bind();
+
+    glUseProgram(m_program_skeleton);
+    GLuint mMatrix = glGetUniformLocation(m_program_skeleton, "mMatrix");
+    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+    GLuint vMatrix = glGetUniformLocation(m_program_skeleton, "vMatrix");
+    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    GLuint pMatrix = glGetUniformLocation(m_program_skeleton, "pMatrix");
+    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+
+    m_vbo_skeleton.create();
+    m_vbo_skeleton.setUsagePattern( QOpenGLBuffer::StaticDraw);
+    if ( !m_vbo_skeleton.bind() ) {
+        qDebug() << "Could not bind vertex buffer to the context.";
+    }
+
+    m_vbo_skeleton.allocate(NULL, getNodesCount() * sizeof(SkeletonVertex));
+    initSkeletonVBO(m_vbo_skeleton);
+
+    qDebug() << " m_mesh.getNodesCount(): " << getNodesCount();
+    qDebug() << " m_mesh.getNodesCount()* sizeof(QVector3D): " << getNodesCount()* sizeof(SkeletonVertex);
+
+    GL_Error();
+
+    int offset = 0;
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(SkeletonVertex),  0);
+
+    offset += sizeof(QVector3D);
+    glEnableVertexAttribArray(1);
+    glVertexAttribIPointer(1, 1, GL_INT, sizeof(SkeletonVertex), (GLvoid*)offset);
+
+    GL_Error();
+
+    m_vbo_skeleton.release();
+    m_vao_skeleton.release();
+}
+
+bool Mesh::initOpenGLFunctions(struct MeshUniforms mesh_uniforms)
+{
+    m_glFunctionsSet = true;
+    initializeOpenGLFunctions();
+    m_uniforms = mesh_uniforms;
+
+    initBuffer();
+
+    initMeshShaders();
+    initMeshPointsShaders();
+    initSkeletonShaders();
+
+    return true;
+}
+
+
+bool Mesh::initBuffer()
+{
+    if (m_glFunctionsSet == false)
+        return false;
+
+    int bufferSize =  m_buffer_data.size() * sizeof(struct ssbo_mesh);
+
+    glGenBuffers(1, &m_buffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize , NULL, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_bindIdx, m_buffer);
+    qDebug() << "mesh buffer size: " << bufferSize;
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
+    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    memcpy(p,   m_buffer_data.data(),  bufferSize);
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+    return true;
+}
+
+void Mesh::draw(struct MeshUniforms mesh_uniforms)
+{
+    GLint y_axis, x_axis;
+    m_uniforms = mesh_uniforms;
+    m_vao_skeleton.bind();
+    glUseProgram(m_program_skeleton);
+
+    GLuint mMatrix = glGetUniformLocation(m_program_skeleton, "mMatrix");
+    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+    GLuint vMatrix = glGetUniformLocation(m_program_skeleton, "vMatrix");
+    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    GLuint pMatrix = glGetUniformLocation(m_program_skeleton, "pMatrix");
+    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+    y_axis = glGetUniformLocation(m_program_skeleton, "y_axis");
+    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
+
+    x_axis = glGetUniformLocation(m_program_skeleton, "x_axis");
+    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
+
+    glDrawArrays(GL_POINTS, 0,  getNodesCount() );
+    m_vao_skeleton.release();
+
+    /************************/
+    m_vao_mesh.bind();
+    glUseProgram(m_program_mesh);
+
+
+    mMatrix = glGetUniformLocation(m_program_mesh, "mMatrix");
+    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+    vMatrix = glGetUniformLocation(m_program_mesh, "vMatrix");
+    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    pMatrix = glGetUniformLocation(m_program_mesh, "pMatrix");
+    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+    y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
+    glUniform1iv(y_axis, 1, &mesh_uniforms.y_axis);
+
+    x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
+    glUniform1iv(x_axis, 1, &mesh_uniforms.x_axis);
+
+    glDrawArrays(GL_TRIANGLES, 0,  getVertixCount() );
+
+    m_vao_mesh.release();
+    /************************/
+    m_vao_mesh_points.bind();
+    glUseProgram(m_program_mesh_points);
+    mMatrix = glGetUniformLocation(m_program_mesh_points, "mMatrix");
+    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+    vMatrix = glGetUniformLocation(m_program_mesh_points, "vMatrix");
+    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    pMatrix = glGetUniformLocation(m_program_mesh_points, "pMatrix");
+    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+    y_axis = glGetUniformLocation(m_program_mesh_points, "y_axis");
+    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
+
+    x_axis = glGetUniformLocation(m_program_mesh_points, "x_axis");
+    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
+
+    glDrawArrays(GL_POINTS, 0,  getVertixCount() );
+    m_vao_mesh_points.release();
+    /************************/
+
+}

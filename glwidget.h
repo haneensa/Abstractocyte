@@ -32,27 +32,13 @@ protected:
     void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
-    void setMVPAttrib(GLuint program);
+    void updateMVPAttrib();
     void loadMesh();
 
     AbstractionSpace            *m_2dspace;
 
     /* mesh */
     Mesh                        m_mesh;
-    QOpenGLVertexArrayObject    m_vao_mesh;
-    QOpenGLBuffer               m_vbo_mesh;
-    GLuint                      m_program_mesh;
-
-
-    QOpenGLVertexArrayObject    m_vao_mesh_points;
-    GLuint                      m_program_mesh_points;
-
-
-    QOpenGLVertexArrayObject    m_vao_skeleton;
-    QOpenGLBuffer               m_vbo_skeleton;
-    unsigned int                m_skeleton_vertices_size;
-    GLuint                      m_program_skeleton;
-    std::vector<Object*>        m_skeleton_obj;
 
     /* matrices */
     QMatrix4x4                  m_projection;

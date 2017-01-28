@@ -12,6 +12,14 @@ struct ssbo_mesh {
     QVector4D center;
 };
 
+struct MeshUniforms {
+    GLint y_axis;
+    GLint x_axis;
+    float* mMatrix;
+    float* vMatrix;
+    float* pMatrix;
+};
+
 class Mesh : protected MainOpenGL
 {
 public:
@@ -19,18 +27,22 @@ public:
     ~Mesh();
     bool loadObj(QString path);
     int getVertixCount();
-    bool initVBO(QOpenGLBuffer vbo);
-    bool initVertexAttrib();
+
+
     // temp functions
     bool loadSkeletonPoints(QString path);
     int getNodesCount();
     bool initSkeletonVBO(QOpenGLBuffer vbo);
 
-    // ssbo buffer data
-    int getBufferSize();
-    void* getBufferData();
+    // OpenGL initialization
     bool initBuffer();
-    void initOpenGLFunctions();
+    bool initOpenGLFunctions(struct MeshUniforms mesh_uniforms);
+    bool initVBO(QOpenGLBuffer vbo);
+    bool initVertexAttrib();
+    void draw(struct MeshUniforms mesh_uniforms);
+    bool initMeshShaders();
+    bool initMeshPointsShaders();
+    bool initSkeletonShaders();
 
 protected:
     int                                 m_vertices_size;
@@ -51,6 +63,22 @@ protected:
     GLuint                              m_bindIdx;
 
     bool                                m_glFunctionsSet;
+
+    /* opengl buffers and vars */
+    QOpenGLVertexArrayObject    m_vao_mesh;
+    QOpenGLBuffer               m_vbo_mesh;
+    GLuint                      m_program_mesh;
+
+
+    QOpenGLVertexArrayObject    m_vao_mesh_points;
+    GLuint                      m_program_mesh_points;
+
+
+    QOpenGLVertexArrayObject    m_vao_skeleton;
+    QOpenGLBuffer               m_vbo_skeleton;
+    GLuint                      m_program_skeleton;
+    struct MeshUniforms         m_uniforms;
+
 };
 
 #endif // MESH_H
