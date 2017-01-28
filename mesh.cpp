@@ -166,22 +166,6 @@ int Mesh::getVertixCount()
 
 
 
-bool Mesh::initVBO(QOpenGLBuffer vbo)
-{
-    vbo.allocate(NULL, getVertixCount()  * sizeof(VertexData));
-
-    int offset = 0;
-    for (std::size_t i = 0; i < m_objects.size(); i++) {
-        int count = m_objects[i]->get_ms_Size() * sizeof(VertexData);
-        qDebug() << i << " allocating: " << m_objects[i]->getName().data();
-        vbo.write(offset, &m_objects[i]->get_ms_Vertices()[0], count);
-        offset += count;
-
-   }
-
-    return true;
-}
-
 bool Mesh::initVertexAttrib()
 {
     if (m_glFunctionsSet == false)
@@ -272,19 +256,39 @@ int Mesh::getNodesCount()
     return m_skeleton_nodes_size;
 }
 
+bool Mesh::initOpenGLFunctions(struct MeshUniforms mesh_uniforms)
+{
+    m_glFunctionsSet = true;
+    initializeOpenGLFunctions();
+    m_uniforms = mesh_uniforms;
 
-bool Mesh::initSkeletonVBO(QOpenGLBuffer vbo)
+    initBuffer();
+
+    initMeshShaders();
+    initMeshPointsShaders();
+    initSkeletonShaders();
+
+    return true;
+}
+
+
+bool Mesh::initBuffer()
 {
     if (m_glFunctionsSet == false)
         return false;
 
-    int offset = 0;
-    for (std::size_t i = 0; i < m_skeletons.size(); i++) {
-        int count = m_skeletons[i]->get_s_Size() * sizeof(SkeletonVertex);
-        vbo.write(offset, &m_skeletons[i]->get_s_Vertices()[0], count);
-        qDebug() << i << " allocating: " << m_skeletons[i]->getName().data() << " count: " << count;
-        offset += count;
-   }
+    int bufferSize =  m_buffer_data.size() * sizeof(struct ssbo_mesh);
+
+    glGenBuffers(1, &m_buffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize , NULL, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_bindIdx, m_buffer);
+    qDebug() << "mesh buffer size: " << bufferSize;
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
+    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    memcpy(p,   m_buffer_data.data(),  bufferSize);
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
     return true;
 }
@@ -324,7 +328,17 @@ bool Mesh::initMeshShaders()
         qDebug() << "Could not bind vertex buffer to the context.";
     }
 
-    initVBO(m_vbo_mesh);
+    m_vbo_mesh.allocate(NULL, getVertixCount()  * sizeof(VertexData));
+
+    int offset = 0;
+    for (std::size_t i = 0; i < m_objects.size(); i++) {
+        int count = m_objects[i]->get_ms_Size() * sizeof(VertexData);
+        qDebug() << i << " allocating: " << m_objects[i]->getName().data();
+        m_vbo_mesh.write(offset, &m_objects[i]->get_ms_Vertices()[0], count);
+        offset += count;
+
+   }
+
     initVertexAttrib();
 
     m_vbo_mesh.release();
@@ -404,14 +418,22 @@ bool Mesh::initSkeletonShaders()
     }
 
     m_vbo_skeleton.allocate(NULL, getNodesCount() * sizeof(SkeletonVertex));
-    initSkeletonVBO(m_vbo_skeleton);
+
+    int offset = 0;
+    for (std::size_t i = 0; i < m_skeletons.size(); i++) {
+        int count = m_skeletons[i]->get_s_Size() * sizeof(SkeletonVertex);
+        m_vbo_skeleton.write(offset, &m_skeletons[i]->get_s_Vertices()[0], count);
+        qDebug() << i << " allocating: " << m_skeletons[i]->getName().data() << " count: " << count;
+        offset += count;
+   }
+
 
     qDebug() << " m_mesh.getNodesCount(): " << getNodesCount();
     qDebug() << " m_mesh.getNodesCount()* sizeof(QVector3D): " << getNodesCount()* sizeof(SkeletonVertex);
 
     GL_Error();
 
-    int offset = 0;
+    offset = 0;
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(SkeletonVertex),  0);
 
@@ -423,43 +445,6 @@ bool Mesh::initSkeletonShaders()
 
     m_vbo_skeleton.release();
     m_vao_skeleton.release();
-}
-
-bool Mesh::initOpenGLFunctions(struct MeshUniforms mesh_uniforms)
-{
-    m_glFunctionsSet = true;
-    initializeOpenGLFunctions();
-    m_uniforms = mesh_uniforms;
-
-    initBuffer();
-
-    initMeshShaders();
-    initMeshPointsShaders();
-    initSkeletonShaders();
-
-    return true;
-}
-
-
-bool Mesh::initBuffer()
-{
-    if (m_glFunctionsSet == false)
-        return false;
-
-    int bufferSize =  m_buffer_data.size() * sizeof(struct ssbo_mesh);
-
-    glGenBuffers(1, &m_buffer);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize , NULL, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_bindIdx, m_buffer);
-    qDebug() << "mesh buffer size: " << bufferSize;
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
-    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-    memcpy(p,   m_buffer_data.data(),  bufferSize);
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-
-    return true;
 }
 
 void Mesh::draw(struct MeshUniforms mesh_uniforms)

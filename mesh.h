@@ -32,12 +32,10 @@ public:
     // temp functions
     bool loadSkeletonPoints(QString path);
     int getNodesCount();
-    bool initSkeletonVBO(QOpenGLBuffer vbo);
 
     // OpenGL initialization
-    bool initBuffer();
     bool initOpenGLFunctions(struct MeshUniforms mesh_uniforms);
-    bool initVBO(QOpenGLBuffer vbo);
+    bool initBuffer();
     bool initVertexAttrib();
     void draw(struct MeshUniforms mesh_uniforms);
     bool initMeshShaders();
