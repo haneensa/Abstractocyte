@@ -4,7 +4,8 @@
 AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     : m_xdim(xdim),
       m_ydim(ydim),
-      m_bindIdx(3)
+      m_bindIdx(3),
+      m_glFunctionsSet(false)
 {
     // val, alpha, color_intp, point_size, additional info
     // float leftMin, float leftMax, float rightMin, float rightMax
@@ -28,6 +29,7 @@ AbstractionSpace::~AbstractionSpace()
 
 void AbstractionSpace::initOpenGLFunctions()
 {
+    m_glFunctionsSet = true;
     initializeOpenGLFunctions();
 }
 
@@ -58,6 +60,9 @@ void* AbstractionSpace::getBufferData()
 
 bool AbstractionSpace::initBuffer()
 {
+    if (m_glFunctionsSet == false)
+        return false;
+
     glGenBuffers(1, &m_buffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
     glBufferData(GL_SHADER_STORAGE_BUFFER,  getBufferSize() , NULL, GL_DYNAMIC_COPY);

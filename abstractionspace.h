@@ -4,13 +4,13 @@
 #include <vector>
 #include <string>
 #include <QVector4D>
-#include <QOpenGLFunctions_4_3_Core>
+#include "mainopengl.h"
 
 struct ssbo_absSpace {
 
 };
 
-class AbstractionSpace : protected QOpenGLFunctions_4_3_Core
+class AbstractionSpace : protected MainOpenGL
 {
 public:
     AbstractionSpace(int xdim, int ydim);
@@ -31,6 +31,7 @@ private:
     QVector4D                           space2d[2][5]; // val, alpha, color_intp, point_size, additional infos
     GLuint                              m_buffer;
     GLuint                              m_bindIdx;
+    bool                                m_glFunctionsSet;
 };
 
 #endif // ABSTRACTIONSPACE_H

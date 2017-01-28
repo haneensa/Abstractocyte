@@ -33,6 +33,8 @@ GLWidget::GLWidget(QWidget *parent)
     path = "://data/mouse03_skeletons.sk";
     m_mesh.loadSkeletonPoints(path); // 11638884, 19131720
 
+    // todo: one graph manager, with all the graphs manipulations
+
     m_distance = 0.2;
     m_rotation = QQuaternion();
     //reset rotation
@@ -97,7 +99,7 @@ void GLWidget::setMVPAttrib(GLuint program)
 void GLWidget::initializeGL()
 {
     qDebug() << "initializeGL";
-
+    int offset = 0;
     initializeOpenGLFunctions();
     m_2dspace->initOpenGLFunctions();
     m_mesh.initOpenGLFunctions();
@@ -136,26 +138,8 @@ void GLWidget::initializeGL()
         qDebug() << "Could not bind vertex buffer to the context.";
     }
 
-    m_vbo_mesh.allocate(NULL, m_mesh.getVertixCount()  * sizeof(VertexData));
-
     m_mesh.initVBO(m_vbo_mesh);
-
-    int offset = 0;
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(VertexData),  0);
-
-
-    offset +=  sizeof(QVector3D);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(VertexData), (GLvoid*)offset);
-
-
-    offset += sizeof(QVector3D);
-    glEnableVertexAttribArray(2);
-    glVertexAttribIPointer(2, 1, GL_INT, sizeof(VertexData), (GLvoid*)offset);
-
+    m_mesh.initVertexAttrib();
 
     m_vbo_mesh.release();
     m_vao_mesh.release();
@@ -182,22 +166,7 @@ void GLWidget::initializeGL()
     }
 
     setMVPAttrib(m_program_mesh_points);
-
-    offset = 0;
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(VertexData),  0);
-
-
-    offset +=  sizeof(QVector3D);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(VertexData), (GLvoid*)offset);
-
-
-    offset += sizeof(QVector3D);
-    glEnableVertexAttribArray(2);
-    glVertexAttribIPointer(2, 1, GL_INT, sizeof(VertexData), (GLvoid*)offset);
+    m_mesh.initVertexAttrib();
 
     m_vbo_mesh.release();
     m_vao_mesh_points.release();

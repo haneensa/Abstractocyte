@@ -2,7 +2,8 @@
 #include "mesh.h"
 
 Mesh::Mesh()
-    :  m_bindIdx(2)
+    :  m_bindIdx(2),
+       m_glFunctionsSet(false)
 {
     m_vertices_size = 0;
     m_skeleton_nodes_size = 0;
@@ -159,6 +160,8 @@ int Mesh::getVertixCount()
 
 bool Mesh::initVBO(QOpenGLBuffer vbo)
 {
+    vbo.allocate(NULL, getVertixCount()  * sizeof(VertexData));
+
     int offset = 0;
     for (std::size_t i = 0; i < m_objects.size(); i++) {
         int count = m_objects[i]->get_ms_Size() * sizeof(VertexData);
@@ -171,6 +174,29 @@ bool Mesh::initVBO(QOpenGLBuffer vbo)
     return true;
 }
 
+bool Mesh::initVertexAttrib()
+{
+    if (m_glFunctionsSet == false)
+        return false;
+
+    int offset = 0;
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexData),  0);
+
+
+    offset +=  sizeof(QVector3D);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexData), (GLvoid*)offset);
+
+
+    offset += sizeof(QVector3D);
+    glEnableVertexAttribArray(2);
+    glVertexAttribIPointer(2, 1, GL_INT, sizeof(VertexData), (GLvoid*)offset);
+    return true;
+
+}
 
 int Mesh::getBufferSize()
 {
@@ -185,11 +211,15 @@ void* Mesh::getBufferData()
 
 void Mesh::initOpenGLFunctions()
 {
+    m_glFunctionsSet = true;
     initializeOpenGLFunctions();
 }
 
 bool Mesh::initBuffer()
 {
+    if (m_glFunctionsSet == false)
+        return false;
+
     glGenBuffers(1, &m_buffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
     glBufferData(GL_SHADER_STORAGE_BUFFER, getBufferSize() , NULL, GL_DYNAMIC_COPY);
@@ -272,6 +302,9 @@ int Mesh::getNodesCount()
 
 bool Mesh::initSkeletonVBO(QOpenGLBuffer vbo)
 {
+    if (m_glFunctionsSet == false)
+        return false;
+
     int offset = 0;
     for (std::size_t i = 0; i < m_skeletons.size(); i++) {
         int count = m_skeletons[i]->get_s_Size() * sizeof(SkeletonVertex);

@@ -4,7 +4,7 @@
 // file manipulations
 #include <QString>
 #include <QFile>
-#include <QOpenGLFunctions_4_3_Core>
+#include "mainopengl.h"
 
 #include "object.h"
 struct ssbo_mesh {
@@ -12,7 +12,7 @@ struct ssbo_mesh {
     QVector4D center;
 };
 
-class Mesh : protected QOpenGLFunctions_4_3_Core
+class Mesh : protected MainOpenGL
 {
 public:
     Mesh();
@@ -20,6 +20,7 @@ public:
     bool loadObj(QString path);
     int getVertixCount();
     bool initVBO(QOpenGLBuffer vbo);
+    bool initVertexAttrib();
     // temp functions
     bool loadSkeletonPoints(QString path);
     int getNodesCount();
@@ -48,6 +49,8 @@ protected:
     std::vector<struct ssbo_mesh>       m_buffer_data; // Color, Cenert, Type
     GLuint                              m_buffer;
     GLuint                              m_bindIdx;
+
+    bool                                m_glFunctionsSet;
 };
 
 #endif // MESH_H
