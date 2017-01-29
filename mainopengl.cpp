@@ -10,6 +10,7 @@ MainOpenGL::MainOpenGL()
 
 MainOpenGL::~MainOpenGL()
 {
+    qDebug() << "~MainOpenGL";
     if (flag == true) {
         qDebug() << "Delete MainOpenGL";
         delete m_program_text;

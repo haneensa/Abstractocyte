@@ -2,6 +2,7 @@
 #define NODE_H
 
 #include <QVector3D>
+#include <QVector2D>
 
 #include "edge.h"
 
@@ -18,21 +19,33 @@ public:
     int getIdxID()              { return m_idxID; }
 
     Node_t getNodeType()        { return m_node_t; }
-    QVector3D get3DPosition()   {return QVector3D(m_x, m_y, m_z); }
-
+    QVector3D get3DPosition()   {return m_nodeXYZ; }
     void addEdge(Edge *e);
 
+
+    // force based layout related functions
+    QVector2D getLayoutedPosition();
+    void addToLayoutedPosition(QVector2D newPos);
+
+    void addToForceSum(QVector2D newForce);
+    QVector2D getForceSum()     { return m_forceSum; }
+
+    void resetForce();
+
+
 private:
-    int     m_nID;
-    int     m_idxID;
+    int                     m_nID;
+    int                     m_idxID;
     // original 3D position
-    float   m_x;
-    float   m_y;
-    float   m_z;
+    QVector3D               m_nodeXYZ;
 
-    Node_t m_node_t;
+    Node_t                  m_node_t;
 
-    std::map<int, Edge*> m_adjEdges;
+    std::map<int, Edge*>    m_adjEdges;
+
+    // force directed layout
+    QVector2D               m_forceSum; // force to be applied on 2D position
+    QVector2D               m_layouted; // 2D position after applying force
 };
 
 #endif // NODE_H

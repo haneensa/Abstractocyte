@@ -48,7 +48,11 @@ public:
     std::map<int, Edge*>::iterator getEdgesEnd()    { return m_edges.end(); }
 
     // force directed layout functions
-
+    void runforceDirectedLayout();
+    void attractConnectedNodes(Edge *edge, float k);
+    void repulseNodes(Node *node1, Node *node2, float k);
+    QVector2D attractionForce(float x1, float y1, float x2, float y2, float k);
+    QVector2D repulsiveForce(float x1, float y1, float x2, float y2, float k);
 
 
     // opengl related functions
@@ -68,7 +72,17 @@ protected:
 
     // for opengl buffer
     std::vector<struct BufferNode>  m_bufferNodes;
-    std::vector<GLushort>       m_bufferIndices;
+    std::vector<GLushort>           m_bufferIndices;
+
+    // force directed laout
+    float                           m_MAX_DISTANCE;
+    float                           m_AABBdim;
+    float                           m_Cr;
+    float                           m_Ca;
+    int                             m_ITERATIONS;
+    float                           m_MAX_VERTEX_MOVEMENT;
+    float                           m_SLOW_FACTOR;
+    float                           m_MAX_FORCE;
 
 };
 

@@ -10,7 +10,7 @@ struct ssbo_absSpace {
 
 };
 
-class AbstractionSpace : protected MainOpenGL
+class AbstractionSpace : public MainOpenGL
 {
 public:
     AbstractionSpace(int xdim, int ydim);

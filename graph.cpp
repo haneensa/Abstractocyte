@@ -6,6 +6,14 @@ Graph::Graph()
      m_edgesCounter = 0;
      m_dupEdges = 0;
 
+
+     // force directed layout parameters
+     m_Cr = 1.5;
+     m_Ca = 0.5;
+     m_AABBdim = 0.15f; // used for spatial hashing query dim
+     m_MAX_DISTANCE = 0.1f;
+     m_ITERATIONS = 10000;
+
 }
 
 
@@ -171,3 +179,155 @@ void Graph::allocateBIndices(QOpenGLBuffer indexVbo)
                         m_bufferIndices.size() * sizeof(GLushort) );
 }
 
+
+
+/************************ Force Directed Layout ****************************/
+void Graph::runforceDirectedLayout()
+{
+    qDebug() << "run force directed layout";
+    float area = 1.0;
+    float k = std::sqrt( area / m_nodesCounter );
+
+    // reset layouted coordinates to original values
+    for ( int i = 0; i < m_ITERATIONS; i++ ) {
+        qDebug() << "Iteration # " << i;
+
+        // forces on nodes due to node-node repulsion
+        for ( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++ ) {
+            Node *node1 = (*iter).second;
+            for ( auto iter2 = m_nodes.begin(); iter2 != m_nodes.end(); iter2++ ) {
+                Node *node2 = (*iter2).second;
+                if ( node1->getIdxID() == node2->getIdxID() )
+                    continue;
+                repulseNodes(node1, node2, m_Cr * k);
+            }
+        }
+
+        // forcs due to edge attraction
+        for ( auto iter = m_edges.begin(); iter != m_edges.end(); iter++ ) {
+            Edge *edge = (*iter).second;
+            attractConnectedNodes(edge, m_Ca * k);
+        }
+
+        float moveAccumlation = 0.0;
+        // update nodes position fter force
+        for ( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
+            Node *node = (*iter).second;
+
+            // get amount of force on node
+            QVector2D force = m_SLOW_FACTOR * node->getForceSum();
+            if ( force.length() > m_MAX_FORCE )
+                force = force.normalized() * m_MAX_FORCE;
+
+            // calculate how much to move
+            float xMove = force.x();
+            float yMove = force.y();
+
+            // check if this would take the node outside the bounding area
+            // if yes, then compute the torque, and apply that instead
+
+            // limit the movement to the maximum defined
+            if ( xMove > m_MAX_VERTEX_MOVEMENT )    xMove = m_MAX_VERTEX_MOVEMENT;
+            if ( xMove < -m_MAX_VERTEX_MOVEMENT )   xMove = -m_MAX_VERTEX_MOVEMENT;
+            if ( yMove > m_MAX_VERTEX_MOVEMENT )    yMove = m_MAX_VERTEX_MOVEMENT;
+            if ( yMove < -m_MAX_VERTEX_MOVEMENT )   yMove = -m_MAX_VERTEX_MOVEMENT;
+
+            moveAccumlation += std::abs(xMove) + std::abs(yMove);
+            node->addToLayoutedPosition(QVector2D(xMove, yMove)); // add to 2D position
+
+            // update node value in m_nodes buffer
+            m_bufferNodes[node->getIdxID()].coord3D = QVector3D(node->getLayoutedPosition(), 0.0);
+            // reset node force
+            node->resetForce();
+        }
+    }
+
+}
+
+void Graph::attractConnectedNodes(Edge *edge, float k)
+{
+    Node *node1 = edge->getNode1();
+    Node *node2 = edge->getNode2();
+
+    QVector2D n1 = node1->getLayoutedPosition();
+    QVector2D n2 = node2->getLayoutedPosition();
+
+    QVector2D force = attractionForce(n1.x(), n1.y(), n2.x(), n2.y(), k);
+
+    // attract: node1 -> ------- <- node2
+    node1->addToForceSum( force );
+    node2->addToForceSum( -force );
+}
+
+// node1: node creating the force
+// node2: node the force is acting on
+void  Graph::repulseNodes(Node *node1, Node *node2, float k)
+{
+    QVector2D n1 = node1->getLayoutedPosition();
+    QVector2D n2 = node2->getLayoutedPosition();
+
+    QVector2D force = repulsiveForce(n1.x(), n1.y(), n2.x(), n2.y(), k);
+
+    // Repel: <- node1 -------- node2 ->
+    node1->addToForceSum( -force );
+}
+
+QVector2D  Graph::attractionForce(float x1, float y1, float x2, float y2, float k)
+{
+    QVector2D force;
+    float attraction;
+    // node1 -------> node2
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+    QVector2D dxy = QVector2D(dx, dy);
+    float distance = dxy.length();
+    float distanceSquared = dxy.lengthSquared();
+    if (distanceSquared < 0.0001) { // too small
+        dx = 0.1f * (std::rand() % 100) / 100.0f + 0.1;
+        dy = 0.1f * (std::rand() % 100) / 100.0f + 0.1;
+        distanceSquared = dx * dx + dy * dy;
+    }
+
+    if (distance > m_MAX_DISTANCE) {
+        distance = m_MAX_DISTANCE;
+        distanceSquared = distance * distance;
+    }
+
+
+    // fa(d) = d^2/k
+    // fa(d) = K_s * ( distance - L) (hooke's law)
+    // fa(d) = c1 * log(d/c2) -> c1 = 2, c2 = 1
+    // fa(d) = -k * d
+    attraction = (distanceSquared /*- k*k*/) / k;
+    // Hooke's Law: F = -kx
+
+    force =  dxy.normalized() * attraction;
+
+    return force;
+}
+
+QVector2D Graph::repulsiveForce(float x1, float y1, float x2, float y2, float k)
+{
+    // get the difference vector between the positions of the two nodes
+    QVector2D force = QVector2D(0.0, 0.0);
+
+    // node 1 -----> node2
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+    float repulsion;
+    QVector2D dxy = QVector2D(dx, dy);
+    float distance = dxy.length() + 0.0001; // to avoid 0
+
+    // 1) fr(d) = -k^2/d
+    // 2) fr(d) = Kr / d^2 (Coulomb's law)
+    // 3) fr(d) = c3/d2 -> c3 = 1
+    // 4) fr(d) = k/d2
+    // Coulomb's Law: F = k(Qq/r^2)
+
+    if (distance <= m_AABBdim) {
+        repulsion =  (k * k) / distance;
+        force =  dxy.normalized() * repulsion;
+    }
+
+    return force;
+}

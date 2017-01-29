@@ -9,12 +9,14 @@ MousePad::MousePad(QWidget *parent)
     :  QOpenGLWidget(parent),
        m_vbo_circle( QOpenGLBuffer::VertexBuffer )
 {
+    qDebug() << "MousePad";
     circle.x = 0.0;
     circle.y = 0.0;
 }
 
 MousePad::~MousePad()
 {
+    qDebug() << "~MousePad";
     makeCurrent();
     delete m_program_circle;
     delete m_program_selection;

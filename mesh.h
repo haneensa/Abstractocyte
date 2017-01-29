@@ -20,7 +20,7 @@ struct MeshUniforms {
     float* pMatrix;
 };
 
-class Mesh : protected MainOpenGL
+class Mesh : public MainOpenGL
 {
 public:
     Mesh();
@@ -34,7 +34,8 @@ public:
     int getNodesCount();
 
     // OpenGL initialization
-    bool initOpenGLFunctions(struct MeshUniforms mesh_uniforms);
+    bool initOpenGLFunctions();
+    bool iniShadersVBOs(struct MeshUniforms mesh_uniforms);
     bool initBuffer();
     bool initVertexAttrib();
     void draw(struct MeshUniforms mesh_uniforms);

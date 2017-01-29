@@ -44,6 +44,7 @@ public:
     void initText( const QFont &_f  );
     void renderText( float x, float y, float scaleX, float scaleY, const QString &text );
 
+
 public:
     struct FontChar {
         int width;

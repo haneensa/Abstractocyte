@@ -10,10 +10,23 @@ Mesh::Mesh()
     m_vertices_size = 0;
     m_skeleton_nodes_size = 0;
     m_limit = 2;
+
+    // to do: combine all these files in one .obj file
+    // to do: interface to load these files
+    QString path= "://data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj";
+    loadObj(path);
+    path = "://data/mouse03_skeleton_centroid.obj";
+    loadObj(path);
+    path = "://data/mouse03_astro_skeleton.sk";
+    loadSkeletonPoints(path); // 11638884, 19131720
+    path = "://data/mouse03_skeletons.sk";
+    loadSkeletonPoints(path); // 11638884, 19131720
+
 }
 
 Mesh::~Mesh()
 {
+    qDebug() << "~Mesh()";
     if (m_glFunctionsSet) {
         qDebug() << "~Mesh()";
         for (std::size_t i = 0; i != m_objects.size(); i++) {
@@ -259,10 +272,16 @@ int Mesh::getNodesCount()
     return m_skeleton_nodes_size;
 }
 
-bool Mesh::initOpenGLFunctions(struct MeshUniforms mesh_uniforms)
+bool Mesh::initOpenGLFunctions()
 {
     m_glFunctionsSet = true;
     initializeOpenGLFunctions();
+
+    return true;
+}
+
+bool Mesh::iniShadersVBOs(struct MeshUniforms mesh_uniforms)
+{
     m_uniforms = mesh_uniforms;
 
     initBuffer();
@@ -273,7 +292,6 @@ bool Mesh::initOpenGLFunctions(struct MeshUniforms mesh_uniforms)
 
     return true;
 }
-
 
 bool Mesh::initBuffer()
 {

@@ -24,7 +24,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
 
 AbstractionSpace::~AbstractionSpace()
 {
-
+    qDebug() << "~AbstractionSpace";
 }
 
 void AbstractionSpace::initOpenGLFunctions()

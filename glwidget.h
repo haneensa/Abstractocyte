@@ -10,8 +10,6 @@
 #include "mesh.h"
 #include "abstractionspace.h"
 
-#define GL_GLEXT_PROTOTYPES
-
 class GLWidget : public QOpenGLWidget, MainOpenGL
 {
     Q_OBJECT
@@ -38,7 +36,7 @@ protected:
     AbstractionSpace            *m_2dspace;
 
     /* mesh */
-    Mesh                        m_mesh;
+    Mesh                        *m_mesh;
     GraphManager                *m_graphManager;
     /* matrices */
     QMatrix4x4                  m_projection;
@@ -60,7 +58,6 @@ protected:
     /* mouse pad */
     int                         m_yaxis;
     int                         m_xaxis;
-    int                         m_state; // determine the attributes to interpolate between
 };
 
 

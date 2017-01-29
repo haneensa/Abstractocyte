@@ -3,7 +3,8 @@
 GraphManager::GraphManager()
     : m_IndexVBO(QOpenGLBuffer::IndexBuffer),
       m_NodesVBO( QOpenGLBuffer::VertexBuffer ),
-      m_ngraph(0)
+      m_ngraph(0),
+      m_glFunctionsSet(false)
 {
     if (m_ngraph < max_graphs)  {
         m_graph[m_ngraph] = new Graph();
@@ -17,8 +18,27 @@ GraphManager::GraphManager()
 GraphManager::~GraphManager()
 {
     qDebug() << "~GraphManager()";
+    if (m_layout_thread1.joinable()) {
+        m_layout_thread1.join();
+    }
+
+    // destroy all vbo and vao and programs and graphs
+}
+
+void GraphManager::startForceDirectedLayout(int graphIdx)
+{
+    m_layout_thread1 = std::thread(&Graph::runforceDirectedLayout, m_graph[graphIdx]);
 
 }
+
+bool GraphManager::initOpenGLFunctions()
+{
+    m_glFunctionsSet = true;
+    initializeOpenGLFunctions();
+
+    return true;
+}
+
 
 // we initialize the vbos for drawing
 bool GraphManager::initVBO(struct GraphUniforms graph_uniforms, int graphIdx)
@@ -28,8 +48,10 @@ bool GraphManager::initVBO(struct GraphUniforms graph_uniforms, int graphIdx)
         return false;
     }
 
+    if (m_glFunctionsSet == false)
+        return false;
+
     qDebug() << "graph->initVBO";
-    initializeOpenGLFunctions();
     m_uniforms = graph_uniforms;
 
     // 1) initialize shaders
@@ -111,13 +133,21 @@ void GraphManager::drawNodes(struct GraphUniforms graph_uniforms, int graphIdx)
         return;
     }
 
+
+    if (m_glFunctionsSet == false)
+        return;
+
     m_uniforms = graph_uniforms;
+
     m_NodesVAO.bind();
+    m_NodesVBO.bind();
+    m_graph[graphIdx]->allocateBVertices(m_NodesVBO);
 
     glUseProgram(m_program_nodes);
     updateUniforms();
 
     glDrawArrays(GL_POINTS, 0, m_graph[graphIdx]->vertexBufferSize() );
+    m_NodesVBO.release();
     m_NodesVAO.release();
 }
 
@@ -127,6 +157,10 @@ void GraphManager::drawEdges(struct GraphUniforms graph_uniforms, int graphIdx)
         qDebug() << "graph index out of range";
         return;
     }
+
+
+    if (m_glFunctionsSet == false)
+        return;
 
     m_uniforms = graph_uniforms;
     m_IndexVAO.bind();
@@ -144,6 +178,10 @@ void GraphManager::drawEdges(struct GraphUniforms graph_uniforms, int graphIdx)
 
 void GraphManager::updateUniforms()
 {
+
+    if (m_glFunctionsSet == false)
+        return;
+
     // initialize uniforms
     GLuint mMatrix = glGetUniformLocation(m_program_nodes, "mMatrix");
     glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
