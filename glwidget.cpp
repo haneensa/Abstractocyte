@@ -78,24 +78,24 @@ void GLWidget::updateMVPAttrib()
 void GLWidget::initializeGL()
 {
     qDebug() << "initializeGL";
-    int offset = 0;
     initializeOpenGLFunctions();
-    m_2dspace->initOpenGLFunctions();
     updateMVPAttrib();
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
     /******************** 1 Abstraction Space ********************/
+    m_2dspace->initOpenGLFunctions();
     m_2dspace->initBuffer();
 
     /******************** 2 initialize Mesh **********************/
-    struct MeshUniforms mesh_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
-    m_mesh.initOpenGLFunctions(mesh_uniforms);
+   // struct MeshUniforms mesh_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
+  //  m_mesh.initOpenGLFunctions(mesh_uniforms);
 
     /****************** 3 Initialize Graph  *******************/
-
+    m_graphManager = new GraphManager();
+    struct GraphUniforms graph_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
+    m_graphManager->initVBO(graph_uniforms, 0);
 
     /**************** End data initialization *****************/
 
@@ -118,8 +118,13 @@ void GLWidget::paintGL()
     const qreal retinaScale = devicePixelRatio();
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
     updateMVPAttrib();
-    struct MeshUniforms mesh_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
-    m_mesh.draw(mesh_uniforms);
+   // struct MeshUniforms mesh_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
+    struct GraphUniforms graph_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
+
+   // m_mesh.draw(mesh_uniforms);
+    m_graphManager->drawNodes(graph_uniforms, 0);
+    m_graphManager->drawEdges(graph_uniforms, 0);
+
 
 }
 

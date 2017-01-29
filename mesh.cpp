@@ -14,15 +14,18 @@ Mesh::Mesh()
 
 Mesh::~Mesh()
 {
-    for (std::size_t i = 0; i != m_objects.size(); i++) {
-        delete m_objects[i];
+    if (m_glFunctionsSet) {
+        qDebug() << "~Mesh()";
+        for (std::size_t i = 0; i != m_objects.size(); i++) {
+            delete m_objects[i];
+        }
+
+        glDeleteProgram(m_program_skeleton);
+        glDeleteProgram(m_program_mesh);
+
+        m_vao_mesh.destroy();
+        m_vbo_mesh.destroy();
     }
-
-    glDeleteProgram(m_program_skeleton);
-    glDeleteProgram(m_program_mesh);
-
-    m_vao_mesh.destroy();
-    m_vbo_mesh.destroy();
 }
 
 // 75892 ----(remove debug msgs)---> 63610

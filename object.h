@@ -8,8 +8,9 @@
 enum class Object_t { AXON, DENDRITE, BOUTON, SPINE, MITO, SYNAPSE, ASTROCYTE, GLYCOGEN, UNKNOWN };
 
 struct VertexData {
-    QVector3D mesh_vertex;
+    QVector3D mesh_vertex;  
     QVector3D skeleton_vertex;
+    // bool value for marking this vertex
     GLint       ID;
 };
 

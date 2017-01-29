@@ -1,6 +1,6 @@
 #version 430
 
-out vec4  outcol;
+out vec4 outcol;
 in vec4 colAttrg;
 
 void main() {

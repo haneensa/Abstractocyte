@@ -17,5 +17,10 @@
         <file>shaders/skeleton_point.vert</file>
         <file>shaders/mesh_points.geom</file>
         <file>shaders/mesh_points.frag</file>
+        <file>shaders/nodes.frag</file>
+        <file>shaders/nodes.geom</file>
+        <file>shaders/nodes.vert</file>
+        <file>shaders/lines.frag</file>
+        <file>shaders/lines.geom</file>
     </qresource>
 </RCC>

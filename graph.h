@@ -3,10 +3,13 @@
 
 #include "node.h"
 #include "edge.h"
+
 #include <QDebug>
 #include <QFile>
 #include <QVector2D>
 #include <QVector3D>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
 
 // store graph per object?
 
@@ -26,8 +29,11 @@ public:
     bool loadEdges(QString filename);
 
     Node* addNode(int nID, float x, float y, float z);
-    Edge* addEdge(int nID1, int nID2);
+    Edge* addEdge(int eID, int nID1, int nID2);
+
     Node* getNode(int nID);
+    Edge* getEdge(int eID);
+
 
     std::map<int, Node*> getNodes() { return m_nodes; }
     std::map<int, Edge*> getEdges() { return m_edges; }
@@ -41,18 +47,28 @@ public:
     std::map<int, Edge*>::iterator getEdgesBegin()  { return m_edges.begin(); }
     std::map<int, Edge*>::iterator getEdgesEnd()    { return m_edges.end(); }
 
+    // force directed layout functions
 
+
+
+    // opengl related functions
+    size_t vertexBufferSize() { return m_bufferNodes.size(); }
+    size_t indexBufferSize() { return m_bufferIndices.size(); }
+
+    void allocateBVertices(QOpenGLBuffer vertexVbo);
+    void allocateBIndices(QOpenGLBuffer indexVbo);
 
 protected:
-    std::map<int, Node*> m_nodes;
-    std::map<int, Edge*> m_edges;
-
-    // for opengl buffer
-    std::vector<struct BufferNode> m_bufferNodes;
+    std::map<int, Node*>            m_nodes;
+    std::map<int, Edge*>            m_edges;
 
     int m_nodesCounter;
     int m_edgesCounter;
     int m_dupEdges;
+
+    // for opengl buffer
+    std::vector<struct BufferNode>  m_bufferNodes;
+    std::vector<GLushort>       m_bufferIndices;
 
 };
 

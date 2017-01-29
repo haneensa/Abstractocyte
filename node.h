@@ -12,17 +12,19 @@ class Edge;
 class Node
 {
 public:
-    Node(int nID, float x, float y, float z, Node_t node_type = Node_t::ASTROCYTE);
+    Node(int nID, int idxID, float x, float y, float z, Node_t node_type = Node_t::ASTROCYTE);
     ~Node();
     int getID()                 { return m_nID; }
+    int getIdxID()              { return m_idxID; }
+
     Node_t getNodeType()        { return m_node_t; }
     QVector3D get3DPosition()   {return QVector3D(m_x, m_y, m_z); }
 
     void addEdge(Edge *e);
 
-protected:
+private:
     int     m_nID;
-
+    int     m_idxID;
     // original 3D position
     float   m_x;
     float   m_y;

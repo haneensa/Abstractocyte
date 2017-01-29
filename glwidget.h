@@ -39,7 +39,7 @@ protected:
 
     /* mesh */
     Mesh                        m_mesh;
-
+    GraphManager                *m_graphManager;
     /* matrices */
     QMatrix4x4                  m_projection;
     QMatrix4x4                  m_mMatrix;
