@@ -13,6 +13,9 @@ Graph::Graph()
      m_AABBdim = 0.15f; // used for spatial hashing query dim
      m_MAX_DISTANCE = 0.1f;
      m_ITERATIONS = 10000;
+     m_MAX_VERTEX_MOVEMENT = 0.01f;
+     m_SLOW_FACTOR = 0.01f;
+     m_MAX_FORCE = 1.0f;
 
 }
 
@@ -108,7 +111,7 @@ Node* Graph::addNode(int nID, float x, float y, float z)
     m_nodesCounter++;
 
     QVector3D coord3D = QVector3D(x, y, z);
-    QVector2D coord2D = QVector2D(z, y);
+    QVector2D coord2D = QVector2D(x, y);
 
     struct BufferNode bnode = {coord3D, coord2D};
     // ids assigned to nods should match the indices in this vector!
@@ -182,6 +185,13 @@ void Graph::allocateBIndices(QOpenGLBuffer indexVbo)
 
 
 /************************ Force Directed Layout ****************************/
+void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
+{
+    for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
+        (*iter).second->resetLayout(rotationMatrix);
+    }
+}
+
 void Graph::runforceDirectedLayout()
 {
     qDebug() << "run force directed layout";
@@ -194,7 +204,7 @@ void Graph::runforceDirectedLayout()
 
         // forces on nodes due to node-node repulsion
         for ( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++ ) {
-            Node *node1 = (*iter).second;
+            Node *node1 = (*iter).second;    
             for ( auto iter2 = m_nodes.begin(); iter2 != m_nodes.end(); iter2++ ) {
                 Node *node2 = (*iter2).second;
                 if ( node1->getIdxID() == node2->getIdxID() )

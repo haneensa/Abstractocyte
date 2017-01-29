@@ -44,6 +44,12 @@ void Node::addToLayoutedPosition(QVector2D newPos)
     m_layouted += newPos;
 }
 
+void Node::resetLayout(QMatrix4x4 rotationMatrix)
+{
+    QVector3D vec = rotationMatrix * m_nodeXYZ;
+    m_layouted = vec.toVector2D();
+    resetForce();
+}
 
 void Node::addToForceSum(QVector2D newForce)
 {

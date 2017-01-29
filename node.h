@@ -3,7 +3,7 @@
 
 #include <QVector3D>
 #include <QVector2D>
-
+#include <QMatrix4x4>
 #include "edge.h"
 
 enum class Node_t { AXON, DENDRITE, BOUTON, SPINE, MITO, SYNAPSE, ASTROCYTE, GLYCOGEN };
@@ -26,6 +26,7 @@ public:
     // force based layout related functions
     QVector2D getLayoutedPosition();
     void addToLayoutedPosition(QVector2D newPos);
+    void resetLayout(QMatrix4x4 rotationMatrix);
 
     void addToForceSum(QVector2D newForce);
     QVector2D getForceSum()     { return m_forceSum; }

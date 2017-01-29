@@ -7,8 +7,10 @@
  * FinalMatrix = Projection * View * Model
  * Model = RotationAroundOrigin * TranslationFromOrigin * RotationAroundObjectCenter
  */
-#include "glwidget.h"
 #include <QResource>
+#include <QTimer>
+
+#include "glwidget.h"
 #include "colors.h"
 
 GLWidget::GLWidget(QWidget *parent)
@@ -32,6 +34,12 @@ GLWidget::GLWidget(QWidget *parent)
     m_rotation.setZ(0.0f);
     //reset translation
     m_translation = QVector3D(0.0, 0.0, 0.0);
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start(0);
+
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 GLWidget::~GLWidget()
@@ -52,7 +60,7 @@ void GLWidget::updateMVPAttrib()
     // world/model matrix: determines the position and orientation of an object in 3D space
     m_mMatrix.setToIdentity();
 
-    // Scale
+    // Center Zoom
     m_mMatrix.translate(m_cameraPosition);
     m_mMatrix.scale(m_distance);
     m_mMatrix.translate(-1.0 * m_cameraPosition);
@@ -60,10 +68,22 @@ void GLWidget::updateMVPAttrib()
     // Translation
     m_mMatrix.translate(m_translation);
 
+    // Model Matrix without rotation
+    QMatrix4x4 mMatrix_noRotation;
+    mMatrix_noRotation = m_mMatrix;
+
     // Rotation
-    m_mMatrix.translate(m_cameraPosition);
-    m_mMatrix.rotate(m_rotation);
-    m_mMatrix.translate(-1.0 * m_cameraPosition);
+    QMatrix4x4 rotationMatrix;
+    rotationMatrix.translate(m_cameraPosition);
+    rotationMatrix.rotate(m_rotation);
+    rotationMatrix.translate(-1.0 * m_cameraPosition);
+
+    m_mMatrix *= rotationMatrix;
+
+    m_mesh_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
+
+    // graph model matrix without rotation, apply rotation to nodes directly
+    m_graph_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(), mMatrix_noRotation.data(), rotationMatrix};
 }
 
 void GLWidget::initializeGL()
@@ -82,11 +102,9 @@ void GLWidget::initializeGL()
     /******************** 1 Abstraction Space ********************/
     m_2dspace->initBuffer();
     /******************** 2 initialize Mesh **********************/
-//    struct MeshUniforms mesh_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
-//    m_mesh->iniShadersVBOs(mesh_uniforms);
+//    m_mesh->iniShadersVBOs(m_mesh_uniforms);
     /****************** 3 Initialize Graph  *******************/
-    struct GraphUniforms graph_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
-    m_graphManager->initVBO(graph_uniforms, 0);
+    m_graphManager->initVBO(m_graph_uniforms, 0);
     /**************** End data initialization *****************/
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -108,12 +126,9 @@ void GLWidget::paintGL()
     const qreal retinaScale = devicePixelRatio();
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
     updateMVPAttrib();
-//    struct MeshUniforms mesh_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
-    struct GraphUniforms graph_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
-
-//    m_mesh->draw(mesh_uniforms);
-    m_graphManager->drawNodes(graph_uniforms, 0);
-    m_graphManager->drawEdges(graph_uniforms, 0);
+//    m_mesh->draw(m_mesh_uniforms);
+    m_graphManager->drawNodes(m_graph_uniforms, 0);
+    m_graphManager->drawEdges(m_graph_uniforms, 0);
 
 
 }
@@ -205,6 +220,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             m_isRotatable = !m_isRotatable;
             break;
         case(Qt::Key_F):
+            // pass rotation matrix
             m_graphManager->startForceDirectedLayout(0);
             break;
     }

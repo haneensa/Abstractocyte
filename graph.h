@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QVector2D>
 #include <QVector3D>
+#include <QMatrix4x4>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 
@@ -53,7 +54,7 @@ public:
     void repulseNodes(Node *node1, Node *node2, float k);
     QVector2D attractionForce(float x1, float y1, float x2, float y2, float k);
     QVector2D repulsiveForce(float x1, float y1, float x2, float y2, float k);
-
+    void resetCoordinates(QMatrix4x4 rotationMatrix);
 
     // opengl related functions
     size_t vertexBufferSize() { return m_bufferNodes.size(); }

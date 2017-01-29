@@ -4,7 +4,8 @@ GraphManager::GraphManager()
     : m_IndexVBO(QOpenGLBuffer::IndexBuffer),
       m_NodesVBO( QOpenGLBuffer::VertexBuffer ),
       m_ngraph(0),
-      m_glFunctionsSet(false)
+      m_glFunctionsSet(false),
+      m_FDL_running(false)
 {
     if (m_ngraph < max_graphs)  {
         m_graph[m_ngraph] = new Graph();
@@ -27,7 +28,14 @@ GraphManager::~GraphManager()
 
 void GraphManager::startForceDirectedLayout(int graphIdx)
 {
+    // update the 2D node position at the start and whenever the m_mvp change, -> when m_value == 1.0 and m_mvp changed
+    if (m_layout_thread1.joinable()) {
+        m_layout_thread1.join();
+    }
+    // reset graph
+    m_graph[graphIdx]->resetCoordinates(m_uniforms.rMatrix);
     m_layout_thread1 = std::thread(&Graph::runforceDirectedLayout, m_graph[graphIdx]);
+  //  m_FDL_running = true;
 
 }
 
@@ -184,11 +192,16 @@ void GraphManager::updateUniforms()
 
     // initialize uniforms
     GLuint mMatrix = glGetUniformLocation(m_program_nodes, "mMatrix");
-    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+    if (m_FDL_running) // force directed layout started, them use model without rotation
+        glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
+    else
+        glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
 
     GLuint vMatrix = glGetUniformLocation(m_program_nodes, "vMatrix");
     glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
 
     GLuint pMatrix = glGetUniformLocation(m_program_nodes, "pMatrix");
     glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+
 }

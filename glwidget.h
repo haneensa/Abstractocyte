@@ -38,6 +38,10 @@ protected:
     /* mesh */
     Mesh                        *m_mesh;
     GraphManager                *m_graphManager;
+
+    struct MeshUniforms         m_mesh_uniforms;
+    struct GraphUniforms        m_graph_uniforms;
+
     /* matrices */
     QMatrix4x4                  m_projection;
     QMatrix4x4                  m_mMatrix;

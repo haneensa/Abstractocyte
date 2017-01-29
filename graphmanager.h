@@ -16,6 +16,8 @@ struct GraphUniforms {
     float* mMatrix;
     float* vMatrix;
     float* pMatrix;
+    float* modelNoRotMatrix;
+    QMatrix4x4 rMatrix;
 };
 
 
@@ -55,6 +57,7 @@ protected:
 
     // thread management
     std::thread                     m_layout_thread1;
+    bool                            m_FDL_running;
 };
 
 #endif // GRAPHMANAGER_H
