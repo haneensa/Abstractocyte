@@ -3,6 +3,7 @@
 
 #include "node.h"
 #include "edge.h"
+#include "spatialhash.h"
 
 #include <QDebug>
 #include <QFile>
@@ -63,6 +64,8 @@ public:
     void allocateBVertices(QOpenGLBuffer vertexVbo);
     void allocateBIndices(QOpenGLBuffer indexVbo);
 
+    void terminateFDL()  { m_FDL_terminate = true; }
+
 protected:
     std::map<int, Node*>            m_nodes;
     std::map<int, Edge*>            m_edges;
@@ -73,7 +76,7 @@ protected:
 
     // for opengl buffer
     std::vector<struct BufferNode>  m_bufferNodes;
-    std::vector<GLushort>           m_bufferIndices;
+    std::vector<GLuint>           m_bufferIndices;
 
     // force directed laout
     float                           m_MAX_DISTANCE;
@@ -84,6 +87,8 @@ protected:
     float                           m_MAX_VERTEX_MOVEMENT;
     float                           m_SLOW_FACTOR;
     float                           m_MAX_FORCE;
+
+    bool                            m_FDL_terminate;
 
 };
 

@@ -35,13 +35,15 @@ public:
 
     // OpenGL initialization
     bool initOpenGLFunctions();
-    bool iniShadersVBOs(struct MeshUniforms mesh_uniforms);
+    bool iniShadersVBOs();
     bool initBuffer();
     bool initVertexAttrib();
-    void draw(struct MeshUniforms mesh_uniforms);
+    void draw();
     bool initMeshShaders();
     bool initMeshPointsShaders();
     bool initSkeletonShaders();
+    void updateUniforms(struct MeshUniforms mesh_uniforms);
+
 
 protected:
     int                                 m_vertices_size;

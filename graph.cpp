@@ -1,6 +1,7 @@
 #include "graph.h"
 
 Graph::Graph()
+    : m_FDL_terminate(true)
 {
      m_nodesCounter = 0;
      m_edgesCounter = 0;
@@ -52,7 +53,6 @@ bool Graph::loadNodes(QString filename)
         float x = atof(wordList[1].data())/200.0;
         float y = atof(wordList[2].data())/200.0;
         float z = atof(wordList[3].data())/200.0;
-        qDebug() <<nID << " " << x << " " << y << " " << z;
         // type, size, glycogen around this node
 
         // add node
@@ -95,6 +95,7 @@ bool Graph::loadEdges(QString filename)
         float nID1 = atof(wordList[1].data());
         float nID2 = atof(wordList[2].data());
         // add edge
+       // qDebug() << eID << " " << nID1 << " " << nID2;
         this->addEdge(eID, nID1, nID2);
     }
 
@@ -107,7 +108,7 @@ Node* Graph::addNode(int nID, float x, float y, float z)
 {
     size_t idxID = m_bufferNodes.size();
     Node* newNode = new Node(nID, idxID, x, y, z);
-    m_nodes[newNode->getID()] = newNode;
+    m_nodes[newNode->getID()] = newNode; // these IDs should be unique per graph!q
     m_nodesCounter++;
 
     QVector3D coord3D = QVector3D(x, y, z);
@@ -140,7 +141,7 @@ Edge* Graph::addEdge(int eID, int nID1, int nID2)
     n1->addEdge(newEdge);
     n2->addEdge(newEdge);
 
-    m_edges[newEdge->getIdxID()] = newEdge;
+    m_edges[newEdge->getID()] = newEdge; // ID should be unique then!
 
     m_bufferIndices.push_back(n1->getIdxID());
     m_bufferIndices.push_back(n2->getIdxID());
@@ -179,7 +180,7 @@ void Graph::allocateBIndices(QOpenGLBuffer indexVbo)
 {
 
     indexVbo.allocate( m_bufferIndices.data(),
-                        m_bufferIndices.size() * sizeof(GLushort) );
+                        m_bufferIndices.size() * sizeof(GLuint) );
 }
 
 
@@ -195,17 +196,25 @@ void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
 void Graph::runforceDirectedLayout()
 {
     qDebug() << "run force directed layout";
+    m_FDL_terminate = false;
     float area = 1.0;
     float k = std::sqrt( area / m_nodesCounter );
 
     // reset layouted coordinates to original values
     for ( int i = 0; i < m_ITERATIONS; i++ ) {
+        if (m_FDL_terminate) goto quit;
+
         qDebug() << "Iteration # " << i;
+
 
         // forces on nodes due to node-node repulsion
         for ( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++ ) {
+            if (m_FDL_terminate) goto quit;
+
             Node *node1 = (*iter).second;    
             for ( auto iter2 = m_nodes.begin(); iter2 != m_nodes.end(); iter2++ ) {
+                if (m_FDL_terminate) goto quit;
+
                 Node *node2 = (*iter2).second;
                 if ( node1->getIdxID() == node2->getIdxID() )
                     continue;
@@ -215,6 +224,8 @@ void Graph::runforceDirectedLayout()
 
         // forcs due to edge attraction
         for ( auto iter = m_edges.begin(); iter != m_edges.end(); iter++ ) {
+            if (m_FDL_terminate) goto quit;
+
             Edge *edge = (*iter).second;
             attractConnectedNodes(edge, m_Ca * k);
         }
@@ -222,6 +233,8 @@ void Graph::runforceDirectedLayout()
         float moveAccumlation = 0.0;
         // update nodes position fter force
         for ( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
+            if (m_FDL_terminate) goto quit;
+
             Node *node = (*iter).second;
 
             // get amount of force on node
@@ -246,11 +259,15 @@ void Graph::runforceDirectedLayout()
             node->addToLayoutedPosition(QVector2D(xMove, yMove)); // add to 2D position
 
             // update node value in m_nodes buffer
-            m_bufferNodes[node->getIdxID()].coord3D = QVector3D(node->getLayoutedPosition(), 0.0);
+            m_bufferNodes[node->getIdxID()].coord3D = QVector3D(node->getLayoutedPosition(), node->get3DPosition().z());
             // reset node force
             node->resetForce();
         }
-    }
+    } // end iterations
+
+
+quit:
+qDebug() << "Exist Thread" ;
 
 }
 

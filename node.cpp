@@ -60,3 +60,6 @@ void Node::resetForce()
 {
     m_forceSum = QVector2D(0.0, 0.0);
 }
+
+
+// hash map

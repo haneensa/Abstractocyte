@@ -20,7 +20,7 @@ GLWidget::GLWidget(QWidget *parent)
         m_xaxis(0)
 {
     m_2dspace = new AbstractionSpace(100, 100);
-//    m_mesh = new Mesh();
+    m_mesh = new Mesh();
     m_graphManager = new GraphManager();
 
     // todo: one graph manager, with all the graphs manipulations
@@ -49,7 +49,7 @@ GLWidget::~GLWidget()
 //    makeCurrent();
     delete m_2dspace;
     delete m_graphManager;
-//    delete m_mesh;
+    delete m_mesh;
 
 //    doneCurrent();
 }
@@ -87,6 +87,8 @@ void GLWidget::updateMVPAttrib()
    // m_graph_uniforms.mMatrix = m_mMatrix.data();
     m_mesh_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
 
+    m_graphManager->updateUniforms(m_graph_uniforms);
+    m_mesh->updateUniforms(m_mesh_uniforms);
 }
 
 void GLWidget::initializeGL()
@@ -94,7 +96,7 @@ void GLWidget::initializeGL()
     qDebug() << "initializeGL";
     initializeOpenGLFunctions();
     m_2dspace->initOpenGLFunctions();
-//    m_mesh->initOpenGLFunctions();
+    m_mesh->initOpenGLFunctions();
     m_graphManager->initOpenGLFunctions();
 
     updateMVPAttrib();
@@ -105,9 +107,9 @@ void GLWidget::initializeGL()
     /******************** 1 Abstraction Space ********************/
     m_2dspace->initBuffer();
     /******************** 2 initialize Mesh **********************/
-//    m_mesh->iniShadersVBOs(m_mesh_uniforms);
+    m_mesh->iniShadersVBOs();
     /****************** 3 Initialize Graph  *******************/
-    m_graphManager->initVBO(m_graph_uniforms, 0);
+    m_graphManager->initVBO(0);
     /**************** End data initialization *****************/
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -129,9 +131,10 @@ void GLWidget::paintGL()
     const qreal retinaScale = devicePixelRatio();
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
     updateMVPAttrib();
-//    m_mesh->draw(m_mesh_uniforms);
-    m_graphManager->drawNodes(m_graph_uniforms, 0);
-    m_graphManager->drawEdges(m_graph_uniforms, 0);
+    m_mesh->draw();
+
+    m_graphManager->drawNodes(0);
+    m_graphManager->drawEdges(0);
 
 
 }
@@ -224,9 +227,13 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             break;
         case(Qt::Key_F):
             // pass rotation matrix
+            m_isRotatable = false;
             updateMVPAttrib();
-            m_graphManager->startForceDirectedLayout(m_graph_uniforms, 0);
+            m_graphManager->startForceDirectedLayout(0);
             break;
+        case(Qt::Key_X):
+            m_isRotatable = true;
+            m_graphManager->stopForceDirectedLayout(0);
     }
 }
 

@@ -28,13 +28,15 @@ public:
     ~GraphManager();
 
     bool initOpenGLFunctions();
-    void drawNodes(struct GraphUniforms graph_uniforms, int graphIdx);
-    void drawEdges(struct GraphUniforms graph_uniforms, int graphIdx);
-    bool initVBO(struct GraphUniforms graph_uniforms, int graphIdx);
-    void updateUniforms();
+    void drawNodes(int graphIdx);
+    void drawEdges(int graphIdx);
+    bool initVBO(int graphIdx);
+    void updateUniformsLocation();
+    void updateUniforms(struct GraphUniforms graph_uniforms);
 
     // force directed layout
     void startForceDirectedLayout(int graphIdx);
+    void stopForceDirectedLayout(int graphIdx);
 
 protected:
     // later if I need more independent graphs
@@ -58,6 +60,9 @@ protected:
     // thread management
     std::thread                     m_layout_thread1;
     bool                            m_FDL_running;
+
+    // todo: flag that stops the FDL and kill the thread
+    // todo: ?
 };
 
 #endif // GRAPHMANAGER_H

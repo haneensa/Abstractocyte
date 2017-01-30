@@ -10,7 +10,12 @@ GraphManager::GraphManager()
     if (m_ngraph < max_graphs)  {
         m_graph[m_ngraph] = new Graph();
         m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_nodes.csv");
-        m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/skeleton_astro_segments.csv");
+//        m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/skeleton_astro_segments.csv");
+
+        m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_points_2000offsets.csv");
+      //  m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_points.csv");
+        m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/points_segments.csv");
+
         m_ngraph++;
     }
 
@@ -19,6 +24,7 @@ GraphManager::GraphManager()
 GraphManager::~GraphManager()
 {
     qDebug() << "~GraphManager()";
+    stopForceDirectedLayout(0);
     if (m_layout_thread1.joinable()) {
         m_layout_thread1.join();
     }
@@ -26,16 +32,26 @@ GraphManager::~GraphManager()
     // destroy all vbo and vao and programs and graphs
 }
 
-void GraphManager::startForceDirectedLayout(int graphIdx)
+void GraphManager::stopForceDirectedLayout(int graphIdx)
 {
-    // update the 2D node position at the start and whenever the m_mvp change, -> when m_value == 1.0 and m_mvp changed
+    m_graph[graphIdx]->terminateFDL();
+    m_FDL_running = false; // todo: get this from the graph itself, since it is per graph, even the thread?
+
     if (m_layout_thread1.joinable()) {
         m_layout_thread1.join();
     }
+
+}
+
+void GraphManager::startForceDirectedLayout(int graphIdx)
+{
+    // update the 2D node position at the start and whenever the m_mvp change, -> when m_value == 1.0 and m_mvp changed
+    stopForceDirectedLayout(graphIdx);
+
     // reset graph
     m_graph[graphIdx]->resetCoordinates(m_uniforms.rMatrix);
+    m_FDL_running = true;
     m_layout_thread1 = std::thread(&Graph::runforceDirectedLayout, m_graph[graphIdx]);
-  //  m_FDL_running = true;
 
 }
 
@@ -49,7 +65,7 @@ bool GraphManager::initOpenGLFunctions()
 
 
 // we initialize the vbos for drawing
-bool GraphManager::initVBO(struct GraphUniforms graph_uniforms, int graphIdx)
+bool GraphManager::initVBO(int graphIdx)
 {
     if (m_ngraph < graphIdx) {
         qDebug() << "graph index out of range";
@@ -60,7 +76,6 @@ bool GraphManager::initVBO(struct GraphUniforms graph_uniforms, int graphIdx)
         return false;
 
     qDebug() << "graph->initVBO";
-    m_uniforms = graph_uniforms;
 
     // 1) initialize shaders
     m_program_nodes = glCreateProgram();
@@ -97,7 +112,7 @@ bool GraphManager::initVBO(struct GraphUniforms graph_uniforms, int graphIdx)
                           sizeof(struct BufferNode),  (void*)offset);
     GL_Error();
 
-    updateUniforms();
+    updateUniformsLocation();
 
     // initialize uniforms
 
@@ -125,7 +140,7 @@ bool GraphManager::initVBO(struct GraphUniforms graph_uniforms, int graphIdx)
     m_graph[graphIdx]->allocateBIndices(m_IndexVBO);
 
     glUseProgram(m_program_Index);
-    updateUniforms();
+    updateUniformsLocation();
 
 
     m_IndexVBO.release();
@@ -134,7 +149,7 @@ bool GraphManager::initVBO(struct GraphUniforms graph_uniforms, int graphIdx)
     return true;
 }
 
-void GraphManager::drawNodes(struct GraphUniforms graph_uniforms, int graphIdx)
+void GraphManager::drawNodes(int graphIdx)
 {
     if (m_ngraph < graphIdx) {
         qDebug() << "graph index out of range";
@@ -145,21 +160,20 @@ void GraphManager::drawNodes(struct GraphUniforms graph_uniforms, int graphIdx)
     if (m_glFunctionsSet == false)
         return;
 
-    m_uniforms = graph_uniforms;
 
     m_NodesVAO.bind();
     m_NodesVBO.bind();
     m_graph[graphIdx]->allocateBVertices(m_NodesVBO);
 
     glUseProgram(m_program_nodes);
-    updateUniforms();
+    updateUniformsLocation();
 
     glDrawArrays(GL_POINTS, 0, m_graph[graphIdx]->vertexBufferSize() );
     m_NodesVBO.release();
     m_NodesVAO.release();
 }
 
-void GraphManager::drawEdges(struct GraphUniforms graph_uniforms, int graphIdx)
+void GraphManager::drawEdges(int graphIdx)
 {
     if (m_ngraph < graphIdx) {
         qDebug() << "graph index out of range";
@@ -170,32 +184,33 @@ void GraphManager::drawEdges(struct GraphUniforms graph_uniforms, int graphIdx)
     if (m_glFunctionsSet == false)
         return;
 
-    m_uniforms = graph_uniforms;
     m_IndexVAO.bind();
     m_NodesVBO.bind();
     m_IndexVBO.bind();
 
     glUseProgram(m_program_Index);
-    updateUniforms();
+    updateUniformsLocation();
 
-    glDrawElements(GL_LINES, m_graph[graphIdx]->indexBufferSize(), GL_UNSIGNED_SHORT, 0 );
+    glDrawElements(GL_LINES, m_graph[graphIdx]->indexBufferSize(), GL_UNSIGNED_INT, 0 );
     m_NodesVBO.release();
     m_IndexVBO.release();
     m_IndexVAO.release();
 }
 
-void GraphManager::updateUniforms()
+void GraphManager::updateUniformsLocation()
 {
 
     if (m_glFunctionsSet == false)
         return;
 
+
     // initialize uniforms
     GLuint mMatrix = glGetUniformLocation(m_program_nodes, "mMatrix");
-    if (m_FDL_running) // force directed layout started, them use model without rotation
+    if (m_FDL_running) { // force directed layout started, them use model without rotation
         glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
-    else
+    } else {
         glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+    }
 
     GLuint vMatrix = glGetUniformLocation(m_program_nodes, "vMatrix");
     glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
@@ -204,4 +219,9 @@ void GraphManager::updateUniforms()
     glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
 
 
+}
+
+void GraphManager::updateUniforms(struct GraphUniforms graph_uniforms)
+{
+    m_uniforms = graph_uniforms;
 }

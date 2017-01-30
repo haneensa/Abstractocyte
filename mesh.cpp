@@ -280,10 +280,8 @@ bool Mesh::initOpenGLFunctions()
     return true;
 }
 
-bool Mesh::iniShadersVBOs(struct MeshUniforms mesh_uniforms)
+bool Mesh::iniShadersVBOs()
 {
-    m_uniforms = mesh_uniforms;
-
     initBuffer();
 
     initMeshShaders();
@@ -468,10 +466,9 @@ bool Mesh::initSkeletonShaders()
     m_vao_skeleton.release();
 }
 
-void Mesh::draw(struct MeshUniforms mesh_uniforms)
+void Mesh::draw()
 {
     GLint y_axis, x_axis;
-    m_uniforms = mesh_uniforms;
     m_vao_skeleton.bind();
     glUseProgram(m_program_skeleton);
 
@@ -508,10 +505,10 @@ void Mesh::draw(struct MeshUniforms mesh_uniforms)
     glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
 
     y_axis = glGetUniformLocation(m_program_mesh, "y_axis");
-    glUniform1iv(y_axis, 1, &mesh_uniforms.y_axis);
+    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
 
     x_axis = glGetUniformLocation(m_program_mesh, "x_axis");
-    glUniform1iv(x_axis, 1, &mesh_uniforms.x_axis);
+    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
 
     glDrawArrays(GL_TRIANGLES, 0,  getVertixCount() );
 
@@ -538,4 +535,9 @@ void Mesh::draw(struct MeshUniforms mesh_uniforms)
     m_vao_mesh_points.release();
     /************************/
 
+}
+
+void Mesh::updateUniforms(struct MeshUniforms mesh_uniforms)
+{
+    m_uniforms = mesh_uniforms;
 }
