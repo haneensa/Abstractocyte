@@ -69,21 +69,24 @@ void GLWidget::updateMVPAttrib()
     m_mMatrix.translate(m_translation);
 
     // Model Matrix without rotation
-    QMatrix4x4 mMatrix_noRotation;
-    mMatrix_noRotation = m_mMatrix;
+    m_model_noRotation.setToIdentity();
+    m_model_noRotation = m_mMatrix;
 
     // Rotation
-    QMatrix4x4 rotationMatrix;
-    rotationMatrix.translate(m_cameraPosition);
-    rotationMatrix.rotate(m_rotation);
-    rotationMatrix.translate(-1.0 * m_cameraPosition);
-
-    m_mMatrix *= rotationMatrix;
-
-    m_mesh_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
+    m_rotationMatrix.setToIdentity();
+    m_rotationMatrix.translate(m_cameraPosition);
+    m_rotationMatrix.rotate(m_rotation);
+    m_rotationMatrix.translate(-1.0 * m_cameraPosition);
+    m_mMatrix *= m_rotationMatrix;
 
     // graph model matrix without rotation, apply rotation to nodes directly
-    m_graph_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(), mMatrix_noRotation.data(), rotationMatrix};
+    m_graph_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
+                        m_model_noRotation.data(), m_rotationMatrix};
+
+
+   // m_graph_uniforms.mMatrix = m_mMatrix.data();
+    m_mesh_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
+
 }
 
 void GLWidget::initializeGL()
@@ -221,7 +224,8 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             break;
         case(Qt::Key_F):
             // pass rotation matrix
-            m_graphManager->startForceDirectedLayout(0);
+            updateMVPAttrib();
+            m_graphManager->startForceDirectedLayout(m_graph_uniforms, 0);
             break;
     }
 }

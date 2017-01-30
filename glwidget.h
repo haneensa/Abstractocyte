@@ -46,16 +46,18 @@ protected:
     QMatrix4x4                  m_projection;
     QMatrix4x4                  m_mMatrix;
     QMatrix4x4                  m_vMatrix;
+    QMatrix4x4                  m_model_noRotation;
+    QMatrix4x4                  m_rotationMatrix;
+
     QVector3D                   m_cameraPosition;
     QVector3D                   m_center;
-    GLuint                      uboMatrices; /* temp */
+
 
     /* rotation */
     QPoint                      m_lastPos;
     double                      m_distance;
     bool                        m_isRotatable;
     QQuaternion                 m_rotation;
-    QQuaternion                  m_Oldrotation; /* temp */
     QVector3D                   m_rotationAxis;
     QVector3D                   m_translation;
 
