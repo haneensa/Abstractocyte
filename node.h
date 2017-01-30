@@ -24,7 +24,7 @@ public:
 
 
     // force based layout related functions
-    QVector2D getLayoutedPosition();
+    QVector3D getLayoutedPosition();
     void addToLayoutedPosition(QVector2D newPos);
     void resetLayout(QMatrix4x4 rotationMatrix);
 
@@ -34,7 +34,6 @@ public:
     void resetForce();
 
     // hashmap
-    void setHashMap(std::pair<int, int> cell, int index);
 
 
 private:
@@ -49,10 +48,7 @@ private:
 
     // force directed layout
     QVector2D               m_forceSum; // force to be applied on 2D position
-    QVector2D               m_layouted; // 2D position after applying force
-
-    // hashmap
-    int                     m_hashMapIndex;
+    QVector3D               m_layouted; // 2D position after applying force
 
 };
 

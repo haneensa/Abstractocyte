@@ -10,11 +10,11 @@ GraphManager::GraphManager()
     if (m_ngraph < max_graphs)  {
         m_graph[m_ngraph] = new Graph();
         m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_nodes.csv");
-//        m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/skeleton_astro_segments.csv");
+        m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/skeleton_astro_segments.csv");
 
-        m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_points_2000offsets.csv");
+      //  m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_points_2000offsets.csv");
       //  m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_points.csv");
-        m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/points_segments.csv");
+      //  m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/points_segments.csv");
 
         m_ngraph++;
     }
@@ -36,7 +36,7 @@ void GraphManager::stopForceDirectedLayout(int graphIdx)
 {
     m_graph[graphIdx]->terminateFDL();
     m_FDL_running = false; // todo: get this from the graph itself, since it is per graph, even the thread?
-
+    updateUniformsLocation();
     if (m_layout_thread1.joinable()) {
         m_layout_thread1.join();
     }
@@ -50,6 +50,8 @@ void GraphManager::startForceDirectedLayout(int graphIdx)
 
     // reset graph
     m_graph[graphIdx]->resetCoordinates(m_uniforms.rMatrix);
+
+
     m_FDL_running = true;
     m_layout_thread1 = std::thread(&Graph::runforceDirectedLayout, m_graph[graphIdx]);
 

@@ -64,6 +64,9 @@ protected:
     /* mouse pad */
     int                         m_yaxis;
     int                         m_xaxis;
+
+    // force directed layout
+    bool                        m_FDL_running;
 };
 
 

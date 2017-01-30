@@ -17,7 +17,8 @@ GLWidget::GLWidget(QWidget *parent)
     :   QOpenGLWidget(parent),
         m_isRotatable(true),
         m_yaxis(0),
-        m_xaxis(0)
+        m_xaxis(0),
+         m_FDL_running(false)
 {
     m_2dspace = new AbstractionSpace(100, 100);
     m_mesh = new Mesh();
@@ -87,6 +88,8 @@ void GLWidget::updateMVPAttrib()
    // m_graph_uniforms.mMatrix = m_mMatrix.data();
     m_mesh_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
 
+    // todo: whenver the rotation matrix changes then update
+    // the nodes buffer after reseting the nodes with rotation matrix
     m_graphManager->updateUniforms(m_graph_uniforms);
     m_mesh->updateUniforms(m_mesh_uniforms);
 }
@@ -223,16 +226,20 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             update();
             break;
         case(Qt::Key_T):
-            m_isRotatable = !m_isRotatable;
+            // if force directed layout running then cant change this
+            if(!m_FDL_running)
+                m_isRotatable = !m_isRotatable;
             break;
         case(Qt::Key_F):
             // pass rotation matrix
             m_isRotatable = false;
+            m_FDL_running = true;
             updateMVPAttrib();
             m_graphManager->startForceDirectedLayout(0);
             break;
         case(Qt::Key_X):
             m_isRotatable = true;
+            m_FDL_running = false;
             m_graphManager->stopForceDirectedLayout(0);
     }
 }

@@ -189,8 +189,11 @@ void Graph::allocateBIndices(QOpenGLBuffer indexVbo)
 void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
 {
     for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
-        (*iter).second->resetLayout(rotationMatrix);
+        Node *node = (*iter).second;
+        node->resetLayout(rotationMatrix);
+        m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
     }
+
 }
 
 void Graph::runforceDirectedLayout()
@@ -199,7 +202,7 @@ void Graph::runforceDirectedLayout()
     m_FDL_terminate = false;
     float area = 1.0;
     float k = std::sqrt( area / m_nodesCounter );
-
+    std::vector<Node*> nearNodes;
     // reset layouted coordinates to original values
     for ( int i = 0; i < m_ITERATIONS; i++ ) {
         if (m_FDL_terminate) goto quit;
@@ -259,7 +262,7 @@ void Graph::runforceDirectedLayout()
             node->addToLayoutedPosition(QVector2D(xMove, yMove)); // add to 2D position
 
             // update node value in m_nodes buffer
-            m_bufferNodes[node->getIdxID()].coord3D = QVector3D(node->getLayoutedPosition(), node->get3DPosition().z());
+            m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
             // reset node force
             node->resetForce();
         }
@@ -276,8 +279,8 @@ void Graph::attractConnectedNodes(Edge *edge, float k)
     Node *node1 = edge->getNode1();
     Node *node2 = edge->getNode2();
 
-    QVector2D n1 = node1->getLayoutedPosition();
-    QVector2D n2 = node2->getLayoutedPosition();
+    QVector3D n1 = node1->getLayoutedPosition();
+    QVector3D n2 = node2->getLayoutedPosition();
 
     QVector2D force = attractionForce(n1.x(), n1.y(), n2.x(), n2.y(), k);
 
@@ -290,8 +293,8 @@ void Graph::attractConnectedNodes(Edge *edge, float k)
 // node2: node the force is acting on
 void  Graph::repulseNodes(Node *node1, Node *node2, float k)
 {
-    QVector2D n1 = node1->getLayoutedPosition();
-    QVector2D n2 = node2->getLayoutedPosition();
+    QVector3D n1 = node1->getLayoutedPosition();
+    QVector3D n2 = node2->getLayoutedPosition();
 
     QVector2D force = repulsiveForce(n1.x(), n1.y(), n2.x(), n2.y(), k);
 
