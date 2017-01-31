@@ -1,9 +1,9 @@
 #version 430
 
-layout (lines) in;
-layout (line_strip, max_vertices = 2) out;
-//layout (points) in;
-//layout (points, max_vertices = 1) out;
+//layout (lines) in;
+//layout (line_strip, max_vertices = 2) out;
+layout (points) in;
+layout (points, max_vertices = 1) out;
 
 void build_grid(vec4 position)
 {
@@ -31,8 +31,8 @@ void main() {
     gl_PointSize = 10;
     EmitVertex();
 
-    gl_Position = gl_in[1].gl_Position;
-    gl_PointSize = 10;
-    EmitVertex();
-    EndPrimitive();
+  //  gl_Position = gl_in[1].gl_Position;
+  //  gl_PointSize = 10;
+  //  EmitVertex();
+   // EndPrimitive();
 }

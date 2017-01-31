@@ -9,6 +9,6 @@ uniform mat4 pMatrix;
 
 void main(void)
 {
-    mat4 pvmMatrix = pMatrix /* vMatrix  * mMatrix*/;
-    gl_Position =  pvmMatrix * vec4(coord2D, 0.0,  1.0);
+    mat4 pvmMatrix = pMatrix * vMatrix  * mMatrix;
+    gl_Position =  pvmMatrix * vec4(coord2D, 2.5,  1.0);
 }
