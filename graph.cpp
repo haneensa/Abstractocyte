@@ -9,19 +9,19 @@ Graph::Graph()
 
 
      // force directed layout parameters
-     m_Cr = 1.0;
+     m_Cr = 1.5;
      m_Ca = 0.5;
-     m_AABBdim = 0.1f; // used for spatial hashing query dim
+     m_AABBdim = 0.2f; // used for spatial hashing query dim
      m_MAX_DISTANCE = 0.1f;
      m_ITERATIONS = 10000;
-     m_MAX_VERTEX_MOVEMENT = 0.1f;
+     m_MAX_VERTEX_MOVEMENT = 0.05f;
      m_SLOW_FACTOR = 0.01f;
      m_MAX_FORCE = 1.0f;
 
      // spatial hashing
-     int gridCol = 5;
+     int gridCol = 10;
      float gridMin = 0.0f;
-     float gridMax = 5.0f;
+     float gridMax = 1.0f;
      hashGrid = new SpatialHash(gridCol, gridMin, gridMax);
 }
 
@@ -259,24 +259,11 @@ void Graph::runforceDirectedLayout()
                 Node *node2 = (*iter2);
                 if ( node1->getIdxID() == node2->getIdxID() )
                     continue;
+                // this one,
                 repulseNodes(node1, node2, m_Cr * k);
             }
         }
 
-
-//        for ( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++ ) {
-//            if (m_FDL_terminate) goto quit;
-
-//            Node *node1 = (*iter).second;
-//            for ( auto iter2 = m_nodes.begin(); iter2 != m_nodes.end(); iter2++ ) {
-//                if (m_FDL_terminate) goto quit;
-
-//                Node *node2 = (*iter2).second;
-//                if ( node1->getIdxID() == node2->getIdxID() )
-//                    continue;
-//                repulseNodes(node1, node2, m_Cr * k);
-//            }
-//        }
 
 
         // forcs due to edge attraction
@@ -428,7 +415,9 @@ QVector2D Graph::repulsiveForce(float x1, float y1, float x2, float y2, float k)
 
   //  if (distance <= m_MAX_DISTANCE) {
 //        qDebug() << "distance <= m_MAX_DISTANCE: " << distance;
-        repulsion =    (k * k) / distance;
+//        repulsion =    (k * k) / distance;
+        repulsion =    (k * k) * (distance - m_MAX_DISTANCE);
+
         force =  dxy.normalized() * repulsion;
   //  }
 

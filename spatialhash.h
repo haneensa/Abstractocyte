@@ -12,10 +12,14 @@
 #include "node.h"
 
 struct GridUniforms {
-    float* vMatrix;
-    float* mMatrix;
-    float* pMatrix;
-};
+        GLint y_axis;
+        GLint x_axis;
+        float* mMatrix;
+        float* vMatrix;
+        float* pMatrix;
+        float* modelNoRotMatrix;
+        QMatrix4x4 rMatrix;
+ };
 
 struct pair_hash {
     template <class T1, class T2>
