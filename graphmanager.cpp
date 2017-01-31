@@ -10,11 +10,11 @@ GraphManager::GraphManager()
     if (m_ngraph < max_graphs)  {
         m_graph[m_ngraph] = new Graph();
         m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_nodes.csv");
-        m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/skeleton_astro_segments.csv");
+//        m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/skeleton_astro_segments.csv");
 
-      //  m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_points_2000offsets.csv");
+        m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_points_2000offsets.csv");
       //  m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_points.csv");
-      //  m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/points_segments.csv");
+        m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/points_segments.csv");
 
         m_ngraph++;
     }
@@ -84,6 +84,7 @@ bool GraphManager::initVBO(int graphIdx)
     bool res = initShader(m_program_nodes,  ":/shaders/nodes.vert", ":/shaders/nodes.geom", ":/shaders/nodes.frag");
     if (res == false)
         return res;
+
     m_program_Index = glCreateProgram();
     res = initShader(m_program_Index,  ":/shaders/nodes.vert", ":/shaders/lines.geom", ":/shaders/lines.frag");
     if (res == false)
@@ -151,17 +152,27 @@ bool GraphManager::initVBO(int graphIdx)
     return true;
 }
 
+void GraphManager::initGrid()
+{
+    m_graph[0]->initGridBuffers();
+}
+
+void GraphManager::drawGrid(struct GridUniforms grid_uniforms)
+{
+    m_graph[0]->drawGrid(grid_uniforms);
+}
+
+
 void GraphManager::drawNodes(int graphIdx)
 {
+
     if (m_ngraph < graphIdx) {
         qDebug() << "graph index out of range";
         return;
     }
 
-
     if (m_glFunctionsSet == false)
         return;
-
 
     m_NodesVAO.bind();
     m_NodesVBO.bind();
@@ -182,7 +193,6 @@ void GraphManager::drawEdges(int graphIdx)
         return;
     }
 
-
     if (m_glFunctionsSet == false)
         return;
 
@@ -201,10 +211,8 @@ void GraphManager::drawEdges(int graphIdx)
 
 void GraphManager::updateUniformsLocation()
 {
-
     if (m_glFunctionsSet == false)
         return;
-
 
     // initialize uniforms
     GLuint mMatrix = glGetUniformLocation(m_program_nodes, "mMatrix");

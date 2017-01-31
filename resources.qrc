@@ -22,5 +22,8 @@
         <file>shaders/nodes.vert</file>
         <file>shaders/lines.frag</file>
         <file>shaders/lines.geom</file>
+        <file>shaders/grid.frag</file>
+        <file>shaders/grid.geom</file>
+        <file>shaders/grid.vert</file>
     </qresource>
 </RCC>

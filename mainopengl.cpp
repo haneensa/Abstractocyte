@@ -27,7 +27,6 @@ void MainOpenGL::GL_Error()
 {
     GLenum glerr = glGetError();
     if (glerr == GL_NO_ERROR) {
-        qDebug() << "GL_NO_ERROR";
         return;
     }
 

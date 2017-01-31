@@ -9,21 +9,31 @@ Graph::Graph()
 
 
      // force directed layout parameters
-     m_Cr = 1.5;
+     m_Cr = 1.0;
      m_Ca = 0.5;
-     m_AABBdim = 0.15f; // used for spatial hashing query dim
+     m_AABBdim = 0.1f; // used for spatial hashing query dim
      m_MAX_DISTANCE = 0.1f;
      m_ITERATIONS = 10000;
-     m_MAX_VERTEX_MOVEMENT = 0.01f;
+     m_MAX_VERTEX_MOVEMENT = 0.1f;
      m_SLOW_FACTOR = 0.01f;
      m_MAX_FORCE = 1.0f;
 
+     // spatial hashing
+     int gridCol = 5;
+     float gridMin = 0.0f;
+     float gridMax = 5.0f;
+     hashGrid = new SpatialHash(gridCol, gridMin, gridMax);
 }
 
 
 Graph::~Graph()
 {
+    qDebug() << "Func: ~Graph";
+    for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
+        delete (*iter).second;
+    }
 
+    delete hashGrid;
 }
 
 // nID, x, y, z
@@ -184,14 +194,40 @@ void Graph::allocateBIndices(QOpenGLBuffer indexVbo)
 }
 
 
+/************************ Spatial Hashing *********************************/
+void Graph::updateNode(Node *node)
+{
+    hashGrid->updateNode(node);
+    return;
+}
+
+void Graph::initGridBuffers()
+{
+    qDebug() << "initGridBuffers";
+    hashGrid->initOpenGLFunctions();
+    if (hashGrid->init_Shaders_Buffers() == false) {
+        qDebug() << "error!";
+        return;
+    }
+}
+
+void Graph::drawGrid(struct GridUniforms grid_uniforms)
+{
+    hashGrid->drawGrid(grid_uniforms);
+}
 
 /************************ Force Directed Layout ****************************/
+
+
 void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
 {
+    hashGrid->clear();
     for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
         Node *node = (*iter).second;
         node->resetLayout(rotationMatrix);
         m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
+        // add to the spatial hash
+        hashGrid->insert((*iter).second);
     }
 
 }
@@ -200,7 +236,7 @@ void Graph::runforceDirectedLayout()
 {
     qDebug() << "run force directed layout";
     m_FDL_terminate = false;
-    float area = 1.0;
+    float area = 25.0;
     float k = std::sqrt( area / m_nodesCounter );
     std::vector<Node*> nearNodes;
     // reset layouted coordinates to original values
@@ -214,16 +250,34 @@ void Graph::runforceDirectedLayout()
         for ( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++ ) {
             if (m_FDL_terminate) goto quit;
 
-            Node *node1 = (*iter).second;    
-            for ( auto iter2 = m_nodes.begin(); iter2 != m_nodes.end(); iter2++ ) {
+            Node *node1 = (*iter).second;
+            nearNodes.clear();
+            hashGrid->queryAABB(node1, m_AABBdim, nearNodes);
+            for ( auto iter2 = nearNodes.begin(); iter2 != nearNodes.end(); iter2++ ) {
                 if (m_FDL_terminate) goto quit;
 
-                Node *node2 = (*iter2).second;
+                Node *node2 = (*iter2);
                 if ( node1->getIdxID() == node2->getIdxID() )
                     continue;
                 repulseNodes(node1, node2, m_Cr * k);
             }
         }
+
+
+//        for ( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++ ) {
+//            if (m_FDL_terminate) goto quit;
+
+//            Node *node1 = (*iter).second;
+//            for ( auto iter2 = m_nodes.begin(); iter2 != m_nodes.end(); iter2++ ) {
+//                if (m_FDL_terminate) goto quit;
+
+//                Node *node2 = (*iter2).second;
+//                if ( node1->getIdxID() == node2->getIdxID() )
+//                    continue;
+//                repulseNodes(node1, node2, m_Cr * k);
+//            }
+//        }
+
 
         // forcs due to edge attraction
         for ( auto iter = m_edges.begin(); iter != m_edges.end(); iter++ ) {
@@ -242,9 +296,10 @@ void Graph::runforceDirectedLayout()
 
             // get amount of force on node
             QVector2D force = m_SLOW_FACTOR * node->getForceSum();
-            if ( force.length() > m_MAX_FORCE )
+            if ( force.length() > m_MAX_FORCE ) {
+                qDebug() << "MAX_FORCE: " << m_MAX_FORCE;
                 force = force.normalized() * m_MAX_FORCE;
-
+            }
             // calculate how much to move
             float xMove = force.x();
             float yMove = force.y();
@@ -253,10 +308,22 @@ void Graph::runforceDirectedLayout()
             // if yes, then compute the torque, and apply that instead
 
             // limit the movement to the maximum defined
-            if ( xMove > m_MAX_VERTEX_MOVEMENT )    xMove = m_MAX_VERTEX_MOVEMENT;
-            if ( xMove < -m_MAX_VERTEX_MOVEMENT )   xMove = -m_MAX_VERTEX_MOVEMENT;
-            if ( yMove > m_MAX_VERTEX_MOVEMENT )    yMove = m_MAX_VERTEX_MOVEMENT;
-            if ( yMove < -m_MAX_VERTEX_MOVEMENT )   yMove = -m_MAX_VERTEX_MOVEMENT;
+            if ( xMove > m_MAX_VERTEX_MOVEMENT )   {
+                qDebug() << "xMove: " << xMove;
+                xMove = m_MAX_VERTEX_MOVEMENT;
+            }
+            if ( xMove < -m_MAX_VERTEX_MOVEMENT )   {
+                qDebug() << "xMove: " << xMove;
+                xMove = -m_MAX_VERTEX_MOVEMENT;
+            }
+            if ( yMove > m_MAX_VERTEX_MOVEMENT )    {
+                qDebug() << "xMove: " << yMove;
+                yMove = m_MAX_VERTEX_MOVEMENT;
+            }
+            if ( yMove < -m_MAX_VERTEX_MOVEMENT )  {
+                qDebug() << "xMove: " << yMove;
+                yMove = -m_MAX_VERTEX_MOVEMENT;
+            }
 
             moveAccumlation += std::abs(xMove) + std::abs(yMove);
             node->addToLayoutedPosition(QVector2D(xMove, yMove)); // add to 2D position
@@ -265,6 +332,8 @@ void Graph::runforceDirectedLayout()
             m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
             // reset node force
             node->resetForce();
+            // update node position in spatial hash
+            updateNode(node);
         }
     } // end iterations
 
@@ -312,16 +381,19 @@ QVector2D  Graph::attractionForce(float x1, float y1, float x2, float y2, float 
     QVector2D dxy = QVector2D(dx, dy);
     float distance = dxy.length();
     float distanceSquared = dxy.lengthSquared();
-    if (distanceSquared < 0.0001) { // too small
+    if (distance < 0.0001) { // too small
+        qDebug() << "Too small distance " << distance;
         dx = 0.1f * (std::rand() % 100) / 100.0f + 0.1;
         dy = 0.1f * (std::rand() % 100) / 100.0f + 0.1;
         distanceSquared = dx * dx + dy * dy;
     }
 
-    if (distance > m_MAX_DISTANCE) {
-        distance = m_MAX_DISTANCE;
-        distanceSquared = distance * distance;
-    }
+
+//    if (distance > m_MAX_DISTANCE) {
+//        qDebug() << "MAX_DISTANCE: " << distance;
+//        distance = m_MAX_DISTANCE;
+//        distanceSquared = distance * distance;
+//    }
 
 
     // fa(d) = d^2/k
@@ -354,10 +426,11 @@ QVector2D Graph::repulsiveForce(float x1, float y1, float x2, float y2, float k)
     // 4) fr(d) = k/d2
     // Coulomb's Law: F = k(Qq/r^2)
 
-    if (distance <= m_AABBdim) {
-        repulsion =  (k * k) / distance;
+  //  if (distance <= m_MAX_DISTANCE) {
+//        qDebug() << "distance <= m_MAX_DISTANCE: " << distance;
+        repulsion =    (k * k) / distance;
         force =  dxy.normalized() * repulsion;
-    }
+  //  }
 
     return force;
 }

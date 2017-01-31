@@ -63,3 +63,13 @@ void Node::resetForce()
 
 
 // hash map
+void Node::setHashMap(std::pair<int, int> cell)
+{
+    m_hashMapCell = cell;
+}
+
+std::pair<int, int>  Node::getHashMapCell()
+{
+    return m_hashMapCell;
+}
+

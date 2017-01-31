@@ -1,3 +1,5 @@
+// TODO: draw the boundry of grid
+
 #ifndef SPATIALHASH_H
 #define SPATIALHASH_H
 
@@ -6,7 +8,14 @@
 #include <set>
 #include <unordered_map>
 
+#include "mainopengl.h"
 #include "node.h"
+
+struct GridUniforms {
+    float* vMatrix;
+    float* mMatrix;
+    float* pMatrix;
+};
 
 struct pair_hash {
     template <class T1, class T2>
@@ -17,11 +26,12 @@ struct pair_hash {
     }
 };
 
-class SpatialHash
+class SpatialHash: public MainOpenGL
 {
 public:
     SpatialHash(int col, float min, float max);
     ~SpatialHash();
+
 
     // insert point in grid
     std::pair<int, int> hash(float x, float y);
@@ -31,13 +41,27 @@ public:
     void updateNode(Node *node);
     void clear();
 
+    // opengl functions
+     bool initOpenGLFunctions();
+     void drawGrid(struct GridUniforms grid_uniforms);
+     bool init_Shaders_Buffers();
+     void fillGridDataPoints();
+
 protected:
     float   m_cellSize;
     float   m_min;
     float   m_max;
     float   m_col;
-    int     m_buckets;
     std::unordered_map< std::pair<int, int>, std::vector<Node*>, pair_hash > m_hashMap;
+
+    // opengl functions to draw grid
+    QOpenGLVertexArrayObject        m_GridVAO;
+    QOpenGLBuffer                   m_GridVBO;
+    GLuint                          m_program_grid;
+
+    bool                            m_glFunctionsSet;
+    std::vector< QVector2D >        m_gridDataPoints;
+    struct GridUniforms             m_uniforms;
 };
 
 #endif // SPATIALHASH_H

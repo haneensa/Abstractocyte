@@ -34,7 +34,8 @@ public:
     void resetForce();
 
     // hashmap
-
+    void setHashMap(std::pair<int, int> cell);
+    std::pair<int, int>  getHashMapCell();
 
 private:
     int                     m_nID;
@@ -49,6 +50,9 @@ private:
     // force directed layout
     QVector2D               m_forceSum; // force to be applied on 2D position
     QVector3D               m_layouted; // 2D position after applying force
+
+    // hashmap
+    std::pair<int, int>     m_hashMapCell;
 
 };
 

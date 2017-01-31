@@ -66,6 +66,12 @@ public:
 
     void terminateFDL()  { m_FDL_terminate = true; }
 
+    // spatial hashing
+    void updateNode(Node *node);
+    void drawGrid(struct GridUniforms grid_uniforms);
+    void initGridBuffers();
+    void updateGridUniforms(struct GridUniforms grid_uniforms);
+
 protected:
     std::map<int, Node*>            m_nodes;
     std::map<int, Edge*>            m_edges;
@@ -89,6 +95,9 @@ protected:
     float                           m_MAX_FORCE;
 
     bool                            m_FDL_terminate;
+
+    // spatial hashing
+    SpatialHash                     *hashGrid;
 
 };
 

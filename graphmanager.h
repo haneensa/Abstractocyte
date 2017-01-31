@@ -38,6 +38,9 @@ public:
     void startForceDirectedLayout(int graphIdx);
     void stopForceDirectedLayout(int graphIdx);
 
+    void drawGrid(struct GridUniforms grid_uniforms);
+    void initGrid();
+
 protected:
     // later if I need more independent graphs
     Graph                           *m_graph[max_graphs];
