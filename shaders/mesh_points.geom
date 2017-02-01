@@ -54,32 +54,24 @@ void main() {
     int type = int(SSBO_data[ID].center.w);
     color_val = SSBO_data[ID].color;
     vec4 pos1, pos2;
-    int slider = (type == 0) ? y_axis : x_axis;
-    vec4 alpha1 = space2d[type][0];
-    vec4 alpha2 = space2d[type][1];
-    vec4 alpha3 = space2d[type][2];
-    vec4 alpha4 = space2d[type][3];
-    vec4 alpha5 = space2d[type][4];
 
-    float val = translate(slider, alpha1.x, alpha1.y, alpha1.z, alpha1.w);
+    // astrocyte or neurites?
+    int slider = (type == 0) ? y_axis : x_axis;
+
+    vec4 alpha1 = space2d[type][0]; // position interpolation (pos1, pos2)
+    vec4 alpha2 = space2d[type][1]; // alpha
+    vec4 alpha3 = space2d[type][2]; // color_intp
+    vec4 alpha4 = space2d[type][3]; // point_size
+    vec4 alpha5 = space2d[type][4]; // additional info
+
+    // use the space2D values to get: value of interpolation between pos1 and pos2, alpha, color_interpolation, point size
+    float position_intp = translate(slider, alpha1.x, alpha1.y, alpha1.z, alpha1.w);
     alpha =  translate(slider, alpha2.x, alpha2.y, alpha2.w, alpha2.z);
     color_intp = translate(slider, alpha3.x, alpha3.y, alpha3.z, alpha3.w);
     gl_PointSize =  translate(slider, alpha4.x, alpha4.y, alpha4.z, alpha4.w);
 
     int pos1_flag = int(alpha5.z);
     int pos2_flag = int(alpha5.w);
-
-    // to switch from skeleton to node
-    if (type == 1) {
-        if (slider > alpha5.y) {
-            pos1_flag = 2;
-            pos2_flag = 3;
-            gl_PointSize =  translate(slider, alpha5.y, 100, 7, 30);
-            val = translate(slider, alpha5.y, 100, 0.0, 1.0);
-            alpha = 1.0;
-        }
-
-   }
 
     switch(pos1_flag)
     {
@@ -95,7 +87,7 @@ void main() {
     case 3: pos2 = vec4(V_center[i].xyz, 1.0); break;
     }
 
-   vec4 new_position = mix(pos1 , pos2, val);
+   vec4 new_position = mix(pos1 , pos2, position_intp);
    gl_Position = new_position;
    EmitVertex();
    EndPrimitive();

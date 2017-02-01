@@ -24,9 +24,11 @@ public:
     bool initBuffer();
     bool updateBuffer();
 
+    void updateXYaxis(int xaxis, int yaxis);
+
 private:
-    int                                 m_xdim;
-    int                                 m_ydim;
+    int                                 m_xaxis;
+    int                                 m_yaxis;
     std::vector<int>                    m_absStates;
     QVector4D                           space2d[2][5]; // val, alpha, color_intp, point_size, additional infos
     GLuint                              m_buffer;

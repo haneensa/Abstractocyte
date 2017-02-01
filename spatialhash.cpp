@@ -145,25 +145,25 @@ void SpatialHash::fillGridDataPoints()
 //        }
 //    }
     // todo: draw grid represented by spatial hashing
-//    m_gridDataPoints.push_back(QVector2D(-1, 1));
-//    m_gridDataPoints.push_back(QVector2D(1, 1));
+    m_gridDataPoints.push_back(QVector2D(-1, 1));
+    m_gridDataPoints.push_back(QVector2D(1, 1));
 
-//    m_gridDataPoints.push_back(QVector2D(-1, -1));
-//    m_gridDataPoints.push_back(QVector2D(1, -1));
+    m_gridDataPoints.push_back(QVector2D(-1, -1));
+    m_gridDataPoints.push_back(QVector2D(1, -1));
 
    m_gridDataPoints.push_back(QVector2D(0, 1));
    m_gridDataPoints.push_back(QVector2D(0, -1));
 
-//   m_gridDataPoints.push_back(QVector2D(-1, 0));
-//   m_gridDataPoints.push_back(QVector2D(1, 0));
+   m_gridDataPoints.push_back(QVector2D(-1, 0));
+   m_gridDataPoints.push_back(QVector2D(1, 0));
 
 
-//   m_gridDataPoints.push_back(QVector2D(1, 1));
-//   m_gridDataPoints.push_back(QVector2D(1, -1));
+   m_gridDataPoints.push_back(QVector2D(1, 1));
+   m_gridDataPoints.push_back(QVector2D(1, -1));
 
 
-//   m_gridDataPoints.push_back(QVector2D(-1, 1));
-//   m_gridDataPoints.push_back(QVector2D(-1, -1));
+   m_gridDataPoints.push_back(QVector2D(-1, 1));
+   m_gridDataPoints.push_back(QVector2D(-1, -1));
 }
 
 bool SpatialHash::init_Shaders_Buffers()
@@ -226,7 +226,7 @@ void SpatialHash::drawGrid(struct GridUniforms grid_uniforms)
     GLuint pMatrix = glGetUniformLocation(m_program_grid, "pMatrix");
     glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
 
-    glDrawArrays(GL_LINES, 0, m_gridDataPoints.size() );
+    glDrawArrays(GL_POINTS, 0, m_gridDataPoints.size() );
 
     m_GridVAO.release();
 }

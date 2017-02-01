@@ -12,10 +12,8 @@ out float       alpha;
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
-
 uniform int     y_axis;
 uniform int     x_axis;
-
 
 struct SSBO_datum {
     vec4 color;

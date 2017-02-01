@@ -21,7 +21,7 @@ GLWidget::GLWidget(QWidget *parent)
         m_FDL_running(false)
 {
     m_2dspace = new AbstractionSpace(100, 100);
-//    m_mesh = new Mesh();
+    m_mesh = new Mesh();
     m_graphManager = new GraphManager();
 
     // todo: one graph manager, with all the graphs manipulations
@@ -47,12 +47,12 @@ GLWidget::~GLWidget()
 {
     qDebug() << "~GLWidget()";
 
-//    makeCurrent();
+    makeCurrent();
     delete m_2dspace;
     delete m_graphManager;
-//    delete m_mesh;
+    delete m_mesh;
 
-//    doneCurrent();
+    doneCurrent();
 }
 
 void GLWidget::updateMVPAttrib()
@@ -91,7 +91,7 @@ void GLWidget::updateMVPAttrib()
     // todo: whenver the rotation matrix changes then update
     // the nodes buffer after reseting the nodes with rotation matrix
     m_graphManager->updateUniforms(m_graph_uniforms);
-//    m_mesh->updateUniforms(m_mesh_uniforms);
+    m_mesh->updateUniforms(m_mesh_uniforms);
 }
 
 void GLWidget::initializeGL()
@@ -99,7 +99,7 @@ void GLWidget::initializeGL()
     qDebug() << "initializeGL";
     initializeOpenGLFunctions();
     m_2dspace->initOpenGLFunctions();
-//    m_mesh->initOpenGLFunctions();
+    m_mesh->initOpenGLFunctions();
     m_graphManager->initOpenGLFunctions();
 
     updateMVPAttrib();
@@ -110,7 +110,7 @@ void GLWidget::initializeGL()
     /******************** 1 Abstraction Space ********************/
     m_2dspace->initBuffer();
     /******************** 2 initialize Mesh **********************/
-//    m_mesh->iniShadersVBOs();
+    m_mesh->iniShadersVBOs();
     /****************** 3 Initialize Graph  *******************/
     m_graphManager->initVBO(0);
     m_graphManager->initGrid();
@@ -135,13 +135,13 @@ void GLWidget::paintGL()
     const qreal retinaScale = devicePixelRatio();
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
     updateMVPAttrib();
-//    m_mesh->draw();
+    m_mesh->draw();
 
     struct GridUniforms grid_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
                 m_model_noRotation.data(), m_rotationMatrix};
     m_graphManager->drawGrid(grid_uniforms);
-//    m_graphManager->drawNodes(0);
-//    m_graphManager->drawEdges(0);
+    m_graphManager->drawNodes(0);
+    m_graphManager->drawEdges(0);
 
 
 }
@@ -228,34 +228,39 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             //reset zoom
             m_distance = 0.2f;
             update();
-            break;
+        break;
         case(Qt::Key_T):
             // if force directed layout running then cant change this
             if(!m_FDL_running)
                 m_isRotatable = !m_isRotatable;
-            break;
+        break;
         case(Qt::Key_F):
             // pass rotation matrix
             m_isRotatable = false;
             m_FDL_running = true;
             updateMVPAttrib();
             m_graphManager->startForceDirectedLayout(0);
-            break;
+        break;
         case(Qt::Key_X):
             m_isRotatable = true;
             m_FDL_running = false;
             m_graphManager->stopForceDirectedLayout(0);
+        break;
     }
 }
 
 void GLWidget::getSliderX(int value)
 {
     m_xaxis = value;
+    // update the m_xaxis in abstraction space
+    m_2dspace->updateXYaxis(m_xaxis, m_yaxis);
     update();
 }
 
 void GLWidget::getSliderY(int value)
 {
     m_yaxis = value;
+    // update the m_yaxis in abstraction space
+    m_2dspace->updateXYaxis(m_xaxis, m_yaxis);
     update();
 }
