@@ -138,12 +138,12 @@ void SpatialHash::fillGridDataPoints()
     std::pair<int,int>  tright = hash(m_max, m_max);
 
     //qDebug() << bleft << " " << tright;
-    for (int i = bleft.first; i <= tright.first; ++i) {
-        for (int j = bleft.second; j <= tright.second; ++j) {
-            qDebug() << i << " " << j;
-            m_gridDataPoints.push_back(QVector2D(i, j));
-        }
-    }
+//    for (int i = bleft.first; i <= tright.first; ++i) {
+//        for (int j = bleft.second; j <= tright.second; ++j) {
+//            qDebug() << i << " " << j;
+//            m_gridDataPoints.push_back(QVector2D(i, j));
+//        }
+//    }
     // todo: draw grid represented by spatial hashing
 //    m_gridDataPoints.push_back(QVector2D(-1, 1));
 //    m_gridDataPoints.push_back(QVector2D(1, 1));
@@ -151,8 +151,8 @@ void SpatialHash::fillGridDataPoints()
 //    m_gridDataPoints.push_back(QVector2D(-1, -1));
 //    m_gridDataPoints.push_back(QVector2D(1, -1));
 
-//   m_gridDataPoints.push_back(QVector2D(0, 1));
-//   m_gridDataPoints.push_back(QVector2D(0, -1));
+   m_gridDataPoints.push_back(QVector2D(0, 1));
+   m_gridDataPoints.push_back(QVector2D(0, -1));
 
 //   m_gridDataPoints.push_back(QVector2D(-1, 0));
 //   m_gridDataPoints.push_back(QVector2D(1, 0));
@@ -226,7 +226,7 @@ void SpatialHash::drawGrid(struct GridUniforms grid_uniforms)
     GLuint pMatrix = glGetUniformLocation(m_program_grid, "pMatrix");
     glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
 
-    glDrawArrays(GL_POINTS, 0, m_gridDataPoints.size() );
+    glDrawArrays(GL_LINES, 0, m_gridDataPoints.size() );
 
     m_GridVAO.release();
 }
