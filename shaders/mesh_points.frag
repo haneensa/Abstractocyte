@@ -1,7 +1,6 @@
 #version 430
 
 in float        alpha;
-in float        color_intp;
 in vec4         color_val;
 out vec4        outcol;
 

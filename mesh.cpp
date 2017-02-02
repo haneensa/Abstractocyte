@@ -9,7 +9,7 @@ Mesh::Mesh()
 {
     m_vertices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 20;
+    m_limit = 200;
 
     // to do: combine all these files in one .obj file
     // to do: interface to load these files
@@ -492,6 +492,33 @@ void Mesh::draw()
     m_vao_skeleton.release();
 
     /************************/
+    glDisable (GL_BLEND);
+    glBlendFunc (GL_ONE, GL_ONE);
+
+    m_vao_mesh_points.bind();
+    glUseProgram(m_program_mesh_points);
+    mMatrix = glGetUniformLocation(m_program_mesh_points, "mMatrix");
+    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+    vMatrix = glGetUniformLocation(m_program_mesh_points, "vMatrix");
+    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    pMatrix = glGetUniformLocation(m_program_mesh_points, "pMatrix");
+    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+    y_axis = glGetUniformLocation(m_program_mesh_points, "y_axis");
+    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
+
+    x_axis = glGetUniformLocation(m_program_mesh_points, "x_axis");
+    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
+
+    glDrawArrays(GL_POINTS, 0,  getVertixCount() );
+    m_vao_mesh_points.release();
+    /************************/
+
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     m_vao_mesh.bind();
     glUseProgram(m_program_mesh);
 
@@ -515,26 +542,7 @@ void Mesh::draw()
 
     m_vao_mesh.release();
     /************************/
-    m_vao_mesh_points.bind();
-    glUseProgram(m_program_mesh_points);
-    mMatrix = glGetUniformLocation(m_program_mesh_points, "mMatrix");
-    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
 
-    vMatrix = glGetUniformLocation(m_program_mesh_points, "vMatrix");
-    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
-
-    pMatrix = glGetUniformLocation(m_program_mesh_points, "pMatrix");
-    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
-
-    y_axis = glGetUniformLocation(m_program_mesh_points, "y_axis");
-    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
-
-    x_axis = glGetUniformLocation(m_program_mesh_points, "x_axis");
-    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
-
-    glDrawArrays(GL_POINTS, 0,  getVertixCount() );
-    m_vao_mesh_points.release();
-    /************************/
 
 }
 

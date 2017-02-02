@@ -1,51 +1,14 @@
 #version 430
 
 out vec4        outcol;
-in vec4         posAttrG;
-in float        G_ID;
-
-uniform int     y_axis;
-uniform int     x_axis;
+in float        alpha;
 in vec4        color_val;
-
-float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
-{
-    // if value < leftMin -> value = leftMin
-    value = max(value, leftMin);
-    // if value > leftMax -> value = leftMax
-    value = min(value, leftMax);
-    // Figure out how 'wide' each range is
-    float leftSpan = leftMax - leftMin;
-    float rightSpan = rightMax - rightMin;
-
-    // Convert the left range into a 0-1 range (float)
-    float valueScaled = float(value - leftMin) / float(leftSpan);
-
-    // Convert the 0-1 range into a value in the right range.
-    return rightMin + (valueScaled * rightSpan);
-}
-
-
-
 
 float           Ns = 250;
 vec4            mat_specular = vec4(1);
 vec4            light_specular = vec4(1);
 
-
 void main() {
-    float alpha;
-    if (G_ID <= 0.0) {
-        alpha = translate(y_axis, 90, 100, 0.0, 1.0);
-    } else {
-        if(x_axis == 50)
-            alpha = 1.0;
-        else {
-            0.0;
-        }
-    }
-
-
     vec3 lightDir =  vec3(0.5, 0.0, -0.9);
     vec3 normal;
     normal.xy = gl_PointCoord * 2.0 - vec2(1.0);
@@ -59,7 +22,4 @@ void main() {
     float spec = max( pow( dot(normal, halfVector), Ns ), 0. );
     vec4 S = light_specular * mat_specular * spec;
     outcol = vec4(color_val.rgb, alpha) * diffuse + S;
-    outcol.a = alpha;
-    if (outcol.a < 0.5)
-        discard;
 }

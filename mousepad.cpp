@@ -1,7 +1,6 @@
-// todo:    1- circle border using shaders (done)
-//          2- select circle (done)
-//          2.2- and move around
-//          3- text
+// todo:    1) draw the grid with colors first
+//          2) enable selection buffer
+//          3) use ID for each color to retrieve the properties of the area we are inside
 
 #include "mousepad.h"
 

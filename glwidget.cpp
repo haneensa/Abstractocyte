@@ -37,9 +37,9 @@ GLWidget::GLWidget(QWidget *parent)
     //reset translation
     m_translation = QVector3D(0.0, 0.0, 0.0);
 
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(0);
+//    QTimer *timer = new QTimer(this);
+//    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+//    timer->start(0);
 
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -136,6 +136,7 @@ void GLWidget::paintGL()
     const qreal retinaScale = devicePixelRatio();
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
     updateMVPAttrib();
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     m_mesh->draw();
 
     struct GridUniforms grid_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
@@ -143,8 +144,7 @@ void GLWidget::paintGL()
     m_graphManager->drawGrid(grid_uniforms);
     m_graphManager->drawNodes(0);
     m_graphManager->drawEdges(0);
-
-
+    m_mesh->draw();
 }
 
 void GLWidget::resizeGL(int w, int h)
