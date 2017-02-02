@@ -11,7 +11,6 @@ uniform mat4 vMatrix;
 // Projection transformation
 uniform mat4 pMatrix;
 
-out vec4        V_color;
 out int         V_ID;
 
 // get ID, to color this thing
@@ -31,6 +30,5 @@ void main(void)
     posAttrV = posAttr;
     mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
     gl_Position =  pvmMatrix * vec4(posAttr.xyz, 1.0);
-    V_color = SSBO_data[ID].color;
     V_ID = ID;
 }

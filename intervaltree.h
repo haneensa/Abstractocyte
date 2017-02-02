@@ -1,10 +1,22 @@
 #ifndef INTERVALTREE_H
 #define INTERVALTREE_H
 
+#include <QVector4D>
+
+struct properties {
+    QVector4D pos_alpha;
+    QVector4D trans_alpha;
+    QVector4D color_alpha;
+    QVector4D point_size;
+    QVector4D extra_info;
+    QVector4D render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
+};
+
 // Structure to represent an interval
 struct Interval
 {
     int low, high;
+    struct properties int_properties;
 };
 
 // Structure to represent a node in interval search tree
@@ -24,7 +36,7 @@ public:
 
 public:
     void insertIntervals(Interval ints[], int n);
-    void getInterval(int p);
+    Interval * getInterval(int p);
 
 protected:
     ITNode *newNode(Interval i);

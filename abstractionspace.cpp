@@ -5,23 +5,69 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     : m_xaxis(xdim),
       m_yaxis(ydim),
       m_bindIdx(3),
-      m_glFunctionsSet(false)
+      m_glFunctionsSet(false),
+      m_prevIntvMaxX(0),
+      m_prevIntvMaxY(0)
 {
 
+    struct properties ast1, ast2, ast3;
+    struct properties neu1, neu2, neu3;
+
+    ast1.pos_alpha = QVector4D(0, 20, 0.0, 1.0);
+    ast1.trans_alpha = QVector4D(0, 20, 1.0, 1.0);
+    ast1.color_alpha = QVector4D(0, 20, 0, 1.0); // color_intp (toon/phong)
+    ast1.point_size = QVector4D(0, 20, 1, 1);
+    ast1.extra_info = QVector4D(0.1f, 0, 1, 1);
+    ast1.render_type = QVector4D(1, 0, 0, 0);
+
+    ast2.pos_alpha = QVector4D(20, 40, 0.0, 0.5);
+    ast2.trans_alpha = QVector4D(20, 40, 1.0, 0.0); // mesh points would flip this (0->1)
+    ast2.color_alpha = QVector4D(20, 40, 1, 1.0); // color_intp (toon/phong)
+    ast2.point_size = QVector4D(20, 40, 1, 6);
+    ast2.extra_info = QVector4D(0.1f, 0, 1, 2);
+    ast2.render_type = QVector4D(1, 1, 0, 0);
+
+    ast3.pos_alpha = QVector4D(40, 100, 0.5, 1.0);
+    ast3.trans_alpha = QVector4D(40, 100, 1.0, 1.0);
+    ast3.color_alpha = QVector4D(40, 100, 1, 1.0); // color_intp (toon/phong)
+    ast3.point_size = QVector4D(40, 100, 6, 6);
+    ast3.extra_info = QVector4D(0.1f, 0, 1, 2);
+    ast3.render_type = QVector4D(0, 1, 1, 0);
+
+
+    neu1.pos_alpha  = QVector4D(0, 20, 0, 1.0);      // position interpolation
+    neu1.trans_alpha = QVector4D(0, 20, 1.0, 1.0);    // alpha
+    neu1.color_alpha = QVector4D(0, 20, 0, 1.0);       // color intp (toon/phong)
+    neu1.point_size = QVector4D(0, 20, 1, 1);        // point size
+    neu1.extra_info = QVector4D(0.1f, 0.05f, 1, 1);       // alpha limit, div, pos1, pos2
+    neu1.render_type = QVector4D(1, 0, 0, 0);
+
+    neu2.pos_alpha  = QVector4D(20, 50, 0, 1.0);      // position interpolation
+    neu2.trans_alpha = QVector4D(20, 50, 1.0, 0.0);    // alpha
+    neu2.color_alpha = QVector4D(20, 50, 1, 1.0);       // color intp (toon/phong)
+    neu2.point_size = QVector4D(20, 50, 1, 7);        // point size
+    neu2.extra_info = QVector4D(0.1f, 0.05f, 1, 2);       // alpha limit, div, pos1, pos2
+    neu2.render_type = QVector4D(1, 1, 1, 0);
+
+    neu3.pos_alpha  = QVector4D(50, 100, 0, 1);      // position interpolation
+    neu3.trans_alpha = QVector4D(50, 100, 1, 1);    // alpha
+    neu3.color_alpha = QVector4D(50, 100, 1, 1);       // color intp (toon/phong)
+    neu3.point_size = QVector4D(50, 100, 7, 25);        // point size
+    neu3.extra_info = QVector4D(0.1f, 0.05f, 2, 3);       // alpha limit, div, pos1, pos2
+    neu3.render_type = QVector4D(0, 1, 1, 0);
+
+    Interval x_intervals[] = { {0, 20, neu1}, {20, 50, neu2}, {50, 100, neu3} };
+    m_intervalX.insertIntervals(x_intervals, 3);
+
+    Interval y_intervals[] = { {0, 20, ast1}, {20, 40, ast2}, {40, 100, ast3} };
+    m_intervalY.insertIntervals(y_intervals, 3);
 
     // position interpolation (pos1, pos2), alpha, color_intp, point_size, additional info
     // float leftMin, float leftMax, float rightMin, float rightMax
-    m_2DState.states[0][0] = QVector4D(20, 100, 0, 1.0);
-    m_2DState.states[0][1] = QVector4D(20, 40, 1.0, 0.0);
-    m_2DState.states[0][2] = QVector4D(0, 20, 0, 1.0);
-    m_2DState.states[0][3] = QVector4D(20, 40, 1, 6);
-    m_2DState.states[0][4] = QVector4D(0.2f, 0, 1, 2);
+    // interval [0, 20]
 
-    m_2DState.states[1][0] = QVector4D(20, 50, 0, 1.0);      // position interpolation
-    m_2DState.states[1][1] = QVector4D(40, 50, 1.0, 0.0);    // alpha
-    m_2DState.states[1][2] = QVector4D(0, 20, 0, 1.0);       // color intp (toon/phong)
-    m_2DState.states[1][3] = QVector4D(20, 50, 1, 7);        // point size
-    m_2DState.states[1][4] = QVector4D(0.1f, 0.05f, 1, 2);       // alpha limit, div, pos1, pos2
+
+
 }
 
 AbstractionSpace::~AbstractionSpace()
@@ -76,11 +122,10 @@ bool AbstractionSpace::initBuffer()
     glBufferData(GL_SHADER_STORAGE_BUFFER,  getBufferSize() , NULL, GL_DYNAMIC_COPY);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_bindIdx, m_buffer);
     qDebug() << "AbstractionSpace buffer size: " << getBufferSize();
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
-    GLvoid *p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-    memcpy(p,  getBufferData(),  getBufferSize());
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+    updateYaxis(0);
+    updateXaxis(0);
+
     return true;
 }
 
@@ -96,35 +141,61 @@ bool AbstractionSpace::updateBuffer()
     return true;
 }
 
-void AbstractionSpace::updateXYaxis(int xaxis, int yaxis)
+void AbstractionSpace::updateXaxis(int xaxis)
 {
     m_xaxis = xaxis;
+
+    // update the 2d space vlues
+    Interval *res = m_intervalX.getInterval(xaxis);
+    if (res == NULL) {
+         qDebug()  << "\nNo overlapping interval";
+         return;
+    }
+
+    if (m_prevIntvMaxX == res->high)
+        return;
+
+    qDebug()  << "\nOverlaps with [" << res->low << ", " << res->high << "]";
+
+    struct properties states = res->int_properties;
+
+    m_2DState.states[1][0] = states.pos_alpha;      // position interpolation
+    m_2DState.states[1][1] = states.trans_alpha;    // alpha
+    m_2DState.states[1][2] = states.color_alpha;       // color intp (toon/phong)
+    m_2DState.states[1][3] = states.point_size;        // point size
+    m_2DState.states[1][4] = states.extra_info;       // alpha limit, div, pos1, pos2
+    m_2DState.states[1][5] = states.render_type;
+
+
+    // if we move to new quadrant then:
+    updateBuffer();
+}
+
+void AbstractionSpace::updateYaxis(int yaxis)
+{
     m_yaxis = yaxis;
 
     // update the 2d space vlues
-    int leftMin = 50;
-    int leftMax = 100;
-    struct properties p00;
-    struct properties p10, p20, p30;
-    struct properties p01, p02, p03;
 
-    p00  = {1, 1.0, 1.0, 1.0, 1}; // concrete phong shading
+    Interval *res;
+    res = m_intervalY.getInterval(yaxis);
+    if (res == NULL) {
+         qDebug()  << "\nNo overlapping interval";
+         return;
+    }
 
-    p10 = {1, 1.0, 1.0, 0.0, 1}; // toon shading, skeleton start appearing
-    p20 = {2, 1.0, 1.0, 0.0, 7}; // skeleton, toon shading
-    p30 = {3, 1.0, 1.0, 0.0, 30}; // skeleton, toon shading
+    if (m_prevIntvMaxY == res->high)
+        return;
 
-    p01 = {1, 1.0, 1.0, 0.0, 1}; // toon shading, skeleton start appearing
-    p02 = {2, 0.5, 0.0, 0.0, 6}; // triangle geometry disappearing, skeleton, toon shading
-    p03 = {2, 1.0, 1.0, 0.0, 7}; // skeleton only
+    qDebug()  << "\nOverlaps with [" << res->low << ", " << res->high << "]";
 
-
-    m_2DState.states[1][0] = QVector4D(leftMin, leftMax, 1-p20.pos_alpha, p30.pos_alpha);      // position interpolation
-    m_2DState.states[1][1] = QVector4D(leftMin, leftMax, p20.trans_alpha,  p30.trans_alpha);    // alpha
-    m_2DState.states[1][2] = QVector4D(leftMin, leftMax, 1, 1);        // color intp (toon/phong)
-    m_2DState.states[1][3] = QVector4D(leftMin, leftMax, p20.point_size, p30.point_size);       // point size
-    m_2DState.states[1][4] = QVector4D(0.1f, 50, 2, p30.source);       // alpha limit, div, pos1, pos2
-
+    struct properties states = res->int_properties;
+    m_2DState.states[0][0] = states.pos_alpha;
+    m_2DState.states[0][1] = states.trans_alpha;
+    m_2DState.states[0][2] = states.color_alpha; // color_intp (toon/phong)
+    m_2DState.states[0][3] = states.point_size;
+    m_2DState.states[0][4] = states.extra_info;
+    m_2DState.states[0][5] = states.render_type;
 
     // if we move to new quadrant then:
     updateBuffer();

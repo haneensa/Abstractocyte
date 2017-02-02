@@ -4,9 +4,6 @@
 IntervalTree::IntervalTree()
 {
     root = NULL;
-    Interval ints[] = { {0, 20}, {20, 50}, {50, 100} };
-    insertIntervals(ints, 3);
-    getInterval(10);
 }
 
 void IntervalTree::insertIntervals(Interval ints[], int n)
@@ -16,16 +13,10 @@ void IntervalTree::insertIntervals(Interval ints[], int n)
     inorder(root);
 }
 
-void IntervalTree::getInterval(int p)
+Interval * IntervalTree::getInterval(int p)
 {
     Interval x = {p, p};
-
-    qDebug() << "\nSearching for interval [" << x.low << "," << x.high << "]";
-    Interval *res = overlapSearch(root, x);
-    if (res == NULL)
-         qDebug()  << "\nNo overlapping interval";
-    else
-         qDebug()  << "\nOverlaps with [" << res->low << ", " << res->high << "]";
+    return overlapSearch(root, x);
 }
 
 // A utility function to create a new interval search tree node

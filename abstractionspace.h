@@ -5,18 +5,11 @@
 #include <string>
 #include <QVector4D>
 #include "mainopengl.h"
+#include "intervaltree.h"
 
 
 struct ssbo_2DState {
-    QVector4D  states[2][5]; // val, alpha, color_intp, point_size, additional infos
-};
-
-struct properties {
-    int source;
-    float pos_alpha;
-    float trans_alpha;
-    float color_alpha;
-    int point_size;
+    QVector4D  states[2][6]; // val, alpha, color_intp, point_size, additional infos
 };
 
 
@@ -35,7 +28,8 @@ public:
     bool initBuffer();
     bool updateBuffer();
 
-    void updateXYaxis(int xaxis, int yaxis);
+    void updateXaxis(int xaxis);
+    void updateYaxis(int yaxis);
 
     void defineQuadrant(QVector2D leftMin, int dim, struct ssbo_2DState data);
 
@@ -60,6 +54,13 @@ private:
     // Data
     struct ssbo_2DState                 m_2DState;
     std::unordered_map< std::pair<int, int>, struct ssbo_2DState , pair_hash > m_statesMap;
+
+
+    IntervalTree                        m_intervalX;
+    IntervalTree                        m_intervalY;
+
+    int                                 m_prevIntvMaxX;
+    int                                 m_prevIntvMaxY;
 };
 
 #endif // ABSTRACTIONSPACE_H

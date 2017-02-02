@@ -45,7 +45,7 @@ layout (std430, binding=2) buffer mesh_data
 
 layout (std430, binding=3) buffer space2d_data
 {
-    vec4 space2d[2][5];
+    vec4 space2d[2][6];
 };
 
 void main() {
@@ -63,6 +63,11 @@ void main() {
     vec4 alpha3 = space2d[type][2]; // color_intp
     vec4 alpha4 = space2d[type][3]; // point_size
     vec4 alpha5 = space2d[type][4]; // additional info
+    vec4 alpha6 = space2d[type][5]; // additional info
+
+    if (alpha6.y == 0) {
+        return;
+    }
 
     // use the space2D values to get: value of interpolation between pos1 and pos2, alpha, color_interpolation, point size
     alpha =  translate(slider, alpha2.x, alpha2.y, alpha2.w, alpha2.z);

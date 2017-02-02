@@ -9,7 +9,7 @@ Mesh::Mesh()
 {
     m_vertices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 2;
+    m_limit = 20;
 
     // to do: combine all these files in one .obj file
     // to do: interface to load these files
@@ -471,25 +471,25 @@ void Mesh::draw()
     GLint y_axis, x_axis;
     GLuint mMatrix, vMatrix, pMatrix;
 
-//    m_vao_skeleton.bind();
-//    glUseProgram(m_program_skeleton);
-//    mMatrix = glGetUniformLocation(m_program_skeleton, "mMatrix");
-//    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+    m_vao_skeleton.bind();
+    glUseProgram(m_program_skeleton);
+    mMatrix = glGetUniformLocation(m_program_skeleton, "mMatrix");
+    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
 
-//    vMatrix = glGetUniformLocation(m_program_skeleton, "vMatrix");
-//    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+    vMatrix = glGetUniformLocation(m_program_skeleton, "vMatrix");
+    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
 
-//    pMatrix = glGetUniformLocation(m_program_skeleton, "pMatrix");
-//    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+    pMatrix = glGetUniformLocation(m_program_skeleton, "pMatrix");
+    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
 
-//    y_axis = glGetUniformLocation(m_program_skeleton, "y_axis");
-//    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
+    y_axis = glGetUniformLocation(m_program_skeleton, "y_axis");
+    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
 
-//    x_axis = glGetUniformLocation(m_program_skeleton, "x_axis");
-//    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
+    x_axis = glGetUniformLocation(m_program_skeleton, "x_axis");
+    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
 
-//    glDrawArrays(GL_POINTS, 0,  getNodesCount() );
-//    m_vao_skeleton.release();
+    glDrawArrays(GL_POINTS, 0,  getNodesCount() );
+    m_vao_skeleton.release();
 
     /************************/
     m_vao_mesh.bind();

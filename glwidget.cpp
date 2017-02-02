@@ -12,7 +12,6 @@
 
 #include "glwidget.h"
 #include "colors.h"
-#include "intervaltree.h"
 
 GLWidget::GLWidget(QWidget *parent)
     :   QOpenGLWidget(parent),
@@ -21,7 +20,6 @@ GLWidget::GLWidget(QWidget *parent)
         m_xaxis(0),
         m_FDL_running(false)
 {
-    IntervalTree interval;
 
     m_2dspace = new AbstractionSpace(100, 100);
     m_mesh = new Mesh();
@@ -256,7 +254,7 @@ void GLWidget::getSliderX(int value)
 {
     m_xaxis = value;
     // update the m_xaxis in abstraction space
-    m_2dspace->updateXYaxis(m_xaxis, m_yaxis);
+    m_2dspace->updateXaxis(m_xaxis);
     update();
 }
 
@@ -264,6 +262,6 @@ void GLWidget::getSliderY(int value)
 {
     m_yaxis = value;
     // update the m_yaxis in abstraction space
-    m_2dspace->updateXYaxis(m_xaxis, m_yaxis);
+    m_2dspace->updateYaxis(m_yaxis);
     update();
 }
