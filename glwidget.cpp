@@ -12,6 +12,7 @@
 
 #include "glwidget.h"
 #include "colors.h"
+#include "intervaltree.h"
 
 GLWidget::GLWidget(QWidget *parent)
     :   QOpenGLWidget(parent),
@@ -20,6 +21,8 @@ GLWidget::GLWidget(QWidget *parent)
         m_xaxis(0),
         m_FDL_running(false)
 {
+    IntervalTree interval;
+
     m_2dspace = new AbstractionSpace(100, 100);
     m_mesh = new Mesh();
     m_graphManager = new GraphManager();

@@ -26,6 +26,8 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 }
 
 
+
+
 float           Ns = 250;
 vec4            mat_specular = vec4(1);
 vec4            light_specular = vec4(1);

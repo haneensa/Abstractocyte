@@ -65,8 +65,12 @@ void main() {
     vec4 alpha5 = space2d[type][4]; // additional info
 
     // use the space2D values to get: value of interpolation between pos1 and pos2, alpha, color_interpolation, point size
-    float position_intp = translate(slider, alpha1.x, alpha1.y, alpha1.z, alpha1.w);
     alpha =  translate(slider, alpha2.x, alpha2.y, alpha2.w, alpha2.z);
+    if (alpha < alpha5.y){
+        return;
+    }
+
+    float position_intp = translate(slider, alpha1.x, alpha1.y, alpha1.z, alpha1.w);
     color_intp = translate(slider, alpha3.x, alpha3.y, alpha3.z, alpha3.w);
     gl_PointSize =  translate(slider, alpha4.x, alpha4.y, alpha4.z, alpha4.w);
 

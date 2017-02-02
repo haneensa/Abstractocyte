@@ -469,26 +469,27 @@ bool Mesh::initSkeletonShaders()
 void Mesh::draw()
 {
     GLint y_axis, x_axis;
-    m_vao_skeleton.bind();
-    glUseProgram(m_program_skeleton);
+    GLuint mMatrix, vMatrix, pMatrix;
 
-    GLuint mMatrix = glGetUniformLocation(m_program_skeleton, "mMatrix");
-    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+//    m_vao_skeleton.bind();
+//    glUseProgram(m_program_skeleton);
+//    mMatrix = glGetUniformLocation(m_program_skeleton, "mMatrix");
+//    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
 
-    GLuint vMatrix = glGetUniformLocation(m_program_skeleton, "vMatrix");
-    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+//    vMatrix = glGetUniformLocation(m_program_skeleton, "vMatrix");
+//    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
 
-    GLuint pMatrix = glGetUniformLocation(m_program_skeleton, "pMatrix");
-    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+//    pMatrix = glGetUniformLocation(m_program_skeleton, "pMatrix");
+//    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
 
-    y_axis = glGetUniformLocation(m_program_skeleton, "y_axis");
-    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
+//    y_axis = glGetUniformLocation(m_program_skeleton, "y_axis");
+//    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
 
-    x_axis = glGetUniformLocation(m_program_skeleton, "x_axis");
-    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
+//    x_axis = glGetUniformLocation(m_program_skeleton, "x_axis");
+//    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
 
-    glDrawArrays(GL_POINTS, 0,  getNodesCount() );
-    m_vao_skeleton.release();
+//    glDrawArrays(GL_POINTS, 0,  getNodesCount() );
+//    m_vao_skeleton.release();
 
     /************************/
     m_vao_mesh.bind();
