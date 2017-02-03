@@ -127,6 +127,14 @@ bool MainOpenGL::initShader(GLuint program, const char *vshader, const char *gsh
         return false;
     }
 
+    glDetachShader( program, vs);
+    glDetachShader( program, gs );
+    glDetachShader( program, fs );
+
+    glDeleteShader( vs );
+    glDeleteShader( gs );
+    glDeleteShader( fs );
+
     return true;
 }
 
