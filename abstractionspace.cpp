@@ -55,10 +55,10 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu2.extra_info = QVector4D(0.0f, 0.0f, 1, 2);       // alpha limit, div, pos1, pos2
     neu2.render_type = QVector4D(1, 1, 1, 0);
 
-    neu3.pos_alpha  = QVector4D(50, 100, 0, 1);      // position interpolation
-    neu3.trans_alpha = QVector4D(50, 100, 1, 1);    // alpha
-    neu3.color_alpha = QVector4D(50, 100, 1, 1);       // color intp (toon/phong)
-    neu3.point_size = QVector4D(50, 100, 7, 25);        // point size
+    neu3.pos_alpha  = QVector4D(50, 99, 0, 1);      // position interpolation
+    neu3.trans_alpha = QVector4D(50, 99, 1, 1);    // alpha
+    neu3.color_alpha = QVector4D(50, 99, 1, 1);       // color intp (toon/phong)
+    neu3.point_size = QVector4D(50, 99, 7, 20);        // point size
     neu3.extra_info = QVector4D(0.0f, 0.0f, 2, 3);       // alpha limit, div, pos1, pos2
     neu3.render_type = QVector4D(0, 1, 0, 0);
 

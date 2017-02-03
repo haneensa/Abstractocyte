@@ -37,9 +37,9 @@ GLWidget::GLWidget(QWidget *parent)
     //reset translation
     m_translation = QVector3D(0.0, 0.0, 0.0);
 
-//    QTimer *timer = new QTimer(this);
-//    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-//    timer->start(0);
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+
 
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -144,7 +144,6 @@ void GLWidget::paintGL()
     m_graphManager->drawGrid(grid_uniforms);
     m_graphManager->drawNodes(0);
     m_graphManager->drawEdges(0);
-    m_mesh->draw();
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -236,6 +235,9 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
                 m_isRotatable = !m_isRotatable;
         break;
         case(Qt::Key_F):
+
+            timer->start(0);
+
             // pass rotation matrix
             m_isRotatable = false;
             m_FDL_running = true;
@@ -243,6 +245,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             m_graphManager->startForceDirectedLayout(0);
         break;
         case(Qt::Key_X):
+            timer->stop();
             m_isRotatable = true;
             m_FDL_running = false;
             m_graphManager->stopForceDirectedLayout(0);

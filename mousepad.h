@@ -45,9 +45,16 @@ protected:
     void renderSelection(void);
     void processSelection(float dx, float dy);
 
+    void initSelectionPointerGL();
+    void init2DSpaceGL();
+
 private:
     QMatrix4x4                  m_projection;
+    int                         m_w;
+    int                         m_h;
 
+    /* selection pointer */
+    struct point                circle;
     QOpenGLVertexArrayObject    m_vao_circle;
     QOpenGLBuffer               m_vbo_circle;
     QOpenGLShaderProgram        *m_program_circle;
@@ -55,9 +62,17 @@ private:
     QOpenGLVertexArrayObject    m_vao_selection;
     QOpenGLShaderProgram        *m_program_selection;
 
-    struct point                circle;
-    int                         m_w;
-    int                         m_h;
+
+
+    /* abstraction space grid */
+    QOpenGLVertexArrayObject    m_vao_2DSpace;
+    QOpenGLVertexArrayObject    m_vao_2DSpace_Selection;
+
+    QOpenGLBuffer               m_vbo_2DSpaceVerts;
+    QOpenGLBuffer               m_vbo_2DSpaceIndix;
+
+    QOpenGLShaderProgram        *m_program_2DSpace;
+    QOpenGLShaderProgram        *m_program_2DSpace_Selection;
 };
 
 #endif // MOUSEPAD_H

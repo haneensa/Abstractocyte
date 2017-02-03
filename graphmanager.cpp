@@ -32,6 +32,18 @@ GraphManager::~GraphManager()
     }
 
     // destroy all vbo and vao and programs and graphs
+
+    if (m_glFunctionsSet == true) {
+
+        m_NodesVAO.destroy();
+        m_NodesVBO.destroy();
+
+        m_IndexVAO.destroy();
+        m_IndexVBO.destroy();
+    }
+
+    delete m_graph[0]; // todo: if more than one iterate over all
+
 }
 
 void GraphManager::stopForceDirectedLayout(int graphIdx)
@@ -117,9 +129,8 @@ bool GraphManager::initVBO(int graphIdx)
                           sizeof(struct BufferNode),  (void*)offset);
     GL_Error();
 
-    updateUniformsLocation();
-
     // initialize uniforms
+    updateUniformsLocation();
 
     m_NodesVBO.release();
     m_NodesVAO.release();

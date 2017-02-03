@@ -25,5 +25,8 @@
         <file>shaders/grid.frag</file>
         <file>shaders/grid.geom</file>
         <file>shaders/grid.vert</file>
+        <file>shaders/space2d.frag</file>
+        <file>shaders/space2d.geom</file>
+        <file>shaders/space2d.vert</file>
     </qresource>
 </RCC>

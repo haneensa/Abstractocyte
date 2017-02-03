@@ -6,7 +6,9 @@
 
 MousePad::MousePad(QWidget *parent)
     :  QOpenGLWidget(parent),
-       m_vbo_circle( QOpenGLBuffer::VertexBuffer )
+       m_vbo_circle( QOpenGLBuffer::VertexBuffer ),
+       m_vbo_2DSpaceVerts( QOpenGLBuffer::VertexBuffer ),
+       m_vbo_2DSpaceIndix( QOpenGLBuffer::IndexBuffer )
 {
     qDebug() << "MousePad";
     circle.x = 0.0;
@@ -27,29 +29,10 @@ MousePad::~MousePad()
     doneCurrent();
 }
 
-void MousePad::initializeGL()
+void MousePad::initSelectionPointerGL()
 {
-    initializeOpenGLFunctions();
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    qDebug() << "Widget OpenGl: " << format().majorVersion() << "." << format().minorVersion();
-    qDebug() << "Context valid: " << context()->isValid();
-    qDebug() << "Really used OpenGl: " << context()->format().majorVersion() << "." << context()->format().minorVersion();
-    qDebug() << "OpenGl information: VENDOR:       " << (const char*)glGetString(GL_VENDOR);
-    qDebug() << "                    RENDERDER:    " << (const char*)glGetString(GL_RENDERER);
-    qDebug() << "                    VERSION:      " << (const char*)glGetString(GL_VERSION);
-    qDebug() << "                    GLSL VERSION: " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
-
-    m_projection.setToIdentity();
-
     m_program_circle = new QOpenGLShaderProgram(this);
     bool res = initShader(m_program_circle, ":/shaders/shader.vert", ":/shaders/shader.geom", ":/shaders/shader.frag");
-    if(res == false)
-        return;
-
-    m_program_selection = new QOpenGLShaderProgram(this);
-    res = initShader(m_program_selection, ":/shaders/selection.vert", ":/shaders/selection.geom", ":/shaders/selection.frag");
     if(res == false)
         return;
 
@@ -77,6 +60,13 @@ void MousePad::initializeGL()
     m_vbo_circle.release();
     m_vao_circle.release();
 
+    /* selection buffer */
+
+    m_program_selection = new QOpenGLShaderProgram(this);
+    res = initShader(m_program_selection, ":/shaders/selection.vert", ":/shaders/selection.geom", ":/shaders/selection.frag");
+    if(res == false)
+        return;
+
     // create vbos and vaos
     m_vao_selection.create();
     m_vao_selection.bind();
@@ -93,6 +83,95 @@ void MousePad::initializeGL()
 
     m_vbo_circle.release();
     m_vao_selection.release();
+}
+
+void MousePad::init2DSpaceGL()
+{
+    m_program_2DSpace = new QOpenGLShaderProgram(this);
+    bool res = initShader(m_program_2DSpace, ":/shaders/space2d.vert", ":/shaders/space2d.geom",
+                          ":/shaders/space2d.frag");
+    if(res == false)
+        return;
+
+    qDebug() << "init buffers";
+    GL_Error();
+    // create vbos and vaos
+    m_vao_2DSpace.create();
+    m_vao_2DSpace.bind();
+
+    m_vbo_2DSpaceVerts.create();
+    m_vbo_2DSpaceVerts.setUsagePattern( QOpenGLBuffer::DynamicDraw);
+    m_vbo_2DSpaceVerts.bind();
+
+    float p1 = 20.0/100.0;
+    GLfloat vertices[] = {
+        0.0f, 0.0f,
+        p1, 0.0f,
+        0.0f, p1,
+
+        p1, 0.0f,
+        p1, p1,
+        0.0f, p1,
+    };
+
+    m_vbo_2DSpaceVerts.allocate(vertices, 6 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
+
+    m_program_2DSpace->bind();
+    m_program_2DSpace->setUniformValue("pMatrix", m_projection);
+    m_program_2DSpace->enableAttributeArray("posAttr");
+    m_program_2DSpace->setAttributeBuffer("posAttr", GL_FLOAT, 0, 2);
+    m_program_2DSpace->release();
+    GL_Error();
+
+    m_vbo_2DSpaceVerts.release();
+    m_vao_2DSpace.release();
+
+    /* selection buffer */
+//    m_program_2DSpace_Selection = new QOpenGLShaderProgram(this);
+//    res = initShader(m_program_2DSpace_Selection, ":/shaders/space2d.vert", ":/shaders/space2d.geom",
+//                     ":/shaders/space2d.frag");
+//    if(res == false)
+//        return;
+
+//    // create vbos and vaos
+//    m_vao_2DSpace_Selection.create();
+//    m_vao_2DSpace_Selection.bind();
+//    if ( !m_vbo_2DSpaceVerts.bind() ) {
+//        qDebug() << "Could not bind vertex buffer to the context.";
+//        return;
+//    }
+
+//    m_program_2DSpace_Selection->bind();
+//    m_program_2DSpace_Selection->enableAttributeArray("posAttr");
+//    m_program_2DSpace_Selection->setAttributeBuffer("posAttr", GL_FLOAT, 0, 2);
+//    m_program_2DSpace_Selection->setUniformValue("pMatrix",   m_projection);
+//    m_program_2DSpace_Selection->release();
+
+//    m_vbo_2DSpaceVerts.release();
+//    m_vao_2DSpace_Selection.release();
+}
+
+void MousePad::initializeGL()
+{
+    qDebug() << "MousePad::initializeGL()";
+    initializeOpenGLFunctions();
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    initSelectionPointerGL();
+    init2DSpaceGL();
+
+    qDebug() << "Widget OpenGl: " << format().majorVersion() << "." << format().minorVersion();
+    qDebug() << "Context valid: " << context()->isValid();
+    qDebug() << "Really used OpenGl: " << context()->format().majorVersion() << "." << context()->format().minorVersion();
+    qDebug() << "OpenGl information: VENDOR:       " << (const char*)glGetString(GL_VENDOR);
+    qDebug() << "                    RENDERDER:    " << (const char*)glGetString(GL_RENDERER);
+    qDebug() << "                    VERSION:      " << (const char*)glGetString(GL_VERSION);
+    qDebug() << "                    GLSL VERSION: " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+
+    m_projection.setToIdentity();
+
+
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
@@ -113,6 +192,13 @@ void MousePad::paintGL()
     glDrawArrays(GL_POINTS, 0, 1);
     m_program_circle->release();
     m_vao_circle.release();
+
+    m_vao_2DSpace.bind();
+    m_program_2DSpace->bind();
+    m_program_2DSpace->setUniformValue("pMatrix", m_projection);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    m_program_2DSpace->release();
+    m_vao_2DSpace.release();
 }
 
 void MousePad::resizeGL(int w, int h)

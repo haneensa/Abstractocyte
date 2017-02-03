@@ -67,6 +67,8 @@ protected:
 
     // force directed layout
     bool                        m_FDL_running;
+
+    QTimer                      *timer;
 };
 
 

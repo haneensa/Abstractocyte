@@ -97,6 +97,9 @@ void main() {
     }
 
    vec4 new_position = mix(pos1 , pos2, position_intp);
+   //vec4 new_position = pos2 * position_intp +   (0.99 - position_intp) *pos1;
+
+
    gl_Position = new_position;
    EmitVertex();
    EndPrimitive();
