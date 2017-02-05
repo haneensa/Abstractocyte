@@ -5,14 +5,16 @@
 #include <string>
 #include <QVector4D>
 #include "mainopengl.h"
-#include "intervaltree.h"
 
 
 struct ssbo_2DState {
     QVector4D  states[2][6]; // val, alpha, color_intp, point_size, additional infos
 };
 
-
+struct ast_neu_properties {
+    struct properties ast;
+    struct properties neu;
+};
 
 class AbstractionSpace : public MainOpenGL
 {
@@ -28,10 +30,8 @@ public:
     bool initBuffer();
     bool updateBuffer();
 
-    void updateXaxis(int xaxis);
-    void updateYaxis(int yaxis);
-
     void defineQuadrant(QVector2D leftMin, int dim, struct ssbo_2DState data);
+    void updateID(int ID);
 
 private:
     struct pair_hash {
@@ -46,6 +46,7 @@ private:
     int                                 m_xaxis;
     int                                 m_yaxis;
 
+    int                                 m_intervalID;
     // OpenGL
     GLuint                              m_buffer;
     GLuint                              m_bindIdx;
@@ -53,14 +54,9 @@ private:
 
     // Data
     struct ssbo_2DState                 m_2DState;
-    std::unordered_map< std::pair<int, int>, struct ssbo_2DState , pair_hash > m_statesMap;
 
+    std::vector< struct ast_neu_properties >  m_IntervalXY;
 
-    IntervalTree                        m_intervalX;
-    IntervalTree                        m_intervalY;
-
-    int                                 m_prevIntvMaxX;
-    int                                 m_prevIntvMaxY;
 };
 
 #endif // ABSTRACTIONSPACE_H

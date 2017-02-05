@@ -18,6 +18,10 @@ struct abstractionPoint {
 };
 
 
+
+
+
+
 class MousePad : public QOpenGLWidget, MainOpenGL
 {
     Q_OBJECT
@@ -37,6 +41,7 @@ signals:
     void setSignalY(int value);
     void setSliderX(int value);
     void setSliderY(int value);
+    void setIntervalID(int ID);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -56,29 +61,36 @@ protected:
 
     void initRect(QVector2D p00, float dimX, float dimY, int ID);
     void initBuffer();
+    void initData();
+    bool updateBuffer();
+
 private:
-    QMatrix4x4                  m_projection;
-    int                         m_w;
-    int                         m_h;
+    QMatrix4x4                              m_projection;
+    int                                     m_w;
+    int                                     m_h;
+
+    int                                     m_x;
+    int                                     m_y;
 
     /* selection pointer */
-    struct point                circle;
-    QOpenGLVertexArrayObject    m_vao_circle;
-    QOpenGLBuffer               m_vbo_circle;
-    QOpenGLShaderProgram        *m_program_circle;
+    struct point                            circle;
+    QOpenGLVertexArrayObject                m_vao_circle;
+    QOpenGLBuffer                           m_vbo_circle;
+    QOpenGLShaderProgram                    *m_program_circle;
 
-    QOpenGLVertexArrayObject    m_vao_selection;
-    QOpenGLShaderProgram        *m_program_selection;
+    QOpenGLVertexArrayObject                m_vao_selection;
+    QOpenGLShaderProgram                    *m_program_selection;
 
 
+     int                                    m_intervalID;
 
     /* abstraction space grid */
-    std::vector<QVector4D>                  m_buffer_data; // Color, Cenert, Type
-    GLuint                                  m_buffer;
-    GLuint                                  m_bindIdx;
+    std::vector<QVector4D>                  m_buffer_color_data; // Color, Cenert, Type
+    GLuint                                  m_buffer_color;
+    GLuint                                  m_bindColorIdx;
 
-    std::vector<struct abstractionPoint>    m_vertices;
-    std::vector<GLuint>                     m_indices;
+    std::vector<struct abstractionPoint>      m_vertices;
+    std::vector<GLuint>                       m_indices;
 
     QOpenGLVertexArrayObject                m_vao_2DSpace;
     QOpenGLVertexArrayObject                m_vao_2DSpace_Selection;

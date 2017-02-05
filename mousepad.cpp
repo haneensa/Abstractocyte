@@ -11,7 +11,7 @@ MousePad::MousePad(QWidget *parent)
        m_vbo_2DSpaceVerts( QOpenGLBuffer::VertexBuffer ),
        m_vbo_2DSpaceIndix( QOpenGLBuffer::IndexBuffer )
 {
-    m_bindIdx = 1;
+    m_bindColorIdx = 1;
     qDebug() << "MousePad";
     circle.x = 0.0;
     circle.y = 0.0;
@@ -117,57 +117,65 @@ void MousePad::initRect(QVector2D p00, float dimX, float dimY, int ID)
     m_indices.push_back(offset + 2);
 }
 
-
-void MousePad::initBuffer()
+void MousePad::initData()
 {
 
-    m_buffer_data.push_back(red);
-    m_buffer_data.push_back(orange);
-    m_buffer_data.push_back(blueviolet);
-    m_buffer_data.push_back(steelblue);
-    m_buffer_data.push_back(seagreen);
-    m_buffer_data.push_back(brown);
-    m_buffer_data.push_back(violet);
-    m_buffer_data.push_back(peru);
-    m_buffer_data.push_back(mediumspringgreen);
-    m_buffer_data.push_back(gainsboro);
-    m_buffer_data.push_back(honeydew);
-    m_buffer_data.push_back(darkkhaki);
+    // init intervals
 
-    int bufferSize =  m_buffer_data.size() * sizeof(QVector4D);
+    struct properties ast1, ast2, ast3, ast4;
+    struct properties neu1, neu2, neu3;
 
-    glGenBuffers(1, &m_buffer);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize , NULL, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_bindIdx, m_buffer);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
-    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-    memcpy(p,   m_buffer_data.data(),  bufferSize);
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+    ast1.pos_alpha = QVector4D(0, 20, 0.0, 1.0);
+    ast1.trans_alpha = QVector4D(0, 20, 1.0, 1.0);
+    ast1.color_alpha = QVector4D(0, 20, 0, 1.0); // color_intp (toon/phong)
+    ast1.point_size = QVector4D(0, 20, 1, 1);
+    ast1.extra_info = QVector4D(0.0f, 0, 1, 1);
+    ast1.render_type = QVector4D(1, 0, 0, 0);
 
-}
+    ast2.pos_alpha = QVector4D(20, 40, 0.0, 0.5);
+    ast2.trans_alpha = QVector4D(20, 40, 1.0, 0.0); // mesh points would flip this (0->1)
+    ast2.color_alpha = QVector4D(20, 40, 1, 1.0); // color_intp (toon/phong)
+    ast2.point_size = QVector4D(20, 40, 1, 3);
+    ast2.extra_info = QVector4D(0.0f, 0, 1, 2);
+    ast2.render_type = QVector4D(1, 1, 0, 0);
+
+    ast3.pos_alpha = QVector4D(40, 90, 0.5, 1.0);
+    ast3.trans_alpha = QVector4D(40, 90, 1.0, 1.0);
+    ast3.color_alpha = QVector4D(40, 90, 1, 1.0); // color_intp (toon/phong)
+    ast3.point_size = QVector4D(40, 90, 3, 6);
+    ast3.extra_info = QVector4D(0.0f, 0, 1, 2);
+    ast3.render_type = QVector4D(0, 1, 1, 0);
+    ast4.pos_alpha = QVector4D(90, 99, 0.0, 1.0);
+    ast4.trans_alpha = QVector4D(90, 99, 1.0, 0.0);
+    ast4.color_alpha = QVector4D(90, 99, 1, 1); // color_intp (toon/phong)
+    ast4.point_size = QVector4D(90, 99, 6, 6);
+    ast4.extra_info = QVector4D(0.05f, 0, 2, 2);
+    ast4.render_type = QVector4D(0, 0, 1, 0);
+
+    neu1.pos_alpha  = QVector4D(0, 20, 0, 1.0);      // position interpolation
+    neu1.trans_alpha = QVector4D(0, 20, 1.0, 1.0);    // alpha
+    neu1.color_alpha = QVector4D(0, 20, 0, 1.0);       // color intp (toon/phong)
+    neu1.point_size = QVector4D(0, 20, 1, 1);        // point size
+    neu1.extra_info = QVector4D(0.0f, 0.0f, 1, 1);       // alpha limit, div, pos1, pos2
+    neu1.render_type = QVector4D(1, 0, 0, 0);
+
+    neu2.pos_alpha  = QVector4D(20, 50, 0, 1.0);      // position interpolation
+    neu2.trans_alpha = QVector4D(20, 50, 1.0, 0.0);    // alpha
+    neu2.color_alpha = QVector4D(20, 50, 1, 1.0);       // color intp (toon/phong)
+    neu2.point_size = QVector4D(20, 50, 1, 7);        // point size
+    neu2.extra_info = QVector4D(0.0f, 0.0f, 1, 2);       // alpha limit, div, pos1, pos2
+    neu2.render_type = QVector4D(1, 1, 1, 0);
+
+    neu3.pos_alpha  = QVector4D(50, 99, 0, 1);      // position interpolation
+    neu3.trans_alpha = QVector4D(50, 99, 1, 1);    // alpha
+    neu3.color_alpha = QVector4D(50, 99, 1, 1);       // color intp (toon/phong)
+    neu3.point_size = QVector4D(50, 99, 7, 20);        // point size
+    neu3.extra_info = QVector4D(0.0f, 0.0f, 2, 3);       // alpha limit, div, pos1, pos2
+    neu3.render_type = QVector4D(0, 1, 0, 0);
 
 
-void MousePad::init2DSpaceGL()
-{
-    m_program_2DSpace = glCreateProgram();
-    bool res = initShader(m_program_2DSpace, ":/shaders/space2d.vert", ":/shaders/space2d.geom",
-                          ":/shaders/space2d.frag");
-    if(res == false)
-        return;
 
-    glUseProgram(m_program_2DSpace);
-    qDebug() << "init buffers";
-    GL_Error();
-    // create vbos and vaos
-    m_vao_2DSpace.create();
-    m_vao_2DSpace.bind();
-
-    m_vbo_2DSpaceVerts.create();
-    m_vbo_2DSpaceVerts.setUsagePattern( QOpenGLBuffer::DynamicDraw);
-    m_vbo_2DSpaceVerts.bind();
-
+    // init rects
     float p10 = 20.0/100.0;
     float p20 = 20.0/100.0;
     float p30 = 30.0/100.0;
@@ -180,66 +188,126 @@ void MousePad::init2DSpaceGL()
     QVector2D p = QVector2D(0, 0);
     // x (0, 20)
     // y (0, 20)
+    //m_IntervalXY.push_back({ast1, neu1});
     initRect(p, p20, p20, ID++); // 0
 
     // x (0, 20)
     // y (20, 40)
     p = QVector2D(0, p20);
+    //m_IntervalXY.push_back({ast2, neu1});
     initRect(p, p20, p20, ID++); // 1
 
     // x (0, 20)
     // y (40, 50)
     p = QVector2D(0, p20+p20);
+  //  m_IntervalXY.push_back({ast3, neu1});
     initRect(p, p20, p50, ID++); // 2
 
     // x (0, 20)
     // y (90, 100)
     p = QVector2D(0, p20+p20+p50);
+  //  m_IntervalXY.push_back({ast4, neu1});
     initRect(p, p20, p100, ID++); // 3
 
     // x (20, 50)
     // y (0, 20)
     p = QVector2D(p20, 0);
+  //  m_IntervalXY.push_back({ast1, neu2});
     initRect(p, p30, p20, ID++); // 4
 
     // x (50, 100)
     // y (0, 20)
     p = QVector2D(p50, 0);
+ //   m_IntervalXY.push_back({ast1, neu3});
     initRect(p, p50, p20, ID++); // 5
 
     // x (20, 50)
     // y (20, 40)
     p = QVector2D(p20, p20);
+  //  m_IntervalXY.push_back({ast2, neu2});
     initRect(p, p30, p20, ID++); // 6
 
     // x (20, 50)
     // y (40, 90)
     p = QVector2D(p20, p40);
+  //  m_IntervalXY.push_back({ast3, neu2});
     initRect(p, p30, p50, ID++); // 7
 
 
     // x (20, 50)
     // y (90, 100)
     p = QVector2D(p20, p90);
+  //  m_IntervalXY.push_back({ast4, neu2});
     initRect(p, p30, p10, ID++); // 8
 
     // x (50, 100)
     // y (20, 40)
     p = QVector2D(p50, p20);
+   // m_IntervalXY.push_back({ast2, neu3});
     initRect(p, p50, p20, ID++); // 9
 
 
     // x (50, 100)
     // y (40, 90)
     p = QVector2D(p50, p40);
+    //m_IntervalXY.push_back({ast3, neu3});
     initRect(p, p50, p50, ID++); // 10
 
     // x (50, 100)
     // y (90, 100)
     p = QVector2D(p50, p90);
+   // m_IntervalXY.push_back({ast4, neu3});
     initRect(p, p50, p10, ID++); // 11
 
+}
 
+void MousePad::initBuffer()
+{
+
+    m_buffer_color_data.push_back(red);
+    m_buffer_color_data.push_back(orange);
+    m_buffer_color_data.push_back(blueviolet);
+    m_buffer_color_data.push_back(steelblue);
+    m_buffer_color_data.push_back(seagreen);
+    m_buffer_color_data.push_back(brown);
+    m_buffer_color_data.push_back(violet);
+    m_buffer_color_data.push_back(peru);
+    m_buffer_color_data.push_back(mediumspringgreen);
+    m_buffer_color_data.push_back(gainsboro);
+    m_buffer_color_data.push_back(honeydew);
+    m_buffer_color_data.push_back(darkkhaki);
+
+    int bufferSize =  m_buffer_color_data.size() * sizeof(QVector4D);
+
+    glGenBuffers(1, &m_buffer_color);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer_color);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize , NULL, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_bindColorIdx, m_buffer_color);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer_color);
+    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    memcpy(p,   m_buffer_color_data.data(),  bufferSize);
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+}
+
+void MousePad::init2DSpaceGL()
+{
+    m_program_2DSpace = glCreateProgram();
+    bool res = initShader(m_program_2DSpace, ":/shaders/space2d.vert", ":/shaders/space2d.geom",
+                          ":/shaders/space2d.frag");
+    if(res == false)
+        return;
+
+    glUseProgram(m_program_2DSpace);
+    qDebug() << "init buffers";
+    // create vbos and vaos
+    m_vao_2DSpace.create();
+    m_vao_2DSpace.bind();
+
+    m_vbo_2DSpaceVerts.create();
+    m_vbo_2DSpaceVerts.setUsagePattern( QOpenGLBuffer::DynamicDraw);
+    m_vbo_2DSpaceVerts.bind();
 
     m_vbo_2DSpaceVerts.allocate( m_vertices.data(), m_vertices.size() * sizeof(QVector3D) );
 
@@ -304,8 +372,19 @@ void MousePad::initializeGL()
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    qDebug() << "MousePad::initData()";
+    initData();
+    GL_Error();
+
+    qDebug() << "MousePad::initBuffer()";
     initBuffer();
+    GL_Error();
+
+    qDebug() << "MousePad::initSelectionPointerGL()";
     initSelectionPointerGL();
+    GL_Error();
+
+    qDebug() << "MousePad::initializeGL()";
     init2DSpaceGL();
 
     qDebug() << "Widget OpenGl: " << format().majorVersion() << "." << format().minorVersion();
@@ -379,7 +458,7 @@ QSize MousePad::sizeHint() const
 
 void MousePad::mouseMoveEvent(QMouseEvent *event)
 {
-    qDebug() << "Func: mouseMoveEvent: " << event->pos().x() << " " << event->pos().y();
+    //qDebug() << "Func: mouseMoveEvent: " << event->pos().x() << " " << event->pos().y();
     // here update the mouse position as we move!
 
 
@@ -400,14 +479,14 @@ void MousePad::mouseMoveEvent(QMouseEvent *event)
 
 void MousePad::mousePressEvent(QMouseEvent *event)
 {
-    qDebug() << "Func: mousePressEvent: " << event->pos().x() << " " << event->pos().y();
+    //qDebug() << "Func: mousePressEvent: " << event->pos().x() << " " << event->pos().y();
     setFocus();
     event->accept();
 }
 
 void MousePad::mouseReleaseEvent(QMouseEvent *event)
 {
-    qDebug() << "Func: mouseReleaseEvent " <<  event->x() << " " << event->y();
+    //qDebug() << "Func: mouseReleaseEvent " <<  event->x() << " " << event->y();
     setFocus();
 
     event->accept();
@@ -415,6 +494,10 @@ void MousePad::mouseReleaseEvent(QMouseEvent *event)
 
 void MousePad::setSlotsX(int value)
 {
+    if (m_x == value)
+        return;
+
+    m_x = value;
     // minimum = 0, maximum = 99
     emit setSignalX(value);
     m_vbo_circle.bind();
@@ -422,6 +505,21 @@ void MousePad::setSlotsX(int value)
     GLfloat points[] = { circle.x,  circle.y };
     m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
     m_vbo_circle.release();
+
+
+//    makeCurrent();
+//    const qreal retinaScale = devicePixelRatio();
+//    GLint viewport[4]; //  return of glGetIntegerv() -> x, y, width, height of viewport
+//    glGetIntegerv(GL_VIEWPORT, viewport);
+
+//    int x = m_x * retinaScale;
+//    int y = viewport[3] - m_y * retinaScale;
+
+//    doneCurrent();
+//    // calculate the offset from press to release, then update the point position
+//    // get the position were we pressed
+//    processSelection(x, y);
+
     update();
 
 }
@@ -429,6 +527,10 @@ void MousePad::setSlotsX(int value)
 
 void MousePad::setSlotsY(int value)
 {
+    if (m_y == value)
+        return;
+
+    m_y = value;
     // minimum = 0, maximum = 99
     emit setSignalY(value);
     m_vbo_circle.bind();
@@ -436,6 +538,21 @@ void MousePad::setSlotsY(int value)
     GLfloat points[] = { circle.x,  circle.y };
     m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
     m_vbo_circle.release();
+
+//    makeCurrent();
+//    const qreal retinaScale = devicePixelRatio();
+//    GLint viewport[4]; //  return of glGetIntegerv() -> x, y, width, height of viewport
+//    glGetIntegerv(GL_VIEWPORT, viewport);
+
+//    int x = m_x * retinaScale;
+//    int y = viewport[3] - m_y * retinaScale;
+
+//    doneCurrent();
+//    // calculate the offset from press to release, then update the point position
+//    // get the position were we pressed
+//    processSelection(x, y);
+
+
     update();
 }
 
@@ -484,12 +601,12 @@ void MousePad::processSelection(float x, float y)
     // 4 bytes per pixel (RGBA), 1x1 bitmap
     // width * height * components (RGBA)
     unsigned char res[4];
-    qDebug() << "Pixel at: " << x << " " << y;
+    //qDebug() << "Pixel at: " << x << " " << y;
     glReadBuffer(GL_BACK);
     glReadPixels(x,  y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &res);
     int pickedID = res[0] + res[1] * 256 + res[2] * 256 * 256;
 
-    qDebug() <<  res[0] <<  " " << res[1] <<  " " << res[2];
+    //qDebug() <<  res[0] <<  " " << res[1] <<  " " << res[2];
 
     if (pickedID <= 0) {
         qDebug() << "Background, Picked ID: " << pickedID;
@@ -507,8 +624,8 @@ void MousePad::processSelection(float x, float y)
 
         emit setSliderX(circle.x * 100);
         emit setSliderY(circle.y * 100);
-
-        qDebug() << "Picked ID: " << pickedID << "-> " << circle.x << " " << circle.y;
+        emit setIntervalID(pickedID - 1);
+        //qDebug() << "Picked ID: " << pickedID << "-> " << circle.x << " " << circle.y;
     }
 
     // update the circle vbo

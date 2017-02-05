@@ -257,15 +257,16 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 void GLWidget::getSliderX(int value)
 {
     m_xaxis = value;
-    // update the m_xaxis in abstraction space
-    m_2dspace->updateXaxis(m_xaxis);
     update();
 }
 
 void GLWidget::getSliderY(int value)
 {
     m_yaxis = value;
-    // update the m_yaxis in abstraction space
-    m_2dspace->updateYaxis(m_yaxis);
     update();
+}
+
+void GLWidget::getIntervalID(int ID)
+{
+    m_2dspace->updateID(ID);
 }

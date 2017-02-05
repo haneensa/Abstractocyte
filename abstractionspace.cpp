@@ -5,11 +5,9 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     : m_xaxis(xdim),
       m_yaxis(ydim),
       m_bindIdx(3),
-      m_glFunctionsSet(false),
-      m_prevIntvMaxX(0),
-      m_prevIntvMaxY(0)
+      m_glFunctionsSet(false)
 {
-
+    m_intervalID = 0;
     struct properties ast1, ast2, ast3, ast4;
     struct properties neu1, neu2, neu3;
 
@@ -62,16 +60,71 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu3.extra_info = QVector4D(0.0f, 0.0f, 2, 3);       // alpha limit, div, pos1, pos2
     neu3.render_type = QVector4D(0, 1, 0, 0);
 
-    Interval x_intervals[] = { {0, 20, neu1}, {20, 50, neu2}, {50, 100, neu3} };
-    m_intervalX.insertIntervals(x_intervals, 3);
+    // x (0, 20)
+    // y (0, 20)
+    m_IntervalXY.push_back({ast1, neu1}); // 0
+    // x (0, 20)
+    // y (20, 40)
+    m_IntervalXY.push_back({ast2, neu1}); // 1
+    // x (0, 20)
+    // y (40, 50)
+    m_IntervalXY.push_back({ast3, neu1}); // 2
 
-    Interval y_intervals[] = { {0, 20, ast1}, {20, 40, ast2}, {40, 90, ast3}, {90, 100, ast4} };
-    m_intervalY.insertIntervals(y_intervals, 4);
+    // x (0, 20)
+    // y (90, 100)
+    m_IntervalXY.push_back({ast4, neu1}); // 3
+
+    // x (20, 50)
+    // y (0, 20)
+    m_IntervalXY.push_back({ast1, neu2}); // 4
+
+    // x (50, 100)
+    // y (0, 20)
+    m_IntervalXY.push_back({ast1, neu3}); // 5
+
+    // x (20, 50)
+    // y (20, 40)
+    m_IntervalXY.push_back({ast2, neu2}); // 6
+
+    // x (20, 50)
+    // y (40, 90)
+    m_IntervalXY.push_back({ast3, neu2}); // 7
+
+
+    // x (20, 50)
+    // y (90, 100)
+    m_IntervalXY.push_back({ast4, neu2}); // 8
+
+    // x (50, 100)
+    // y (20, 40)
+    m_IntervalXY.push_back({ast2, neu3}); // 9
+
+
+    // x (50, 100)
+    // y (40, 90)
+    m_IntervalXY.push_back({ast3, neu3}); // 10
+
+    // x (50, 100)
+    // y (90, 100)
+    m_IntervalXY.push_back({ast4, neu3}); // 11
 }
 
 AbstractionSpace::~AbstractionSpace()
 {
     qDebug() << "~AbstractionSpace";
+}
+
+void AbstractionSpace::updateID(int ID)
+{
+    if (ID < 0 || ID >= m_IntervalXY.size())
+        return;
+
+    if (ID == m_intervalID) {
+       return;
+    }
+    m_intervalID = ID;
+    updateBuffer();
+    qDebug() << "m_intervalID: " << ID;
 }
 
 void AbstractionSpace::initOpenGLFunctions()
@@ -90,16 +143,6 @@ void AbstractionSpace::initOpenGLFunctions()
 // |         |          |
 // *---------**---------*
 
-void AbstractionSpace::defineAbstractionState(int x, int y, std::string name, int dx, int dy)
-{
-
-}
-void AbstractionSpace::defineQuadrant(QVector2D  leftMin, int dim, struct ssbo_2DState data)
-{
-    std::pair<int, int> index;
-    // using leftMin and dim, compute the index of this qudrant
-    m_statesMap.insert( std::make_pair(index, data) );
-}
 
 int AbstractionSpace::getBufferSize()
 {
@@ -121,15 +164,32 @@ bool AbstractionSpace::initBuffer()
     glBufferData(GL_SHADER_STORAGE_BUFFER,  getBufferSize() , NULL, GL_DYNAMIC_COPY);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_bindIdx, m_buffer);
     qDebug() << "AbstractionSpace buffer size: " << getBufferSize();
-
-    updateYaxis(0);
-    updateXaxis(0);
+    updateBuffer();
 
     return true;
 }
 
 bool AbstractionSpace::updateBuffer()
 {
+    qDebug() << " AbstractionSpace::updateBuffer: " << m_intervalID;
+
+    // update buffer data
+    struct properties states = m_IntervalXY[m_intervalID].neu;
+    m_2DState.states[1][0] = states.pos_alpha;      // position interpolation
+    m_2DState.states[1][1] = states.trans_alpha;    // alpha
+    m_2DState.states[1][2] = states.color_alpha;    // color intp (toon/phong)
+    m_2DState.states[1][3] = states.point_size;        // point size
+    m_2DState.states[1][4] = states.extra_info;       // alpha limit, div, pos1, pos2
+    m_2DState.states[1][5] = states.render_type;
+
+    states  = m_IntervalXY[m_intervalID].ast;
+    m_2DState.states[0][0] = states.pos_alpha;
+    m_2DState.states[0][1] = states.trans_alpha;
+    m_2DState.states[0][2] = states.color_alpha; // color_intp (toon/phong)
+    m_2DState.states[0][3] = states.point_size;
+    m_2DState.states[0][4] = states.extra_info;
+    m_2DState.states[0][5] = states.render_type;
+
     // update buffer data
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
@@ -138,64 +198,4 @@ bool AbstractionSpace::updateBuffer()
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
     return true;
-}
-
-void AbstractionSpace::updateXaxis(int xaxis)
-{
-    m_xaxis = xaxis;
-
-    // update the 2d space vlues
-    Interval *res = m_intervalX.getInterval(xaxis);
-    if (res == NULL) {
-         qDebug()  << "\nNo overlapping interval";
-         return;
-    }
-
-    if (m_prevIntvMaxX == res->high)
-        return;
-
-   // qDebug()  << "\nOverlaps with [" << res->low << ", " << res->high << "]";
-
-    struct properties states = res->int_properties;
-
-    m_2DState.states[1][0] = states.pos_alpha;      // position interpolation
-    m_2DState.states[1][1] = states.trans_alpha;    // alpha
-    m_2DState.states[1][2] = states.color_alpha;       // color intp (toon/phong)
-    m_2DState.states[1][3] = states.point_size;        // point size
-    m_2DState.states[1][4] = states.extra_info;       // alpha limit, div, pos1, pos2
-    m_2DState.states[1][5] = states.render_type;
-
-
-    // if we move to new quadrant then:
-    updateBuffer();
-}
-
-void AbstractionSpace::updateYaxis(int yaxis)
-{
-    m_yaxis = yaxis;
-
-    // update the 2d space vlues
-
-    Interval *res;
-    res = m_intervalY.getInterval(yaxis);
-    if (res == NULL) {
-         qDebug()  << "\nNo overlapping interval";
-         return;
-    }
-
-    if (m_prevIntvMaxY == res->high)
-        return;
-
-    qDebug()  << "\nOverlaps with [" << res->low << ", " << res->high << "]";
-
-    struct properties states = res->int_properties;
-    m_2DState.states[0][0] = states.pos_alpha;
-    m_2DState.states[0][1] = states.trans_alpha;
-    m_2DState.states[0][2] = states.color_alpha; // color_intp (toon/phong)
-    m_2DState.states[0][3] = states.point_size;
-    m_2DState.states[0][4] = states.extra_info;
-    m_2DState.states[0][5] = states.render_type;
-
-    // if we move to new quadrant then:
-    updateBuffer();
 }

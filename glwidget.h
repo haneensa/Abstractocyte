@@ -17,9 +17,11 @@ class GLWidget : public QOpenGLWidget, MainOpenGL
 public:
     GLWidget(QWidget *parent = 0);
     ~GLWidget();
+
 public slots:
     void getSliderX(int value);
     void getSliderY(int value);
+    void getIntervalID(int ID);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
