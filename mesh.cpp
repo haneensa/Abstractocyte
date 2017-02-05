@@ -9,7 +9,7 @@ Mesh::Mesh()
 {
     m_vertices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 20;
+    m_limit = 2;
 
     // to do: combine all these files in one .obj file
     // to do: interface to load these files

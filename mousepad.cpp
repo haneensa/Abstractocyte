@@ -3,6 +3,7 @@
 //          3) use ID for each color to retrieve the properties of the area we are inside
 
 #include "mousepad.h"
+#include "colors.h"
 
 MousePad::MousePad(QWidget *parent)
     :  QOpenGLWidget(parent),
@@ -10,6 +11,7 @@ MousePad::MousePad(QWidget *parent)
        m_vbo_2DSpaceVerts( QOpenGLBuffer::VertexBuffer ),
        m_vbo_2DSpaceIndix( QOpenGLBuffer::IndexBuffer )
 {
+    m_bindIdx = 1;
     qDebug() << "MousePad";
     circle.x = 0.0;
     circle.y = 0.0;
@@ -85,14 +87,77 @@ void MousePad::initSelectionPointerGL()
     m_vao_selection.release();
 }
 
+void MousePad::initRect(QVector2D p00, float dimX, float dimY, int ID)
+{
+    struct abstractionPoint p = {p00, ID};
+    p.ID = ID;
+    int offset = m_vertices.size();
+
+    m_vertices.push_back(p);        // p00
+
+    p.point.setX(p00.x() + dimX);   // p10
+    p.point.setY(p00.y());
+    m_vertices.push_back(p);
+
+    p.point.setX(p00.x());          // p01
+    p.point.setY(p00.y() + dimY);
+    m_vertices.push_back(p);
+
+    p.point.setX(p00.x() + dimX);   // p11
+    p.point.setY(p00.y() + dimY);
+    m_vertices.push_back(p);
+
+
+    m_indices.push_back(offset + 0);
+    m_indices.push_back(offset + 1);
+    m_indices.push_back(offset + 2);
+
+    m_indices.push_back(offset + 1);
+    m_indices.push_back(offset + 3);
+    m_indices.push_back(offset + 2);
+}
+
+
+void MousePad::initBuffer()
+{
+
+    m_buffer_data.push_back(red);
+    m_buffer_data.push_back(orange);
+    m_buffer_data.push_back(blueviolet);
+    m_buffer_data.push_back(steelblue);
+    m_buffer_data.push_back(seagreen);
+    m_buffer_data.push_back(brown);
+    m_buffer_data.push_back(violet);
+    m_buffer_data.push_back(peru);
+    m_buffer_data.push_back(mediumspringgreen);
+    m_buffer_data.push_back(gainsboro);
+    m_buffer_data.push_back(honeydew);
+    m_buffer_data.push_back(darkkhaki);
+
+    int bufferSize =  m_buffer_data.size() * sizeof(QVector4D);
+
+    glGenBuffers(1, &m_buffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize , NULL, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_bindIdx, m_buffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
+    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    memcpy(p,   m_buffer_data.data(),  bufferSize);
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+}
+
+
 void MousePad::init2DSpaceGL()
 {
-    m_program_2DSpace = new QOpenGLShaderProgram(this);
+    m_program_2DSpace = glCreateProgram();
     bool res = initShader(m_program_2DSpace, ":/shaders/space2d.vert", ":/shaders/space2d.geom",
                           ":/shaders/space2d.frag");
     if(res == false)
         return;
 
+    glUseProgram(m_program_2DSpace);
     qDebug() << "init buffers";
     GL_Error();
     // create vbos and vaos
@@ -103,75 +168,130 @@ void MousePad::init2DSpaceGL()
     m_vbo_2DSpaceVerts.setUsagePattern( QOpenGLBuffer::DynamicDraw);
     m_vbo_2DSpaceVerts.bind();
 
-    float p1 = 20.0/100.0;
-    struct abstractionPoint p;
-    p.ID = 0;
+    float p10 = 20.0/100.0;
+    float p20 = 20.0/100.0;
+    float p30 = 30.0/100.0;
+    float p40 = 40.0/100.0;
+    float p50 = 50.0/100.0;
+    float p90 = 90.0/100.0;
+    float p100 = 100.0/100.0;
 
-    p.point = QVector2D(0, 0);
-    m_vertices.push_back(p);
+    int ID = 0;
+    QVector2D p = QVector2D(0, 0);
+    // x (0, 20)
+    // y (0, 20)
+    initRect(p, p20, p20, ID++); // 0
 
-    p.point = QVector2D(p1, 0);
-    m_vertices.push_back(p);
+    // x (0, 20)
+    // y (20, 40)
+    p = QVector2D(0, p20);
+    initRect(p, p20, p20, ID++); // 1
 
-    p.point = QVector2D(0, p1);
-    m_vertices.push_back(p);
+    // x (0, 20)
+    // y (40, 50)
+    p = QVector2D(0, p20+p20);
+    initRect(p, p20, p50, ID++); // 2
 
-    p.point = QVector2D(p1, p1);
-    m_vertices.push_back(p);
+    // x (0, 20)
+    // y (90, 100)
+    p = QVector2D(0, p20+p20+p50);
+    initRect(p, p20, p100, ID++); // 3
+
+    // x (20, 50)
+    // y (0, 20)
+    p = QVector2D(p20, 0);
+    initRect(p, p30, p20, ID++); // 4
+
+    // x (50, 100)
+    // y (0, 20)
+    p = QVector2D(p50, 0);
+    initRect(p, p50, p20, ID++); // 5
+
+    // x (20, 50)
+    // y (20, 40)
+    p = QVector2D(p20, p20);
+    initRect(p, p30, p20, ID++); // 6
+
+    // x (20, 50)
+    // y (40, 90)
+    p = QVector2D(p20, p40);
+    initRect(p, p30, p50, ID++); // 7
 
 
-    m_indices.push_back(0);
-    m_indices.push_back(1);
-    m_indices.push_back(2);
+    // x (20, 50)
+    // y (90, 100)
+    p = QVector2D(p20, p90);
+    initRect(p, p30, p10, ID++); // 8
 
-    m_indices.push_back(1);
-    m_indices.push_back(3);
-    m_indices.push_back(2);
+    // x (50, 100)
+    // y (20, 40)
+    p = QVector2D(p50, p20);
+    initRect(p, p50, p20, ID++); // 9
+
+
+    // x (50, 100)
+    // y (40, 90)
+    p = QVector2D(p50, p40);
+    initRect(p, p50, p50, ID++); // 10
+
+    // x (50, 100)
+    // y (90, 100)
+    p = QVector2D(p50, p90);
+    initRect(p, p50, p10, ID++); // 11
+
+
 
     m_vbo_2DSpaceVerts.allocate( m_vertices.data(), m_vertices.size() * sizeof(QVector3D) );
 
     m_vbo_2DSpaceIndix.create();
     m_vbo_2DSpaceIndix.bind();
     m_vbo_2DSpaceIndix.allocate( m_indices.data(), m_indices.size() * sizeof(GLuint) );
-    m_vbo_2DSpaceIndix.release();
 
-    m_program_2DSpace->bind();
-    m_program_2DSpace->setUniformValue("pMatrix", m_projection);
-    m_program_2DSpace->enableAttributeArray("posAttr");
+
     int offset = 0;
-    m_program_2DSpace->setAttributeBuffer("posAttr", GL_FLOAT, offset, 3, sizeof(struct abstractionPoint));
-    offset += sizeof(QVector2D);
-    m_program_2DSpace->enableAttributeArray("ID");
-    m_program_2DSpace->setAttributeBuffer("ID", GL_INT, offset, 1,sizeof(struct abstractionPoint));
-    m_program_2DSpace->release();
-    GL_Error();
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(struct abstractionPoint),  0);
 
+    offset += sizeof(QVector2D);
+    glEnableVertexAttribArray(1);
+    glVertexAttribIPointer(1, 1, GL_INT, sizeof(struct abstractionPoint), (GLvoid*)offset);
+
+
+
+    m_vbo_2DSpaceIndix.release();
     m_vbo_2DSpaceVerts.release();
     m_vao_2DSpace.release();
+    GL_Error();
 
     /* selection buffer */
-//    m_program_2DSpace_Selection = new QOpenGLShaderProgram(this);
-//    res = initShader(m_program_2DSpace_Selection, ":/shaders/space2d.vert", ":/shaders/space2d.geom",
-//                     ":/shaders/space2d.frag");
-//    if(res == false)
-//        return;
+    m_program_2DSpace_Selection  = glCreateProgram();
+    res = initShader(m_program_2DSpace_Selection, ":/shaders/space2d.vert", ":/shaders/space2d.geom",
+                     ":/shaders/space2d.frag");
+    if(res == false)
+        return;
 
-//    // create vbos and vaos
-//    m_vao_2DSpace_Selection.create();
-//    m_vao_2DSpace_Selection.bind();
-//    if ( !m_vbo_2DSpaceVerts.bind() ) {
-//        qDebug() << "Could not bind vertex buffer to the context.";
-//        return;
-//    }
+    glUseProgram(m_program_2DSpace_Selection);
 
-//    m_program_2DSpace_Selection->bind();
-//    m_program_2DSpace_Selection->enableAttributeArray("posAttr");
-//    m_program_2DSpace_Selection->setAttributeBuffer("posAttr", GL_FLOAT, 0, 2);
-//    m_program_2DSpace_Selection->setUniformValue("pMatrix",   m_projection);
-//    m_program_2DSpace_Selection->release();
+    // create vbos and vaos
+    m_vao_2DSpace_Selection.create();
+    m_vao_2DSpace_Selection.bind();
+    m_vbo_2DSpaceVerts.bind();
 
-//    m_vbo_2DSpaceVerts.release();
-//    m_vao_2DSpace_Selection.release();
+    offset = 0;
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(struct abstractionPoint),  0);
+
+    offset += sizeof(QVector2D);
+    glEnableVertexAttribArray(1);
+    glVertexAttribIPointer(1, 1, GL_INT, sizeof(struct abstractionPoint), (GLvoid*)offset);
+
+
+    int isSelectionLoc = glGetUniformLocation(m_program_2DSpace_Selection, "is_selection_shader");
+    int isSelection = 1;
+    glUniform1i(isSelectionLoc, isSelection);
+
+    m_vbo_2DSpaceVerts.release();
+    m_vao_2DSpace_Selection.release();
 }
 
 void MousePad::initializeGL()
@@ -181,6 +301,7 @@ void MousePad::initializeGL()
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    initBuffer();
     initSelectionPointerGL();
     init2DSpaceGL();
 
@@ -193,8 +314,6 @@ void MousePad::initializeGL()
     qDebug() << "                    GLSL VERSION: " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
 
     m_projection.setToIdentity();
-
-
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
@@ -218,10 +337,13 @@ void MousePad::paintGL()
 
     m_vao_2DSpace.bind();
     m_vbo_2DSpaceIndix.bind();
-    m_program_2DSpace->bind();
-    m_program_2DSpace->setUniformValue("pMatrix", m_projection);
+    glUseProgram(m_program_2DSpace);
+
+    GLuint pMatrix = glGetUniformLocation(m_program_2DSpace, "pMatrix");
+    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_projection.data());
+
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
-    m_program_2DSpace->release();
+
     m_vbo_2DSpaceIndix.release();
     m_vao_2DSpace.release();
 }

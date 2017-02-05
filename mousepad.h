@@ -17,6 +17,7 @@ struct abstractionPoint {
     int       ID;
 };
 
+
 class MousePad : public QOpenGLWidget, MainOpenGL
 {
     Q_OBJECT
@@ -53,8 +54,8 @@ protected:
     void initSelectionPointerGL();
     void init2DSpaceGL();
 
-    void initRect(QVector2D p00, float dimX, float dimY);
-
+    void initRect(QVector2D p00, float dimX, float dimY, int ID);
+    void initBuffer();
 private:
     QMatrix4x4                  m_projection;
     int                         m_w;
@@ -72,17 +73,21 @@ private:
 
 
     /* abstraction space grid */
-    std::vector<struct abstractionPoint>        m_vertices;
-    std::vector<GLuint>                         m_indices;
+    std::vector<QVector4D>                  m_buffer_data; // Color, Cenert, Type
+    GLuint                                  m_buffer;
+    GLuint                                  m_bindIdx;
 
-    QOpenGLVertexArrayObject                    m_vao_2DSpace;
-    QOpenGLVertexArrayObject                    m_vao_2DSpace_Selection;
+    std::vector<struct abstractionPoint>    m_vertices;
+    std::vector<GLuint>                     m_indices;
 
-    QOpenGLBuffer                               m_vbo_2DSpaceVerts;
-    QOpenGLBuffer                               m_vbo_2DSpaceIndix;
+    QOpenGLVertexArrayObject                m_vao_2DSpace;
+    QOpenGLVertexArrayObject                m_vao_2DSpace_Selection;
 
-    QOpenGLShaderProgram                        *m_program_2DSpace;
-    QOpenGLShaderProgram                        *m_program_2DSpace_Selection;
+    QOpenGLBuffer                           m_vbo_2DSpaceVerts;
+    QOpenGLBuffer                           m_vbo_2DSpaceIndix;
+
+    GLuint                                  m_program_2DSpace;
+    GLuint                                  m_program_2DSpace_Selection;
 };
 
 #endif // MOUSEPAD_H

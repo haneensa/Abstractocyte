@@ -1,8 +1,8 @@
 #version 430
 
 // in: per vertex data
-in vec4 posAttr;
-in int ID;
+layout(location = 0) in vec4 posAttr;
+layout(location = 1) in int ID;
 
 out int V_ID;
 uniform mat4 pMatrix;
