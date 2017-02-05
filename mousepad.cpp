@@ -104,22 +104,45 @@ void MousePad::init2DSpaceGL()
     m_vbo_2DSpaceVerts.bind();
 
     float p1 = 20.0/100.0;
-    GLfloat vertices[] = {
-        0.0f, 0.0f,
-        p1, 0.0f,
-        0.0f, p1,
+    struct abstractionPoint p;
+    p.ID = 0;
 
-        p1, 0.0f,
-        p1, p1,
-        0.0f, p1,
-    };
+    p.point = QVector2D(0, 0);
+    m_vertices.push_back(p);
 
-    m_vbo_2DSpaceVerts.allocate(vertices, 6 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
+    p.point = QVector2D(p1, 0);
+    m_vertices.push_back(p);
+
+    p.point = QVector2D(0, p1);
+    m_vertices.push_back(p);
+
+    p.point = QVector2D(p1, p1);
+    m_vertices.push_back(p);
+
+
+    m_indices.push_back(0);
+    m_indices.push_back(1);
+    m_indices.push_back(2);
+
+    m_indices.push_back(1);
+    m_indices.push_back(3);
+    m_indices.push_back(2);
+
+    m_vbo_2DSpaceVerts.allocate( m_vertices.data(), m_vertices.size() * sizeof(QVector3D) );
+
+    m_vbo_2DSpaceIndix.create();
+    m_vbo_2DSpaceIndix.bind();
+    m_vbo_2DSpaceIndix.allocate( m_indices.data(), m_indices.size() * sizeof(GLuint) );
+    m_vbo_2DSpaceIndix.release();
 
     m_program_2DSpace->bind();
     m_program_2DSpace->setUniformValue("pMatrix", m_projection);
     m_program_2DSpace->enableAttributeArray("posAttr");
-    m_program_2DSpace->setAttributeBuffer("posAttr", GL_FLOAT, 0, 2);
+    int offset = 0;
+    m_program_2DSpace->setAttributeBuffer("posAttr", GL_FLOAT, offset, 3, sizeof(struct abstractionPoint));
+    offset += sizeof(QVector2D);
+    m_program_2DSpace->enableAttributeArray("ID");
+    m_program_2DSpace->setAttributeBuffer("ID", GL_INT, offset, 1,sizeof(struct abstractionPoint));
     m_program_2DSpace->release();
     GL_Error();
 
@@ -194,10 +217,12 @@ void MousePad::paintGL()
     m_vao_circle.release();
 
     m_vao_2DSpace.bind();
+    m_vbo_2DSpaceIndix.bind();
     m_program_2DSpace->bind();
     m_program_2DSpace->setUniformValue("pMatrix", m_projection);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
     m_program_2DSpace->release();
+    m_vbo_2DSpaceIndix.release();
     m_vao_2DSpace.release();
 }
 
