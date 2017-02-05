@@ -176,7 +176,7 @@ void MousePad::init2DSpaceGL()
     float p90 = 90.0/100.0;
     float p100 = 100.0/100.0;
 
-    int ID = 0;
+    int ID = 1;
     QVector2D p = QVector2D(0, 0);
     // x (0, 20)
     // y (0, 20)
@@ -256,6 +256,9 @@ void MousePad::init2DSpaceGL()
     glEnableVertexAttribArray(1);
     glVertexAttribIPointer(1, 1, GL_INT, sizeof(struct abstractionPoint), (GLvoid*)offset);
 
+    int isSelectionLoc = glGetUniformLocation(m_program_2DSpace, "is_selection_shader");
+    int isSelection = 0;
+    glUniform1i(isSelectionLoc, isSelection);
 
 
     m_vbo_2DSpaceIndix.release();
@@ -286,8 +289,8 @@ void MousePad::init2DSpaceGL()
     glVertexAttribIPointer(1, 1, GL_INT, sizeof(struct abstractionPoint), (GLvoid*)offset);
 
 
-    int isSelectionLoc = glGetUniformLocation(m_program_2DSpace_Selection, "is_selection_shader");
-    int isSelection = 1;
+    isSelectionLoc = glGetUniformLocation(m_program_2DSpace_Selection, "is_selection_shader");
+    isSelection = 1;
     glUniform1i(isSelectionLoc, isSelection);
 
     m_vbo_2DSpaceVerts.release();
@@ -443,6 +446,19 @@ void MousePad::renderSelection(void)
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    m_vao_2DSpace.bind();
+    m_vbo_2DSpaceIndix.bind();
+    glUseProgram(m_program_2DSpace_Selection);
+
+    GLuint pMatrix = glGetUniformLocation(m_program_2DSpace_Selection, "pMatrix");
+    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_projection.data());
+
+    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+
+    m_vbo_2DSpaceIndix.release();
+    m_vao_2DSpace.release();
+
+
     m_vao_selection.bind();
     m_program_selection->bind();
     m_program_selection->setUniformValue("pMatrix",  m_projection);
@@ -475,7 +491,7 @@ void MousePad::processSelection(float x, float y)
 
     qDebug() <<  res[0] <<  " " << res[1] <<  " " << res[2];
 
-    if (pickedID == 0) {
+    if (pickedID <= 0) {
         qDebug() << "Background, Picked ID: " << pickedID;
     } else { 
         GLint viewport[4];

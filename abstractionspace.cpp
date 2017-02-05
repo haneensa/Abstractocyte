@@ -154,7 +154,7 @@ void AbstractionSpace::updateXaxis(int xaxis)
     if (m_prevIntvMaxX == res->high)
         return;
 
-    qDebug()  << "\nOverlaps with [" << res->low << ", " << res->high << "]";
+   // qDebug()  << "\nOverlaps with [" << res->low << ", " << res->high << "]";
 
     struct properties states = res->int_properties;
 

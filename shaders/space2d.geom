@@ -17,10 +17,11 @@ layout (triangle_strip, max_vertices = 3) out;
 void main() {
     for(int i = 0; i < 3; i++) {
         int ID  = V_ID[i];
+        float b = ID/255.0;
         if (is_selection_shader == 1)
-             color = vec4(1.0, 0.0, 0.0, 0.0);
+             color = vec4(b,  0.0,  0.0, 0.0);
         else
-            color = SSBO_data[ID];
+            color = SSBO_data[ID-1];
 
         gl_Position = gl_in[i].gl_Position;
         EmitVertex();
