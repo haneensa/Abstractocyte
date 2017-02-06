@@ -142,9 +142,8 @@ void GLWidget::paintGL()
     struct GridUniforms grid_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
                 m_model_noRotation.data(), m_rotationMatrix};
     m_graphManager->drawGrid(grid_uniforms);
-    m_graphManager->drawNodes(0);
-    m_graphManager->drawEdges(0);
-    m_mesh->draw();
+//    m_graphManager->drawNodes(0);
+//    m_graphManager->drawEdges(0);
 }
 
 void GLWidget::resizeGL(int w, int h)

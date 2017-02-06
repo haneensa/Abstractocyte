@@ -65,7 +65,7 @@ void main() {
     // use the space2D values to get: value of interpolation between pos1 and pos2, alpha, color_interpolation, point size
     alpha =  translate(slider, alpha2.x, alpha2.y, alpha2.z, alpha2.w);
 
-    if (alpha < alpha5.x){
+    if (alpha < 0.09){
         return;
     }
 

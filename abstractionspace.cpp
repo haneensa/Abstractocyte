@@ -32,10 +32,10 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast3.extra_info = QVector4D(0.0f, 0, 1, 2);
     ast3.render_type = QVector4D(0, 1, 1, 0);
 
-    ast4.pos_alpha = QVector4D(90, 99, 0.0, 1.0);
-    ast4.trans_alpha = QVector4D(90, 99, 1.0, 0.0);
-    ast4.color_alpha = QVector4D(90, 99, 1, 1); // color_intp (toon/phong)
-    ast4.point_size = QVector4D(90, 99, 6, 6);
+    ast4.pos_alpha = QVector4D(80, 99, 0.0, 1.0);
+    ast4.trans_alpha = QVector4D(80, 99, 1.0, 0.0);
+    ast4.color_alpha = QVector4D(80, 99, 1, 1); // color_intp (toon/phong)
+    ast4.point_size = QVector4D(80, 99, 6, 6);
     ast4.extra_info = QVector4D(0.05f, 0, 2, 2);
     ast4.render_type = QVector4D(0, 0, 1, 0);
 
