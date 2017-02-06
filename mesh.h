@@ -28,7 +28,7 @@ public:
     bool loadObj(QString path);
     int getVertixCount();
 
-
+    bool loadDataset(QString path);
     // temp functions
     bool loadSkeletonPoints(QString path);
     int getNodesCount();

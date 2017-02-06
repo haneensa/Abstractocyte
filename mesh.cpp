@@ -9,7 +9,7 @@ Mesh::Mesh()
 {
     m_vertices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 2000;
+    m_limit = 500;
 
     // to do: combine all these files in one .obj file
     // to do: interface to load these files
@@ -39,6 +39,51 @@ Mesh::~Mesh()
         m_vao_mesh.destroy();
         m_vbo_mesh.destroy();
     }
+}
+
+/*
+o astrocyte
+p x y z # astrocyte center point
+b branch_2_1_3
+sv x y z # skeleton vertex
+sv x y z
+.....
+l sv_id1 sv_id2  # line segments between skeleton vertices in branch
+l sv_id1 sv_id2
+.....
+v x y z sv_index # mesh vertices and nearest skeleton vertex to it
+v x y z sv_index
+v x y z sv_index
+v x y z sv_index
+...
+f v1 v2 v3
+f v1 v2 v3
+....
+
+# Above Would be Repeated for all objects.
+
+# connectivity edges between neurites
+c connecitity_graph1
+l p1_idx p2_idx
+l p1_idx p2_idx
+
+c connecitity_graph2
+l p1_idx p2_idx
+l p1_idx p2_idx
+
+  */
+bool Mesh::loadDataset(QString path)
+{
+    // open file
+    // if 'o' then create new object and set its name and hvgx ID
+    // if 'p' then add to obj its center and its volume
+    // if 'sv' then add to the skeleton data in obj
+    // if 'l' then add edges information which connects skeleton points
+    // if v and f construct the mesh vertices
+
+    // if 'c connecitity_graph1' then add these info to the points IDs for neurite neurite connictivity 2D mode which astrocyte disappears
+    // if 'c connecitity_graph2' then add skeleton-neurite connecivity points which would be shown only when? in the 2D mode
+    return true;
 }
 
 // 75892 ----(remove debug msgs)---> 63610
@@ -91,9 +136,10 @@ bool Mesh::loadObj(QString path)
             name  = wordList[1].data();
             idx = m_objects.size();
             obj = new Object(name, idx);
-           if (obj->getObjectType(name) == Object_t::AXON ||obj->getObjectType(name) == Object_t::DENDRITE ) {
-               continue;
-           }
+         //  if (obj->getObjectType(name) == Object_t::AXON ||obj->getObjectType(name) == Object_t::DENDRITE  ||obj->getObjectType(name) == Object_t::MITO   ) {
+          //     flag_prev = 0;
+          //     continue;
+         //  }
             // get objet color based on type
             color = obj->getColor();
             ssbo_object_data.color = color;
@@ -107,6 +153,8 @@ bool Mesh::loadObj(QString path)
             } else {
                 center = QVector4D(x, y, z, 1);
             }
+
+            obj->setCenter(center);
             ssbo_object_data.center = center;
         } else if (wordList[0]  == "v" && flag_prev >= 1 ) {
             float x1 = atof(wordList[1].data());
@@ -243,10 +291,10 @@ bool Mesh::loadSkeletonPoints(QString path)
             name  = wordList[1].data();
             idx = m_skeletons.size();
             obj = new Object(name, idx);
-            if (obj->getObjectType(name) == Object_t::AXON ||obj->getObjectType(name) == Object_t::DENDRITE ) {
-                flag_prev = 0;
-                continue;
-            }
+            //if (obj->getObjectType(name) == Object_t::AXON ||obj->getObjectType(name) == Object_t::DENDRITE ||obj->getObjectType(name) == Object_t::MITO  ) {
+             //   flag_prev = 0;
+            //    continue;
+           // }
             vertex.ID = idx;
             flag_prev = 1;
         } else if (wordList[0] == "p" && flag_prev >= 1) {

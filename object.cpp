@@ -10,11 +10,13 @@ Object::Object(std::string name, int idx, int ID)
         name.erase(name.size()-1, name.size()-1);
     }
 
-    m_name  = name;
-    m_idxID = idx;
-    m_ID    = ID;
-    m_object_t = getObjectType(m_name);
-    m_color = QVector4D(1.0, 1.0, 0.0, 1.0);
+    m_name  = name; // obj name
+    m_idxID = idx;  // index ID in the object list
+    m_ID    = ID;   // hvgx ID
+    m_object_t = getObjectType(m_name); // obect type
+    m_color = QVector4D(1.0, 1.0, 0.0, 1.0);    // default one
+    m_volume = 0;
+    m_center = QVector4D(0, 0, 0, 0);
     qDebug() << "create " << m_name.data();
 }
 
@@ -47,11 +49,6 @@ Object_t Object::getObjectType(std::string name)
     }
 }
 
-void Object::add_m_vertex(QVector3D vertex)
-{
-    m_mesh_vertices.push_back(vertex);
-}
-
 void Object::add_s_vertex(struct SkeletonVertex vertex)
 {
     m_skeleton_vertices.push_back(vertex);
@@ -62,10 +59,6 @@ void Object::add_ms_vertex(struct VertexData vertex_data)
     m_mesh_skeleton_vertices.push_back(vertex_data);
 }
 
-std::vector<QVector3D> Object::get_m_Vertices()
-{
-    return m_mesh_vertices;
-}
 
 std::vector<struct SkeletonVertex> Object::get_s_Vertices()
 {
@@ -80,11 +73,6 @@ std::vector<struct VertexData> Object::get_ms_Vertices()
 std::string Object::getName()
 {
     return m_name;
-}
-
-size_t Object::get_m_Size()
-{
-    return m_mesh_vertices.size();
 }
 
 size_t Object::get_s_Size()
@@ -133,7 +121,17 @@ QVector4D Object::getColor()
     return m_color;
 }
 
+QVector4D Object::getCenter()
+{
+    return m_center;
+}
+
 void Object::setColor(QVector4D color)
 {
     m_color = color;
+}
+
+void Object::setCenter(QVector4D center)
+{
+    m_center = center;
 }
