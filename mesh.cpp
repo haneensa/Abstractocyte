@@ -11,17 +11,18 @@ Mesh::Mesh()
     m_skeleton_nodes_size = 0;
     m_limit = 500;
 
-    // to do: combine all these files in one .obj file
+    // to do: combine all these files in one .obj file -> m3_dataset.obj
     // to do: interface to load these files
     QString path= "://data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj";
     loadObj(path);
-    path = "://data/mouse03_skeleton_centroid.obj";
-    loadObj(path);
-    path = "://data/mouse03_astro_skeleton.sk";
-    loadSkeletonPoints(path); // 11638884, 19131720
-    path = "://data/mouse03_skeletons.sk";
-    loadSkeletonPoints(path); // 11638884, 19131720
-
+//    path = "://data/mouse03_skeleton_centroid.obj";
+//    loadObj(path);
+//    path = "://data/mouse03_astro_skeleton.sk";
+//    loadSkeletonPoints(path); // 11638884, 19131720
+//    path = "://data/mouse03_skeletons.sk";
+//    loadSkeletonPoints(path); // 11638884, 19131720
+    path = "://scripts/mouse03_mesh_center.obj";
+    loadDataset(path);
 }
 
 Mesh::~Mesh()
@@ -76,13 +77,103 @@ bool Mesh::loadDataset(QString path)
 {
     // open file
     // if 'o' then create new object and set its name and hvgx ID
-    // if 'p' then add to obj its center and its volume
+    // if 'p' then add to obj its center
+    // if vl: then add object volume
     // if 'sv' then add to the skeleton data in obj
     // if 'l' then add edges information which connects skeleton points
     // if v and f construct the mesh vertices
 
     // if 'c connecitity_graph1' then add these info to the points IDs for neurite neurite connictivity 2D mode which astrocyte disappears
     // if 'c connecitity_graph2' then add skeleton-neurite connecivity points which would be shown only when? in the 2D mode
+    qDebug() << "Func: loadVertices";
+    auto t1 = std::chrono::high_resolution_clock::now();
+
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        qDebug() << "Could not open the file for reading";
+        return false;
+    }
+
+    QTextStream in(&file);
+    QList<QByteArray> wordList;
+
+    Object *obj = NULL;
+    std::string name;
+    QVector4D center = QVector4D(0.0, 0.0, 0.0, 0.0);
+    std::vector< struct VertexData > verticesList;
+    GLint idx = -1;
+
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        wordList = line.split(' ');
+        if (wordList[0] == "o") {
+            // o objname_hvgxID
+            QByteArray nameline  = wordList[1].data();
+            QList<QByteArray> nameList = nameline.split('_');
+            name.clear();
+            for (int i = 0; i < nameList.size() - 1; ++i)
+                name += nameList[i].data();
+
+            int hvgxID = atoi(nameList[nameList.size() - 1].data());
+            qDebug() << " " << name.data() << " " << hvgxID;
+
+        } else if (wordList[0] == "p") {
+            // p centerX centerY centerZ
+            float x = atof(wordList[1].data());
+            float y = atof(wordList[2].data());
+            float z = atof(wordList[3].data());
+            if (obj->getObjectType(name) == Object_t::ASTROCYTE ) {
+                center = QVector4D(x, y, z, 0);
+            } else {
+                center = QVector4D(x, y, z, 1);
+            }
+
+        } else if (wordList[0]  == "v") {
+            float x1 = atof(wordList[1].data());
+            float y1 = atof(wordList[2].data());
+            float z1 = atof(wordList[3].data());
+            QVector3D mesh_vertex(x1, y1, z1);
+            struct VertexData v;
+            v.ID = idx;
+            v.mesh_vertex = mesh_vertex;
+            if (wordList.size() < 6) {
+                // place holder
+                v.skeleton_vertex = mesh_vertex;
+            } else {
+                float x2 = atof(wordList[4].data());
+                float y2 = atof(wordList[5].data());
+                float z2 = atof(wordList[6].data());
+                QVector3D skeleton_vertex(x2, y2, z2);
+                v.skeleton_vertex = skeleton_vertex;
+            }
+            verticesList.push_back(v);
+
+        }  else if (wordList[0]  == "f") {
+            unsigned int f1_index = atoi(wordList[1].data());
+            unsigned int f2_index = atoi(wordList[2].data());
+            unsigned int f3_index = atoi(wordList[3].data());
+            if (f1_index > verticesList.size() || f2_index > verticesList.size() || f3_index > verticesList.size()  ) {
+                // error, break
+                qDebug() << "Error in obj file! " << name.data() << " " << idx << " " << verticesList.size() << " " << f1_index << " " << f2_index << " " << f3_index ;
+                delete obj;
+                break;
+            }
+
+            // add faces indices to object itself
+            /* vertex 1 */
+            struct VertexData v1 = verticesList[f1_index - 1];
+            obj->add_ms_vertex(v1);
+            /* vertex 2 */
+            struct VertexData v2 = verticesList[f2_index - 1];
+            obj->add_ms_vertex(v2);
+            /* vertex 3 */
+            struct VertexData v3 = verticesList[f3_index - 1];
+            obj->add_ms_vertex(v3);
+
+            m_vertices_size += 3;
+        }
+    }
+
     return true;
 }
 
@@ -136,10 +227,10 @@ bool Mesh::loadObj(QString path)
             name  = wordList[1].data();
             idx = m_objects.size();
             obj = new Object(name, idx);
-         //  if (obj->getObjectType(name) == Object_t::AXON ||obj->getObjectType(name) == Object_t::DENDRITE  ||obj->getObjectType(name) == Object_t::MITO   ) {
-          //     flag_prev = 0;
-          //     continue;
-         //  }
+           if (obj->getObjectType(name) == Object_t::SYNAPSE  ||obj->getObjectType(name) == Object_t::MITO   ) {
+               flag_prev = 0;
+               continue;
+           }
             // get objet color based on type
             color = obj->getColor();
             ssbo_object_data.color = color;
@@ -291,10 +382,10 @@ bool Mesh::loadSkeletonPoints(QString path)
             name  = wordList[1].data();
             idx = m_skeletons.size();
             obj = new Object(name, idx);
-            //if (obj->getObjectType(name) == Object_t::AXON ||obj->getObjectType(name) == Object_t::DENDRITE ||obj->getObjectType(name) == Object_t::MITO  ) {
-             //   flag_prev = 0;
-            //    continue;
-           // }
+            if (obj->getObjectType(name) == Object_t::SYNAPSE ||obj->getObjectType(name) == Object_t::MITO  ) {
+                flag_prev = 0;
+                continue;
+            }
             vertex.ID = idx;
             flag_prev = 1;
         } else if (wordList[0] == "p" && flag_prev >= 1) {
@@ -518,28 +609,7 @@ void Mesh::draw()
 {
     GLint y_axis, x_axis;
     GLuint mMatrix, vMatrix, pMatrix;
-    glDisable (GL_BLEND);
-    glBlendFunc (GL_ONE, GL_ONE);
 
-    m_vao_mesh_points.bind();
-    glUseProgram(m_program_mesh_points);
-    mMatrix = glGetUniformLocation(m_program_mesh_points, "mMatrix");
-    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
-
-    vMatrix = glGetUniformLocation(m_program_mesh_points, "vMatrix");
-    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
-
-    pMatrix = glGetUniformLocation(m_program_mesh_points, "pMatrix");
-    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
-
-    y_axis = glGetUniformLocation(m_program_mesh_points, "y_axis");
-    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
-
-    x_axis = glGetUniformLocation(m_program_mesh_points, "x_axis");
-    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
-
-    glDrawArrays(GL_POINTS, 0,  getVertixCount() );
-    m_vao_mesh_points.release();
     /************************/
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -589,7 +659,28 @@ void Mesh::draw()
 
     /************************/
 
+    glDisable (GL_BLEND);
+    glBlendFunc (GL_ONE, GL_ONE);
 
+    m_vao_mesh_points.bind();
+    glUseProgram(m_program_mesh_points);
+    mMatrix = glGetUniformLocation(m_program_mesh_points, "mMatrix");
+    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+    vMatrix = glGetUniformLocation(m_program_mesh_points, "vMatrix");
+    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    pMatrix = glGetUniformLocation(m_program_mesh_points, "pMatrix");
+    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+    y_axis = glGetUniformLocation(m_program_mesh_points, "y_axis");
+    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
+
+    x_axis = glGetUniformLocation(m_program_mesh_points, "x_axis");
+    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
+
+    glDrawArrays(GL_POINTS, 0,  getVertixCount() );
+    m_vao_mesh_points.release();
 
 
 

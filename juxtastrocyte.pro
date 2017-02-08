@@ -27,8 +27,7 @@ SOURCES += main.cpp\
     mesh.cpp \
     abstractionspace.cpp \
     graphmanager.cpp \
-    spatialhash.cpp \
-    intervaltree.cpp
+    spatialhash.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -42,8 +41,7 @@ HEADERS  += mainwindow.h \
     colors.h \
     abstractionspace.h \
     graphmanager.h \
-    spatialhash.h \
-    intervaltree.h
+    spatialhash.h
 
 FORMS    += mainwindow.ui
 

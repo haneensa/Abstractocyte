@@ -11,12 +11,16 @@ GraphManager::GraphManager()
         m_graph[m_ngraph] = new Graph();
 
         // todo: load per segment the segments points defining the curve, and find a way to render them as part of the sekeleton
-        m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_nodes.csv");
-        m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/skeleton_astro_segments.csv");
+//        m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_nodes.csv");
+//        m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/skeleton_astro_segments.csv");
 
 //        m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_points_2000offsets.csv");
       //  m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_points.csv");
 //        m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/points_segments.csv");
+
+        // test connectivity info
+        m_graph[m_ngraph]->loadNodes("://data/originalData/processed_data/nodesList.csv");
+        m_graph[m_ngraph]->loadEdges("://data/originalData/processed_data/connectivityList.csv");
 
         m_ngraph++;
     }

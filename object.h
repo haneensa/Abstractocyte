@@ -63,6 +63,7 @@ private:
     QVector4D                               m_center;
     std::vector< struct SkeletonVertex >    m_skeleton_vertices;
     std::vector< struct VertexData >        m_mesh_skeleton_vertices;
+    std::vector<GLuint>                     m_bufferIndices;
 };
 
 #endif // OBJECT_H
