@@ -9,7 +9,8 @@
 #include "object.h"
 struct ssbo_mesh {
     QVector4D color;
-    QVector4D center;
+    QVector4D center;   // center.w = neurite/astrocyte
+    QVector4D info;     // volume, type (axon, bouton, spine, dendrite, ..), ?, ?
 };
 
 struct MeshUniforms {
@@ -66,20 +67,25 @@ protected:
     bool                                m_glFunctionsSet;
 
     /* opengl buffers and vars */
-    QOpenGLVertexArrayObject    m_vao_mesh;
-    QOpenGLBuffer               m_vbo_mesh;
-    GLuint                      m_program_mesh;
+    QOpenGLVertexArrayObject            m_vao_mesh;
+    QOpenGLBuffer                       m_vbo_mesh;
+    QOpenGLBuffer                       m_vbo_IndexMesh;
+    GLuint                              m_program_mesh;
 
 
-    QOpenGLVertexArrayObject    m_vao_mesh_points;
-    GLuint                      m_program_mesh_points;
+    QOpenGLVertexArrayObject            m_vao_mesh_points;
+    GLuint                              m_program_mesh_points;
 
 
-    QOpenGLVertexArrayObject    m_vao_skeleton;
-    QOpenGLBuffer               m_vbo_skeleton;
-    GLuint                      m_program_skeleton;
-    struct MeshUniforms         m_uniforms;
+    QOpenGLVertexArrayObject            m_vao_skeleton;
+    QOpenGLBuffer                       m_vbo_skeleton;
+    GLuint                              m_program_skeleton;
+    struct MeshUniforms                 m_uniforms;
 
+    // store all vertices of the mesh.
+    // vertices are sequential increasing for all objects
+    std::vector< struct VertexData >    verticesList;
+    int                                 m_indices_size;
 };
 
 #endif // MESH_H

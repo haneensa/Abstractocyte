@@ -17,8 +17,8 @@
 
 struct BufferNode
 {
-    QVector3D coord3D;
-    QVector2D coord2D;
+    QVector3D coord3D; // vertex center
+    QVector2D coord2D; // layouted coordinate
 };
 
 class Graph

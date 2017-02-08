@@ -25,17 +25,17 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast2.extra_info = QVector4D(0.0f, 0, 1, 2);
     ast2.render_type = QVector4D(1, 1, 0, 0);
 
-    ast3.pos_alpha = QVector4D(40, 90, 0.5, 1.0);
-    ast3.trans_alpha = QVector4D(40, 90, 1.0, 1.0);
-    ast3.color_alpha = QVector4D(40, 90, 1, 1.0); // color_intp (toon/phong)
-    ast3.point_size = QVector4D(40, 90, 3, 6);
+    ast3.pos_alpha = QVector4D(40, 70, 0.5, 1.0);
+    ast3.trans_alpha = QVector4D(40, 70, 1.0, 1.0);
+    ast3.color_alpha = QVector4D(40, 70, 1, 1.0); // skeletob <-> mesh
+    ast3.point_size = QVector4D(40, 70, 3, 6);
     ast3.extra_info = QVector4D(0.0f, 0, 1, 2);
     ast3.render_type = QVector4D(0, 1, 1, 0);
 
-    ast4.pos_alpha = QVector4D(80, 99, 0.0, 1.0);
-    ast4.trans_alpha = QVector4D(80, 99, 1.0, 0.0);
-    ast4.color_alpha = QVector4D(80, 99, 1, 1); // color_intp (toon/phong)
-    ast4.point_size = QVector4D(80, 99, 6, 6);
+    ast4.pos_alpha = QVector4D(70, 99, 0.0, 1.0);
+    ast4.trans_alpha = QVector4D(70, 99, 1.0, 0.0);
+    ast4.color_alpha = QVector4D(70, 99, 1, 1); // skeletob <-> no skeleton
+    ast4.point_size = QVector4D(70, 99, 6, 6);
     ast4.extra_info = QVector4D(0.05f, 0, 2, 2);
     ast4.render_type = QVector4D(0, 0, 1, 0);
 

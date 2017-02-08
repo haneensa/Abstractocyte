@@ -25,30 +25,31 @@ public:
     Object(std::string name, int idx, int ID = 0);
     ~Object();
 
-    // add vertex to skeleton only
-    void add_s_vertex(struct SkeletonVertex vertex);
     // add mesh and skeleton vertices together using VertexData
-    void add_ms_vertex(struct VertexData vertex_data);
+    void add_s_vertex(struct SkeletonVertex vertex_data);
+
+    void addTriangleIndex(GLuint faces);
 
     std::vector<struct SkeletonVertex> get_s_Vertices();
-    std::vector<struct VertexData> get_ms_Vertices();
 
     size_t get_s_Size();
-    size_t get_ms_Size();
-
-    Object_t getObjectType(std::string name);
+    size_t get_indices_Size()   { return m_meshIndices.size(); }
+    void* get_indices()       { return m_meshIndices.data(); }
+    Object_t getObjectType();
     std::string getName();
 
     QVector4D getColor();
     QVector4D getCenter();
+    int getVolume();
 
     void setColor(QVector4D color);
     void setCenter(QVector4D center);
+    void setVolume(int volume);
 
 
 private:
     std::string                             m_name;
-    int                                     m_ID;
+    int                                     m_ID; // hvgx
     int                                     m_idxID;
 
     // object properties
@@ -62,8 +63,8 @@ private:
     // object data representtion
     QVector4D                               m_center;
     std::vector< struct SkeletonVertex >    m_skeleton_vertices;
-    std::vector< struct VertexData >        m_mesh_skeleton_vertices;
-    std::vector<GLuint>                     m_bufferIndices;
+
+    std::vector<GLuint>                     m_meshIndices;
 };
 
 #endif // OBJECT_H

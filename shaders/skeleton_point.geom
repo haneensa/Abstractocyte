@@ -14,6 +14,7 @@ uniform int     x_axis;
 struct SSBO_datum {
     vec4 color;
     vec4 center;
+    vec4 info;
 };
 
 layout (std430, binding=2) buffer mesh_data

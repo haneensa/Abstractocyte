@@ -188,11 +188,12 @@ void MousePad::initData()
 
 
     // init rects
-    float p10 = 20.0/100.0;
+    float p10 = 10.0/100.0;
     float p20 = 20.0/100.0;
     float p30 = 30.0/100.0;
     float p40 = 40.0/100.0;
     float p50 = 50.0/100.0;
+    float p70 = 70.0/100.0;
     float p80 = 80.0/100.0;
     float p100 = 100.0/100.0;
 
@@ -210,16 +211,16 @@ void MousePad::initData()
     initRect(p, p20, p20, ID++); // 1
 
     // x (0, 20)
-    // y (40, 80)
+    // y (40, 70)
     p = QVector2D(0,  p40);
   //  m_IntervalXY.push_back({ast3, neu1});
-    initRect(p, p20, p40, ID++); // 2
+    initRect(p, p20, p30, ID++); // 2
 
     // x (0, 20)
-    // y (80, 100)
-    p = QVector2D(0, p80);
+    // y (70, 100)
+    p = QVector2D(0, p70);
   //  m_IntervalXY.push_back({ast4, neu1});
-    initRect(p, p20, p20, ID++); // 3
+    initRect(p, p20, p30, ID++); // 3
 
     // x (20, 50)
     // y (0, 20)
@@ -240,17 +241,17 @@ void MousePad::initData()
     initRect(p, p30, p20, ID++); // 6
 
     // x (20, 50)
-    // y (40, 80)
+    // y (40, 70)
     p = QVector2D(p20, p40);
   //  m_IntervalXY.push_back({ast3, neu2});
-    initRect(p, p30, p40, ID++); // 7
+    initRect(p, p30, p30, ID++); // 7
 
 
     // x (20, 50)
-    // y (80, 100)
-    p = QVector2D(p20, p80);
+    // y (70, 100)
+    p = QVector2D(p20, p70);
   //  m_IntervalXY.push_back({ast4, neu2});
-    initRect(p, p30, p20, ID++); // 8
+    initRect(p, p30, p30, ID++); // 8
 
     // x (50, 100)
     // y (20, 40)
@@ -260,16 +261,16 @@ void MousePad::initData()
 
 
     // x (50, 100)
-    // y (40, 80)
+    // y (40, 70)
     p = QVector2D(p50, p40);
     //m_IntervalXY.push_back({ast3, neu3});
-    initRect(p, p50, p40, ID++); // 10
+    initRect(p, p50, p30, ID++); // 10
 
     // x (50, 100)
-    // y (80, 100)
-    p = QVector2D(p50, p80);
+    // y (70, 100)
+    p = QVector2D(p50, p70);
    // m_IntervalXY.push_back({ast4, neu3});
-    initRect(p, p50, p20, ID++); // 11
+    initRect(p, p50, p30, ID++); // 11
 
 }
 

@@ -13,7 +13,7 @@ Object::Object(std::string name, int idx, int ID)
     m_name  = name; // obj name
     m_idxID = idx;  // index ID in the object list
     m_ID    = ID;   // hvgx ID
-    m_object_t = getObjectType(m_name); // obect type
+    m_object_t = getObjectType(); // obect type
     m_color = QVector4D(1.0, 1.0, 0.0, 1.0);    // default one
     m_volume = 0;
     m_center = QVector4D(0, 0, 0, 0);
@@ -24,7 +24,7 @@ Object::~Object()
 {
 }
 
-Object_t Object::getObjectType(std::string name)
+Object_t Object::getObjectType()
 {
     // make it generic later
     std::string code = m_name.substr(0, 3);
@@ -54,9 +54,9 @@ void Object::add_s_vertex(struct SkeletonVertex vertex)
     m_skeleton_vertices.push_back(vertex);
 }
 
-void Object::add_ms_vertex(struct VertexData vertex_data)
+void Object::addTriangleIndex(GLuint face)
 {
-    m_mesh_skeleton_vertices.push_back(vertex_data);
+    m_meshIndices.push_back(face);
 }
 
 
@@ -65,10 +65,6 @@ std::vector<struct SkeletonVertex> Object::get_s_Vertices()
     return m_skeleton_vertices;
 }
 
-std::vector<struct VertexData> Object::get_ms_Vertices()
-{
-    return m_mesh_skeleton_vertices;
-}
 
 std::string Object::getName()
 {
@@ -78,11 +74,6 @@ std::string Object::getName()
 size_t Object::get_s_Size()
 {
     return m_skeleton_vertices.size();
-}
-
-size_t Object::get_ms_Size()
-{
-    return m_mesh_skeleton_vertices.size();
 }
 
 QVector4D Object::getColor()
@@ -134,4 +125,15 @@ void Object::setColor(QVector4D color)
 void Object::setCenter(QVector4D center)
 {
     m_center = center;
+}
+
+void Object::setVolume(int volume)
+{
+    m_volume = volume;
+}
+
+
+int Object::getVolume()
+{
+    return m_volume;
 }
