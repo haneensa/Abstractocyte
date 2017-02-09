@@ -115,6 +115,35 @@ void GLWidget::initializeGL()
     /****************** 3 Initialize Graph  *******************/
     m_graphManager->initVBO(0);
     m_graphManager->initGrid();
+
+
+    /**************** INIT OIT *******************************/
+    glGenBuffers(2, m_buffers);
+    GLuint maxNodes = 20 * m_width * m_height;
+    GLint nodeSize = 5 * sizeof(GLfloat) + sizeof(GLuint); // The size of a linked list node
+
+     // Our atomic counter
+    glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, m_buffers[COUNTER_BUFFER]);
+    glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), NULL, GL_DYNAMIC_DRAW);
+
+    // The buffer for the head pointers, as an image texture
+    glGenTextures(1, &m_headPtrTex);
+    glBindTexture(GL_TEXTURE_2D, m_headPtrTex);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_R32UI, m_width, m_height);
+    glBindImageTexture(0, m_headPtrTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32UI);
+
+    // The buffer of linked lists
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_buffers[LINKED_LIST_BUFFER]);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, maxNodes * nodeSize, NULL, GL_DYNAMIC_DRAW);
+
+    // prog.setUniform("MaxNodes", maxNodes);
+
+    std::vector<GLuint> headPtrClearBuf(width*height, 0xffffffff);
+    glGenBuffers(1, &m_clearBuf);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_clearBuf);
+    glBufferData(GL_PIXEL_UNPACK_BUFFER, headPtrClearBuf.size() * sizeof(GLuint),
+                &headPtrClearBuf[0], GL_STATIC_COPY);
+
     /**************** End data initialization *****************/
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);

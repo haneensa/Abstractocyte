@@ -3,6 +3,10 @@
 
 #include "node.h"
 
+// store the points of a segment, starting from the knots and the points in between
+// here we get the indices that connect these points
+// slowly lower the resolution until we go to 2D skeleton
+
 enum class Edge_t { ASTRO_SKELETON, NEURITE_SKELETON, NEURITE_NEURITE };
 
 class Node;
@@ -26,6 +30,8 @@ protected:
     Edge_t  m_edge_t;
     Node*   m_node1;
     Node*   m_node2;
+    // list of nodes in between
+    std::vector<Node*> nodesList;
 };
 
 #endif // EDGE_H

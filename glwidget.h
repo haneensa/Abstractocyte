@@ -10,6 +10,17 @@
 #include "mesh.h"
 #include "abstractionspace.h"
 
+enum BufferNames {
+    COUNTER_BUFFER = 0,
+    LINKED_LIST_BUFFER
+};
+
+struct ListNode {
+    QVector4D color;
+    GLfloat depth;
+    GLuint next;
+};
+
 class GLWidget : public QOpenGLWidget, MainOpenGL
 {
     Q_OBJECT
@@ -71,6 +82,16 @@ protected:
     bool                        m_FDL_running;
 
     QTimer                      *timer;
+
+    // OIT
+    int m_width, m_height;
+    GLuint m_buffers[2], m_fsQuad, m_headPtrTex;
+    GLuint m_pass1Index, m_pass2Index;
+    GLuint m_clearBuf;
+
+    void pass1();
+    void pass2();
+    void clearBuffers();
 };
 
 

@@ -74,6 +74,8 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu4.extra_info = QVector4D(0.0f, 0.0f, 2, 3);       // alpha limit, div, pos1, pos2
     neu4.render_type = QVector4D(0, 1, 0, 0);
 
+    // (x: 99, y: 99) -> show graph nodes and edges
+
 
     // x (0, 20)
     // y (0, 20)
