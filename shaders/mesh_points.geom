@@ -38,7 +38,6 @@ struct SSBO_datum {
     vec4 info;
 };
 
-
 layout (std430, binding=2) buffer mesh_data
 {
     SSBO_datum SSBO_data[];
@@ -52,7 +51,7 @@ layout (std430, binding=3) buffer space2d_data
 
 void main() {
     int i = 0;
-    int ID = V_ID[i];
+    int ID = V_ID[i]; // ID here is the index of this object in ssbo array
     int type = int(SSBO_data[ID].center.w);
     color_val = SSBO_data[ID].color;
     vec4 pos1, pos2;
@@ -79,7 +78,14 @@ void main() {
 
     float position_intp = translate(slider, alpha1.x, alpha1.y, alpha1.z, alpha1.w);
     color_intp = translate(slider, alpha3.x, alpha3.y, alpha3.z, alpha3.w);
-    gl_PointSize =  translate(slider, alpha4.x, alpha4.y, alpha4.z, alpha4.w);
+
+    float max_size;
+    if (type == 1)
+        max_size = (1 + SSBO_data[ID].info.x/1000000.0)  * alpha4.w ; // todo: normalize outside
+    else
+        max_size = alpha4.w ; // todo: normalize outside
+
+    gl_PointSize =  translate(slider, alpha4.x, alpha4.y, alpha4.z, max_size);
 
     int pos1_flag = int(alpha5.z);
     int pos2_flag = int(alpha5.w);

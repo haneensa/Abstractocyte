@@ -17,11 +17,6 @@ struct abstractionPoint {
     int       ID;
 };
 
-
-
-
-
-
 class MousePad : public QOpenGLWidget, MainOpenGL
 {
     Q_OBJECT
@@ -59,7 +54,9 @@ protected:
     void initSelectionPointerGL();
     void init2DSpaceGL();
 
-    void initRect(QVector2D p00, float dimX, float dimY, int ID);
+    void initRect(QVector2D x_interval, QVector2D y_interval, int ID);
+    void initTriangle(QVector2D coords1, QVector2D coords2,QVector2D coords3, int ID);
+
     void initBuffer();
     void initData();
     bool updateBuffer();

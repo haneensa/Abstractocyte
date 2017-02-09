@@ -95,10 +95,14 @@ void MousePad::initSelectionPointerGL()
     m_vao_selection.release();
 }
 
-void MousePad::initRect(QVector2D p00, float dimX, float dimY, int ID)
+void MousePad::initRect(QVector2D x_interval, QVector2D y_interval, int ID)
 {
+    QVector2D p00 = QVector2D(x_interval.x()/100.0, y_interval.x()/100.0);
+    float dimX = (x_interval.y() - x_interval.x())/100.0;
+    float dimY = (y_interval.y() - y_interval.x())/100.0;
+
+
     struct abstractionPoint p = {p00, ID};
-    p.ID = ID;
     int offset = m_vertices.size();
 
     m_vertices.push_back(p);        // p00
@@ -125,153 +129,109 @@ void MousePad::initRect(QVector2D p00, float dimX, float dimY, int ID)
     m_indices.push_back(offset + 2);
 }
 
+void MousePad::initTriangle(QVector2D coords1, QVector2D coords2,QVector2D coords3, int ID)
+{
+    int offset = m_vertices.size();
+    struct abstractionPoint p1 = {coords1/100.0, ID};
+    struct abstractionPoint p2 = {coords2/100.0, ID};
+    struct abstractionPoint p3 = {coords3/100.0, ID};
+
+    m_vertices.push_back(p1);
+    m_vertices.push_back(p2);
+    m_vertices.push_back(p3);
+
+    m_indices.push_back(offset + 0);
+    m_indices.push_back(offset + 1);
+    m_indices.push_back(offset + 2);
+}
+
 void MousePad::initData()
 {
 
     // init intervals
 
-    struct properties ast1, ast2, ast3, ast4;
-    struct properties neu1, neu2, neu3;
-
-    ast1.pos_alpha = QVector4D(0, 20, 0.0, 1.0);
-    ast1.trans_alpha = QVector4D(0, 20, 1.0, 1.0);
-    ast1.color_alpha = QVector4D(0, 20, 0, 1.0); // color_intp (toon/phong)
-    ast1.point_size = QVector4D(0, 20, 1, 1);
-    ast1.extra_info = QVector4D(0.0f, 0, 1, 1);
-    ast1.render_type = QVector4D(1, 0, 0, 0);
-
-    ast2.pos_alpha = QVector4D(20, 40, 0.0, 0.5);
-    ast2.trans_alpha = QVector4D(20, 40, 1.0, 0.0); // mesh points would flip this (0->1)
-    ast2.color_alpha = QVector4D(20, 40, 1, 1.0); // color_intp (toon/phong)
-    ast2.point_size = QVector4D(20, 40, 1, 3);
-    ast2.extra_info = QVector4D(0.0f, 0, 1, 2);
-    ast2.render_type = QVector4D(1, 1, 0, 0);
-
-    ast3.pos_alpha = QVector4D(40, 90, 0.5, 1.0);
-    ast3.trans_alpha = QVector4D(40, 90, 1.0, 1.0);
-    ast3.color_alpha = QVector4D(40, 90, 1, 1.0); // color_intp (toon/phong)
-    ast3.point_size = QVector4D(40, 90, 3, 6);
-    ast3.extra_info = QVector4D(0.0f, 0, 1, 2);
-    ast3.render_type = QVector4D(0, 1, 1, 0);
-    ast4.pos_alpha = QVector4D(90, 99, 0.0, 1.0);
-    ast4.trans_alpha = QVector4D(90, 99, 1.0, 0.0);
-    ast4.color_alpha = QVector4D(90, 99, 1, 1); // color_intp (toon/phong)
-    ast4.point_size = QVector4D(90, 99, 6, 6);
-    ast4.extra_info = QVector4D(0.05f, 0, 2, 2);
-    ast4.render_type = QVector4D(0, 0, 1, 0);
-
-    neu1.pos_alpha  = QVector4D(0, 20, 0, 1.0);      // position interpolation
-    neu1.trans_alpha = QVector4D(0, 20, 1.0, 1.0);    // alpha
-    neu1.color_alpha = QVector4D(0, 20, 0, 1.0);       // color intp (toon/phong)
-    neu1.point_size = QVector4D(0, 20, 1, 1);        // point size
-    neu1.extra_info = QVector4D(0.0f, 0.0f, 1, 1);       // alpha limit, div, pos1, pos2
-    neu1.render_type = QVector4D(1, 0, 0, 0);
-
-    neu2.pos_alpha  = QVector4D(20, 50, 0, 1.0);      // position interpolation
-    neu2.trans_alpha = QVector4D(20, 50, 1.0, 0.0);    // alpha
-    neu2.color_alpha = QVector4D(20, 50, 1, 1.0);       // color intp (toon/phong)
-    neu2.point_size = QVector4D(20, 50, 1, 7);        // point size
-    neu2.extra_info = QVector4D(0.0f, 0.0f, 1, 2);       // alpha limit, div, pos1, pos2
-    neu2.render_type = QVector4D(1, 1, 1, 0);
-
-    neu3.pos_alpha  = QVector4D(50, 99, 0, 1);      // position interpolation
-    neu3.trans_alpha = QVector4D(50, 99, 1, 1);    // alpha
-    neu3.color_alpha = QVector4D(50, 99, 1, 1);       // color intp (toon/phong)
-    neu3.point_size = QVector4D(50, 99, 7, 20);        // point size
-    neu3.extra_info = QVector4D(0.0f, 0.0f, 2, 3);       // alpha limit, div, pos1, pos2
-    neu3.render_type = QVector4D(0, 1, 0, 0);
-
-
     // TODO: refactor this and make it easier to construct the space with fewer parameters
     // TODO: connect abstraction space buffer update data with this one
     // find a place to decide on the data and group them together instead on seperate classes
 
-
-    // init rects
-    float p10 = 10.0/100.0;
-    float p20 = 20.0/100.0;
-    float p30 = 30.0/100.0;
-    float p40 = 40.0/100.0;
-    float p50 = 50.0/100.0;
-    float p70 = 70.0/100.0;
-    float p80 = 80.0/100.0;
-    float p100 = 100.0/100.0;
-
     int ID = 1;
-    QVector2D p = QVector2D(0, 0);
-    // x (0, 20)
-    // y (0, 20)
+    QVector2D x_interval, y_interval;
+
+
+    // ################## 0-20
+    x_interval = QVector2D(0, 20);
+
+    y_interval = QVector2D(0, 20);
     //m_IntervalXY.push_back({ast1, neu1});
-    initRect(p, p20, p20, ID++); // 0
+    initRect(x_interval, y_interval, ID++); // 0
 
-    // x (0, 20)
-    // y (20, 40)
-    p = QVector2D(0, p20);
+    y_interval = QVector2D(20, 40);
     //m_IntervalXY.push_back({ast2, neu1});
-    initRect(p, p20, p20, ID++); // 1
+    initRect(x_interval, y_interval, ID++); // 1
 
-    // x (0, 20)
-    // y (40, 70)
-    p = QVector2D(0,  p40);
-  //  m_IntervalXY.push_back({ast3, neu1});
-    initRect(p, p20, p30, ID++); // 2
+    y_interval = QVector2D(40, 60);
+    //  m_IntervalXY.push_back({ast3, neu1});
+    initRect(x_interval, y_interval, ID++); // 2
 
-    // x (0, 20)
-    // y (70, 100)
-    p = QVector2D(0, p70);
-  //  m_IntervalXY.push_back({ast4, neu1});
-    initRect(p, p20, p30, ID++); // 3
-
-    // x (20, 50)
-    // y (0, 20)
-    p = QVector2D(p20, 0);
-  //  m_IntervalXY.push_back({ast1, neu2});
-    initRect(p, p30, p20, ID++); // 4
-
-    // x (50, 100)
-    // y (0, 20)
-    p = QVector2D(p50, 0);
- //   m_IntervalXY.push_back({ast1, neu3});
-    initRect(p, p50, p20, ID++); // 5
-
-    // x (20, 50)
-    // y (20, 40)
-    p = QVector2D(p20, p20);
-  //  m_IntervalXY.push_back({ast2, neu2});
-    initRect(p, p30, p20, ID++); // 6
-
-    // x (20, 50)
-    // y (40, 70)
-    p = QVector2D(p20, p40);
-  //  m_IntervalXY.push_back({ast3, neu2});
-    initRect(p, p30, p30, ID++); // 7
+    y_interval = QVector2D(60, 100);
+    //  m_IntervalXY.push_back({ast4, neu1});
+    initRect(x_interval, y_interval, ID++); // 3
 
 
-    // x (20, 50)
-    // y (70, 100)
-    p = QVector2D(p20, p70);
-  //  m_IntervalXY.push_back({ast4, neu2});
-    initRect(p, p30, p30, ID++); // 8
 
-    // x (50, 100)
-    // y (20, 40)
-    p = QVector2D(p50, p20);
-   // m_IntervalXY.push_back({ast2, neu3});
-    initRect(p, p50, p20, ID++); // 9
+    // ################## 20-60
+    x_interval = QVector2D(20, 60);
+
+    y_interval = QVector2D(0, 20);
+    //  m_IntervalXY.push_back({ast1, neu2});
+    initRect(x_interval, y_interval, ID++); // 4
+
+    y_interval = QVector2D(20, 40);
+    //  m_IntervalXY.push_back({ast2, neu2});
+    initRect(x_interval, y_interval, ID++);  // 6
+
+    y_interval = QVector2D(40, 60);
+    //  m_IntervalXY.push_back({ast3, neu2});
+    initRect(x_interval, y_interval, ID++); // 7
+
+    y_interval = QVector2D(60, 100);
+    //  m_IntervalXY.push_back({ast4, neu2});
+    initRect(x_interval, y_interval, ID++);  // 8
 
 
-    // x (50, 100)
-    // y (40, 70)
-    p = QVector2D(p50, p40);
+
+    // ################## 60-100
+    x_interval = QVector2D(60, 100);
+
+    y_interval = QVector2D(0, 20);
+    //   m_IntervalXY.push_back({ast1, neu3});
+    initRect(x_interval, y_interval, ID++);  // 5
+
+    y_interval = QVector2D(20, 40);
+    // m_IntervalXY.push_back({ast2, neu3});
+    initRect(x_interval, y_interval, ID++);  // 9
+
+    y_interval = QVector2D(40, 60);
     //m_IntervalXY.push_back({ast3, neu3});
-    initRect(p, p50, p30, ID++); // 10
+    initRect(x_interval, y_interval, ID++);  // 10
 
-    // x (50, 100)
-    // y (70, 100)
-    p = QVector2D(p50, p70);
-   // m_IntervalXY.push_back({ast4, neu3});
-    initRect(p, p50, p30, ID++); // 11
+//    y_interval = QVector2D(70, 100);
+//    // m_IntervalXY.push_back({ast4, neu3});
+//    initRect(x_interval, y_interval, ID++); // 11
 
+
+    // ################## x: 60-100 , y: 70-100
+    x_interval = QVector2D(80, 100);
+    y_interval = QVector2D(80, 100);
+//    // m_IntervalXY.push_back({ast4, neu3});
+   initRect(x_interval, y_interval, ID++);  // 12
+
+    ID++;
+   initTriangle(  QVector2D(80, 80),QVector2D(80, 100), QVector2D(60, 100), ID);
+   initTriangle(  QVector2D(60, 60), QVector2D(80, 80),QVector2D(60, 100), ID);
+
+   initTriangle(  QVector2D(60, 60), QVector2D(100, 60), QVector2D(80, 80), ID);
+   initTriangle(  QVector2D(100, 60),  QVector2D(100, 80), QVector2D(80, 80), ID);
 }
 
 void MousePad::initBuffer()
@@ -289,6 +249,10 @@ void MousePad::initBuffer()
     m_buffer_color_data.push_back(gainsboro);
     m_buffer_color_data.push_back(honeydew);
     m_buffer_color_data.push_back(darkkhaki);
+    m_buffer_color_data.push_back(gray);
+    m_buffer_color_data.push_back(lightsalmon);
+    m_buffer_color_data.push_back(orchid);
+    m_buffer_color_data.push_back(royalblue);
 
     int bufferSize =  m_buffer_color_data.size() * sizeof(QVector4D);
 

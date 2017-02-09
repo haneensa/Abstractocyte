@@ -26,7 +26,6 @@ class Mesh : public MainOpenGL
 public:
     Mesh();
     ~Mesh();
-    bool loadObj(QString path);
     int getVertixCount();
 
     bool loadDataset(QString path);
@@ -44,7 +43,7 @@ public:
     bool initMeshPointsShaders();
     bool initSkeletonShaders();
     void updateUniforms(struct MeshUniforms mesh_uniforms);
-
+    void updateUniformsLocation(GLuint program);
 
 protected:
     int                                 m_vertices_size;

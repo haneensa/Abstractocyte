@@ -14,7 +14,6 @@ struct SSBO_datum {
     vec4 info;
 };
 
-
 layout (std430, binding=2) buffer mesh_data
 {
     SSBO_datum SSBO_data[];
