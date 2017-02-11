@@ -12,6 +12,7 @@ struct VertexData {
     QVector3D   skeleton_vertex;
     // add  bool value for marking this vertex
     GLint       ID;
+    GLint       bleed;
 };
 
 struct SkeletonVertex {

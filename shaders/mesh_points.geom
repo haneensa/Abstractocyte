@@ -4,6 +4,7 @@ in vec4         Vskeleton_vx[];
 
 in int          V_ID[];
 in vec4         V_center[];
+in  int         V_bleeding[];
 
 out vec4        color_val;
 out float       color_intp;
@@ -53,7 +54,10 @@ void main() {
     int i = 0;
     int ID = V_ID[i]; // ID here is the index of this object in ssbo array
     int type = int(SSBO_data[ID].center.w);
-    color_val = SSBO_data[ID].color;
+    if (V_bleeding[i] == 1)
+        color_val = vec4(1.0, 0.0, 0.0, 1.0);
+    else
+        color_val = SSBO_data[ID].color;
     vec4 pos1, pos2;
 
     // astrocyte or neurites?
@@ -80,9 +84,9 @@ void main() {
     color_intp = translate(slider, alpha3.x, alpha3.y, alpha3.z, alpha3.w);
 
     float max_size;
-    if (type == 1)
-        max_size = (1 + SSBO_data[ID].info.x/1000000.0)  * alpha4.w ; // todo: normalize outside
-    else
+   // if (type == 1)
+   //     max_size = (1 + SSBO_data[ID].info.x/1000000.0)  * alpha4.w ; // todo: normalize outside
+   // else
         max_size = alpha4.w ; // todo: normalize outside
 
     gl_PointSize =  translate(slider, alpha4.x, alpha4.y, alpha4.z, max_size);

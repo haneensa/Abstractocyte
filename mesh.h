@@ -29,8 +29,7 @@ public:
     int getVertixCount();
 
     bool loadDataset(QString path);
-    // temp functions
-    bool loadSkeletonPoints(QString path);
+
     int getNodesCount();
 
     // OpenGL initialization
@@ -85,6 +84,8 @@ protected:
     // vertices are sequential increasing for all objects
     std::vector< struct VertexData >    verticesList;
     int                                 m_indices_size;
+
+    int                                 m_vertex_offset;
 };
 
 #endif // MESH_H

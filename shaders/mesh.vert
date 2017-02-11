@@ -3,10 +3,12 @@
 layout(location = 0) in vec3    mesh_vx;
 layout(location = 1) in vec3    skeleton_vx;
 layout(location = 2) in int     ID;
+layout(location = 3) in int     bleed;
 
 out vec4        Vskeleton_vx;
 out int         V_ID;
 out vec4        V_center;
+out int         V_bleeding;
 
 struct SSBO_datum {
     vec4 color;
@@ -34,4 +36,5 @@ void main(void)
     V_ID = ID;
     vec3 center3d = SSBO_data[ID].center.xyz;
     V_center =  pvmMatrix * vec4(center3d, 1.0);
+    V_bleeding = bleed;
 }

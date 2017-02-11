@@ -12,67 +12,67 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     struct properties neu1, neu2, neu3, neu4 /* 2D */;
 
     ast1.pos_alpha = QVector4D(0, 20, 0.0, 1.0);
-    ast1.trans_alpha = QVector4D(0, 20, 1.0, 1.0);
-    ast1.color_alpha = QVector4D(0, 20, 0, 1.0); // color_intp (toon/phong)
-    ast1.point_size = QVector4D(0, 20, 1, 1);
-    ast1.extra_info = QVector4D(0.0f, 0, 1, 1);
-    ast1.render_type = QVector4D(1, 0, 0, 0);
+        ast1.trans_alpha = QVector4D(0, 20, 1.0, 1.0);
+        ast1.color_alpha = QVector4D(0, 20, 0, 1.0); // color_intp (toon/phong)
+        ast1.point_size = QVector4D(0, 20, 1, 1);
+        ast1.extra_info = QVector4D(0.0f, 0, 1, 1);
+        ast1.render_type = QVector4D(1, 0, 0, 0);
 
-    ast2.pos_alpha = QVector4D(20, 40, 0.0, 0.5);
-    ast2.trans_alpha = QVector4D(20, 40, 1.0, 0.0); // mesh points would flip this (0->1)
-    ast2.color_alpha = QVector4D(20, 40, 1, 1.0); // color_intp (toon/phong)
-    ast2.point_size = QVector4D(20, 40, 1, 3);
-    ast2.extra_info = QVector4D(0.0f, 0, 1, 2);
-    ast2.render_type = QVector4D(1, 1, 0, 0);
+        ast2.pos_alpha = QVector4D(20, 40, 0.0, 0.5);
+        ast2.trans_alpha = QVector4D(20, 40, 1.0, 0.0); // mesh points would flip this (0->1)
+        ast2.color_alpha = QVector4D(20, 40, 1, 1.0); // color_intp (toon/phong)
+        ast2.point_size = QVector4D(20, 40, 1, 3);
+        ast2.extra_info = QVector4D(0.0f, 0, 1, 2);
+        ast2.render_type = QVector4D(1, 1, 0, 0);
 
-    ast3.pos_alpha = QVector4D(40, 60, 0.5, 1.0);
-    ast3.trans_alpha = QVector4D(40, 60, 1.0, 1.0);
-    ast3.color_alpha = QVector4D(40, 60, 1, 1.0); // skeletob <-> mesh
-    ast3.point_size = QVector4D(40, 60, 3, 6);
-    ast3.extra_info = QVector4D(0.0f, 0, 1, 2);
-    ast3.render_type = QVector4D(0, 1, 1, 0);
+        ast3.pos_alpha = QVector4D(40, 60, 0.5, 1.0);
+        ast3.trans_alpha = QVector4D(40, 60, 1.0, 1.0);
+        ast3.color_alpha = QVector4D(40, 60, 1, 1.0); // skeletob <-> mesh
+        ast3.point_size = QVector4D(40, 60, 3, 6);
+        ast3.extra_info = QVector4D(0.0f, 0, 1, 2);
+        ast3.render_type = QVector4D(0, 1, 1, 0);
 
-    ast4.pos_alpha = QVector4D(60, 99, 0.0, 1.0);
-    ast4.trans_alpha = QVector4D(60, 99, 1.0, 0.0);
-    ast4.color_alpha = QVector4D(60, 99, 1, 1); // skeletob <-> no skeleton
-    ast4.point_size = QVector4D(60, 99, 6, 6);
-    ast4.extra_info = QVector4D(0.05f, 0, 2, 2);
-    ast4.render_type = QVector4D(0, 0, 1, 0);
+        ast4.pos_alpha = QVector4D(60, 99, 0.0, 1.0);
+        ast4.trans_alpha = QVector4D(60, 99, 1.0, 0.0);
+        ast4.color_alpha = QVector4D(60, 99, 1, 1); // skeletob <-> no skeleton
+        ast4.point_size = QVector4D(60, 99, 6, 6);
+        ast4.extra_info = QVector4D(0.05f, 0, 2, 2);
+        ast4.render_type = QVector4D(0, 0, 1, 0);
 
-    ast5.pos_alpha = QVector4D(80, 99, 0.0, 1.0);
-    ast5.trans_alpha = QVector4D(80, 99, 1.0, 0.0);
-    ast5.color_alpha = QVector4D(80, 99, 1, 1); // skeletob <-> no skeleton
-    ast5.point_size = QVector4D(80, 99, 6, 6);
-    ast5.extra_info = QVector4D(0.05f, 0, 2, 2);
-    ast5.render_type = QVector4D(0, 0, 1, 0);
+        ast5.pos_alpha = QVector4D(80, 99, 0.0, 1.0);
+        ast5.trans_alpha = QVector4D(80, 99, 1.0, 0.0);
+        ast5.color_alpha = QVector4D(80, 99, 1, 1); // skeletob <-> no skeleton
+        ast5.point_size = QVector4D(80, 99, 6, 6);
+        ast5.extra_info = QVector4D(0.05f, 0, 2, 2);
+        ast5.render_type = QVector4D(0, 0, 1, 0);
 
-    neu1.pos_alpha  = QVector4D(0, 20, 0, 1.0);      // position interpolation
-    neu1.trans_alpha = QVector4D(0, 20, 1.0, 1.0);    // alpha
-    neu1.color_alpha = QVector4D(0, 20, 0, 1.0);       // color intp (toon/phong)
-    neu1.point_size = QVector4D(0, 20, 1, 1);        // point size
-    neu1.extra_info = QVector4D(0.0f, 0.0f, 1, 1);       // alpha limit, div, pos1, pos2
-    neu1.render_type = QVector4D(1, 0, 0, 0);
+        neu1.pos_alpha  = QVector4D(0, 20, 0, 1.0);      // position interpolation
+        neu1.trans_alpha = QVector4D(0, 20, 1.0, 1.0);    // alpha
+        neu1.color_alpha = QVector4D(0, 20, 0, 1.0);       // color intp (toon/phong)
+        neu1.point_size = QVector4D(0, 20, 1, 1);        // point size
+        neu1.extra_info = QVector4D(0.0f, 0.0f, 1, 1);       // alpha limit, div, pos1, pos2
+        neu1.render_type = QVector4D(1, 0, 0, 0);
 
-    neu2.pos_alpha  = QVector4D(20, 60, 0, 1.0);      // position interpolation
-    neu2.trans_alpha = QVector4D(20, 60, 1.0, 0.0);    // alpha
-    neu2.color_alpha = QVector4D(20, 60, 1, 1.0);       // color intp (toon/phong)
-    neu2.point_size = QVector4D(20, 60, 1, 7);        // point size
-    neu2.extra_info = QVector4D(0.0f, 0.0f, 1, 2);       // alpha limit, div, pos1, pos2
-    neu2.render_type = QVector4D(1, 1, 1, 0);
+        neu2.pos_alpha  = QVector4D(20, 60, 0, 1.0);      // position interpolation
+        neu2.trans_alpha = QVector4D(20, 60, 1.0, 0.0);    // alpha
+        neu2.color_alpha = QVector4D(20, 60, 1, 1.0);       // color intp (toon/phong)
+        neu2.point_size = QVector4D(20, 60, 1, 7);        // point size
+        neu2.extra_info = QVector4D(0.0f, 0.0f, 1, 2);       // alpha limit, div, pos1, pos2
+        neu2.render_type = QVector4D(1, 1, 1, 0);
 
-    neu3.pos_alpha  = QVector4D(60, 99, 0, 1);      // position interpolation
-    neu3.trans_alpha = QVector4D(60, 99, 1, 1);    // alpha
-    neu3.color_alpha = QVector4D(60, 99, 1, 1);       // color intp (toon/phong)
-    neu3.point_size = QVector4D(60, 99, 7, 20);        // point size
-    neu3.extra_info = QVector4D(0.0f, 0.0f, 2, 3);       // alpha limit, div, pos1, pos2
-    neu3.render_type = QVector4D(0, 1, 0, 0);
+        neu3.pos_alpha  = QVector4D(60, 99, 0, 1);      // position interpolation
+        neu3.trans_alpha = QVector4D(60, 99, 1, 1);    // alpha
+        neu3.color_alpha = QVector4D(60, 99, 1, 1);       // color intp (toon/phong)
+        neu3.point_size = QVector4D(60, 99, 7, 20);        // point size
+        neu3.extra_info = QVector4D(0.0f, 0.0f, 2, 3);       // alpha limit, div, pos1, pos2
+        neu3.render_type = QVector4D(0, 1, 0, 0);
 
-    neu4.pos_alpha  = QVector4D(80, 99, 0, 1);      // position interpolation
-    neu4.trans_alpha = QVector4D(80, 99, 1, 1);    // alpha
-    neu4.color_alpha = QVector4D(80, 99, 1, 1);       // color intp (toon/phong)
-    neu4.point_size = QVector4D(80, 99, 7, 20);        // point size
-    neu4.extra_info = QVector4D(0.0f, 0.0f, 2, 3);       // alpha limit, div, pos1, pos2
-    neu4.render_type = QVector4D(0, 1, 0, 0);
+        neu4.pos_alpha  = QVector4D(80, 99, 0, 1);      // position interpolation
+        neu4.trans_alpha = QVector4D(80, 99, 1, 1);    // alpha
+        neu4.color_alpha = QVector4D(80, 99, 1, 1);       // color intp (toon/phong)
+        neu4.point_size = QVector4D(80, 99, 7, 20);        // point size
+        neu4.extra_info = QVector4D(0.0f, 0.0f, 2, 3);       // alpha limit, div, pos1, pos2
+        neu4.render_type = QVector4D(0, 1, 0, 0);
 
     // (x: 99, y: 99) -> show graph nodes and edges
 

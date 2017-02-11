@@ -3,6 +3,7 @@
 in vec4         Vskeleton_vx[];
 in  int         V_ID[];
 in  vec4        V_center[];
+in  int         V_bleeding[];
 
 out float       color_intp;
 out vec4        color_val;
@@ -53,10 +54,20 @@ void main() {
   vec3 B = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
   normal_out = normalize(cross(A,B));
 
+  int is_bleeding;
+  if ( V_bleeding[0] == 1 || V_bleeding[1] == 1 || V_bleeding[2] == 1)
+     is_bleeding = 1;
+  else
+     is_bleeding = 0;
+
   for(int i = 0; i < 3; i++) {
     int ID = V_ID[i];
     int type = int(SSBO_data[ID].center.w);
-    color_val = SSBO_data[ID].color;
+    if (is_bleeding == 1)
+        color_val = vec4(1.0, 0.0, 0.0, 1.0);
+    else
+        color_val = SSBO_data[ID].color;
+
     vec4 pos1, pos2;
 
     // astrocyte or neurites?

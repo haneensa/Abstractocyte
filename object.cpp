@@ -17,7 +17,7 @@ Object::Object(std::string name, int idx, int ID)
     m_color = QVector4D(1.0, 1.0, 0.0, 1.0);    // default one
     m_volume = 0;
     m_center = QVector4D(0, 0, 0, 0);
-    qDebug() << "create " << m_name.data();
+    qDebug() << "create " << m_name.data() << " hvgxID: " << m_ID;
 }
 
 Object::~Object()
@@ -89,10 +89,10 @@ QVector4D Object::getColor()
         m_color = gold;
         break;
     case Object_t::SPINE:
-        m_color = orange;
+        m_color = darkmagenta;
         break;
     case Object_t::BOUTON:
-        m_color = mediumaquamarine;
+        m_color = greenyellow;
         break;
     case Object_t::MITO:
         m_color = mediumslateblue;

@@ -20,7 +20,7 @@ GraphManager::GraphManager()
 
         // test connectivity info
         m_graph[m_ngraph]->loadNodes("://data/originalData/processed_data/nodesList.csv");
-        m_graph[m_ngraph]->loadEdges("://data/originalData/processed_data/connectivityList.csv");
+       // m_graph[m_ngraph]->loadEdges("://data/originalData/processed_data/connectivityList.csv");
 
         m_ngraph++;
     }

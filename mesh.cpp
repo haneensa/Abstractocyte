@@ -11,21 +11,16 @@ Mesh::Mesh()
     m_vertices_size = 0;
     m_indices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 20;
+    m_limit = 43;
+    m_vertex_offset = 0;
 
     // to do: combine all these files in one .obj file -> m3_dataset.obj
     // to do: interface to load these files
     QString path;
-   // path = "://data/skeleton_astrocyte_m3/mouse3_astro_skelton.obj";
-  //  loadObj(path);
-//    path = "://data/mouse03_skeleton_centroid.obj";
-//    loadObj(path);
-    path = "://data/mouse03_astro_skeleton.sk";
-    loadSkeletonPoints(path); // 11638884, 19131720
-    path = "://data/mouse03_skeletons.sk";
-
-    loadSkeletonPoints(path); // 11638884, 19131720
-    path = "://scripts/mouse03_mesh_center.obj";
+     //loadSkeletonPoints(path); // 11638884, 19131720
+    path = "://data/input_data/mouse03_astro_mesh_center_skeleton.obj.bin";
+    loadDataset(path);
+    path = "://data/input_data/mouse03_neurite_center_skeleton_bleeding.obj.bin";
     loadDataset(path);
 }
 
@@ -100,13 +95,16 @@ bool Mesh::loadDataset(QString path)
 
     QTextStream in(&file);
     QList<QByteArray> wordList;
+
+    QList<QByteArray> bleeding_list;
+
     int flag_prev = 0;
 
     Object *obj = NULL;
     std::string name;
     QVector4D center = QVector4D(0.0, 0.0, 0.0, 0.0);
     GLint idx = -1;
-
+    int vertex_offset = 0; // offset of the last vertex count from previus obj file
     // ssbo buffer info for mesh data
     // [color, center, volume, type, ?]
     struct ssbo_mesh ssbo_object_data;
@@ -114,6 +112,11 @@ bool Mesh::loadDataset(QString path)
     while (!file.atEnd()) {
         QByteArray line = file.readLine();
         wordList = line.split(' ');
+
+        // load the connectiivity edges first here
+        // the nodes are the drawn nodes, and the edges are their edges if both ends present
+        // for each object, add it to the set of object nodes
+
         if (wordList[0] == "o") {
             // o objname_hvgxID
 
@@ -171,6 +174,9 @@ bool Mesh::loadDataset(QString path)
                 qDebug() << "v word list";
                 break;
             }
+
+            ++vertex_offset;
+
             float x1 = atof(wordList[1].data());
             float y1 = atof(wordList[2].data());
             float z1 = atof(wordList[3].data());
@@ -178,6 +184,7 @@ bool Mesh::loadDataset(QString path)
             struct VertexData v;
             v.ID = idx; // this used to index ssbo
             v.mesh_vertex = mesh_vertex;
+            v.bleed = 0;
             if (wordList.size() < 6) {
                 // place holder
                 v.skeleton_vertex = mesh_vertex;
@@ -195,9 +202,9 @@ bool Mesh::loadDataset(QString path)
                 qDebug() << "f word list";
                 break;
             }
-            unsigned int f1_index = atoi(wordList[1].data());
-            unsigned int f2_index = atoi(wordList[2].data());
-            unsigned int f3_index = atoi(wordList[3].data());
+            unsigned int f1_index = atoi(wordList[1].data()) + m_vertex_offset;
+            unsigned int f2_index = atoi(wordList[2].data()) + m_vertex_offset;
+            unsigned int f3_index = atoi(wordList[3].data()) + m_vertex_offset;
             if (f1_index > verticesList.size() || f2_index > verticesList.size() || f3_index > verticesList.size()  ) {
                 // error, break
                 qDebug() << "Error in obj file! " << name.data() << " " << idx << " "
@@ -215,17 +222,33 @@ bool Mesh::loadDataset(QString path)
             /* vertex 3 */
             obj->addTriangleIndex(f3_index - 1);
             m_indices_size += 3;
+
+            for (int i = 1; i < bleeding_list.size(); ++i) {
+                int rv_index = atoi(bleeding_list[i].data()) + m_vertex_offset;
+                if (rv_index > verticesList.size()) {
+                    // error skip
+                    qDebug() << "error! skiped rv " << rv_index << " " << bleeding_list[i].data();
+
+                    continue;
+                }
+                verticesList[rv_index].bleed = 1;
+            }
+
         } else if (wordList[0] == "b") { // branch
             // b branch_branchID_parentBranch_knot1_knot2
         } else if (wordList[0] == "sk") { // skeleton point
             // add it to skeleton point cloud
-//            float x = atof(wordList[2].data());
-//            float y = atof(wordList[3].data());
-//            float z = atof(wordList[4].data());
-//            vertex.skeleton_vertex = QVector3D(x, y, z);
-//            obj->add_s_vertex(vertex);
-//            m_skeleton_nodes_size++;
+            float x = atof(wordList[1].data());
+            float y = atof(wordList[2].data());
+            float z = atof(wordList[3].data());
+            struct SkeletonVertex sk_vertex = {QVector3D(x, y, z), idx};
+            obj->add_s_vertex(sk_vertex);
+            m_skeleton_nodes_size++;
         } else if (wordList[0] == "l") { // edge between skeleton points
+        } else if (wordList[0] == "rv") {
+            if (wordList.size() < 2)
+                continue;
+            bleeding_list = wordList;
         }
     }
 
@@ -233,6 +256,8 @@ bool Mesh::loadDataset(QString path)
         m_buffer_data.push_back(ssbo_object_data);
         m_objects.push_back(obj);
     }
+
+    m_vertex_offset = vertex_offset;
 
     return true;
 }
@@ -262,68 +287,13 @@ bool Mesh::initVertexAttrib()
     offset += sizeof(QVector3D);
     glEnableVertexAttribArray(2);
     glVertexAttribIPointer(2, 1, GL_INT, sizeof(VertexData), (GLvoid*)offset);
-    return true;
 
-}
-
-// todo: combine this with the mesh class
-bool Mesh::loadSkeletonPoints(QString path)
-{
-    qDebug() << "Func: loadSkeletonPoints";
-    QFile file(path);
-    if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        qDebug() << "Could not open the file for reading";
-        return 0;
-    }
-
-    QTextStream in(&file);
-    QList<QByteArray> wordList;
-    std::string name;
-    GLint idx = -1;
-
-
-    struct SkeletonVertex vertex;
-    Object *obj = NULL;
-    int flag_prev = 0;
-    // Point ID, thickness, X Coord, Y Coord, Z Coord, Object ID
-    while (!file.atEnd()) {
-        QByteArray line = file.readLine();
-        wordList = line.split(' ');
-        if (wordList[0] == "o") {
-            if (flag_prev == 1) {
-                m_skeletons.push_back(obj);
-            }
-
-            if (m_skeletons.size() > m_limit) {
-                flag_prev = 0;
-                qDebug() << "Size limit";
-                break;
-            }
-
-            name  = wordList[1].data();
-            idx = m_skeletons.size();
-            obj = new Object(name, idx);
-            if (obj->getObjectType() == Object_t::SYNAPSE ||obj->getObjectType() == Object_t::MITO  ) {
-                flag_prev = 0;
-                continue;
-            }
-            vertex.ID = idx;
-            flag_prev = 1;
-        } else if (wordList[0] == "p" && flag_prev >= 1) {
-            float x = atof(wordList[2].data());
-            float y = atof(wordList[3].data());
-            float z = atof(wordList[4].data());
-            vertex.skeleton_vertex = QVector3D(x, y, z);
-            obj->add_s_vertex(vertex);
-            m_skeleton_nodes_size++;
-        }
-    }
-
-    if (flag_prev == 1) {
-        m_skeletons.push_back(obj);
-    }
+    offset += sizeof(GL_INT);
+    glEnableVertexAttribArray(3);
+    glVertexAttribIPointer(3, 1, GL_INT, sizeof(VertexData), (GLvoid*)offset);
 
     return true;
+
 }
 
 // temp functions until we think of way to represent the data
@@ -482,19 +452,18 @@ bool Mesh::initSkeletonShaders()
         qDebug() << "Could not bind vertex buffer to the context.";
     }
 
-    m_vbo_skeleton.allocate(NULL, getNodesCount() * sizeof(SkeletonVertex));
+    m_vbo_skeleton.allocate(NULL, m_skeleton_nodes_size * sizeof(SkeletonVertex));
 
     int offset = 0;
-    for (std::size_t i = 0; i < m_skeletons.size(); i++) {
-
-        int count = m_skeletons[i]->get_s_Size() * sizeof(SkeletonVertex);
-        m_vbo_skeleton.write(offset, &m_skeletons[i]->get_s_Vertices()[0], count);
-        qDebug() << i << " allocating: " << m_skeletons[i]->getName().data() << " count: " << count;
+    for (std::size_t i = 0; i < m_objects.size(); i++) {
+        int count = m_objects[i]->get_s_Size() * sizeof(SkeletonVertex);
+        m_vbo_skeleton.write(offset, &m_objects[i]->get_s_Vertices()[0], count);
+        qDebug() << i << " allocating: " << m_objects[i]->getName().data() << " count: " << count;
         offset += count;
    }
 
-    qDebug() << " m_mesh.getNodesCount(): " << getNodesCount();
-    qDebug() << " m_mesh.getNodesCount()* sizeof(QVector3D): " << getNodesCount()* sizeof(SkeletonVertex);
+    qDebug() << " m_mesh.getNodesCount(): " << m_skeleton_nodes_size;
+    qDebug() << " m_mesh.getNodesCount()* sizeof(QVector3D): " << m_skeleton_nodes_size* sizeof(SkeletonVertex);
 
     GL_Error();
 
@@ -514,8 +483,6 @@ bool Mesh::initSkeletonShaders()
 
 void Mesh::draw()
 {
-
-
     /************************/
     // I need this because vertex <-> skeleton mapping is not complete
     m_vao_skeleton.bind();
@@ -523,7 +490,7 @@ void Mesh::draw()
 
     updateUniformsLocation(m_program_skeleton);
 
-    glDrawArrays(GL_POINTS, 0,  getNodesCount() );
+    glDrawArrays(GL_POINTS, 0,  m_skeleton_nodes_size );
     m_vao_skeleton.release();
 
     /************************/
