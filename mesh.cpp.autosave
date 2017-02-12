@@ -12,7 +12,7 @@ Mesh::Mesh()
     m_vertices_size = 0;
     m_indices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 100;
+    m_limit = 43;
     m_vertex_offset = 0;
 
     // to do: combine all these files in one .obj file -> m3_dataset.obj
