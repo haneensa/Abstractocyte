@@ -1,6 +1,7 @@
 #version 430
 
-out vec4 outcol;
+in vec4         color_val;
+out vec4        outcol;
 
 float           Ns = 250;
 vec4            mat_specular = vec4(1);
@@ -8,7 +9,6 @@ vec4            light_specular = vec4(1);
 
 
 void main() {
-    vec4 color_val =  vec4( 0.0, 0.545, 0.545, 1.0 );
     vec3 lightDir =  vec3(0.5, 0.0, -0.9);
     vec3 normal;
     normal.xy = gl_PointCoord * 2.0 - vec2(1.0);

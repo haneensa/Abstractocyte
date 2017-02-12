@@ -35,7 +35,7 @@ public:
 
     int getNodesCount();
     // graph related function
-    std::vector<QVector4D> getNeuriteNodes();
+    std::vector<Object*> getNeuriteNodes();
     std::vector<QVector2D> getNeuritesEdges();
 
     // OpenGL initialization
@@ -56,7 +56,7 @@ protected:
 
     int                                 m_limit;
 
-    std::vector<Object*>                m_objects;
+    std::vector<Object*>                m_objects; // make this map by hvgx ID instead of vector
     std::vector<struct ssbo_mesh>       m_buffer_data; // Color, Cenert, Type
     GLuint                              m_buffer;
     GLuint                              m_bindIdx;

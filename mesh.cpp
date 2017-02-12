@@ -1,4 +1,5 @@
 #include <chrono>
+#include <QXmlStreamReader>
 #include "mesh.h"
 
 Mesh::Mesh()
@@ -67,7 +68,7 @@ c connecitity_graph1
 l p1_idx p2_idx
 l p1_idx p2_idx
 
-c connecitity_graph2
+conn connecitity_graph2
 l p1_idx p2_idx
 l p1_idx p2_idx
 
@@ -96,9 +97,9 @@ bool Mesh::loadDataset(QString path)
     QTextStream in(&file);
     QList<QByteArray> wordList;
 
-    QList<QByteArray> bleeding_list;
+    QList<QByteArray> bleeding_list; // store the list of vertices close to astrocyte
 
-    int flag_prev = 0;
+    int flag_prev = 0;  // flag to s
 
     Object *obj = NULL;
     std::string name;
@@ -224,6 +225,7 @@ bool Mesh::loadDataset(QString path)
             obj->addTriangleIndex(f3_index - 1);
             m_indices_size += 3;
 
+
             for (int i = 1; i < bleeding_list.size(); ++i) {
                 int rv_index = atoi(bleeding_list[i].data()) + m_vertex_offset;
                 if (rv_index > verticesList.size()) {
@@ -238,6 +240,10 @@ bool Mesh::loadDataset(QString path)
         } else if (wordList[0] == "b") { // branch
             // b branch_branchID_parentBranch_knot1_knot2
         } else if (wordList[0] == "sk") { // skeleton point
+            if (wordList.size() < 4) {
+                qDebug() << "sk word list";
+                break;
+            }
             // add it to skeleton point cloud
             float x = atof(wordList[1].data());
             float y = atof(wordList[2].data());
@@ -389,9 +395,9 @@ bool Mesh::initMeshShaders()
     m_vbo_IndexMesh.allocate( NULL, m_indices_size * sizeof(GLuint) );
     int offset = 0;
     for (std::size_t i = 0; i < m_objects.size(); i++) {
-        if (m_objects[i]->getObjectType() == Object_t::SYNAPSE  ||m_objects[i]->getObjectType() == Object_t::MITO   ) {
-            continue;
-        }
+      //  if (m_objects[i]->getObjectType() == Object_t::SYNAPSE  ||m_objects[i]->getObjectType() == Object_t::MITO   ) {
+         //   continue;
+      //  }
         int count = m_objects[i]->get_indices_Size() * sizeof(GLuint);
         qDebug() << i << " allocating: " << m_objects[i]->getName().data();
         m_vbo_IndexMesh.write(offset, m_objects[i]->get_indices(), count);
@@ -562,17 +568,9 @@ void Mesh::updateUniformsLocation(GLuint program)
     glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
 }
 
-std::vector<QVector4D> Mesh::getNeuriteNodes()
+std::vector<Object*> Mesh::getNeuriteNodes()
 {
-    std::vector<QVector4D> neurites_nodes;
-    for (std::size_t i = 0; i < m_objects.size(); i++) {
-        QVector4D center = m_objects[i]->getCenter();
-        int hvgxID = m_objects[i]->getHVGXID();
-        QVector4D node_info = QVector4D(hvgxID, center.x(), center.y(), center.z());
-        neurites_nodes.push_back(node_info);
-    }
-
-    return neurites_nodes;
+    return m_objects;
 }
 
 std::vector<QVector2D> Mesh::getNeuritesEdges()

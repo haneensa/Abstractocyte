@@ -76,6 +76,11 @@ size_t Object::get_s_Size()
     return m_skeleton_vertices.size();
 }
 
+void Object::setColor(QVector4D color)
+{
+    m_color = color;
+}
+
 QVector4D Object::getColor()
 {
     switch (m_object_t) {
@@ -112,26 +117,20 @@ QVector4D Object::getColor()
     return m_color;
 }
 
-QVector4D Object::getCenter()
-{
-    return m_center;
-}
-
-void Object::setColor(QVector4D color)
-{
-    m_color = color;
-}
-
 void Object::setCenter(QVector4D center)
 {
     m_center = center;
+}
+
+QVector4D Object::getCenter()
+{
+    return m_center;
 }
 
 void Object::setVolume(int volume)
 {
     m_volume = volume;
 }
-
 
 int Object::getVolume()
 {

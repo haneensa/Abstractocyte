@@ -1,7 +1,7 @@
 #include "graphmanager.h"
 
 GraphManager::GraphManager()
-    : m_IndexVBO(QOpenGLBuffer::IndexBuffer),
+    : m_IndexVBO( QOpenGLBuffer::IndexBuffer ),
       m_NodesVBO( QOpenGLBuffer::VertexBuffer ),
       m_glFunctionsSet(false),
       m_FDL_running(false)
@@ -99,11 +99,25 @@ bool GraphManager::initOpenGLFunctions()
     return true;
 }
 
+void GraphManager::initVertexAttribPointer()
+{
+    int offset = 0;
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(struct BufferNode),  0);
+    offset += sizeof(QVector3D);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
+                          sizeof(struct BufferNode),  (void*)offset);
+    offset += sizeof(QVector2D);
+    glEnableVertexAttribArray(2);
+    glVertexAttribIPointer(2, 1, GL_INT, sizeof(BufferNode), (void*)offset);
+}
 
 // we initialize the vbos for drawing
 bool GraphManager::initVBO(int graphIdx)
 {
-    if (m_ngraph < graphIdx) {
+    if (max_graphs < graphIdx) {
         qDebug() << "graph index out of range";
         return false;
     }
@@ -139,14 +153,8 @@ bool GraphManager::initVBO(int graphIdx)
     glUseProgram(m_program_nodes);
     GL_Error();
 
+    initVertexAttribPointer();
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(struct BufferNode),  0);
-    int offset = sizeof(QVector3D);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(struct BufferNode),  (void*)offset);
     GL_Error();
 
     // initialize uniforms
@@ -160,13 +168,7 @@ bool GraphManager::initVBO(int graphIdx)
     m_IndexVAO.bind();
     m_NodesVBO.bind();
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(struct BufferNode),  0);
-    offset = sizeof(QVector3D);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(struct BufferNode),  (void*)offset);
+    initVertexAttribPointer();
 
     m_NodesVBO.release();
 
@@ -199,7 +201,7 @@ void GraphManager::drawGrid(struct GridUniforms grid_uniforms)
 void GraphManager::drawNodes(int graphIdx)
 {
 
-    if (m_ngraph < graphIdx) {
+    if (max_graphs < graphIdx) {
         qDebug() << "graph index out of range";
         return;
     }
@@ -221,7 +223,7 @@ void GraphManager::drawNodes(int graphIdx)
 
 void GraphManager::drawEdges(int graphIdx)
 {
-    if (m_ngraph < graphIdx) {
+    if (max_graphs < graphIdx) {
         qDebug() << "graph index out of range";
         return;
     }

@@ -4,6 +4,7 @@
 #include "node.h"
 #include "edge.h"
 #include "spatialhash.h"
+#include "object.h"
 
 #include <QDebug>
 #include <QFile>
@@ -19,6 +20,7 @@ struct BufferNode
 {
     QVector3D coord3D; // vertex center
     QVector2D coord2D; // layouted coordinate
+    int ID;
 };
 
 class Graph
@@ -27,11 +29,11 @@ public:
     Graph();
     ~Graph();
 
-    bool createGraph(std::vector<QVector4D> nodes_info, std::vector<QVector2D> edges_info);
+    bool createGraph(std::vector<Object*> nodes_info, std::vector<QVector2D> edges_info);
     bool loadNodes(QString filename);
     bool loadEdges(QString filename);
 
-    Node* addNode(int nID, float x, float y, float z);
+    Node* addNode(int nID, int ssboID, float x, float y, float z);
     Edge* addEdge(int eID, int nID1, int nID2);
 
     Node* getNode(int nID);

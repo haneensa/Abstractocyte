@@ -37,6 +37,8 @@ public:
     void updateUniformsLocation();
     void updateUniforms(struct GraphUniforms graph_uniforms);
 
+    void initVertexAttribPointer();
+
     // force directed layout
     void startForceDirectedLayout(int graphIdx);
     void stopForceDirectedLayout(int graphIdx);
@@ -47,7 +49,6 @@ public:
 protected:
     // later if I need more independent graphs
     Graph                           *m_graph[max_graphs];
-    int                             m_ngraph;
     bool                            m_glFunctionsSet;
 
     // one for the 2D space
@@ -71,7 +72,7 @@ protected:
     // todo: ?
 
     // graphs elements
-    std::vector<QVector4D>            m_neurites_nodes_info;
+    std::vector<Object*>              m_neurites_nodes_info;
     std::vector<QVector2D>            m_nerites_edges_info;
 
 };

@@ -36,8 +36,23 @@ Graph::~Graph()
     delete hashGrid;
 }
 
-bool Graph::createGraph(std::vector<QVector4D> nodes_info, std::vector<QVector2D> edges_info)
+bool Graph::createGraph(std::vector<Object*> nodes_info, std::vector<QVector2D> edges_info)
 {
+    // add nodes
+    for (int i = 0; i < nodes_info.size(); ++i) {
+        int nID = nodes_info[i]->getHVGXID();
+        int ssbo_ID = nodes_info[i]->getIdxID();
+        QVector4D center = nodes_info[i]->getCenter();
+        this->addNode(nID, ssbo_ID, center.x(), center.y(), center.z());
+    }
+
+    // add edges
+    for (int i = 0; i < edges_info.size(); ++i) {
+        int eID = i;
+        int nID1 = edges_info[i].x();
+        int nID2 = edges_info[i].y();
+        this->addEdge(eID, nID1, nID2);
+    }
 
     return true;
 }
@@ -72,7 +87,7 @@ bool Graph::loadNodes(QString filename)
         // type, size, glycogen around this node
 
         // add node
-        this->addNode(nID, x, y, z);
+        this->addNode(nID, 0, x, y, z);
 
     }
     qDebug() << "# nodes: " << m_nodes.size();
@@ -120,7 +135,7 @@ bool Graph::loadEdges(QString filename)
     return true;
 }
 
-Node* Graph::addNode(int nID, float x, float y, float z)
+Node* Graph::addNode(int nID, int ssboID, float x, float y, float z)
 {
     size_t idxID = m_bufferNodes.size();
     Node* newNode = new Node(nID, idxID, x, y, z);
@@ -130,7 +145,7 @@ Node* Graph::addNode(int nID, float x, float y, float z)
     QVector3D coord3D = QVector3D(x, y, z);
     QVector2D coord2D = QVector2D(x, y);
 
-    struct BufferNode bnode = {coord3D, coord2D};
+    struct BufferNode bnode = {coord3D, coord2D, ssboID};
     // ids assigned to nods should match the indices in this vector!
     m_bufferNodes.push_back(bnode);
 
@@ -152,6 +167,7 @@ Edge* Graph::addEdge(int eID, int nID1, int nID2)
         return NULL;
     }
 
+    qDebug() << "create edges: " << nID1 << " " << nID2;
     int idxID = m_edgesCounter++;
     Edge* newEdge = new Edge(eID, idxID, n1, n2);
     n1->addEdge(newEdge);

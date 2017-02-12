@@ -49,6 +49,8 @@ public:
     void setVolume(int volume);
 
     int getHVGXID()                 { return m_ID; }
+    int getIdxID()                 { return m_idxID; }
+
 
 private:
     std::string                             m_name;
