@@ -3,12 +3,13 @@
 
 #include "mainopengl.h"
 #include "graph.h"
+#include "mesh.h"
 
 #include <thread>
 
 
-
-#define max_graphs 1
+// (1) neurite-neurite graph (2) neurite-astrocyte skeleton (3) neurites skeletons - astrocyte skeleton (4) neuries skeletons
+#define max_graphs 4
 
 struct GraphUniforms {
     GLint y_axis;
@@ -26,6 +27,8 @@ class GraphManager : public MainOpenGL
 public:
     GraphManager();
     ~GraphManager();
+
+    void ExtractGraphFromMesh(Mesh *mesh);
 
     bool initOpenGLFunctions();
     void drawNodes(int graphIdx);
@@ -66,6 +69,11 @@ protected:
 
     // todo: flag that stops the FDL and kill the thread
     // todo: ?
+
+    // graphs elements
+    std::vector<QVector4D>            m_neurites_nodes_info;
+    std::vector<QVector2D>            m_nerites_edges_info;
+
 };
 
 #endif // GRAPHMANAGER_H

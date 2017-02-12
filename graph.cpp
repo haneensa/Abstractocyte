@@ -36,6 +36,12 @@ Graph::~Graph()
     delete hashGrid;
 }
 
+bool Graph::createGraph(std::vector<QVector4D> nodes_info, std::vector<QVector2D> edges_info)
+{
+
+    return true;
+}
+
 // nID, x, y, z
 bool Graph::loadNodes(QString filename)
 {

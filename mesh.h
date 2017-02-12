@@ -6,7 +6,10 @@
 #include <QFile>
 #include "mainopengl.h"
 
+#include "graph.h"
 #include "object.h"
+
+
 struct ssbo_mesh {
     QVector4D color;
     QVector4D center;   // center.w = neurite/astrocyte
@@ -31,6 +34,9 @@ public:
     bool loadDataset(QString path);
 
     int getNodesCount();
+    // graph related function
+    std::vector<QVector4D> getNeuriteNodes();
+    std::vector<QVector2D> getNeuritesEdges();
 
     // OpenGL initialization
     bool initOpenGLFunctions();
@@ -50,14 +56,7 @@ protected:
 
     int                                 m_limit;
 
-    // instead of storing the vertices for each object,
-    // store all the vertices at once
-    // use global index for each object
-    // use that index to render the object or not
-    // pros: storage for vertices,
-    // cons: global index to objects faces
     std::vector<Object*>                m_objects;
-    std::vector<Object*>                m_skeletons;
     std::vector<struct ssbo_mesh>       m_buffer_data; // Color, Cenert, Type
     GLuint                              m_buffer;
     GLuint                              m_bindIdx;
@@ -86,6 +85,9 @@ protected:
     int                                 m_indices_size;
 
     int                                 m_vertex_offset;
+
+    // graph related data
+    std::vector<QVector2D>              neurites_neurite_edge;
 };
 
 #endif // MESH_H

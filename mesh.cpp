@@ -20,7 +20,7 @@ Mesh::Mesh()
      //loadSkeletonPoints(path); // 11638884, 19131720
     path = "://data/input_data/mouse03_astro_mesh_center_skeleton.obj.bin";
     loadDataset(path);
-    path = "://data/input_data/mouse03_neurite_center_skeleton_bleeding.obj.bin";
+    path = "://data/input_data/mouse03_neurite_center_skeleton_bleeding_conn.obj.bin";
     loadDataset(path);
 }
 
@@ -108,6 +108,7 @@ bool Mesh::loadDataset(QString path)
     // ssbo buffer info for mesh data
     // [color, center, volume, type, ?]
     struct ssbo_mesh ssbo_object_data;
+    int neuritesTOneurites_flag = 0;
 
     while (!file.atEnd()) {
         QByteArray line = file.readLine();
@@ -244,7 +245,16 @@ bool Mesh::loadDataset(QString path)
             struct SkeletonVertex sk_vertex = {QVector3D(x, y, z), idx};
             obj->add_s_vertex(sk_vertex);
             m_skeleton_nodes_size++;
+        } else if (wordList[0] == "conn") { // edge between skeleton points
+            qDebug() << line;
+            if (wordList[1] == "neuritesToneurites")
+                neuritesTOneurites_flag = 1;
+
         } else if (wordList[0] == "l") { // edge between skeleton points
+            int source = atoi(wordList[1].data());
+            int target = atoi(wordList[2].data());
+            QVector2D edge_info = QVector2D(source, target);
+            neurites_neurite_edge.push_back(edge_info);
         } else if (wordList[0] == "rv") {
             if (wordList.size() < 2)
                 continue;
@@ -257,6 +267,7 @@ bool Mesh::loadDataset(QString path)
         m_objects.push_back(obj);
     }
 
+    qDebug() << "neurites_neurite_edge: " << neurites_neurite_edge.size();
     m_vertex_offset = vertex_offset;
 
     return true;
@@ -549,4 +560,22 @@ void Mesh::updateUniformsLocation(GLuint program)
 
     GLint x_axis = glGetUniformLocation(program, "x_axis");
     glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
+}
+
+std::vector<QVector4D> Mesh::getNeuriteNodes()
+{
+    std::vector<QVector4D> neurites_nodes;
+    for (std::size_t i = 0; i < m_objects.size(); i++) {
+        QVector4D center = m_objects[i]->getCenter();
+        int hvgxID = m_objects[i]->getHVGXID();
+        QVector4D node_info = QVector4D(hvgxID, center.x(), center.y(), center.z());
+        neurites_nodes.push_back(node_info);
+    }
+
+    return neurites_nodes;
+}
+
+std::vector<QVector2D> Mesh::getNeuritesEdges()
+{
+    return neurites_neurite_edge;
 }

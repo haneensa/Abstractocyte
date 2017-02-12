@@ -5,6 +5,7 @@
 #include <QOpenGLBuffer>
 #include <QOpenGLShaderProgram>
 
+
 enum class Object_t { AXON, DENDRITE, BOUTON, SPINE, MITO, SYNAPSE, ASTROCYTE, GLYCOGEN, UNKNOWN };
 
 struct VertexData {
@@ -35,7 +36,7 @@ public:
 
     size_t get_s_Size();
     size_t get_indices_Size()   { return m_meshIndices.size(); }
-    void* get_indices()       { return m_meshIndices.data(); }
+    void* get_indices()         { return m_meshIndices.data(); }
     Object_t getObjectType();
     std::string getName();
 
@@ -47,6 +48,7 @@ public:
     void setCenter(QVector4D center);
     void setVolume(int volume);
 
+    int getHVGXID()                 { return m_ID; }
 
 private:
     std::string                             m_name;
@@ -66,6 +68,9 @@ private:
     std::vector< struct SkeletonVertex >    m_skeleton_vertices;
 
     std::vector<GLuint>                     m_meshIndices;
+
+    // graph related data
+    //  skeleton of this neurites (nodes + edges between them)
 };
 
 #endif // OBJECT_H

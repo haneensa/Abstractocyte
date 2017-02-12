@@ -3,28 +3,9 @@
 GraphManager::GraphManager()
     : m_IndexVBO(QOpenGLBuffer::IndexBuffer),
       m_NodesVBO( QOpenGLBuffer::VertexBuffer ),
-      m_ngraph(0),
       m_glFunctionsSet(false),
       m_FDL_running(false)
 {
-    if (m_ngraph < max_graphs)  {
-        m_graph[m_ngraph] = new Graph();
-
-        // todo: load per segment the segments points defining the curve, and find a way to render them as part of the sekeleton
-//        m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_nodes.csv");
-//        m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/skeleton_astro_segments.csv");
-
-//        m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_points_2000offsets.csv");
-      //  m_graph[m_ngraph]->loadNodes("://data/skeleton_astrocyte_m3/skeleton_astro_points.csv");
-//        m_graph[m_ngraph]->loadEdges("://data/skeleton_astrocyte_m3/points_segments.csv");
-
-        // test connectivity info
-        m_graph[m_ngraph]->loadNodes("://data/originalData/processed_data/nodesList.csv");
-       // m_graph[m_ngraph]->loadEdges("://data/originalData/processed_data/connectivityList.csv");
-
-        m_ngraph++;
-    }
-
 }
 
 GraphManager::~GraphManager()
@@ -48,6 +29,41 @@ GraphManager::~GraphManager()
 
     delete m_graph[0]; // todo: if more than one iterate over all
 
+}
+
+// I have 4 graphs:
+// so here extract the object nodes in a list because more than a graph use them
+// extract skeletons graph in another list
+// extract connectivity between neurites in a list
+// extract connectivity between astrocyte and neurties in another list
+// 1) all skeleton with astrocyte
+    // (nodes are object skeleton nodes, and edges are the edges that connect them)
+    // + connection points between astrocyte and neurites if that vertex is close to the astrocyte
+// 2) skeletons without astrocyte
+    // only nods of object and what connect the object nodes together
+// 3) astrocyte skeleton and object nodes
+    // object nodes
+    // astrocyte graph
+    // connectivity edges between them
+// 4) object nodes and their connectivity information
+    // object nodes
+    // connectivity info from them
+void GraphManager::ExtractGraphFromMesh(Mesh *mesh)
+{
+    // iterate over mesh''s objects, and add all the center nodes except astrocyte
+    // create the a node for each object and store it in neurites_nodes
+     m_neurites_nodes_info = mesh->getNeuriteNodes();
+    // create skeleton for each obeject and add it to skeleton_segments
+
+    // create connectivity information (neurite-neurite) and add it to neurites_conn_edges
+     m_nerites_edges_info = mesh->getNeuritesEdges();
+
+     m_graph[0] = new Graph(); // neurite-neurite
+     m_graph[1] = new Graph(); // neurite-astrocyte skeleton
+     m_graph[2] = new Graph(); //  neurites skeletons - astrocyte skeleton
+     m_graph[3] = new Graph(); // neuries skeletons
+
+     m_graph[0]->createGraph(m_neurites_nodes_info, m_nerites_edges_info);
 }
 
 void GraphManager::stopForceDirectedLayout(int graphIdx)

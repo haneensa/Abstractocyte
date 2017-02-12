@@ -27,6 +27,7 @@ public:
     Graph();
     ~Graph();
 
+    bool createGraph(std::vector<QVector4D> nodes_info, std::vector<QVector2D> edges_info);
     bool loadNodes(QString filename);
     bool loadEdges(QString filename);
 
