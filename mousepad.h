@@ -99,12 +99,6 @@ private:
     GLuint                                  m_program_2DSpace;
     GLuint                                  m_program_2DSpace_Selection;
 
-    GLuint                                  m_fbo;
-    GLuint                                  m_fbo_texture;
-    GLuint                                  m_rbo_depth;
-    GLuint                                  m_vbo_fbo_vertices;
-
-
 };
 
 #endif // MOUSEPAD_H

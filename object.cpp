@@ -4,14 +4,13 @@
 
 #include "colors.h"
 
-Object::Object(std::string name, int idx, int ID)
+Object::Object(std::string name, int ID)
 {
     if (name[name.size()-1] == '\n') {
         name.erase(name.size()-1, name.size()-1);
     }
 
     m_name  = name; // obj name
-    m_idxID = idx;  // index ID in the object list
     m_ID    = ID;   // hvgx ID
     m_object_t = getObjectType(); // obect type
     m_color = QVector4D(1.0, 1.0, 0.0, 1.0);    // default one

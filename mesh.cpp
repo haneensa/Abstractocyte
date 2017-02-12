@@ -12,8 +12,9 @@ Mesh::Mesh()
     m_vertices_size = 0;
     m_indices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 100;
+    m_limit = 43;
     m_vertex_offset = 0;
+    m_buffer_data.resize(746);
 
     // to do: combine all these files in one .obj file -> m3_dataset.obj
     // to do: interface to load these files
@@ -105,7 +106,6 @@ bool Mesh::loadDataset(QString path)
     Object *obj = NULL;
     std::string name;
     QVector4D center = QVector4D(0.0, 0.0, 0.0, 0.0);
-    GLint idx = -1;
     int vertex_offset = 0; // offset of the last vertex count from previus obj file
     // ssbo buffer info for mesh data
     // [color, center, volume, type, ?]
@@ -120,8 +120,11 @@ bool Mesh::loadDataset(QString path)
             // o objname_hvgxID
 
             if (flag_prev == 1) {
+                int hvgxID = obj->getHVGXID();
+                if (hvgxID > m_buffer_data.size())
+                    m_buffer_data.resize(hvgxID + 1);
 
-                m_buffer_data.push_back(ssbo_object_data);
+                m_buffer_data[hvgxID] = ssbo_object_data;
                 m_objects.push_back(obj);
             }
 
@@ -138,8 +141,7 @@ bool Mesh::loadDataset(QString path)
                 name += nameList[i].data();
 
             int hvgxID = atoi(nameList[nameList.size() - 1].data());
-            idx = m_objects.size();
-            obj = new Object(name, idx, hvgxID);
+            obj = new Object(name, hvgxID);
             // get objet color based on type
             QVector4D color = obj->getColor();
             ssbo_object_data.color = color;
@@ -182,7 +184,7 @@ bool Mesh::loadDataset(QString path)
             float z1 = atof(wordList[3].data());
             QVector3D mesh_vertex(x1, y1, z1);
             struct VertexData v;
-            v.ID = idx; // this used to index ssbo
+            v.ID = obj->getHVGXID(); // this used to index ssbo
             v.mesh_vertex = mesh_vertex;
             v.bleed = 0;
             if (wordList.size() < 6) {
@@ -207,7 +209,7 @@ bool Mesh::loadDataset(QString path)
             unsigned int f3_index = atoi(wordList[3].data()) + m_vertex_offset;
             if (f1_index > verticesList.size() || f2_index > verticesList.size() || f3_index > verticesList.size()  ) {
                 // error, break
-                qDebug() << "Error in obj file! " << name.data() << " " << idx << " "
+                qDebug() << "Error in obj file! " << name.data() << " " << obj->getHVGXID() << " "
                          << verticesList.size() << " " << f1_index << " " << f2_index
                          << " " << f3_index ;
                 delete obj;
@@ -246,7 +248,7 @@ bool Mesh::loadDataset(QString path)
             float x = atof(wordList[1].data());
             float y = atof(wordList[2].data());
             float z = atof(wordList[3].data());
-            struct SkeletonVertex sk_vertex = {QVector3D(x, y, z), idx};
+            struct SkeletonVertex sk_vertex = {QVector3D(x, y, z), obj->getHVGXID()};
             obj->add_s_vertex(sk_vertex);
             m_skeleton_nodes_size++;
         } else if (wordList[0] == "conn") { // edge between skeleton points
@@ -271,7 +273,11 @@ bool Mesh::loadDataset(QString path)
     }
 
     if (flag_prev == 1) {
-        m_buffer_data.push_back(ssbo_object_data);
+        int hvgxID = obj->getHVGXID();
+        if (hvgxID > m_buffer_data.size())
+            m_buffer_data.resize(hvgxID + 1);
+
+        m_buffer_data[hvgxID] = ssbo_object_data;
         m_objects.push_back(obj);
     }
 
@@ -345,6 +351,7 @@ bool Mesh::initBuffer()
     if (m_glFunctionsSet == false)
         return false;
 
+    qDebug() <<  " m_buffer_data.size() : " << m_buffer_data.size() ;
     int bufferSize =  m_buffer_data.size() * sizeof(struct ssbo_mesh);
 
     glGenBuffers(1, &m_buffer);

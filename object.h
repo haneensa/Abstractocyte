@@ -24,7 +24,7 @@ struct SkeletonVertex {
 class Object
 {
 public:
-    Object(std::string name, int idx, int ID = 0);
+    Object(std::string name, int ID);
     ~Object();
 
     // add mesh and skeleton vertices together using VertexData
@@ -49,13 +49,11 @@ public:
     void setVolume(int volume);
 
     int getHVGXID()                 { return m_ID; }
-    int getIdxID()                 { return m_idxID; }
 
 
 private:
     std::string                             m_name;
     int                                     m_ID; // hvgx
-    int                                     m_idxID;
 
     // object properties
     Object_t                                m_object_t;     /* object type */

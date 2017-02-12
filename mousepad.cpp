@@ -29,13 +29,6 @@ MousePad::~MousePad()
 
     m_vao_selection.destroy();
 
-    glDeleteRenderbuffers(1, &m_rbo_depth);
-    glDeleteTextures(1, &m_fbo_texture);
-    glDeleteFramebuffers(1, &m_fbo);
-
-    /* free_resources */
-    glDeleteBuffers(1, &m_vbo_fbo_vertices);
-
     doneCurrent();
 }
 
@@ -215,10 +208,6 @@ void MousePad::initData()
     //m_IntervalXY.push_back({ast3, neu3});
     initRect(x_interval, y_interval, ID++);  // 10
 
-//    y_interval = QVector2D(70, 100);
-//    // m_IntervalXY.push_back({ast4, neu3});
-//    initRect(x_interval, y_interval, ID++); // 11
-
 
     // ################## x: 60-100 , y: 70-100
     x_interval = QVector2D(80, 100);
@@ -265,48 +254,6 @@ void MousePad::initBuffer()
     GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
     memcpy(p,   m_buffer_color_data.data(),  bufferSize);
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-
-    /* init selection buffer */
-    // texture
-    glActiveTexture(GL_TEXTURE1);
-    glGenTextures(1, &m_fbo_texture);
-    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_w, m_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // Depth buffer
-    glGenRenderbuffers(1, &m_rbo_depth);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_rbo_depth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, m_w, m_h);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-    // Framebuffer to link everything together
-    glGenFramebuffers(1, &m_fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fbo_texture, 0); // attach 2D tex image to fbo
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_rbo_depth);
-    GLenum status;
-    if ((status = glCheckFramebufferStatus(GL_FRAMEBUFFER)) != GL_FRAMEBUFFER_COMPLETE) {
-      fprintf(stderr, "glCheckFramebufferStatus: error %p", status);
-      return;
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    /* init_resources */
-      GLfloat fbo_vertices[] = {
-        -1, -1,
-         1, -1,
-        -1,  1,
-         1,  1,
-      };
-      glGenBuffers(1, &m_vbo_fbo_vertices);
-      glBindBuffer(GL_ARRAY_BUFFER, m_vbo_fbo_vertices);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(fbo_vertices), fbo_vertices, GL_STATIC_DRAW);
-      glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void MousePad::init2DSpaceGL()
@@ -468,15 +415,6 @@ void MousePad::resizeGL(int w, int h)
     m_projection.setToIdentity();
     m_projection.ortho( 0.0f,  1.0f, 0.0f, 1.0f, -1.0, 1.0 );
 
-    /* onReshape */
-    // Rescale FBO and RBO as well
-    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_w, m_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glBindRenderbuffer(GL_RENDERBUFFER, m_rbo_depth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, m_w, m_h);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     update();
 }

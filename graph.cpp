@@ -41,9 +41,8 @@ bool Graph::createGraph(std::vector<Object*> nodes_info, std::vector<QVector2D> 
     // add nodes
     for (int i = 0; i < nodes_info.size(); ++i) {
         int nID = nodes_info[i]->getHVGXID();
-        int ssbo_ID = nodes_info[i]->getIdxID();
         QVector4D center = nodes_info[i]->getCenter();
-        this->addNode(nID, ssbo_ID, center.x(), center.y(), center.z());
+        this->addNode(nID, center.x(), center.y(), center.z());
     }
 
     // add edges
@@ -87,7 +86,7 @@ bool Graph::loadNodes(QString filename)
         // type, size, glycogen around this node
 
         // add node
-        this->addNode(nID, 0, x, y, z);
+        this->addNode(nID, x, y, z);
 
     }
     qDebug() << "# nodes: " << m_nodes.size();
@@ -135,7 +134,7 @@ bool Graph::loadEdges(QString filename)
     return true;
 }
 
-Node* Graph::addNode(int nID, int ssboID, float x, float y, float z)
+Node* Graph::addNode(int nID, float x, float y, float z)
 {
     size_t idxID = m_bufferNodes.size();
     Node* newNode = new Node(nID, idxID, x, y, z);
@@ -145,7 +144,7 @@ Node* Graph::addNode(int nID, int ssboID, float x, float y, float z)
     QVector3D coord3D = QVector3D(x, y, z);
     QVector2D coord2D = QVector2D(x, y);
 
-    struct BufferNode bnode = {coord3D, coord2D, ssboID};
+    struct BufferNode bnode = {coord3D, coord2D, nID};
     // ids assigned to nods should match the indices in this vector!
     m_bufferNodes.push_back(bnode);
 

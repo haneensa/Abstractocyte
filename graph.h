@@ -33,7 +33,7 @@ public:
     bool loadNodes(QString filename);
     bool loadEdges(QString filename);
 
-    Node* addNode(int nID, int ssboID, float x, float y, float z);
+    Node* addNode(int nID, float x, float y, float z);
     Edge* addEdge(int eID, int nID1, int nID2);
 
     Node* getNode(int nID);

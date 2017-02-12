@@ -58,6 +58,7 @@ void main() {
         color_val = vec4(1.0, 0.0, 0.0, 1.0);
     else
         color_val = SSBO_data[ID].color;
+
     vec4 pos1, pos2;
 
     // astrocyte or neurites?
@@ -109,7 +110,6 @@ void main() {
     }
 
    vec4 new_position = mix(pos1 , pos2, position_intp);
-   //vec4 new_position = pos2 * position_intp +   (0.99 - position_intp) *pos1;
 
 
    gl_Position = new_position;
