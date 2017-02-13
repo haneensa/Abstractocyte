@@ -58,28 +58,6 @@ void Object::addTriangleIndex(GLuint face)
     m_meshIndices.push_back(face);
 }
 
-
-std::vector<struct SkeletonVertex> Object::get_s_Vertices()
-{
-    return m_skeleton_vertices;
-}
-
-
-std::string Object::getName()
-{
-    return m_name;
-}
-
-size_t Object::get_s_Size()
-{
-    return m_skeleton_vertices.size();
-}
-
-void Object::setColor(QVector4D color)
-{
-    m_color = color;
-}
-
 QVector4D Object::getColor()
 {
     switch (m_object_t) {
@@ -118,20 +96,21 @@ QVector4D Object::getColor()
 
 void Object::setCenter(QVector4D center)
 {
+    if (m_object_t == Object_t::ASTROCYTE ) {
+        center.setW(0); // w: indicates the type of the object (glia, neurite)
+    } else {
+        center.setW(1);
+    }
+
     m_center = center;
 }
 
-QVector4D Object::getCenter()
+struct ssbo_mesh Object::getSSBOData()
 {
-    return m_center;
-}
+    struct ssbo_mesh ssbo_data;
+    ssbo_data.color = m_color;
+    ssbo_data.center = m_center;
+    ssbo_data.info.setX(m_volume);
 
-void Object::setVolume(int volume)
-{
-    m_volume = volume;
-}
-
-int Object::getVolume()
-{
-    return m_volume;
+    return ssbo_data;
 }

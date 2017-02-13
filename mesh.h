@@ -4,17 +4,11 @@
 // file manipulations
 #include <QString>
 #include <QFile>
-#include "mainopengl.h"
+#include <QXmlStreamReader>
 
+#include "mainopengl.h"
 #include "graph.h"
 #include "object.h"
-
-
-struct ssbo_mesh {
-    QVector4D color;
-    QVector4D center;   // center.w = neurite/astrocyte
-    QVector4D info;     // volume, type (axon, bouton, spine, dendrite, ..), ?, ?
-};
 
 struct MeshUniforms {
     GLint y_axis;
@@ -32,10 +26,17 @@ public:
     int getVertixCount();
 
     bool loadDataset(QString path);
+    bool importXML(QString path);
+    void parseObject(QXmlStreamReader &xml, Object *obj);
+    void parseMesh(QXmlStreamReader &xml, Object *obj);
+    void parseSkeleton(QXmlStreamReader &xml, Object *obj);
+    void parseBranch(QXmlStreamReader &xml);
+    void parseConnGraph(QXmlStreamReader &xml);
+
 
     int getNodesCount();
     // graph related function
-    std::vector<Object*> getNeuriteNodes();
+    std::map<int, Object*>  getNeuriteNodes();
     std::vector<QVector2D> getNeuritesEdges();
 
     // OpenGL initialization
@@ -56,7 +57,8 @@ protected:
 
     int                                 m_limit;
 
-    std::vector<Object*>                m_objects; // make this map by hvgx ID instead of vector
+    //std::vector<Object*>                m_objects; // make this map by hvgx ID instead of vector
+    std::map<int, Object*>              m_objects;
     std::vector<struct ssbo_mesh>       m_buffer_data; // Color, Cenert, Type
     GLuint                              m_buffer;
     GLuint                              m_bindIdx;
