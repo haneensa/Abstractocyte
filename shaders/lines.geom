@@ -5,6 +5,9 @@ layout (line_strip, max_vertices = 2) out;
 
 in int          V_ID[];
 
+uniform int     y_axis;
+uniform int     x_axis;
+
 struct SSBO_datum {
     vec4 color;
     vec4 center;
@@ -25,9 +28,11 @@ void main() {
     int ID = V_ID[0];
     int type = int(SSBO_data[ID].center.w);
     vec4 alpha6 = space2d[type][5]; // additional info
-    if (alpha6.w == 0) {
+    if ( alpha6.w == 0 || (y_axis < 98  || x_axis < 98) ) {
         return;
     }
+
+    //  Ideally I would interpolate betweeen the edges transparency to show it smothly?
 
     gl_Position = gl_in[0].gl_Position;
     gl_PointSize = gl_in[0].gl_PointSize;

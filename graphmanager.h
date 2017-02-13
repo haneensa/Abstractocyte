@@ -34,7 +34,7 @@ public:
     void drawNodes(int graphIdx);
     void drawEdges(int graphIdx);
     bool initVBO(int graphIdx);
-    void updateUniformsLocation();
+    void updateUniformsLocation(GLuint program);
     void updateUniforms(struct GraphUniforms graph_uniforms);
 
     void initVertexAttribPointer();
@@ -72,7 +72,7 @@ protected:
     // todo: ?
 
     // graphs elements
-    std::vector<Object*>              m_neurites_nodes_info;
+    std::map<int, Object*>            m_neurites_nodes_info;
     std::vector<QVector2D>            m_nerites_edges_info;
 
 };

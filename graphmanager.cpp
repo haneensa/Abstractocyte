@@ -70,7 +70,8 @@ void GraphManager::stopForceDirectedLayout(int graphIdx)
 {
     m_graph[graphIdx]->terminateFDL();
     m_FDL_running = false; // todo: get this from the graph itself, since it is per graph, even the thread?
-    updateUniformsLocation();
+    updateUniformsLocation(m_program_nodes);
+    updateUniformsLocation(m_program_Index);
     if (m_layout_thread1.joinable()) {
         m_layout_thread1.join();
     }
@@ -158,7 +159,7 @@ bool GraphManager::initVBO(int graphIdx)
     GL_Error();
 
     // initialize uniforms
-    updateUniformsLocation();
+    updateUniformsLocation(m_program_nodes);
 
     m_NodesVBO.release();
     m_NodesVAO.release();
@@ -178,7 +179,7 @@ bool GraphManager::initVBO(int graphIdx)
     m_graph[graphIdx]->allocateBIndices(m_IndexVBO);
 
     glUseProgram(m_program_Index);
-    updateUniformsLocation();
+    updateUniformsLocation(m_program_Index);
 
 
     m_IndexVBO.release();
@@ -214,7 +215,7 @@ void GraphManager::drawNodes(int graphIdx)
     m_graph[graphIdx]->allocateBVertices(m_NodesVBO);
 
     glUseProgram(m_program_nodes);
-    updateUniformsLocation();
+    updateUniformsLocation(m_program_nodes);
 
     glDrawArrays(GL_POINTS, 0, m_graph[graphIdx]->vertexBufferSize() );
     m_NodesVBO.release();
@@ -236,7 +237,7 @@ void GraphManager::drawEdges(int graphIdx)
     m_IndexVBO.bind();
 
     glUseProgram(m_program_Index);
-    updateUniformsLocation();
+    updateUniformsLocation(m_program_Index);
 
     glDrawElements(GL_LINES, m_graph[graphIdx]->indexBufferSize(), GL_UNSIGNED_INT, 0 );
     m_NodesVBO.release();
@@ -244,25 +245,30 @@ void GraphManager::drawEdges(int graphIdx)
     m_IndexVAO.release();
 }
 
-void GraphManager::updateUniformsLocation()
+void GraphManager::updateUniformsLocation(GLuint program)
 {
     if (m_glFunctionsSet == false)
         return;
 
     // initialize uniforms
-    GLuint mMatrix = glGetUniformLocation(m_program_nodes, "mMatrix");
+    GLuint mMatrix = glGetUniformLocation(program, "mMatrix");
     if (m_FDL_running) { // force directed layout started, them use model without rotation
         glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
     } else {
         glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
     }
 
-    GLuint vMatrix = glGetUniformLocation(m_program_nodes, "vMatrix");
+    GLuint vMatrix = glGetUniformLocation(program, "vMatrix");
     glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
 
-    GLuint pMatrix = glGetUniformLocation(m_program_nodes, "pMatrix");
+    GLuint pMatrix = glGetUniformLocation(program, "pMatrix");
     glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
 
+    GLint y_axis = glGetUniformLocation(program, "y_axis");
+    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
+
+    GLint x_axis = glGetUniformLocation(program, "x_axis");
+    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
 
 }
 
