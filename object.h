@@ -4,11 +4,14 @@
 #include <QVector3D>
 #include <QOpenGLBuffer>
 #include <QOpenGLShaderProgram>
+
 #include "skeleton.h"
+#include "mesh.h"
+#include "ssbo_structs.h"
 
 enum class Object_t { AXON, DENDRITE, BOUTON, SPINE, MITO, SYNAPSE, ASTROCYTE, GLYCOGEN, UNKNOWN };
 
-// ssbo data structure per object
+// mesh vertex
 struct VertexData {
     QVector3D   mesh_vertex;
     QVector3D   skeleton_vertex;
@@ -16,18 +19,13 @@ struct VertexData {
     GLint       bleed;
 };
 
-// skeleton ssbo per object
+// skeleton vertex
 struct SkeletonVertex {
     QVector3D   skeleton_vertex;
     GLint       ID;
 };
 
-struct ssbo_mesh {
-    QVector4D color;
-    QVector4D center;   // center.w = neurite/astrocyte
-    QVector4D info;     // volume, type (axon, bouton, spine, dendrite, ..), ?, ?
-};
-
+class Skeleton;
 class Object
 {
 public:
@@ -51,7 +49,7 @@ public:
     QVector4D getCenter()               { return m_center; }
     int getVolume()                     { return m_volume; }
     int getHVGXID()                     { return m_ID; }
-    struct ssbo_mesh                    getSSBOData();
+    struct ssbo_mesh getSSBOData();
 
     // properties setters
     void setColor(QVector4D color)      {  m_color = color; }
@@ -74,6 +72,7 @@ private:
 
     // replace this with Skeleton object
     std::vector< struct SkeletonVertex >    m_skeleton_vertices;
+    Skeleton                                m_skeleton;
 
     // indices to access the global mesh vertices defined in mesh
     std::vector<GLuint>                     m_meshIndices;

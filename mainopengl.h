@@ -2,7 +2,6 @@
 #define MAINOPENGL_H
 
 // OpenGL
-
 #include <QOpenGLFunctions>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
@@ -11,8 +10,8 @@
 
 // IO
 #include <QDebug>
-#include <iostream>
 #include <QMouseEvent>
+#include <iostream>
 
 // text includes
 #include <QtGui/QImage>

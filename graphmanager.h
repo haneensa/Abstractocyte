@@ -3,7 +3,7 @@
 
 #include "mainopengl.h"
 #include "graph.h"
-#include "mesh.h"
+#include "objectmanager.h"
 
 #include <thread>
 
@@ -28,7 +28,7 @@ public:
     GraphManager();
     ~GraphManager();
 
-    void ExtractGraphFromMesh(Mesh *mesh);
+    void ExtractGraphFromMesh(ObjectManager *instance);
 
     bool initOpenGLFunctions();
     void drawNodes(int graphIdx);

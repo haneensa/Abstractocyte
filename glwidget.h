@@ -7,8 +7,8 @@
 
 #include "graphmanager.h"
 #include "mainopengl.h"
-#include "mesh.h"
 #include "abstractionspace.h"
+#include "objectmanager.h"
 
 class GLWidget : public QOpenGLWidget, MainOpenGL
 {
@@ -38,7 +38,8 @@ protected:
     AbstractionSpace            *m_2dspace;
 
     /* mesh */
-    Mesh                        *m_mesh;
+    ObjectManager                        *m_mesh;
+
     GraphManager                *m_graphManager;
 
     struct MeshUniforms         m_mesh_uniforms;

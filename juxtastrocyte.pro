@@ -24,12 +24,13 @@ SOURCES += main.cpp\
     node.cpp \
     edge.cpp \
     graph.cpp \
-    mesh.cpp \
     abstractionspace.cpp \
     graphmanager.cpp \
     spatialhash.cpp \
     skeleton.cpp \
-    skeletonbranch.cpp
+    skeletonbranch.cpp \
+    objectmanager.cpp \
+    mesh.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -39,13 +40,15 @@ HEADERS  += mainwindow.h \
     node.h \
     edge.h \
     graph.h \
-    mesh.h \
     colors.h \
     abstractionspace.h \
     graphmanager.h \
     spatialhash.h \
     skeleton.h \
-    skeletonbranch.h
+    skeletonbranch.h \
+    objectmanager.h \
+    mesh.h \
+    ssbo_structs.h
 
 FORMS    += mainwindow.ui
 

@@ -5,11 +5,7 @@
 #include <string>
 #include <QVector4D>
 #include "mainopengl.h"
-
-
-struct ssbo_2DState {
-    QVector4D  states[2][6]; // val, alpha, color_intp, point_size, additional infos
-};
+#include "ssbo_structs.h"
 
 struct ast_neu_properties {
     struct properties ast;

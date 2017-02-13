@@ -48,15 +48,15 @@ GraphManager::~GraphManager()
 // 4) object nodes and their connectivity information
     // object nodes
     // connectivity info from them
-void GraphManager::ExtractGraphFromMesh(Mesh *mesh)
+void GraphManager::ExtractGraphFromMesh(ObjectManager *instance)
 {
     // iterate over mesh''s objects, and add all the center nodes except astrocyte
     // create the a node for each object and store it in neurites_nodes
-     m_neurites_nodes_info = mesh->getNeuriteNodes();
+     m_neurites_nodes_info = instance->getNeuriteNodes();
     // create skeleton for each obeject and add it to skeleton_segments
 
     // create connectivity information (neurite-neurite) and add it to neurites_conn_edges
-     m_nerites_edges_info = mesh->getNeuritesEdges();
+     m_nerites_edges_info = instance->getNeuritesEdges();
 
      m_graph[0] = new Graph(); // neurite-neurite
      m_graph[1] = new Graph(); // neurite-astrocyte skeleton

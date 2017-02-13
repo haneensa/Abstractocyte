@@ -22,7 +22,7 @@ GLWidget::GLWidget(QWidget *parent)
 {
 
     m_2dspace = new AbstractionSpace(100, 100);
-    m_mesh = new Mesh();
+    m_mesh = new ObjectManager();
     m_graphManager = new GraphManager();
     m_graphManager->ExtractGraphFromMesh(m_mesh);
 
