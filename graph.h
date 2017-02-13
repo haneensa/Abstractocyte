@@ -29,7 +29,7 @@ public:
     Graph();
     ~Graph();
 
-    bool createGraph(std::vector<Object*> nodes_info, std::vector<QVector2D> edges_info);
+    bool createGraph(std::map<int, Object*> nodes_info, std::vector<QVector2D> edges_info);
     bool loadNodes(QString filename);
     bool loadEdges(QString filename);
 

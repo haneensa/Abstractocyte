@@ -36,12 +36,13 @@ Graph::~Graph()
     delete hashGrid;
 }
 
-bool Graph::createGraph(std::vector<Object*> nodes_info, std::vector<QVector2D> edges_info)
+bool Graph::createGraph(std::map<int, Object*> nodes_info, std::vector<QVector2D> edges_info)
 {
     // add nodes
-    for (int i = 0; i < nodes_info.size(); ++i) {
-        int nID = nodes_info[i]->getHVGXID();
-        QVector4D center = nodes_info[i]->getCenter();
+    for ( auto iter = nodes_info.begin(); iter != nodes_info.end(); iter++) {
+        Object *object_p = (*iter).second;
+        int nID = object_p->getHVGXID();
+        QVector4D center = object_p->getCenter();
         this->addNode(nID, center.x(), center.y(), center.z());
     }
 
@@ -80,9 +81,9 @@ bool Graph::loadNodes(QString filename)
             continue;
         }
         int nID = atoi(wordList[0].data());
-        float x = atof(wordList[2].data())/*200.0*/;
-        float y = atof(wordList[3].data())/*200.0*/;
-        float z = atof(wordList[4].data())/*200.0*/;
+        float x = atof(wordList[2].data());
+        float y = atof(wordList[3].data());
+        float z = atof(wordList[4].data());
         // type, size, glycogen around this node
 
         // add node
