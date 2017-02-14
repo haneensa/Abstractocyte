@@ -364,10 +364,7 @@ l p1_idx p2_idx
 conn connecitity_graph2
 l p1_idx p2_idx
 l p1_idx p2_idx
-
   */
-
-
 bool ObjectManager::loadDataset(QString path)
 {
     // open file
@@ -755,8 +752,10 @@ bool ObjectManager::initSkeletonShaders()
     m_vbo_skeleton.allocate(NULL, m_skeleton_nodes_size * sizeof(SkeletonVertex));
 
     int offset = 0;
-    for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++) {
+    for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++) { // todo: skip if the object has no skeleton
         Object *object_p = (*iter).second;
+        if (object_p->get_s_Size() == 0)
+            continue;
         int count = object_p->get_s_Size() * sizeof(SkeletonVertex);
         m_vbo_skeleton.write(offset, &object_p->get_s_Vertices()[0], count);
         qDebug() <<  " allocating: " << object_p->getName().data() << " count: " << count;
