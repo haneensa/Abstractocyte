@@ -163,7 +163,7 @@ Edge* Graph::addEdge(int eID, int nID1, int nID2)
     Node *n2 = getNode(nID2);
 
     if (n1 == NULL || n2 == NULL) {
-        qDebug() << "cant insert " << nID1 << " and " << nID2;
+       // qDebug() << "cant insert " << nID1 << " and " << nID2;
         return NULL;
     }
 

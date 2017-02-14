@@ -10,10 +10,11 @@ class SkeletonBranch
 {
 public:
     SkeletonBranch();
-
+    void addKnots(int knot1, int knot2);
+    void addPoints(QStringList pointslist);
 protected:
-    std::vector<int> m_nodes; // -> how about each skeleton has set of nodes, and in the branch they refrence them
-    std::vector<QVector2D> m_points; // the points of this branch
+    int              m_nodes[2]; // -> how about each skeleton has set of nodes, and in the branch they refrence them
+    std::vector<int> m_points; // the points of this branch
 };
 
 #endif // SKELETONBRANCH_H

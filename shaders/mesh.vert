@@ -1,9 +1,7 @@
 #version 430
 
-layout(location = 0) in vec3    mesh_vx;
-layout(location = 1) in vec3    skeleton_vx;
-layout(location = 2) in int     ID;
-layout(location = 3) in int     bleed;
+layout(location = 0) in vec4    mesh_vx;
+layout(location = 1) in vec4    skeleton_vx;
 
 out vec4        Vskeleton_vx;
 out int         V_ID;
@@ -33,8 +31,10 @@ void main(void)
     mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
     gl_Position =  pvmMatrix * vec4(mesh_vx.xyz , 1.0);
     Vskeleton_vx = pvmMatrix * vec4(skeleton_vx.xyz, 1.0);
+    int ID = int(mesh_vx.w);
     V_ID = ID;
     vec3 center3d = SSBO_data[ID].center.xyz;
     V_center =  pvmMatrix * vec4(center3d, 1.0);
-    V_bleeding = bleed;
+    int bleeding =  int(skeleton_vx.w);
+    V_bleeding = bleeding;
 }

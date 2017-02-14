@@ -5,10 +5,8 @@
 
 // mesh vertex
 struct VertexData {
-    QVector3D   mesh_vertex;
-    QVector3D   skeleton_vertex;
-    GLint       ID;
-    GLint       bleed;
+    QVector4D   mesh_vertex;        // w: ID
+    QVector4D   skeleton_vertex;    // w: markers
 };
 
 class Mesh
@@ -18,7 +16,6 @@ public:
     void addVertex(struct VertexData vdata);
     bool isValidFaces(int f1, int f2, int f3);
     void MarkBleedingVertices(QStringList markersList, int vertex_offset); // for xml
-    void MarkBleedingVertices(QList<QByteArray> markersList, int vertex_offset); // for .obj
     int getVerticesSize()       { return verticesList.size(); }
     void allocateVerticesVBO(QOpenGLBuffer vbo_mesh);
 
@@ -26,7 +23,6 @@ protected:
     // faces indices
     // set of faces
     std::vector< struct VertexData >    verticesList;
-    int                                 m_indices_size;
 
 };
 

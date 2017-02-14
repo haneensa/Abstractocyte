@@ -19,14 +19,14 @@ public:
     ObjectManager();
     ~ObjectManager();
 
-    bool loadDataset(QString path);
     bool importXML(QString path);
     void parseObject(QXmlStreamReader &xml, Object *obj);
     void parseMesh(QXmlStreamReader &xml, Object *obj);
     void parseSkeleton(QXmlStreamReader &xml, Object *obj);
-    void parseBranch(QXmlStreamReader &xml);
+    void parseSkeletonNodes(QXmlStreamReader &xml, Object *obj);
+    void parseBranch(QXmlStreamReader &xml, Object *obj);
     void parseConnGraph(QXmlStreamReader &xml);
-
+    void parseSkeletonPoints(QXmlStreamReader &xml, Object *obj);
 
     int getNodesCount();
     // graph related function

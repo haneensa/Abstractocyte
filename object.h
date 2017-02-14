@@ -11,14 +11,6 @@
 
 enum class Object_t { AXON, DENDRITE, BOUTON, SPINE, MITO, SYNAPSE, ASTROCYTE, GLYCOGEN, UNKNOWN };
 
-
-
-// skeleton vertex
-struct SkeletonVertex {
-    QVector3D   skeleton_vertex;
-    GLint       ID;
-};
-
 class Skeleton;
 class Object
 {
@@ -28,9 +20,8 @@ public:
 
     // temporary skeleton data points handleing function
     void add_s_vertex(struct SkeletonVertex vertex_data);
-    std::vector<struct SkeletonVertex> get_s_Vertices() { return m_skeleton_vertices; }
-    size_t get_s_Size()                 {  return m_skeleton_vertices.size(); }
 
+    int writeSkeletontoVBO(QOpenGLBuffer vbo, int offset);
     // mesh indices functions
     void addTriangleIndex(GLuint faces);
     size_t get_indices_Size()           { return m_meshIndices.size(); }
@@ -50,7 +41,10 @@ public:
     void setCenter(QVector4D center);
     void setVolume(int volume)          { m_volume = volume; }
 
-
+    // skeleton management
+    void addSkeletonNode(QVector3D coords);
+    void addSkeletonPoint(QVector3D coords);
+    void addSkeletonBranch(SkeletonBranch *branch);
 
 private:
     std::string                             m_name;
@@ -63,10 +57,7 @@ private:
     QVector4D                               m_center;
     QVector4D                               m_color;
 
-
-    // replace this with Skeleton object
-    std::vector< struct SkeletonVertex >    m_skeleton_vertices;
-    Skeleton                                m_skeleton;
+    Skeleton                                *m_skeleton;
 
     // indices to access the global mesh vertices defined in mesh
     std::vector<GLuint>                     m_meshIndices;

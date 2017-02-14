@@ -16,6 +16,9 @@ Object::Object(std::string name, int ID)
     m_color = QVector4D(1.0, 1.0, 0.0, 1.0);    // default one
     m_volume = 0;
     m_center = QVector4D(0, 0, 0, 0);
+
+    m_skeleton = new Skeleton(m_ID);
+
     qDebug() << "create " << m_name.data() << " hvgxID: " << m_ID;
 }
 
@@ -46,11 +49,6 @@ Object_t Object::getObjectType()
     } else {
         return Object_t::UNKNOWN;
     }
-}
-
-void Object::add_s_vertex(struct SkeletonVertex vertex)
-{
-    m_skeleton_vertices.push_back(vertex);
 }
 
 void Object::addTriangleIndex(GLuint face)
@@ -113,4 +111,34 @@ struct ssbo_mesh Object::getSSBOData()
     ssbo_data.info.setX(m_volume);
 
     return ssbo_data;
+}
+
+// skeleton management
+void Object::addSkeletonNode(QVector3D coords)
+{
+    m_skeleton->addNode(coords);
+}
+
+void Object::addSkeletonPoint(QVector3D coords)
+{
+    m_skeleton->addPoint(coords);
+}
+
+int Object::writeSkeletontoVBO(QOpenGLBuffer vbo, int offset)
+{
+    int size = m_skeleton->getSkeletonPointsSize();
+    if (size == 0) {
+        qDebug() << "no skeleton";
+        return 0;
+    }
+
+    int count = size * sizeof(SkeletonVertex);
+    vbo.write(offset, m_skeleton->getSkeletonPoints(), count);
+    qDebug() <<  " allocating: " <<  getName().data() << " count: " << count;
+
+    return count;
+}
+void Object::addSkeletonBranch(SkeletonBranch *branch)
+{
+    m_skeleton->addBranch(branch);
 }

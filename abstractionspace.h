@@ -1,3 +1,6 @@
+// todo: tie this with mousepad
+// generalize itnervals properties more
+
 #ifndef ABSTRACTIONSPACE_H
 #define ABSTRACTIONSPACE_H
 
