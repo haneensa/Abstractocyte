@@ -8,12 +8,8 @@
  * m_objects -> object class for each object (astrocyte, dendrite, ..)
  *           -> get from this the indices of the mesh
  *           -> get the skeleton vertices
- * verticesList to allocate the buffer
  *
  * m_buffer_data for ssbo initialization which I can take by looping over all m_objects
- *
- *
- *
  */
 ObjectManager::ObjectManager()
     :  m_bindIdx(2),
@@ -22,15 +18,13 @@ ObjectManager::ObjectManager()
        m_vbo_IndexMesh(QOpenGLBuffer::IndexBuffer),
        m_vbo_skeleton( QOpenGLBuffer::VertexBuffer )
 {
-    m_vertices_size = 0;
     m_indices_size = 0;
     m_skeleton_nodes_size = 0;
     m_limit = 43;
     m_vertex_offset = 0;
-    m_buffer_data.resize(746);
+    m_ssbo_data.resize(746);
+    m_mesh = new Mesh();
 
-    // to do: combine all these files in one .obj file -> m3_dataset.obj
-    // to do: interface to load these files
     //QString path;
     //loadSkeletonPoints(path); // 11638884, 19131720
     //path = "://data/input_data/mouse03_astro_mesh_center_skeleton.obj.bin";
@@ -55,6 +49,7 @@ ObjectManager::~ObjectManager()
 
         glDeleteProgram(m_program_skeleton);
         glDeleteProgram(m_program_mesh);
+        glDeleteProgram(m_program_mesh_points);
 
         m_vao_mesh.destroy();
         m_vbo_mesh.destroy();
@@ -72,7 +67,7 @@ bool ObjectManager::importXML(QString path)
         return false;
     }
 
-    m_vertex_offset += verticesList.size();
+    m_vertex_offset += m_mesh->getVerticesSize();
 
     QXmlStreamReader xml(file);
     while( !xml.atEnd() && !xml.hasError() ) {
@@ -187,7 +182,7 @@ void ObjectManager::parseObject(QXmlStreamReader &xml, Object *obj)
 
     if (obj != NULL) {
          m_objects[hvgxID] =  obj;
-         m_buffer_data[hvgxID] = obj->getSSBOData();
+         m_ssbo_data[hvgxID] = obj->getSSBOData();
     }
 }
 
@@ -237,7 +232,7 @@ void ObjectManager::parseMesh(QXmlStreamReader &xml, Object *obj)
                     QVector3D skeleton_vertex(x2, y2, z2);
                     v.skeleton_vertex = skeleton_vertex;
                 }
-                verticesList.push_back(v);
+                m_mesh->addVertex(v);
             } else if (xml.name() == "f") {
                 ++faces;
                 xml.readNext();
@@ -251,13 +246,10 @@ void ObjectManager::parseMesh(QXmlStreamReader &xml, Object *obj)
                 int f2_index = stringlist.at(1).toInt()  + m_vertex_offset;
                 int f3_index = stringlist.at(2).toInt()  + m_vertex_offset;
 
-                if (    f1_index > verticesList.size()
-                        || f2_index > verticesList.size()
-                        || f3_index > verticesList.size()  ) {
+                if (! m_mesh->isValidFaces(f1_index, f2_index, f3_index) ) {
                     // error, break
-                    qDebug() << "Error in obj file! " << obj->getName().data() << " " << obj->getHVGXID() << " "
-                             << verticesList.size() << " " << f1_index << " " << f2_index
-                             << " " << f3_index ;
+                    qDebug() << "Error in obj file! " << obj->getName().data() << " " << obj->getHVGXID()
+                             << " " << f1_index << " " << f2_index << " " << f3_index ;
                     delete obj;
                     break;
                 }
@@ -274,15 +266,8 @@ void ObjectManager::parseMesh(QXmlStreamReader &xml, Object *obj)
                 qDebug() << xml.name();
                 xml.readNext();
                 QStringList markersList = xml.text().toString().split(" ");
-                for (int i = 0; i < markersList.size(); ++i) {
-                    int rv_index = markersList.at(i).toInt() + m_vertex_offset;
-                    if (rv_index >= verticesList.size() || rv_index < 1) {
-                        // error skip
-                        qDebug() << "error! skiped rv " << rv_index;
-                        continue;
-                    }
-                    verticesList[rv_index-1].bleed = 1;
-                }
+                m_mesh->MarkBleedingVertices(markersList, m_vertex_offset);
+
             }
         } // if start element
         xml.readNext();
@@ -408,7 +393,7 @@ bool ObjectManager::loadDataset(QString path)
     QTextStream in(&file);
     QList<QByteArray> wordList;
 
-    QList<QByteArray> bleeding_list; // store the list of vertices close to astrocyte
+    QList<QByteArray> markersList; // store the list of vertices close to astrocyte
 
     int flag_prev = 0;
 
@@ -418,7 +403,7 @@ bool ObjectManager::loadDataset(QString path)
     // ssbo buffer info for mesh data
     // [color, center, volume, type, ?]
     int neuritesTOneurites_flag = 0;
-    m_vertex_offset += verticesList.size();
+    m_vertex_offset += m_mesh->getVerticesSize();
     while (!file.atEnd()) {
         QByteArray line = file.readLine();
         wordList = line.split(' ');
@@ -428,10 +413,10 @@ bool ObjectManager::loadDataset(QString path)
 
             if (flag_prev == 1) {
                 int hvgxID = obj->getHVGXID();
-                if (hvgxID > m_buffer_data.size())
-                    m_buffer_data.resize(hvgxID + 1);
+                if (hvgxID > m_ssbo_data.size())
+                    m_ssbo_data.resize(hvgxID + 1);
 
-                m_buffer_data[hvgxID] = obj->getSSBOData();
+                m_ssbo_data[hvgxID] = obj->getSSBOData();
                 m_objects[hvgxID] =  obj;
             }
 
@@ -498,7 +483,7 @@ bool ObjectManager::loadDataset(QString path)
                 QVector3D skeleton_vertex(x2, y2, z2);
                 v.skeleton_vertex = skeleton_vertex;
             }
-            verticesList.push_back(v);
+            m_mesh->addVertex(v);
 
         }  else if (wordList[0]  == "f") {
             if (wordList.size() < 4) {
@@ -508,11 +493,11 @@ bool ObjectManager::loadDataset(QString path)
             unsigned int f1_index = atoi(wordList[1].data()) + m_vertex_offset;
             unsigned int f2_index = atoi(wordList[2].data()) + m_vertex_offset;
             unsigned int f3_index = atoi(wordList[3].data()) + m_vertex_offset;
-            if (f1_index > verticesList.size() || f2_index > verticesList.size() || f3_index > verticesList.size()  ) {
+
+            if ( ! m_mesh->isValidFaces(f1_index, f2_index, f3_index) ) {
                 // error, break
-                qDebug() << "Error in obj file! " << name.data() << " " << obj->getHVGXID() << " "
-                         << verticesList.size() << " " << f1_index << " " << f2_index
-                         << " " << f3_index ;
+                qDebug() << "Error in obj file! " << obj->getName().data() << " " << obj->getHVGXID()
+                         << " " << f1_index << " " << f2_index << " " << f3_index ;
                 delete obj;
                 break;
             }
@@ -526,17 +511,7 @@ bool ObjectManager::loadDataset(QString path)
             obj->addTriangleIndex(f3_index - 1);
             m_indices_size += 3;
 
-
-            for (int i = 1; i < bleeding_list.size(); ++i) {
-                int rv_index = atoi(bleeding_list[i].data()) + m_vertex_offset - 1;
-                if (rv_index >= verticesList.size()) {
-                    // error skip
-                    qDebug() << "error! skiped rv " << rv_index << " " << bleeding_list[i].data();
-
-                    continue;
-                }
-                verticesList[rv_index].bleed = 1;
-            }
+            m_mesh->MarkBleedingVertices(markersList, m_vertex_offset);
 
         } else if (wordList[0] == "b") { // branch
             // b branch_branchID_parentBranch_knot1_knot2
@@ -569,16 +544,16 @@ bool ObjectManager::loadDataset(QString path)
         } else if (wordList[0] == "rv") {
             if (wordList.size() < 2)
                 continue;
-            bleeding_list = wordList;
+            markersList = wordList;
         }
     }
 
     if (flag_prev == 1) {
         int hvgxID = obj->getHVGXID();
-        if (hvgxID > m_buffer_data.size())
-            m_buffer_data.resize(hvgxID + 1);
+        if (hvgxID > m_ssbo_data.size())
+            m_ssbo_data.resize(hvgxID + 1);
 
-        m_buffer_data[hvgxID] = obj->getSSBOData();
+        m_ssbo_data[hvgxID] = obj->getSSBOData();
         m_objects[hvgxID] =  obj;
     }
 
@@ -588,11 +563,6 @@ bool ObjectManager::loadDataset(QString path)
     qDebug() << "time: " << ms.count() << "ms";
 
     return true;
-}
-
-int ObjectManager::getVertixCount()
-{
-    return m_vertices_size;
 }
 
 bool ObjectManager::initVertexAttrib()
@@ -654,18 +624,18 @@ bool ObjectManager::initBuffer()
     if (m_glFunctionsSet == false)
         return false;
 
-    qDebug() <<  " m_buffer_data.size() : " << m_buffer_data.size() ;
-    int bufferSize =  m_buffer_data.size() * sizeof(struct ssbo_mesh);
+    qDebug() <<  " m_buffer_data.size() : " << m_ssbo_data.size() ;
+    int bufferSize =  m_ssbo_data.size() * sizeof(struct ssbo_mesh);
 
-    glGenBuffers(1, &m_buffer);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
+    glGenBuffers(1, &m_ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize , NULL, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_bindIdx, m_buffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_bindIdx, m_ssbo);
     qDebug() << "mesh buffer size: " << bufferSize;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
     GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-    memcpy(p,   m_buffer_data.data(),  bufferSize);
+    memcpy(p,   m_ssbo_data.data(),  bufferSize);
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
     return true;
@@ -699,7 +669,7 @@ bool ObjectManager::initMeshShaders()
         qDebug() << "Could not bind vertex buffer to the context.";
     }
 
-    m_vbo_mesh.allocate(verticesList.data(), verticesList.size() * sizeof(VertexData));
+    m_mesh->allocateVerticesVBO(m_vbo_mesh);
 
     // initialize index buffers
     m_vbo_IndexMesh.create();

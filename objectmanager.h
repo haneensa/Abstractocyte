@@ -10,7 +10,7 @@
 #include "graph.h"
 #include "object.h"
 #include "glsluniform_structs.h"
-
+#include "mesh.h"
 
 
 class ObjectManager : public MainOpenGL
@@ -18,7 +18,6 @@ class ObjectManager : public MainOpenGL
 public:
     ObjectManager();
     ~ObjectManager();
-    int getVertixCount();
 
     bool loadDataset(QString path);
     bool importXML(QString path);
@@ -47,41 +46,37 @@ public:
     void updateUniformsLocation(GLuint program);
 
 protected:
-    int                                 m_vertices_size;
-    int                                 m_skeleton_nodes_size;
+    // store all vertices of the mesh.
+    // unique vertices, faces to index them.
+    Mesh                                *m_mesh;
 
+    int                                 m_skeleton_nodes_size;
+    int                                 m_indices_size;
+    int                                 m_vertex_offset;
     int                                 m_limit;
 
     //std::vector<Object*>                m_objects; // make this map by hvgx ID instead of vector
     std::map<int, Object*>              m_objects;
-    std::vector<struct ssbo_mesh>       m_buffer_data; // Color, Cenert, Type
-    GLuint                              m_buffer;
+    std::vector<struct ssbo_mesh>       m_ssbo_data; // Color, Cenert, Type
+    GLuint                              m_ssbo;
     GLuint                              m_bindIdx;
 
     bool                                m_glFunctionsSet;
 
     /* opengl buffers and vars */
+    struct MeshUniforms                 m_uniforms;
+
     QOpenGLVertexArrayObject            m_vao_mesh;
     QOpenGLBuffer                       m_vbo_mesh;
     QOpenGLBuffer                       m_vbo_IndexMesh;
     GLuint                              m_program_mesh;
 
-
     QOpenGLVertexArrayObject            m_vao_mesh_points;
-    GLuint                              m_program_mesh_points;// -> to mesh
-
+    GLuint                              m_program_mesh_points;
 
     QOpenGLVertexArrayObject            m_vao_skeleton;
     QOpenGLBuffer                       m_vbo_skeleton;
     GLuint                              m_program_skeleton;
-    struct MeshUniforms                 m_uniforms;
-
-    // store all vertices of the mesh.
-    // vertices are sequential increasing for all objects
-    std::vector< struct VertexData >    verticesList;// -> to mesh
-    int                                 m_indices_size;// -> to mesh
-
-    int                                 m_vertex_offset;
 
     // graph related data
     std::vector<QVector2D>              neurites_neurite_edge;
