@@ -48,7 +48,8 @@ HEADERS  += mainwindow.h \
     skeletonbranch.h \
     objectmanager.h \
     mesh.h \
-    ssbo_structs.h
+    ssbo_structs.h \
+    glsluniform_structs.h
 
 FORMS    += mainwindow.ui
 

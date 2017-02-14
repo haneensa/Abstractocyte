@@ -7,6 +7,15 @@
 #include "mainopengl.h"
 #include "ssbo_structs.h"
 
+struct properties {
+    QVector4D pos_alpha;
+    QVector4D trans_alpha;
+    QVector4D color_alpha;
+    QVector4D point_size;
+    QVector4D extra_info;
+    QVector4D render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
+};
+
 struct ast_neu_properties {
     struct properties ast;
     struct properties neu;

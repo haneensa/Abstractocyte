@@ -10,6 +10,7 @@ public:
 protected:
     // faces indices
     // set of faces
+//    GLuint                              m_program_mesh_points;
 
 };
 

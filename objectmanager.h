@@ -9,14 +9,9 @@
 #include "mainopengl.h"
 #include "graph.h"
 #include "object.h"
+#include "glsluniform_structs.h"
 
-struct MeshUniforms {
-    GLint y_axis;
-    GLint x_axis;
-    float* mMatrix;
-    float* vMatrix;
-    float* pMatrix;
-};
+
 
 class ObjectManager : public MainOpenGL
 {
@@ -73,7 +68,7 @@ protected:
 
 
     QOpenGLVertexArrayObject            m_vao_mesh_points;
-    GLuint                              m_program_mesh_points;
+    GLuint                              m_program_mesh_points;// -> to mesh
 
 
     QOpenGLVertexArrayObject            m_vao_skeleton;
@@ -83,8 +78,8 @@ protected:
 
     // store all vertices of the mesh.
     // vertices are sequential increasing for all objects
-    std::vector< struct VertexData >    verticesList;
-    int                                 m_indices_size;
+    std::vector< struct VertexData >    verticesList;// -> to mesh
+    int                                 m_indices_size;// -> to mesh
 
     int                                 m_vertex_offset;
 

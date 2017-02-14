@@ -4,23 +4,12 @@
 #include "mainopengl.h"
 #include "graph.h"
 #include "objectmanager.h"
-
+#include "glsluniform_structs.h"
 #include <thread>
 
 
 // (1) neurite-neurite graph (2) neurite-astrocyte skeleton (3) neurites skeletons - astrocyte skeleton (4) neuries skeletons
 #define max_graphs 4
-
-struct GraphUniforms {
-    GLint y_axis;
-    GLint x_axis;
-    float* mMatrix;
-    float* vMatrix;
-    float* pMatrix;
-    float* modelNoRotMatrix;
-    QMatrix4x4 rMatrix;
-};
-
 
 class GraphManager : public MainOpenGL
 {
