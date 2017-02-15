@@ -6,8 +6,27 @@
 // data structure for ssbo of abstraction space
 // index (0) -> astrocyte
 // index (1) -> neurites
+struct properties {
+    QVector2D pos_alpha;
+    QVector2D trans_alpha;
+    QVector2D color_alpha;
+    QVector2D point_size;
+    QVector4D extra_info;
+    QVector4D render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
+};
+
+struct ast_neu_properties {
+    struct properties ast;
+    struct properties neu;
+};
+
+// mesh.geom
+// mesh_points.geom
+// lines.geom
+// node.geom
+// skeleton_point.geom
 struct ssbo_2DState {
-    QVector4D  states[2][6]; // val, alpha, color_intp, point_size, additional infos
+    struct ast_neu_properties  states; // val, alpha, color_intp, point_size, additional infos
 };
 
 

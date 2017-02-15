@@ -46,9 +46,24 @@ layout (std430, binding=2) buffer mesh_data
 };
 
 
+struct properties {
+    vec2 pos_alpha;
+    vec2 trans_alpha;
+    vec2 color_alpha;
+    vec2 point_size;
+    vec4 extra_info;
+    vec4 render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
+};
+
+struct ast_neu_properties {
+    properties ast;
+    properties neu;
+};
+
+
 layout (std430, binding=3) buffer space2d_data
 {
-    vec4 space2d[2][6];
+    ast_neu_properties space2d;
 };
 
 void main() {
@@ -65,33 +80,36 @@ void main() {
     // astrocyte or neurites?
     int slider = (type == 0) ? y_axis : x_axis;
 
-    vec4 alpha1 = space2d[type][0]; // position interpolation (pos1, pos2)
-    vec4 alpha2 = space2d[type][1]; // alpha
-    vec4 alpha3 = space2d[type][2]; // color_intp
-    vec4 alpha4 = space2d[type][3]; // point_size
-    vec4 alpha5 = space2d[type][4]; // additional info
-    vec4 alpha6 = space2d[type][5]; // additional info
+    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
+
+    vec2 alpha1 = space_properties.pos_alpha; // position interpolation (pos1, pos2)
+    vec2 alpha2 = space_properties.trans_alpha; // alpha
+    vec2 alpha3 = space_properties.color_alpha; // color_intp
+    vec2 alpha4 = space_properties.point_size; // point_size
+    vec4 alpha5 = space_properties.extra_info; // additional info
+    vec4 alpha6 = space_properties.render_type; // additional info
 
     if (alpha6.y == 0) {
         return;
     }
 
+    float leftMin = alpha5.x;
+    float leftMax = alpha5.y;
+
     // use the space2D values to get: value of interpolation between pos1 and pos2, alpha, color_interpolation, point size
-    alpha =  translate(slider, alpha2.x, alpha2.y, alpha2.w, alpha2.z);
+    alpha =  translate(slider, leftMin, leftMax, alpha2.x, alpha2.y);
     if (alpha < 0.01){
         return;
     }
 
-    float position_intp = translate(slider, alpha1.x, alpha1.y, alpha1.z, alpha1.w);
-    color_intp = translate(slider, alpha3.x, alpha3.y, alpha3.z, alpha3.w);
+    float position_intp = translate(slider,leftMin, leftMax,  alpha1.x, alpha1.y);
+    color_intp = translate(slider, leftMin, leftMax, alpha3.y, alpha3.x);
 
-    float max_size;
    // if (type == 1)
    //     max_size = (1 + SSBO_data[ID].info.x/1000000.0)  * alpha4.w ; // todo: normalize outside
    // else
-        max_size = alpha4.w ; // todo: normalize outside
 
-    gl_PointSize =  translate(slider, alpha4.x, alpha4.y, alpha4.z, max_size);
+    gl_PointSize =  translate(slider, leftMin, leftMax, alpha4.x, alpha4.y);
 
     int pos1_flag = int(alpha5.z);
     int pos2_flag = int(alpha5.w);

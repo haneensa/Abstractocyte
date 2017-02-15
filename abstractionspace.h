@@ -10,20 +10,6 @@
 #include "mainopengl.h"
 #include "ssbo_structs.h"
 
-struct properties {
-    QVector4D pos_alpha;
-    QVector4D trans_alpha;
-    QVector4D color_alpha;
-    QVector4D point_size;
-    QVector4D extra_info;
-    QVector4D render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
-};
-
-struct ast_neu_properties {
-    struct properties ast;
-    struct properties neu;
-};
-
 class AbstractionSpace : public MainOpenGL
 {
 public:
@@ -33,8 +19,6 @@ public:
     void defineAbstractionState(int x, int y, std::string name, int dx = -1, int dy = -1);
     void initOpenGLFunctions();
     // ssbo buffer data
-    int getBufferSize();
-    void* getBufferData();
     bool initBuffer();
     bool updateBuffer();
 
@@ -61,7 +45,7 @@ private:
     bool                                m_glFunctionsSet;
 
     // Data
-    struct ssbo_2DState                 m_2DState;
+    struct ssbo_2DState                 *m_2DState;
 
     std::vector< struct ast_neu_properties >  m_IntervalXY;
 
