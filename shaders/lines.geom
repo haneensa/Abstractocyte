@@ -4,6 +4,7 @@ layout (lines) in;
 layout (line_strip, max_vertices = 2) out;
 
 in int          V_ID[];
+out vec4        color_val;
 
 uniform int     y_axis;
 uniform int     x_axis;
@@ -27,10 +28,12 @@ layout (std430, binding=3) buffer space2d_data
 void main() {
     int ID = V_ID[0];
     int type = int(SSBO_data[ID].center.w);
+    color_val = SSBO_data[ID].color;
     vec4 alpha6 = space2d[type][5]; // additional info
-    if ( alpha6.w == 0 || (y_axis < 98  || x_axis < 98) ) {
-        return;
-    }
+
+  //  if ( alpha6.w == 0 || (y_axis < 98  || x_axis < 98) ) {
+  //      return;
+   // }
 
     //  Ideally I would interpolate betweeen the edges transparency to show it smothly?
 

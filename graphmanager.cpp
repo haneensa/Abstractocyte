@@ -48,22 +48,17 @@ GraphManager::~GraphManager()
 // 4) object nodes and their connectivity information
     // object nodes
     // connectivity info from them
-void GraphManager::ExtractGraphFromMesh(ObjectManager *instance)
+void GraphManager::ExtractGraphFromMesh(ObjectManager *objectManager)
 {
-    // iterate over mesh''s objects, and add all the center nodes except astrocyte
-    // create the a node for each object and store it in neurites_nodes
-     m_neurites_nodes_info = instance->getNeuriteNodes();
-    // create skeleton for each obeject and add it to skeleton_segments
+     m_graph[0] = new Graph( Graph_t::SKELETON_SKELETON ); // neurite-neurite
+//     m_graph[1] = new Graph(Graph_t::NODE_SKELETON); // neurite-astrocyte skeleton
+//     m_graph[2] = new Graph(Graph_t::SKELETON_SKELETON); //  neurites skeletons - astrocyte skeleton
+//     m_graph[3] = new Graph(Graph_t::SKELETON_SKELETON); // neuries skeletons
 
-    // create connectivity information (neurite-neurite) and add it to neurites_conn_edges
-     m_nerites_edges_info = instance->getNeuritesEdges();
-
-     m_graph[0] = new Graph(); // neurite-neurite
-     m_graph[1] = new Graph(); // neurite-astrocyte skeleton
-     m_graph[2] = new Graph(); //  neurites skeletons - astrocyte skeleton
-     m_graph[3] = new Graph(); // neuries skeletons
-
-     m_graph[0]->createGraph(m_neurites_nodes_info, m_nerites_edges_info);
+     m_graph[0]->createGraph(objectManager);
+//     m_graph[1]->createGraph(objectManager);
+//     m_graph[2]->createGraph(objectManager);
+//     m_graph[3]->createGraph(objectManager);
 }
 
 void GraphManager::stopForceDirectedLayout(int graphIdx)
@@ -193,7 +188,7 @@ void GraphManager::initGrid()
     m_graph[0]->initGridBuffers();
 }
 
-void GraphManager::drawGrid(struct GridUniforms grid_uniforms)
+void GraphManager::drawGrid(struct GlobalUniforms grid_uniforms)
 {
     m_graph[0]->drawGrid(grid_uniforms);
 }
@@ -239,6 +234,7 @@ void GraphManager::drawEdges(int graphIdx)
     glUseProgram(m_program_Index);
     updateUniformsLocation(m_program_Index);
 
+    glLineWidth(10.0f);
     glDrawElements(GL_LINES, m_graph[graphIdx]->indexBufferSize(), GL_UNSIGNED_INT, 0 );
     m_NodesVBO.release();
     m_IndexVBO.release();
@@ -272,7 +268,7 @@ void GraphManager::updateUniformsLocation(GLuint program)
 
 }
 
-void GraphManager::updateUniforms(struct GraphUniforms graph_uniforms)
+void GraphManager::updateUniforms(struct GlobalUniforms graph_uniforms)
 {
     m_uniforms = graph_uniforms;
 }

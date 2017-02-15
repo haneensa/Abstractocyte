@@ -12,7 +12,7 @@ struct MeshUniforms {
     float* pMatrix;
 };
 
-struct GraphUniforms {
+struct GlobalUniforms {
     int y_axis;
     int x_axis;
     float* mMatrix;
@@ -21,5 +21,6 @@ struct GraphUniforms {
     float* modelNoRotMatrix;
     QMatrix4x4 rMatrix;
 };
+
 
 #endif // GLSLUNIFORM_STRUCTS_H

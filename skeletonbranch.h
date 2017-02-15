@@ -11,6 +11,7 @@ class SkeletonBranch
 public:
     SkeletonBranch();
     void addKnots(int knot1, int knot2);
+    QVector2D getKnots();
     void addPoints(QStringList pointslist);
 protected:
     int              m_nodes[2]; // -> how about each skeleton has set of nodes, and in the branch they refrence them

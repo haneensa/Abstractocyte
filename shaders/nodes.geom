@@ -30,11 +30,13 @@ void main() {
     int ID = V_ID[0];
     int type = int(SSBO_data[ID].center.w);
     vec4 alpha6 = space2d[type][5]; // additional info
-    if ( alpha6.w == 0 || (y_axis < 98 || x_axis < 98) ) {
-        return;
-    }
+
+   // if ( alpha6.w == 0 || (y_axis < 98 || x_axis < 98) ) {
+  //      return;
+   // }
+
     color_val = SSBO_data[ID].color;
-    gl_PointSize = 20;
+    gl_PointSize = 2;
     EmitVertex();
     EndPrimitive();
 }

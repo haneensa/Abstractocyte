@@ -43,7 +43,7 @@ protected:
     GraphManager                *m_graphManager;
 
     struct MeshUniforms         m_mesh_uniforms;
-    struct GraphUniforms        m_graph_uniforms;
+    struct GlobalUniforms        m_graph_uniforms;
 
     /* matrices */
     QMatrix4x4                  m_projection;

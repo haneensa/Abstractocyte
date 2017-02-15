@@ -207,7 +207,7 @@ bool SpatialHash::init_Shaders_Buffers()
     return true;
 }
 
-void SpatialHash::drawGrid(struct GridUniforms grid_uniforms)
+void SpatialHash::drawGrid(struct GlobalUniforms grid_uniforms)
 {
     if (m_glFunctionsSet == false)
         return;

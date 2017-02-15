@@ -24,7 +24,7 @@ public:
     void drawEdges(int graphIdx);
     bool initVBO(int graphIdx);
     void updateUniformsLocation(GLuint program);
-    void updateUniforms(struct GraphUniforms graph_uniforms);
+    void updateUniforms(struct GlobalUniforms graph_uniforms);
 
     void initVertexAttribPointer();
 
@@ -32,7 +32,7 @@ public:
     void startForceDirectedLayout(int graphIdx);
     void stopForceDirectedLayout(int graphIdx);
 
-    void drawGrid(struct GridUniforms grid_uniforms);
+    void drawGrid(struct GlobalUniforms grid_uniforms);
     void initGrid();
 
 protected:
@@ -51,7 +51,7 @@ protected:
     GLuint                          m_program_nodes;
     GLuint                          m_program_Index;
 
-    struct GraphUniforms            m_uniforms;
+    struct GlobalUniforms            m_uniforms;
 
     // thread management
     std::thread                     m_layout_thread1;
@@ -63,7 +63,6 @@ protected:
     // graphs elements
     std::map<int, Object*>            m_neurites_nodes_info;
     std::vector<QVector2D>            m_nerites_edges_info;
-
 };
 
 #endif // GRAPHMANAGER_H

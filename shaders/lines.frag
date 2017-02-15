@@ -1,7 +1,9 @@
 #version 430
 
+in vec4  color_val;
 out vec4 outcol;
 
 void main() {
-    outcol = vec4( 0.0, 0.545, 0.545, 1.0 );
+    outcol = color_val;
+    outcol.a = 1.0;
 }

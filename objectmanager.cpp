@@ -25,8 +25,8 @@ ObjectManager::ObjectManager()
     m_ssbo_data.resize(746);
     m_mesh = new Mesh();
 
-  //  importXML("://scripts/m3_astrocyte.xml"); // astrocyte  time:  79150.9 ms
-    importXML("://scripts/m3_neurites.xml"); // neurites time:  28802 ms
+    importXML("://scripts/m3_astrocyte.xml"); // astrocyte  time:  79150.9 ms
+   // importXML("://scripts/m3_neurites.xml"); // neurites time:  28802 ms
 }
 
 ObjectManager::~ObjectManager()
@@ -373,7 +373,6 @@ void ObjectManager::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
         xml.readNext();
     } // while
 
-
     qDebug() << "nodes count: " << nodes;
 }
 
@@ -390,14 +389,14 @@ void ObjectManager::parseBranch(QXmlStreamReader &xml, Object *obj)
     qDebug() << xml.name();
     xml.readNext();
 
-    SkeletonBranch *branch;
+    SkeletonBranch *branch = NULL;
     // this object structure is not done
     while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "branches")) {
         // go to the next child of object node
         if (xml.tokenType() == QXmlStreamReader::StartElement) {
             if (xml.name() == "b") {
                 branch = new SkeletonBranch();
-                xml.readNext();
+                int ID = xml.attributes().value("name").toInt();
             } else if (xml.name() == "knots") {
                 if (branch == NULL) {
                     qDebug() << "branch null";
@@ -414,9 +413,9 @@ void ObjectManager::parseBranch(QXmlStreamReader &xml, Object *obj)
                 int knot1 = stringlist.at(0).toInt();
                 int knot2 = stringlist.at(1).toInt();
                 branch->addKnots(knot1, knot2);
-            } else if (xml.name() == "points") {
-                if (branch == NULL) {
-                    qDebug() << "branch null";
+            } else if (xml.name() == "points_ids") {
+                if (branch == NULL || obj == NULL) {
+                    qDebug() << "branch null or obj is NULL";
                     continue;
                 }
                 xml.readNext();
@@ -424,14 +423,11 @@ void ObjectManager::parseBranch(QXmlStreamReader &xml, Object *obj)
                 QString coords = xml.text().toString();
                 QStringList stringlist = coords.split(" ");
                 branch->addPoints(stringlist);
+                obj->addSkeletonBranch(branch);
             }
         } // if start element
         xml.readNext();
     } // while
-
-    obj->addSkeletonBranch(branch);
-
-    qDebug() << " done ";
 }
 
 bool ObjectManager::initVertexAttrib()
@@ -705,7 +701,7 @@ void ObjectManager::updateUniformsLocation(GLuint program)
     glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
 }
 
-std::map<int, Object*>  ObjectManager::getNeuriteNodes()
+std::map<int, Object*>  ObjectManager::getObjectsMap()
 {
     return m_objects;
 }

@@ -5,6 +5,7 @@
 #include <QVector3D>
 
 // skeleton vertex
+// todo: use union instead to represent fields?
 struct SkeletonVertex {
     QVector4D   vertex; // w: ID
 };
@@ -20,8 +21,17 @@ public:
     int getSkeletonPointsSize();
     void addBranch(SkeletonBranch *branch);
 
+     // for simplified graph, we need the branches
+    // knots IDs and their edges
+    std::vector<QVector3D> getGraphNodes();
+    std::vector<QVector2D> getGraphEdges();
+
+    void setNodesOffset(int offset)             { m_nodes_offset = offset; }
+    int getNodesOffset()                        { return m_nodes_offset; }
+
 protected:
     int                             m_ID;
+    int                             m_nodes_offset; // node's IDs offset in the graph
     // skeleton branches
     // o branch_id
     // v x y z

@@ -7,7 +7,6 @@
 #include <QXmlStreamReader>
 
 #include "mainopengl.h"
-#include "graph.h"
 #include "object.h"
 #include "glsluniform_structs.h"
 #include "mesh.h"
@@ -30,7 +29,7 @@ public:
 
     int getNodesCount();
     // graph related function
-    std::map<int, Object*>  getNeuriteNodes();
+    std::map<int, Object*>  getObjectsMap();
     std::vector<QVector2D> getNeuritesEdges();
 
     // OpenGL initialization

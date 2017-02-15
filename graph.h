@@ -1,10 +1,14 @@
+// how to reoresent a whole skeleton in a graph?
+// all the nodes of a skeleton should have the same hvgx id
+// so I cant index the map with it
+
 #ifndef GRAPH_H
 #define GRAPH_H
 
 #include "node.h"
 #include "edge.h"
 #include "spatialhash.h"
-#include "object.h"
+#include "objectmanager.h"
 
 #include <QDebug>
 #include <QFile>
@@ -13,23 +17,36 @@
 #include <QMatrix4x4>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
-
 // store graph per object?
 
 struct BufferNode
 {
-    QVector3D coord3D; // vertex center
+    QVector3D coord3D; // vertex center, todo: w: ID
     QVector2D coord2D; // layouted coordinate
     int ID;
 };
 
+/*
+ * NODE_NODE:
+ * nodes IDs are hvgx ID
+ * edges simple edge between nodes using hvgx ID
+ *
+ * NODE_SKELETON:
+ *
+ */
+enum class Graph_t { NODE_NODE, NODE_SKELETON,  SKELETON_SKELETON };
+
+
 class Graph
 {
 public:
-    Graph();
+    Graph(Graph_t graphType);
     ~Graph();
 
-    bool createGraph(std::map<int, Object*> nodes_info, std::vector<QVector2D> edges_info);
+    bool createGraph(ObjectManager *objectManager);
+    bool parseNODE_NODE(ObjectManager *objectManager);
+    bool parseSKELETON(ObjectManager *objectManager);
+
     bool loadNodes(QString filename);
     bool loadEdges(QString filename);
 
@@ -71,13 +88,21 @@ public:
 
     // spatial hashing
     void updateNode(Node *node);
-    void drawGrid(struct GridUniforms grid_uniforms);
+    void drawGrid(struct GlobalUniforms grid_uniforms);
     void initGridBuffers();
-    void updateGridUniforms(struct GridUniforms grid_uniforms);
+    void updateGridUniforms(struct GlobalUniforms grid_uniforms);
 
 protected:
-    std::map<int, Node*>            m_nodes;
-    std::map<int, Edge*>            m_edges;
+    Graph_t                         m_gType;
+
+    std::map<int, Node*>            m_nodes;    // IDs are unique to identify nodes
+                                                // if more than a skeleton
+                                                // IDs for skeleton are offsets, that is later
+                                                // stored in the skeleton itself
+
+    std::map<int, Edge*>            m_edges;    // IDs refer to m_nodes IDs
+
+    std::map<int, Skeleton*>        m_skeletons; // ID are hvgx
 
     int m_nodesCounter;
     int m_edgesCounter;
@@ -85,7 +110,7 @@ protected:
 
     // for opengl buffer
     std::vector<struct BufferNode>  m_bufferNodes;
-    std::vector<GLuint>           m_bufferIndices;
+    std::vector<GLuint>             m_bufferIndices;
 
     // force directed laout
     float                           m_MAX_DISTANCE;

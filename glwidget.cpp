@@ -140,7 +140,7 @@ void GLWidget::paintGL()
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     m_mesh->draw();
 
-    struct GridUniforms grid_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
+    struct GlobalUniforms grid_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
                 m_model_noRotation.data(), m_rotationMatrix};
     m_graphManager->drawGrid(grid_uniforms);
     m_graphManager->drawNodes(0);

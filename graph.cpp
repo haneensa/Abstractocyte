@@ -1,28 +1,30 @@
 #include "graph.h"
 
-Graph::Graph()
-    : m_FDL_terminate(true)
+Graph::Graph(Graph_t graphType)
+    : m_FDL_terminate(true),
+      m_nodesCounter(0),
+      m_edgesCounter(0),
+      m_dupEdges(0)
+
+
 {
-     m_nodesCounter = 0;
-     m_edgesCounter = 0;
-     m_dupEdges = 0;
+    m_gType = graphType;
 
+    // force directed layout parameters
+    m_Cr = 1.5;
+    m_Ca = 0.5;
+    m_AABBdim = 0.15f; // used for spatial hashing query dim
+    m_MAX_DISTANCE = 0.1f;
+    m_ITERATIONS = 10000;
+    m_MAX_VERTEX_MOVEMENT = 0.05f;
+    m_SLOW_FACTOR = 0.01f;
+    m_MAX_FORCE = 1.0f;
 
-     // force directed layout parameters
-     m_Cr = 1.5;
-     m_Ca = 0.5;
-     m_AABBdim = 0.15f; // used for spatial hashing query dim
-     m_MAX_DISTANCE = 0.1f;
-     m_ITERATIONS = 10000;
-     m_MAX_VERTEX_MOVEMENT = 0.05f;
-     m_SLOW_FACTOR = 0.01f;
-     m_MAX_FORCE = 1.0f;
-
-     // spatial hashing
-     int gridCol = 1;
-     float gridMin = 0.0f;
-     float gridMax = 1.0f;
-     hashGrid = new SpatialHash(gridCol, gridMin, gridMax);
+    // spatial hashing
+    int gridCol = 1;
+    float gridMin = 0.0f;
+    float gridMax = 1.0f;
+    hashGrid = new SpatialHash(gridCol, gridMin, gridMax);
 }
 
 
@@ -36,13 +38,38 @@ Graph::~Graph()
     delete hashGrid;
 }
 
-bool Graph::createGraph(std::map<int, Object*> nodes_info, std::vector<QVector2D> edges_info)
+bool Graph::createGraph(ObjectManager *objectManager)
 {
+    parseSKELETON(objectManager);
+//    bool result;
+//    switch(m_gType) {
+//    case Graph_t::NODE_NODE : result = parseNODE_NODE(objectManager);
+//        break;
+////    case Graph_t::NODE_SKELETON : parseNODE_NODE(objectManager);
+////        break;
+//    case Graph_t::SKELETON_SKELETON : parseSKELETON(objectManager);
+//        break;
+//    }
+
+    return true;
+}
+
+bool Graph::parseNODE_NODE(ObjectManager *objectManager)
+{
+    // iterate over mesh''s objects, and add all the center nodes except astrocyte
+    // create the a node for each object and store it in neurites_nodes
+    std::map<int, Object*> objects_map = objectManager->getObjectsMap();
+    // create skeleton for each obeject and add it to skeleton_segments
+
+    // create connectivity information (neurite-neurite) and add it to neurites_conn_edges
+    std::vector<QVector2D> edges_info = objectManager->getNeuritesEdges();
+
+
     // add nodes
-    for ( auto iter = nodes_info.begin(); iter != nodes_info.end(); iter++) {
-        Object *object_p = (*iter).second;
-        int nID = object_p->getHVGXID();
-        QVector4D center = object_p->getCenter();
+    for ( auto iter = objects_map.begin(); iter != objects_map.end(); iter++) {
+        Object *objectP = (*iter).second;
+        int nID = objectP->getHVGXID();
+        QVector4D center = objectP->getCenter();
         this->addNode(nID, center.x(), center.y(), center.z());
     }
 
@@ -55,6 +82,49 @@ bool Graph::createGraph(std::map<int, Object*> nodes_info, std::vector<QVector2D
     }
 
     return true;
+}
+
+// I need away to mark all nodes skeleton with the same ID,
+// and give each node unique ID
+// combination? <hvgxID, local node ID>
+bool Graph::parseSKELETON(ObjectManager *objectManager)
+{
+    qDebug() << "parseSKELETON";
+    // eventually all graph nodes are in one map with unique IDs regardless of which skeleton
+    // they belong to.
+    // iterate over the objets
+    std::map<int, Object*> objects_map = objectManager->getObjectsMap();
+    for ( auto iter = objects_map.begin(); iter != objects_map.end(); iter++) {
+        Object *objectP = (*iter).second;
+        int nID = objectP->getHVGXID();
+        qDebug() << "object ID: " << nID;
+        // get skeleton of the object
+        Skeleton *skeleton = objectP->getSkeleton();
+        std::vector<QVector3D> nodes3D = skeleton->getGraphNodes();
+        std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
+
+        int node_offset = 0; // last sequential ID given to a node
+        qDebug() << nodes3D.size() << " " << edges2D.size();
+        // add nodes
+        for ( int i = 0; i < nodes3D.size(); i++) {
+            std::pair<int, int> id_tuple =  std::make_pair(nID, i);
+            this->addNode(i, nodes3D[i].x(), nodes3D[i].y(), nodes3D[i].z());
+        }
+
+        // add edges
+        for (int i = 0; i < edges2D.size(); ++i) {
+            int eID = i;
+            int nID1 = edges2D[i].x();
+            int nID2 = edges2D[i].y();
+            this->addEdge(eID, nID1, nID2);
+        }
+
+        skeleton->setNodesOffset(node_offset);
+        m_skeletons[nID] = skeleton;
+        break; // test one skeleton
+    }
+    return true;
+
 }
 
 // nID, x, y, z
@@ -126,7 +196,6 @@ bool Graph::loadEdges(QString filename)
         float nID1 = atof(wordList[1].data());
         float nID2 = atof(wordList[2].data());
         // add edge
-       // qDebug() << eID << " " << nID1 << " " << nID2;
         this->addEdge(eID, nID1, nID2);
     }
 
@@ -163,7 +232,7 @@ Edge* Graph::addEdge(int eID, int nID1, int nID2)
     Node *n2 = getNode(nID2);
 
     if (n1 == NULL || n2 == NULL) {
-       // qDebug() << "cant insert " << nID1 << " and " << nID2;
+        qDebug() << "cant insert " << nID1 << " and " << nID2;
         return NULL;
     }
 
@@ -233,7 +302,7 @@ void Graph::initGridBuffers()
     }
 }
 
-void Graph::drawGrid(struct GridUniforms grid_uniforms)
+void Graph::drawGrid(struct GlobalUniforms grid_uniforms)
 {
     hashGrid->drawGrid(grid_uniforms);
 }

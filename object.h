@@ -45,6 +45,7 @@ public:
     void addSkeletonNode(QVector3D coords);
     void addSkeletonPoint(QVector3D coords);
     void addSkeletonBranch(SkeletonBranch *branch);
+    Skeleton* getSkeleton()            { return m_skeleton; }
 
 private:
     std::string                             m_name;
@@ -61,6 +62,7 @@ private:
 
     // indices to access the global mesh vertices defined in mesh
     std::vector<GLuint>                     m_meshIndices;
+
 };
 
 #endif // OBJECT_H

@@ -37,3 +37,21 @@ void Skeleton::addBranch(SkeletonBranch *branch)
 {
     m_branches.push_back(branch);
 }
+
+std::vector<QVector3D> Skeleton::getGraphNodes()
+{
+    return m_nodes;
+}
+
+std::vector<QVector2D> Skeleton::getGraphEdges()
+{
+    std::vector<QVector2D> graph_knots;
+    // iterate over the branches and get the knots
+    qDebug() << "m_branches.size(): " << m_branches.size();
+    for (int i = 0; i < m_branches.size(); ++i) {
+        QVector2D knots  = m_branches[i]->getKnots();
+        graph_knots.push_back(knots);
+    }
+
+    return graph_knots;
+}
