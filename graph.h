@@ -47,25 +47,25 @@ public:
     bool parseNODE_NODE(ObjectManager *objectManager);
     bool parseSKELETON(ObjectManager *objectManager);
 
-    bool loadNodes(QString filename);
-    bool loadEdges(QString filename);
+//    bool loadNodes(QString filename);
+//    bool loadEdges(QString filename);
 
-    Node* addNode(int nID, float x, float y, float z);
-    Edge* addEdge(int eID, int nID1, int nID2);
+    Node* addNode(std::pair<int, int> id_tuple, float x, float y, float z);
+    Edge* addEdge(int eID, int hvgxID, int nID1, int nID2);
 
-    Node* getNode(int nID);
+    Node* getNode(std::pair<int, int> id_tuple);
     Edge* getEdge(int eID);
 
 
-    std::map<int, Node*> getNodes() { return m_nodes; }
+    std::map<std::pair<int, int>, Node*> getNodes() { return m_nodes; }
     std::map<int, Edge*> getEdges() { return m_edges; }
 
     int getNodesCount(){ return m_nodesCounter; }
     int getEdgesCount() { return m_edgesCounter; }
     int getDupEdgesCount() { return m_dupEdges; }
 
-    std::map<int, Node*>::iterator getNodesBegin()  { return m_nodes.begin(); }
-    std::map<int, Node*>::iterator getNodesEnd()    { return m_nodes.end(); }
+    std::map<std::pair<int, int>, Node*>::iterator getNodesBegin()  { return m_nodes.begin(); }
+    std::map<std::pair<int, int>, Node*>::iterator getNodesEnd()    { return m_nodes.end(); }
     std::map<int, Edge*>::iterator getEdgesBegin()  { return m_edges.begin(); }
     std::map<int, Edge*>::iterator getEdgesEnd()    { return m_edges.end(); }
 
@@ -93,9 +93,18 @@ public:
     void updateGridUniforms(struct GlobalUniforms grid_uniforms);
 
 protected:
+    struct pair_hash {
+        template <class T1, class T2>
+        std::size_t operator () (const std::pair<T1,T2> &p) const {
+            auto h1 = std::hash<T1>{}(p.first);
+            auto h2 = std::hash<T2>{}(p.second);
+            return h1 ^ h2;
+        }
+    };
+
     Graph_t                         m_gType;
 
-    std::map<int, Node*>            m_nodes;    // IDs are unique to identify nodes
+    std::map<std::pair<int, int>, Node*>            m_nodes;    // IDs are unique to identify nodes
                                                 // if more than a skeleton
                                                 // IDs for skeleton are offsets, that is later
                                                 // stored in the skeleton itself

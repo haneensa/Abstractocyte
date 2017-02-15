@@ -104,7 +104,6 @@ bool Graph::parseSKELETON(ObjectManager *objectManager)
         std::vector<QVector3D> nodes3D = skeleton->getGraphNodes();
         std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
 
-        int node_offset = 0; // last sequential ID given to a node
         qDebug() << nodes3D.size() << " " << edges2D.size();
         // add nodes
         for ( int i = 0; i < nodes3D.size(); i++) {
@@ -120,7 +119,6 @@ bool Graph::parseSKELETON(ObjectManager *objectManager)
             this->addEdge(eID, hvgxID, nID1, nID2);
         }
 
-        skeleton->setNodesOffset(node_offset);
         m_skeletons[hvgxID] = skeleton;
        // break; // test one skeleton
     }
