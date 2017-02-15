@@ -54,12 +54,6 @@ void main() {
   vec3 B = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
   normal_out = normalize(cross(A,B));
 
- // int is_bleeding;
-  //if ( V_bleeding[0] == 1 || V_bleeding[1] == 1 || V_bleeding[2] == 1)
-  //   is_bleeding = 1;
- // else
-  //   is_bleeding = 0;
-
   for(int i = 0; i < 3; i++) {
     int ID = V_ID[i];
     int type = int(SSBO_data[ID].center.w);

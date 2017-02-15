@@ -16,9 +16,9 @@ QVector2D SkeletonBranch::getKnots()
     return QVector2D(m_nodes[0], m_nodes[1]);
 }
 
-void SkeletonBranch::addPoints(QStringList pointslist)
+void SkeletonBranch::addPointsIndxs(QStringList pointslist)
 {
     for (int i = 0; i < pointslist.size(); ++i) {
-        m_points.push_back(pointslist.at(i).toInt());
+        m_pointsIndices.push_back(pointslist.at(i).toInt());
     }
 }

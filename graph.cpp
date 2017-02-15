@@ -104,7 +104,6 @@ bool Graph::parseSKELETON(ObjectManager *objectManager)
         std::vector<QVector3D> nodes3D = skeleton->getGraphNodes();
         std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
 
-        int node_offset = 0; // last sequential ID given to a node
         qDebug() << nodes3D.size() << " " << edges2D.size();
         // add nodes
         for ( int i = 0; i < nodes3D.size(); i++) {
@@ -120,7 +119,6 @@ bool Graph::parseSKELETON(ObjectManager *objectManager)
             this->addEdge(eID, hvgxID, nID1, nID2);
         }
 
-        skeleton->setNodesOffset(node_offset);
         m_skeletons[hvgxID] = skeleton;
        // break; // test one skeleton
     }
@@ -128,82 +126,6 @@ bool Graph::parseSKELETON(ObjectManager *objectManager)
 
 }
 
-//// nID, x, y, z
-//bool Graph::loadNodes(QString filename)
-//{
-//    qDebug() << "Func: loadNodes ( "<< filename << " )";
-//    QFile file(filename);
-//    if (!file.open(QFile::ReadOnly | QFile::Text)) {
-//        qDebug() << "could not open the file for reading.";
-//        return false;
-//    }
-//    int flag = 0;
-//    QTextStream in (&file);
-//    QList<QByteArray> wordList;
-//    while(!file.atEnd()) {
-//        QByteArray line = file.readLine();
-//        wordList = line.split(',');
-//        if (wordList.size() < 4) {
-//            qDebug() << "something wrong with input file";
-//            return false;
-//        }
-//        if (flag == 0) {
-//            flag = 1;
-//            continue;
-//        }
-//        int nID = atoi(wordList[0].data());
-//        float x = atof(wordList[2].data());
-//        float y = atof(wordList[3].data());
-//        float z = atof(wordList[4].data());
-//        // type, size, glycogen around this node
-
-//        // add node
-//        this->addNode(nID, x, y, z);
-
-//    }
-//    qDebug() << "# nodes: " << m_nodes.size();
-
-//    file.close();
-//    return true;
-//}
-
-//// eID, nID1, nID2
-//bool Graph::loadEdges(QString filename)
-//{
-//    qDebug() << "Func: loadEdges ( "<< filename << " )";
-//    QFile file(filename);
-//    if (!file.open(QFile::ReadOnly | QFile::Text)) {
-//        qDebug() << "could not open the file for reading.";
-//        return false;
-//    }
-
-//    QTextStream in (&file);
-//    QList<QByteArray> wordList;
-//    int flag = 0;
-//    while(!file.atEnd()) {
-//        QByteArray line = file.readLine();
-//        wordList = line.split(',');
-//        if (wordList.size() < 3 ) {
-//            qDebug() << "something wrong with input file";
-//            return false;
-//        }
-
-//        if (flag == 0) {
-//            flag = 1;
-//            continue;
-//        }
-
-//        int eID = atoi(wordList[0].data());
-//        float nID1 = atof(wordList[1].data());
-//        float nID2 = atof(wordList[2].data());
-//        // add edge
-//        this->addEdge(eID, nID1, nID2);
-//    }
-
-//    qDebug() << "# edges: " << m_edges.size();
-//    file.close();
-//    return true;
-//}
 
 Node* Graph::addNode(std::pair<int, int> id_tuple, float x, float y, float z)
 {

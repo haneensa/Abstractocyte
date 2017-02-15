@@ -1,3 +1,4 @@
+// todo: project this point onto the segment of which this is part of
 #version 430
 
 in vec4         Vskeleton_vx[];

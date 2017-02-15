@@ -212,6 +212,9 @@ void ObjectManager::parseMesh(QXmlStreamReader &xml, Object *obj)
                 QVector4D mesh_vertex(x1, y1, z1,  obj->getHVGXID());
                 struct VertexData v;
                 v.mesh_vertex = mesh_vertex;
+
+                // todo: get the skeleton vertex from the skeleton itself using an index
+                // get the point branch knots as well
                 if (stringlist.size() < 5) {
                     // place holder
                     v.skeleton_vertex = mesh_vertex;
@@ -422,7 +425,7 @@ void ObjectManager::parseBranch(QXmlStreamReader &xml, Object *obj)
                 // list of integers for points IDs
                 QString coords = xml.text().toString();
                 QStringList stringlist = coords.split(" ");
-                branch->addPoints(stringlist);
+                branch->addPointsIndxs(stringlist);
                 obj->addSkeletonBranch(branch);
             }
         } // if start element
@@ -624,6 +627,14 @@ bool ObjectManager::initSkeletonShaders()
     offset = 0;
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonVertex),  0);
+
+    offset += sizeof(QVector4D);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonVertex),  (GLvoid*)offset);
+
+    offset += sizeof(QVector4D);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonVertex),  (GLvoid*)offset);
 
     GL_Error();
 

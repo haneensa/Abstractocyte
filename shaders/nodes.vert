@@ -3,7 +3,7 @@
 // in: per vertex data
 layout (location = 0) in vec3 coord3D;
 layout (location = 1) in vec2 coord2D;
-layout (location = 2) in int ID;
+layout (location = 2) in int ID; // todo: pack this with coord3D
 
 out int                      V_ID;
 

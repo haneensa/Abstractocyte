@@ -1,4 +1,4 @@
-// how to reoresent a whole skeleton in a graph?
+// how to represent a whole skeleton in a graph?
 // all the nodes of a skeleton should have the same hvgx id
 // so I cant index the map with it
 
@@ -46,9 +46,6 @@ public:
     bool createGraph(ObjectManager *objectManager);
     bool parseNODE_NODE(ObjectManager *objectManager);
     bool parseSKELETON(ObjectManager *objectManager);
-
-//    bool loadNodes(QString filename);
-//    bool loadEdges(QString filename);
 
     Node* addNode(std::pair<int, int> id_tuple, float x, float y, float z);
     Edge* addEdge(int eID, int hvgxID, int nID1, int nID2);
@@ -102,7 +99,7 @@ protected:
         }
     };
 
-    Graph_t                         m_gType;
+    Graph_t                                         m_gType;
 
     std::map<std::pair<int, int>, Node*>            m_nodes;    // IDs are unique to identify nodes
                                                 // if more than a skeleton

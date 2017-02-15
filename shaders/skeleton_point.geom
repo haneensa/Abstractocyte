@@ -1,6 +1,8 @@
 #version 430
 
 in int          V_ID[];
+in vec4         V_knot1[];
+in vec4         V_knot2[];
 
 out vec4        color_val;
 out float       alpha;
@@ -44,6 +46,29 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
     return rightMin + (valueScaled * rightSpan);
 }
 
+vec4 project_point_to_lint(vec4 A, vec4 B, vec4 p)
+{
+    vec4 q; // closest point to p on the line segment from A to B
+
+    vec4 AB = (B-A); // vector from A to B
+    float AB_squared = dot(AB, AB); // squared distance from A to B
+    if (AB_squared == 0.0) {
+        // A and B are the same point
+        q = A;
+    } else {
+        vec4 Ap = (p-A); // vector from A to p
+        float t = dot(Ap, AB) / AB_squared; // A + t (B - A)
+        if ( t < 0.0) // before A on the line, return A
+            q = A;
+        else if (t > 1.0) // after B on the line, return B
+            q = B;
+        else // projection lines inbetween A and B on the line
+            q = A + t * AB;
+    }
+
+    return q;
+}
+
 
 void main() {
 
@@ -74,8 +99,16 @@ void main() {
         return;
     }
 
-    gl_Position = gl_in[0].gl_Position;
+    // project the points onto line here
+    vec4 A = V_knot1[0];
+    vec4 B = V_knot2[0];
+    vec4 p = gl_in[0].gl_Position;
+    vec4 projected_point =  project_point_to_lint( A,  B,  p);
     gl_PointSize = 6;
+
+    float position_intp = translate(slider, 60, 80, 0, 1);
+    vec4 new_position = mix(gl_in[0].gl_Position , projected_point, position_intp);
+    gl_Position = new_position;
 
     EmitVertex();
     EndPrimitive();

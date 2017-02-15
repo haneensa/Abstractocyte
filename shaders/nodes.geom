@@ -25,6 +25,7 @@ layout (std430, binding=3) buffer space2d_data
     vec4 space2d[2][6];
 };
 
+
 void main() {
     gl_Position = gl_in[0].gl_Position;
     int ID = V_ID[0];
@@ -37,6 +38,7 @@ void main() {
 
     color_val = SSBO_data[ID].color;
     gl_PointSize = 2;
+
     EmitVertex();
     EndPrimitive();
 }

@@ -1,5 +1,7 @@
 #version 430
 
+// todo: draw thick lines with 3D effects
+
 layout (lines) in;
 layout (line_strip, max_vertices = 2) out;
 
@@ -45,4 +47,27 @@ void main() {
     gl_PointSize = gl_in[1].gl_PointSize;
     EmitVertex();
     EndPrimitive();
+
+/*
+
+1) get 4 vertices
+    1.a) start of previous segment
+    1.b) end of previous segment
+    1.c) end of current segment
+    1.d) end of next segment
+
+2) naive culling
+3) get direction of each 3 segments
+4) get the normal of each of the 3 segments
+5) miter lines
+6) length of the miter by projecting it onto normal then inverse it
+7) prevent long miters at sharp corners
+8) close the gap
+9) generate triangle strip
+
+
+*/
+
+
+
 }

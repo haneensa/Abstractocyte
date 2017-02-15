@@ -8,6 +8,8 @@
 // todo: use union instead to represent fields?
 struct SkeletonVertex {
     QVector4D   vertex; // w: ID
+    QVector4D   knot1;   // end points of the segment
+    QVector4D   knot2;   // end points of the segment
 };
 
 class Skeleton
@@ -26,18 +28,8 @@ public:
     std::vector<QVector3D> getGraphNodes();
     std::vector<QVector2D> getGraphEdges();
 
-    void setNodesOffset(int offset)             { m_nodes_offset = offset; }
-    int getNodesOffset()                        { return m_nodes_offset; }
-
 protected:
     int                             m_ID;
-    int                             m_nodes_offset; // node's IDs offset in the graph
-    // skeleton branches
-    // o branch_id
-    // v x y z
-    // ....
-    // l v1 v2
-    // ...
 
     // a skeleton consists of: nodes, points, and segments
     // local IDs!!

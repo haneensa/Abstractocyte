@@ -20,7 +20,8 @@ void Skeleton::addPoint(QVector3D coords)
 {
     QVector4D point = coords.toVector4D();
     point.setW(m_ID);
-    m_points.push_back({point}); // nodes IDs are from 0 to max, so the index can be used as ID index
+    QVector4D knot1, knot2;
+    m_points.push_back({point, knot1, knot2}); // nodes IDs are from 0 to max, so the index can be used as ID index
 }
 
 void*  Skeleton::getSkeletonPoints()
@@ -35,7 +36,23 @@ int Skeleton::getSkeletonPointsSize()
 
 void Skeleton::addBranch(SkeletonBranch *branch)
 {
+    // get the point and set its knots to this branch knots
     m_branches.push_back(branch);
+    // get this branch points set
+    // reiterate over the m_points, and for each index in this branch get the point set its knots
+    QVector2D knots = branch->getKnots();
+
+    std::vector<int> pointsIndices = branch->getPointsIndxs();
+    for (int i = 0; i < pointsIndices.size(); i++) {
+        int index = pointsIndices[i];
+        struct SkeletonVertex v = m_points[index];
+        QVector3D n1 = m_nodes[knots.x()];
+        QVector3D n2 = m_nodes[knots.y()];
+        v.knot1 = QVector4D(n1.x(), n1.y(), n1.z(), 1.0);
+        v.knot2 = QVector4D(n2.x(), n2.y(), n2.z(), 1.0);
+
+        m_points[index] = v;
+    }
 }
 
 std::vector<QVector3D> Skeleton::getGraphNodes()
