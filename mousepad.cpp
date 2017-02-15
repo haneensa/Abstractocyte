@@ -35,7 +35,7 @@ MousePad::~MousePad()
 void MousePad::initSelectionPointerGL()
 {
     m_program_circle = new QOpenGLShaderProgram(this);
-    bool res = initShader(m_program_circle, ":/shaders/shader.vert", ":/shaders/shader.geom", ":/shaders/shader.frag");
+    bool res = initShader(m_program_circle, ":/shaders/shader_vert.glsl", ":/shaders/shader_geom.glsl", ":/shaders/shader_frag.glsl");
     if(res == false)
         return;
 
@@ -66,7 +66,7 @@ void MousePad::initSelectionPointerGL()
     /* selection buffer */
 
     m_program_selection = new QOpenGLShaderProgram(this);
-    res = initShader(m_program_selection, ":/shaders/selection.vert", ":/shaders/selection.geom", ":/shaders/selection.frag");
+    res = initShader(m_program_selection, ":/shaders/selection_vert.glsl", ":/shaders/selection_geom.glsl", ":/shaders/selection_frag.glsl");
     if(res == false)
         return;
 
@@ -259,8 +259,8 @@ void MousePad::initBuffer()
 void MousePad::init2DSpaceGL()
 {
     m_program_2DSpace = glCreateProgram();
-    bool res = initShader(m_program_2DSpace, ":/shaders/space2d.vert", ":/shaders/space2d.geom",
-                          ":/shaders/space2d.frag");
+    bool res = initShader(m_program_2DSpace, ":/shaders/space2d_vert.glsl", ":/shaders/space2d_geom.glsl",
+                          ":/shaders/space2d_frag.glsl");
     if(res == false)
         return;
 
@@ -301,8 +301,8 @@ void MousePad::init2DSpaceGL()
 
     /* selection buffer */
     m_program_2DSpace_Selection  = glCreateProgram();
-    res = initShader(m_program_2DSpace_Selection, ":/shaders/space2d.vert", ":/shaders/space2d.geom",
-                     ":/shaders/space2d.frag");
+    res = initShader(m_program_2DSpace_Selection, ":/shaders/space2d_vert.glsl", ":/shaders/space2d_geom.glsl",
+                     ":/shaders/space2d_frag.glsl");
     if(res == false)
         return;
 

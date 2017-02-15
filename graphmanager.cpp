@@ -125,12 +125,12 @@ bool GraphManager::initVBO(int graphIdx)
 
     // 1) initialize shaders
     m_program_nodes = glCreateProgram();
-    bool res = initShader(m_program_nodes,  ":/shaders/nodes.vert", ":/shaders/nodes.geom", ":/shaders/nodes.frag");
+    bool res = initShader(m_program_nodes,  ":/shaders/nodes_vert.glsl", ":/shaders/nodes_geom.glsl", ":/shaders/nodes_frag.glsl");
     if (res == false)
         return res;
 
     m_program_Index = glCreateProgram();
-    res = initShader(m_program_Index,  ":/shaders/nodes.vert", ":/shaders/lines.geom", ":/shaders/lines.frag");
+    res = initShader(m_program_Index,  ":/shaders/nodes_vert.glsl", ":/shaders/lines_geom.glsl", ":/shaders/lines_frag.glsl");
     if (res == false)
         return res;
 

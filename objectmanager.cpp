@@ -505,7 +505,7 @@ bool ObjectManager::initMeshShaders()
     /* start initializing mesh */
     qDebug() << "Initializing MESH";
     m_program_mesh = glCreateProgram();
-    bool res = initShader(m_program_mesh, ":/shaders/mesh.vert", ":/shaders/mesh.geom", ":/shaders/mesh.frag");
+    bool res = initShader(m_program_mesh, ":/shaders/mesh_vert.glsl", ":/shaders/mesh_geom.glsl", ":/shaders/mesh_frag.glsl");
     if (res == false)
         return res;
 
@@ -560,7 +560,7 @@ bool ObjectManager::initMeshPointsShaders()
     /***************************************/
     qDebug() << "Initializing MESH POINTS";
     m_program_mesh_points = glCreateProgram();
-    bool res = initShader(m_program_mesh_points, ":/shaders/mesh.vert", ":/shaders/mesh_points.geom", ":/shaders/mesh_points.frag");
+    bool res = initShader(m_program_mesh_points, ":/shaders/mesh_vert.glsl", ":/shaders/mesh_points_geom.glsl", ":/shaders/mesh_points_frag.glsl");
     if (res == false)
         return res;
 
@@ -593,7 +593,7 @@ bool ObjectManager::initSkeletonShaders()
     qDebug() << "point";
 
     m_program_skeleton = glCreateProgram();
-    bool res = initShader(m_program_skeleton, ":/shaders/skeleton_point.vert", ":/shaders/skeleton_point.geom", ":/shaders/skeleton_point.frag");
+    bool res = initShader(m_program_skeleton, ":/shaders/skeleton_point_vert.glsl", ":/shaders/skeleton_point_geom.glsl", ":/shaders/skeleton_point_frag.glsl");
     if (res == false)
         return res;
 

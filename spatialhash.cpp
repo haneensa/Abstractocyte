@@ -175,7 +175,7 @@ bool SpatialHash::init_Shaders_Buffers()
 
     // 1) initialize shaders
     m_program_grid = glCreateProgram();
-    bool res = initShader(m_program_grid,  ":/shaders/grid.vert", ":/shaders/grid.geom", ":/shaders/grid.frag");
+    bool res = initShader(m_program_grid,  ":/shaders/grid_vert.glsl", ":/shaders/grid_geom.glsl", ":/shaders/grid_frag.glsl");
     GL_Error();
 
     if (res == false)
