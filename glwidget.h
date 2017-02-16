@@ -23,6 +23,9 @@ public slots:
     void getSliderY(int value);
     void getIntervalID(int ID);
 
+signals:
+    void setAbstractionData(AbstractionSpace *space_instance);
+
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
     void resizeGL(int w, int h) Q_DECL_OVERRIDE;

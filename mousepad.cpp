@@ -16,6 +16,7 @@ MousePad::MousePad(QWidget *parent)
     qDebug() << "MousePad";
     circle.x = 0.0;
     circle.y = 0.0;
+    m_2dspace = NULL;
 }
 
 MousePad::~MousePad()
@@ -88,139 +89,22 @@ void MousePad::initSelectionPointerGL()
     m_vao_selection.release();
 }
 
-void MousePad::initRect(QVector2D x_interval, QVector2D y_interval, int ID)
-{
-    QVector2D p00 = QVector2D(x_interval.x()/100.0, y_interval.x()/100.0);
-    float dimX = (x_interval.y() - x_interval.x())/100.0;
-    float dimY = (y_interval.y() - y_interval.x())/100.0;
 
-
-    struct abstractionPoint p = {p00, ID};
-    int offset = m_vertices.size();
-
-    m_vertices.push_back(p);        // p00
-
-    p.point.setX(p00.x() + dimX);   // p10
-    p.point.setY(p00.y());
-    m_vertices.push_back(p);
-
-    p.point.setX(p00.x());          // p01
-    p.point.setY(p00.y() + dimY);
-    m_vertices.push_back(p);
-
-    p.point.setX(p00.x() + dimX);   // p11
-    p.point.setY(p00.y() + dimY);
-    m_vertices.push_back(p);
-
-
-    m_indices.push_back(offset + 0);
-    m_indices.push_back(offset + 1);
-    m_indices.push_back(offset + 2);
-
-    m_indices.push_back(offset + 1);
-    m_indices.push_back(offset + 3);
-    m_indices.push_back(offset + 2);
-}
-
-void MousePad::initTriangle(QVector2D coords1, QVector2D coords2,QVector2D coords3, int ID)
-{
-    int offset = m_vertices.size();
-    struct abstractionPoint p1 = {coords1/100.0, ID};
-    struct abstractionPoint p2 = {coords2/100.0, ID};
-    struct abstractionPoint p3 = {coords3/100.0, ID};
-
-    m_vertices.push_back(p1);
-    m_vertices.push_back(p2);
-    m_vertices.push_back(p3);
-
-    m_indices.push_back(offset + 0);
-    m_indices.push_back(offset + 1);
-    m_indices.push_back(offset + 2);
-}
 
 void MousePad::initData()
 {
-
     // init intervals
-
     // TODO: refactor this and make it easier to construct the space with fewer parameters
     // TODO: connect abstraction space buffer update data with this one
     // find a place to decide on the data and group them together instead on seperate classes
 
-    int ID = 1;
-    QVector2D x_interval, y_interval;
+    if (m_2dspace == NULL) {
+        qDebug() << "m_2dspace is NULL";
+        return;
+    }
 
-
-    // ################## 0-20
-    x_interval = QVector2D(0, 20);
-
-    y_interval = QVector2D(0, 20);
-    //m_IntervalXY.push_back({ast1, neu1});
-    initRect(x_interval, y_interval, ID++); // 0
-
-    y_interval = QVector2D(20, 40);
-    //m_IntervalXY.push_back({ast2, neu1});
-    initRect(x_interval, y_interval, ID++); // 1
-
-    y_interval = QVector2D(40, 60);
-    //  m_IntervalXY.push_back({ast3, neu1});
-    initRect(x_interval, y_interval, ID++); // 2
-
-    y_interval = QVector2D(60, 100);
-    //  m_IntervalXY.push_back({ast4, neu1});
-    initRect(x_interval, y_interval, ID++); // 3
-
-
-
-    // ################## 20-60
-    x_interval = QVector2D(20, 60);
-
-    y_interval = QVector2D(0, 20);
-    //  m_IntervalXY.push_back({ast1, neu2});
-    initRect(x_interval, y_interval, ID++); // 4
-
-    y_interval = QVector2D(20, 40);
-    //  m_IntervalXY.push_back({ast2, neu2});
-    initRect(x_interval, y_interval, ID++);  // 6
-
-    y_interval = QVector2D(40, 60);
-    //  m_IntervalXY.push_back({ast3, neu2});
-    initRect(x_interval, y_interval, ID++); // 7
-
-    y_interval = QVector2D(60, 100);
-    //  m_IntervalXY.push_back({ast4, neu2});
-    initRect(x_interval, y_interval, ID++);  // 8
-
-
-
-    // ################## 60-100
-    x_interval = QVector2D(60, 100);
-
-    y_interval = QVector2D(0, 20);
-    //   m_IntervalXY.push_back({ast1, neu3});
-    initRect(x_interval, y_interval, ID++);  // 5
-
-    y_interval = QVector2D(20, 40);
-    // m_IntervalXY.push_back({ast2, neu3});
-    initRect(x_interval, y_interval, ID++);  // 9
-
-    y_interval = QVector2D(40, 60);
-    //m_IntervalXY.push_back({ast3, neu3});
-    initRect(x_interval, y_interval, ID++);  // 10
-
-
-    // ################## x: 60-100 , y: 70-100
-    x_interval = QVector2D(80, 100);
-    y_interval = QVector2D(80, 100);
-//    // m_IntervalXY.push_back({ast4, neu3});
-   initRect(x_interval, y_interval, ID++);  // 12
-
-    ID++;
-   initTriangle(  QVector2D(80, 80),QVector2D(80, 100), QVector2D(60, 100), ID);
-   initTriangle(  QVector2D(60, 60), QVector2D(80, 80),QVector2D(60, 100), ID);
-
-   initTriangle(  QVector2D(60, 60), QVector2D(100, 60), QVector2D(80, 80), ID);
-   initTriangle(  QVector2D(100, 60),  QVector2D(100, 80), QVector2D(80, 80), ID);
+    m_vertices = m_2dspace->get2DSpaceVertices();
+    m_indices = m_2dspace->get2DSpaceIndices();
 }
 
 void MousePad::initBuffer()
@@ -464,7 +348,7 @@ void MousePad::mouseReleaseEvent(QMouseEvent *event)
     event->accept();
 }
 
-void MousePad::setSlotsX(int value)
+void MousePad::getSlotsX(int value)
 {
     if (m_x == value)
         return;
@@ -482,8 +366,7 @@ void MousePad::setSlotsX(int value)
 
 }
 
-
-void MousePad::setSlotsY(int value)
+void MousePad::getSlotsY(int value)
 {
     if (m_y == value)
         return;
@@ -498,6 +381,12 @@ void MousePad::setSlotsY(int value)
     m_vbo_circle.release();
     m_updatedPointer = true;
     update();
+}
+
+void MousePad::getAbstractionData(AbstractionSpace *space_instance)
+{
+    qDebug() << "************ SLOT ";
+    m_2dspace = space_instance;
 }
 
 void MousePad::renderSelection(void)

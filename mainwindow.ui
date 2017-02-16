@@ -130,9 +130,10 @@
     <signal>setSignalX(int)</signal>
     <signal>setIntervalID(int)</signal>
     <signal>signal2()</signal>
-    <slot>setSlotsX(int)</slot>
-    <slot>setSlotsY(int)</slot>
+    <slot>getSlotsX(int)</slot>
+    <slot>getSlotsY(int)</slot>
     <slot>slot1()</slot>
+    <slot>getAbstractionData(AbstractionSpace*)</slot>
    </slots>
   </customwidget>
   <customwidget>
@@ -140,6 +141,7 @@
    <extends>QOpenGLWidget</extends>
    <header>glwidget.h</header>
    <slots>
+    <signal>setAbstractionData(AbstractionSpace*)</signal>
     <slot>getSliderX(int)</slot>
     <slot>getSliderY(int)</slot>
     <slot>getIntervalID(int)</slot>
@@ -148,38 +150,6 @@
  </customwidgets>
  <resources/>
  <connections>
-  <connection>
-   <sender>horizontalSlider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>openGLWidget_2</receiver>
-   <slot>setSlotsX(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>110</x>
-     <y>311</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>110</x>
-     <y>161</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>verticalSlider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>openGLWidget_2</receiver>
-   <slot>setSlotsY(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>27</x>
-     <y>144</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>65</x>
-     <y>133</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>openGLWidget_2</sender>
    <signal>setSliderY(int)</signal>
@@ -257,6 +227,54 @@
     <hint type="destinationlabel">
      <x>232</x>
      <y>205</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget</sender>
+   <signal>setAbstractionData(AbstractionSpace*)</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>getAbstractionData(AbstractionSpace*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>218</x>
+     <y>178</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>147</x>
+     <y>182</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>getSlotsX(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>134</x>
+     <y>300</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>126</x>
+     <y>218</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>verticalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>getSlotsY(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>19</x>
+     <y>149</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>74</x>
+     <y>153</y>
     </hint>
    </hints>
   </connection>

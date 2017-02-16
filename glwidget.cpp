@@ -111,6 +111,7 @@ void GLWidget::initializeGL()
 
     /******************** 1 Abstraction Space ********************/
     m_2dspace->initBuffer();
+    emit setAbstractionData(m_2dspace);
     /******************** 2 initialize Mesh **********************/
     m_mesh->iniShadersVBOs();
     /****************** 3 Initialize Graph  *******************/
@@ -270,3 +271,5 @@ void GLWidget::getIntervalID(int ID)
 {
     m_2dspace->updateID(ID);
 }
+
+

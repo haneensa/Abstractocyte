@@ -99,9 +99,7 @@ void main() {
     float leftMax = alpha5.y;
 
     alpha =  translate(slider, leftMin, leftMax,  alpha2.x, alpha2.y);
-    if (alpha < alpha5.x){
-        return;
-    }
+
 
     float position_intp = translate(slider, leftMin, leftMax, alpha1.x, alpha1.y);
     color_intp = translate(slider, leftMin, leftMax, alpha3.x, alpha3.y);

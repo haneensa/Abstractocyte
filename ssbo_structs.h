@@ -20,11 +20,11 @@ struct ast_neu_properties {
     struct properties neu;
 };
 
-// mesh.geom
-// mesh_points.geom
-// lines.geom
-// node.geom
-// skeleton_point.geom
+// mesh_geom.glsl
+// mesh_points_geom.glsl
+// lines_geom.glsl
+// node_geom.glsl
+// skeleton_point_geom.glsl
 struct ssbo_2DState {
     struct ast_neu_properties  states; // val, alpha, color_intp, point_size, additional infos
 };
@@ -32,6 +32,7 @@ struct ssbo_2DState {
 
 // data structure for ssbo of objects
 // one element per obejct
+//
 struct ssbo_mesh {
     QVector4D color;
     QVector4D center;   // center.w = neurite/astrocyte

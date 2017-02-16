@@ -10,6 +10,12 @@
 #include "mainopengl.h"
 #include "ssbo_structs.h"
 
+struct abstractionPoint {
+    QVector2D point;
+    int       ID;
+};
+
+
 class AbstractionSpace : public MainOpenGL
 {
 public:
@@ -25,6 +31,14 @@ public:
     void defineQuadrant(QVector2D leftMin, int dim, struct ssbo_2DState data);
     void updateID(int ID);
 
+
+    void initRect(QVector2D x_interval, QVector2D y_interval, int ID);
+    void initTriangle(QVector2D coords1, QVector2D coords2,QVector2D coords3, int ID);
+
+
+    std::vector<struct abstractionPoint> get2DSpaceVertices() { return m_vertices; }
+    std::vector<GLuint> get2DSpaceIndices() { return m_indices; }
+
 private:
     struct pair_hash {
         template <class T1, class T2>
@@ -35,20 +49,26 @@ private:
         }
     };
 
-    int                                 m_xaxis;
-    int                                 m_yaxis;
+    int                                         m_xaxis;
+    int                                         m_yaxis;
 
-    int                                 m_intervalID;
+    int                                         m_intervalID;
     // OpenGL
-    GLuint                              m_buffer;
-    GLuint                              m_bindIdx;
-    bool                                m_glFunctionsSet;
+    GLuint                                      m_buffer;
+    GLuint                                      m_bindIdx;
+    bool                                        m_glFunctionsSet;
 
-    // Data
-    struct ssbo_2DState                 *m_2DState;
+    // Datas
+    struct ssbo_2DState                         *m_2DState;
 
-    std::vector< struct ast_neu_properties >  m_IntervalXY;
+    std::vector< struct ast_neu_properties >    m_IntervalXY;
 
+    std::vector<struct abstractionPoint>        m_vertices;
+    std::vector<GLuint>                         m_indices;
+    std::map<std::pair<int, int>, struct properties>
+                                                m_x_axis_states;
+    std::map<std::pair<int, int>, struct properties>
+                                                m_y_axis_states;
 };
 
 #endif // ABSTRACTIONSPACE_H
