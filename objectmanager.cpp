@@ -20,12 +20,12 @@ ObjectManager::ObjectManager()
 {
     m_indices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 43;
+    m_limit = 20000;
     m_vertex_offset = 0;
-    m_ssbo_data.resize(746);
+    m_ssbo_data.resize(1200);
     m_mesh = new Mesh();
 
-    importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    //importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     importXML("://scripts/m3_neurites.xml");    // neurites time:  28802 ms
 }
 
@@ -124,6 +124,7 @@ void ObjectManager::parseObject(QXmlStreamReader &xml, Object *obj)
         qDebug() << "Called XML parseObejct without attribs";
         return;
     }
+    qDebug() << xml.name();
 
     QString nameline  = xml.attributes().value("name").toString();
     QList<QString> nameList = nameline.split('_');
@@ -173,6 +174,11 @@ void ObjectManager::parseObject(QXmlStreamReader &xml, Object *obj)
 
     if (obj != NULL) {
          m_objects[hvgxID] =  obj;
+         if (m_ssbo_data.size() < hvgxID) {
+             qDebug() << "resizing m_ssbo_data.";
+             m_ssbo_data.resize(hvgxID + 100);
+         }
+
          m_ssbo_data[hvgxID] = obj->getSSBOData();
     }
 }
@@ -308,6 +314,7 @@ void ObjectManager::parseSkeletonNodes(QXmlStreamReader &xml, Object *obj)
         qDebug() << "Called XML parseSkeletonNodes without attribs";
         return;
     }
+    qDebug() << xml.name();
 
     xml.readNext();
 
@@ -347,6 +354,8 @@ void ObjectManager::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
         qDebug() << "Called XML parseSkeletonNodes without attribs";
         return;
     }
+    qDebug() << xml.name();
+
 
     xml.readNext();
 

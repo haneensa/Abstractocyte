@@ -7,7 +7,7 @@ SpatialHash::SpatialHash(int col, float min, float max)
         m_GridVBO( QOpenGLBuffer::VertexBuffer )
 {
     m_cellSize = m_max / (float)col;
-    m_col = (m_max - m_min) / m_cellSize;
+    m_col = (m_min - m_min) / m_cellSize;
     qDebug() << col << " " << m_col;
 
     qDebug() << "m_col: " << m_col;

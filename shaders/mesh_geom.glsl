@@ -2,7 +2,6 @@
 
 in vec4         Vskeleton_vx[];
 in  int         V_ID[];
-in  vec4        V_center[];
 in  int         V_bleeding[];
 
 out float       color_intp;
@@ -15,6 +14,13 @@ layout(triangle_strip, max_vertices = 3) out;
 
 uniform int     y_axis;
 uniform int     x_axis;
+// World transformation
+uniform mat4 mMatrix;
+// View Transformation
+uniform mat4 vMatrix;
+// Projection transformation
+uniform mat4 pMatrix;
+
 
 struct SSBO_datum {
     vec4 color;
@@ -104,18 +110,22 @@ void main() {
     float position_intp = translate(slider, leftMin, leftMax, alpha1.x, alpha1.y);
     color_intp = translate(slider, leftMin, leftMax, alpha3.x, alpha3.y);
 
+    mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
+    vec4 center4d  = pvmMatrix * vec4(SSBO_data[ID].center.xyz, 1.0);
+
+
     switch(int(alpha5.z))
     {
     case 1: pos1 = gl_in[i].gl_Position; break;
     case 2: pos1 = vec4(Vskeleton_vx[i].xyz, 1.0); break;
-    case 3: pos1 = vec4(V_center[i].xyz, 1.0); break;
+    case 3: pos1 = center4d; break;
     }
 
     switch(int(alpha5.w))
     {
     case 1: pos2 = gl_in[i].gl_Position; break;
     case 2: pos2 = vec4(Vskeleton_vx[i].xyz, 1.0); break;
-    case 3: pos2 = vec4(V_center[i].xyz, 1.0); break;
+    case 3: pos2 = center4d; break;
     }
 
     vec4 new_position = mix(pos1 , pos2, position_intp);

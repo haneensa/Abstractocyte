@@ -2,8 +2,8 @@
 
 Node::Node(int nID, int idxID, float x, float y, float z, Node_t node_type)
 {
-    m_nID = nID;
-    m_idxID = idxID;
+    m_nID = nID;        // hvgx ID
+    m_idxID = idxID;    // m_bufferNode id
     m_nodeXYZ = QVector3D(x, y, z);
     m_node_t = node_type;
 

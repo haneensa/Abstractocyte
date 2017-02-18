@@ -4,7 +4,6 @@
 in vec4         Vskeleton_vx[];
 
 in int          V_ID[];
-in vec4         V_center[];
 in  int         V_bleeding[];
 
 out vec4        color_val;
@@ -16,6 +15,12 @@ layout(points, max_vertices = 1) out;
 
 uniform int     y_axis;
 uniform int     x_axis;
+// World transformation
+uniform mat4 mMatrix;
+// View Transformation
+uniform mat4 vMatrix;
+// Projection transformation
+uniform mat4 pMatrix;
 
 float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
 {
@@ -67,19 +72,16 @@ layout (std430, binding=3) buffer space2d_data
 };
 
 void main() {
-    int i = 0;
-    int ID = V_ID[i]; // ID here is the index of this object in ssbo array
-    int type = int(SSBO_data[ID].center.w);
-    if (V_bleeding[i] == 1)
+    int ID = V_ID[0]; // ID here is the index of this object in ssbo array
+    int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
+    int slider = (type == 0) ? y_axis : x_axis;  // astrocyte or neurites?
+
+    if (V_bleeding[0] == 1)
         color_val = vec4(1.0, 0.0, 0.0, 1.0);
     else
         color_val = SSBO_data[ID].color;
 
     vec4 pos1, pos2;
-
-    // astrocyte or neurites?
-    int slider = (type == 0) ? y_axis : x_axis;
-
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
     vec2 alpha1 = space_properties.pos_alpha; // position interpolation (pos1, pos2)
@@ -114,18 +116,22 @@ void main() {
     int pos1_flag = int(alpha5.z);
     int pos2_flag = int(alpha5.w);
 
+    mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
+    vec4 center4d  = pvmMatrix * vec4(SSBO_data[ID].center.xyz, 1.0);
+
+
     switch(pos1_flag)
     {
-    case 1: pos1 = gl_in[i].gl_Position; break;
-    case 2: pos1 = vec4(Vskeleton_vx[i].xyz, 1.0); break;
-    case 3: pos1 = vec4(V_center[i].xyz, 1.0); break;
+    case 1: pos1 = gl_in[0].gl_Position; break;
+    case 2: pos1 = vec4(Vskeleton_vx[0].xyz, 1.0); break;
+    case 3: pos1 = center4d; break;
     }
 
     switch(pos2_flag)
     {
-    case 1: pos2 = gl_in[i].gl_Position; break;
-    case 2: pos2 = vec4(Vskeleton_vx[i].xyz, 1.0); break;
-    case 3: pos2 = vec4(V_center[i].xyz, 1.0); break;
+    case 1: pos2 = gl_in[0].gl_Position; break;
+    case 2: pos2 = vec4(Vskeleton_vx[0].xyz, 1.0); break;
+    case 3: pos2 = center4d; break;
     }
 
    vec4 new_position = mix(pos1 , pos2, position_intp);

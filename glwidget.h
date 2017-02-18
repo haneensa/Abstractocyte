@@ -39,6 +39,7 @@ protected:
     void loadMesh();
 
     AbstractionSpace            *m_2dspace;
+    bool                        m_2D;
 
     /* mesh */
     ObjectManager                        *m_mesh;

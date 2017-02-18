@@ -59,7 +59,7 @@ void main() {
    // }
 
     color_val = SSBO_data[ID].color;
-    gl_PointSize = 2;
+    gl_PointSize = 20;
 
     EmitVertex();
     EndPrimitive();

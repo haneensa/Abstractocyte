@@ -32,7 +32,6 @@ struct ssbo_2DState {
 
 // data structure for ssbo of objects
 // one element per obejct
-//
 struct ssbo_mesh {
     QVector4D color;
     QVector4D center;   // center.w = neurite/astrocyte

@@ -40,16 +40,13 @@ Graph::~Graph()
 
 bool Graph::createGraph(ObjectManager *objectManager)
 {
-    parseSKELETON(objectManager);
-//    bool result;
-//    switch(m_gType) {
-//    case Graph_t::NODE_NODE : result = parseNODE_NODE(objectManager);
-//        break;
-////    case Graph_t::NODE_SKELETON : parseNODE_NODE(objectManager);
-////        break;
-//    case Graph_t::SKELETON_SKELETON : parseSKELETON(objectManager);
-//        break;
-//    }
+    bool result;
+    switch(m_gType) {
+    case Graph_t::NODE_NODE : result = parseNODE_NODE(objectManager);
+        break;
+    case Graph_t::SKELETON_SKELETON :  result = parseSKELETON(objectManager);
+        break;
+    }
 
     return true;
 }
@@ -145,6 +142,7 @@ Node* Graph::addNode(std::pair<int, int> id_tuple, float x, float y, float z)
     return newNode;
 }
 
+
 Edge* Graph::addEdge(int eID, int hvgxID, int nID1, int nID2)
 {
     if (nID1 == nID2) {
@@ -152,8 +150,15 @@ Edge* Graph::addEdge(int eID, int hvgxID, int nID1, int nID2)
         return NULL;
     }
 
-    std::pair<int, int> id_tuple1 =  std::make_pair(hvgxID, nID1);
-    std::pair<int, int> id_tuple2 =  std::make_pair(hvgxID, nID2);
+    std::pair<int, int> id_tuple1, id_tuple2;
+
+    if (m_gType == Graph_t::NODE_NODE) {
+        id_tuple1 =  std::make_pair(nID1, -1); // this could be between two different hvgx IDs
+        id_tuple2 =  std::make_pair(nID2, -1);
+    } else {
+        id_tuple1 =  std::make_pair(hvgxID, nID1);
+        id_tuple2 =  std::make_pair(hvgxID, nID2);
+    }
 
     Node *n1 = getNode(id_tuple1);
     Node *n2 = getNode(id_tuple2);
@@ -235,8 +240,7 @@ void Graph::drawGrid(struct GlobalUniforms grid_uniforms)
 }
 
 /************************ Force Directed Layout ****************************/
-
-
+// when we switch to 2D we use the other vertex with the no rotation matrix
 void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
 {
     hashGrid->clear();

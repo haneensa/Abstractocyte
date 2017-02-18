@@ -34,6 +34,7 @@ public:
 
     void drawGrid(struct GlobalUniforms grid_uniforms);
     void initGrid();
+    void update2Dflag(bool is2D);
 
 protected:
     // later if I need more independent graphs
@@ -56,13 +57,10 @@ protected:
     // thread management
     std::thread                     m_layout_thread1;
     bool                            m_FDL_running;
+    bool                            m_2D;
 
     // todo: flag that stops the FDL and kill the thread
     // todo: ?
-
-    // graphs elements
-    std::map<int, Object*>            m_neurites_nodes_info;
-    std::vector<QVector2D>            m_nerites_edges_info;
 };
 
 #endif // GRAPHMANAGER_H

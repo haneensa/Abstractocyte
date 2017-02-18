@@ -4,6 +4,7 @@ in int          V_ID[];
 in vec4         V_knot1[];
 in vec4         V_knot2[];
 
+out float       color_intp;
 out vec4        color_val;
 out float       alpha;
 
@@ -12,6 +13,13 @@ layout (points, max_vertices = 1) out;
 
 uniform int     y_axis;
 uniform int     x_axis;
+
+// World transformation
+uniform mat4 mMatrix;
+// View Transformation
+uniform mat4 vMatrix;
+// Projection transformation
+uniform mat4 pMatrix;
 
 struct SSBO_datum {
     vec4 color;
@@ -86,15 +94,11 @@ vec4 project_point_to_lint(vec4 A, vec4 B, vec4 p)
 
 
 void main() {
-
     int ID = V_ID[0];
-
-    int type = int(SSBO_data[ID].center.w);
+    int type = int(SSBO_data[ID].center.w);     // 0: astrocyte, 1: neurite
+    int slider = (type == 0) ? y_axis : x_axis; // astrocyte or neurites?
 
     color_val = SSBO_data[ID].color;
-
-    // astrocyte or neurites?
-    int slider = (type == 0) ? y_axis : x_axis;
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
@@ -105,33 +109,59 @@ void main() {
     vec4 alpha5 = space_properties.extra_info; // additional info
     vec4 alpha6 = space_properties.render_type; // additional info
 
+    if (alpha6.z == 0) {
+        return;
+    }
+
     float leftMin = alpha5.x;
     float leftMax = alpha5.y;
 
     // use the space2D values to get: value of interpolation between pos1 and pos2, alpha, color_interpolation, point size
     alpha =  translate(slider, leftMin, leftMax, alpha2.x, alpha2.y);
-
     if (alpha < 0.01){
         return;
     }
 
-    if (alpha6.z == 0) {
-        return;
-    }
+    float position_intp = translate(slider,leftMin, leftMax,  alpha1.x, alpha1.y);
+    color_intp = translate(slider, leftMin, leftMax, alpha3.y, alpha3.x);
+
+    gl_PointSize =  translate(slider, leftMin, leftMax, alpha4.x, alpha4.y);
+
 
     // project the points onto line here
     vec4 A = V_knot1[0];
     vec4 B = V_knot2[0];
     vec4 p = gl_in[0].gl_Position;
     vec4 projected_point =  project_point_to_lint( A,  B,  p);
-    gl_PointSize = 6;
 
-    float position_intp = translate(slider, 60, 80, 0, 1);
-    vec4 new_position = mix(gl_in[0].gl_Position , projected_point, position_intp);
-    gl_Position = new_position;
+    int pos1_flag = int(alpha5.z);
+    int pos2_flag = int(alpha5.w);
 
-    EmitVertex();
-    EndPrimitive();
+    mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
+    vec4 center4d  = pvmMatrix * vec4(SSBO_data[ID].center.xyz, 1.0);
+    vec4 pos1, pos2;
+
+    switch(pos1_flag)
+    {
+    case 1: pos1 = gl_in[0].gl_Position; break;
+    case 2: pos1 = gl_in[0].gl_Position; break;
+    case 3: pos1 = center4d; break;
+    case 4: pos1 = projected_point; break;
+    }
+
+    switch(pos2_flag)
+    {
+    case 1: pos2 = gl_in[0].gl_Position; break;
+    case 2: pos2 = gl_in[0].gl_Position; break;
+    case 3: pos2 = center4d; break;
+    case 4: pos2 = projected_point; break;
+    }
+
+   vec4 new_position = mix(pos1 , pos2, position_intp);
+
+
+   gl_Position = new_position;
+   EmitVertex();
 }
 
 

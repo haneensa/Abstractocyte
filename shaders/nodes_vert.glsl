@@ -16,7 +16,13 @@ uniform mat4 pMatrix;
 
 void main(void)
 {
-    mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
-    gl_Position =  pvmMatrix * vec4(coord3D, 1.0);
+    // two positions to interpolate between:
+    // 3D with rotation
+    // projected 2D without rotation
+    mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
+    vec4 mvpCoord3D =  mvpMatrix * vec4(coord3D, 1.0);
+    mat4 pvMatrix = pMatrix * vMatrix;
+    vec4 pvCoord2D = pvMatrix * vec4(coord3D,  1.0);
+    gl_Position =  mvpCoord3D;
     V_ID = ID;
 }

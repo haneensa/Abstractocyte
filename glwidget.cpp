@@ -18,7 +18,8 @@ GLWidget::GLWidget(QWidget *parent)
         m_isRotatable(true),
         m_yaxis(0),
         m_xaxis(0),
-        m_FDL_running(false)
+        m_FDL_running(false),
+        m_2D(false)
 {
 
     m_2dspace = new AbstractionSpace(100, 100);
@@ -139,10 +140,11 @@ void GLWidget::paintGL()
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
     updateMVPAttrib();
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    m_mesh->draw();
+ // m_mesh->draw();
 
-    struct GlobalUniforms grid_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
-                m_model_noRotation.data(), m_rotationMatrix};
+    struct GlobalUniforms grid_uniforms = { m_yaxis, m_xaxis, m_mMatrix.data(),
+                                            m_vMatrix.data(), m_projection.data(),
+                                            m_model_noRotation.data(), m_rotationMatrix};
     m_graphManager->drawGrid(grid_uniforms);
     m_graphManager->drawNodes(0);
     m_graphManager->drawEdges(0);
@@ -236,33 +238,57 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             if(!m_FDL_running)
                 m_isRotatable = !m_isRotatable;
         break;
-        case(Qt::Key_F):
+        case(Qt::Key_2): // start force directed layout
+            if (m_FDL_running) {
+                qDebug() << "cant switch to 2D. layouting algorithm is running";
+            } else if (!m_FDL_running && m_2D) {
+                if (m_2D) {
+                    m_2D = false;
+                    qDebug() << "switching to 3D";
+                    m_isRotatable = true;
+                    m_graphManager->update2Dflag(m_2D);
+                }
+            } else {
+                if (!m_2D) {
+                    m_2D = true;
+                    m_graphManager->update2Dflag(m_2D);
+                }
+            }
 
-            timer->start(0);
-
-            // pass rotation matrix
-            m_isRotatable = false;
-            m_FDL_running = true;
-            updateMVPAttrib();
-            m_graphManager->startForceDirectedLayout(0);
+        break;
+        case(Qt::Key_F): // start force directed layout
+            if (!m_2D) {
+               qDebug() << "can't run force layout on 3D";
+            } else if (m_FDL_running)
+                qDebug() << "force layout is already running.";
+            else {
+                timer->start(0);
+                // pass rotation matrix
+                m_FDL_running = true;   // run force layout
+                updateMVPAttrib();      // update uniforms
+                m_graphManager->startForceDirectedLayout(0);
+            }
         break;
         case(Qt::Key_X):
             timer->stop();
-            m_isRotatable = true;
-            m_FDL_running = false;
             m_graphManager->stopForceDirectedLayout(0);
+            m_FDL_running = false;
         break;
     }
 }
 
 void GLWidget::getSliderX(int value)
 {
+    if (value > 96)
+        value = 100;
     m_xaxis = value;
     update();
 }
 
 void GLWidget::getSliderY(int value)
 {
+    if (value > 98)
+        value = 100;
     m_yaxis = value;
     update();
 }

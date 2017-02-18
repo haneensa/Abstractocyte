@@ -5,19 +5,8 @@ layout(location = 1) in vec4    skeleton_vx;
 
 out vec4        Vskeleton_vx;
 out int         V_ID;
-out vec4        V_center;
 out int         V_bleeding;
 
-struct SSBO_datum {
-    vec4 color;
-    vec4 center;
-    vec4 info;
-};
-
-layout (std430, binding=2) buffer mesh_data
-{
-    SSBO_datum SSBO_data[];
-};
 
 // World transformation
 uniform mat4 mMatrix;
@@ -33,8 +22,6 @@ void main(void)
     Vskeleton_vx = pvmMatrix * vec4(skeleton_vx.xyz, 1.0);
     int ID = int(mesh_vx.w);
     V_ID = ID;
-    vec3 center3d = SSBO_data[ID].center.xyz;
-    V_center =  pvmMatrix * vec4(center3d, 1.0);
     int bleeding =  int(skeleton_vx.w);
     V_bleeding = bleeding;
 }

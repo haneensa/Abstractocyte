@@ -4,7 +4,8 @@ GraphManager::GraphManager()
     : m_IndexVBO( QOpenGLBuffer::IndexBuffer ),
       m_NodesVBO( QOpenGLBuffer::VertexBuffer ),
       m_glFunctionsSet(false),
-      m_FDL_running(false)
+      m_FDL_running(false),
+      m_2D(false)
 {
 }
 
@@ -19,7 +20,6 @@ GraphManager::~GraphManager()
     // destroy all vbo and vao and programs and graphs
 
     if (m_glFunctionsSet == true) {
-
         m_NodesVAO.destroy();
         m_NodesVBO.destroy();
 
@@ -31,6 +31,22 @@ GraphManager::~GraphManager()
 
 }
 
+void GraphManager::update2Dflag(bool is2D)
+{
+    m_2D = is2D;
+    if (!m_2D) {
+        // reset the cooridnates of the graphs
+        QMatrix4x4 identitiy;
+        m_graph[0]->resetCoordinates(identitiy); // for now later I will have two separate variables one for 2D one for 3D
+
+    } else {
+        // reset graph
+        m_graph[0]->resetCoordinates(m_uniforms.rMatrix);
+
+    }
+    updateUniformsLocation(m_program_nodes);
+    updateUniformsLocation(m_program_Index);
+}
 // I have 4 graphs:
 // so here extract the object nodes in a list because more than a graph use them
 // extract skeletons graph in another list
@@ -50,7 +66,7 @@ GraphManager::~GraphManager()
     // connectivity info from them
 void GraphManager::ExtractGraphFromMesh(ObjectManager *objectManager)
 {
-     m_graph[0] = new Graph( Graph_t::SKELETON_SKELETON ); // neurite-neurite
+     m_graph[0] = new Graph( Graph_t::NODE_NODE ); // neurite-neurite
 //     m_graph[1] = new Graph(Graph_t::NODE_SKELETON); // neurite-astrocyte skeleton
 //     m_graph[2] = new Graph(Graph_t::SKELETON_SKELETON); //  neurites skeletons - astrocyte skeleton
 //     m_graph[3] = new Graph(Graph_t::SKELETON_SKELETON); // neuries skeletons
@@ -63,10 +79,11 @@ void GraphManager::ExtractGraphFromMesh(ObjectManager *objectManager)
 
 void GraphManager::stopForceDirectedLayout(int graphIdx)
 {
+    // problem the rotation is still on the nodes
+
     m_graph[graphIdx]->terminateFDL();
     m_FDL_running = false; // todo: get this from the graph itself, since it is per graph, even the thread?
-    updateUniformsLocation(m_program_nodes);
-    updateUniformsLocation(m_program_Index);
+
     if (m_layout_thread1.joinable()) {
         m_layout_thread1.join();
     }
@@ -78,8 +95,6 @@ void GraphManager::startForceDirectedLayout(int graphIdx)
     // update the 2D node position at the start and whenever the m_mvp change, -> when m_value == 1.0 and m_mvp changed
     stopForceDirectedLayout(graphIdx);
 
-    // reset graph
-    m_graph[graphIdx]->resetCoordinates(m_uniforms.rMatrix);
 
 
     m_FDL_running = true;
@@ -248,7 +263,7 @@ void GraphManager::updateUniformsLocation(GLuint program)
 
     // initialize uniforms
     GLuint mMatrix = glGetUniformLocation(program, "mMatrix");
-    if (m_FDL_running) { // force directed layout started, them use model without rotation
+    if (m_2D) { // force directed layout started, them use model without rotation
         glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
     } else {
         glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
