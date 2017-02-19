@@ -1,3 +1,9 @@
+// todo:
+// filter objects by properties
+// color objects by different properties: funtion, type, ?
+// label
+//
+
 #include "object.h"
 #include <QDebug>
 #include <algorithm>

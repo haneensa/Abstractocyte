@@ -200,7 +200,7 @@ bool GraphManager::initVBO(int graphIdx)
 
 void GraphManager::initGrid()
 {
-    m_graph[0]->initGridBuffers();
+  //  m_graph[0]->initGridBuffers();
 }
 
 void GraphManager::drawGrid(struct GlobalUniforms grid_uniforms)
@@ -286,4 +286,39 @@ void GraphManager::updateUniformsLocation(GLuint program)
 void GraphManager::updateUniforms(struct GlobalUniforms graph_uniforms)
 {
     m_uniforms = graph_uniforms;
+}
+
+void GraphManager::updateGraphParam1(double value)
+{
+    m_graph[0]->updateGraphParam1(value);
+}
+
+void GraphManager::updateGraphParam2(double value)
+{
+    m_graph[0]->updateGraphParam2(value);
+}
+
+void GraphManager::updateGraphParam3(double value)
+{
+    m_graph[0]->updateGraphParam3(value);
+}
+
+void GraphManager::updateGraphParam4(double value)
+{
+    m_graph[0]->updateGraphParam4(value);
+}
+
+void GraphManager::updateGraphParam5(double value)
+{
+    m_graph[0]->updateGraphParam5(value);
+}
+
+void GraphManager::updateGraphParam6(double value)
+{
+    m_graph[0]->updateGraphParam6(value);
+}
+
+void GraphManager::updateGraphParam7(double value)
+{
+    m_graph[0]->updateGraphParam7(value);
 }

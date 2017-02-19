@@ -22,6 +22,13 @@ public slots:
     void getSliderX(int value);
     void getSliderY(int value);
     void getIntervalID(int ID);
+    void getGraphParam1(double value);
+    void getGraphParam2(double value);
+    void getGraphParam3(double value);
+    void getGraphParam4(double value);
+    void getGraphParam5(double value);
+    void getGraphParam6(double value);
+    void getGraphParam7(double value);
 
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);

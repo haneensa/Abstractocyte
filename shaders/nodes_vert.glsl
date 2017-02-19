@@ -20,9 +20,8 @@ void main(void)
     // 3D with rotation
     // projected 2D without rotation
     mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
-    vec4 mvpCoord3D =  mvpMatrix * vec4(coord3D, 1.0);
-    mat4 pvMatrix = pMatrix * vMatrix;
-    vec4 pvCoord2D = pvMatrix * vec4(coord3D,  1.0);
-    gl_Position =  mvpCoord3D;
+    vec4 Coord3D =  mvpMatrix * vec4(coord3D, 1.0); // original position
+    vec4 Coord2D = mvpMatrix * vec4(coord2D, coord3D.z,  1.0); // layouted node
+    gl_Position =  Coord3D;
     V_ID = ID;
 }

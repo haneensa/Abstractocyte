@@ -89,6 +89,15 @@ public:
     void initGridBuffers();
     void updateGridUniforms(struct GlobalUniforms grid_uniforms);
 
+    void updateGraphParam1(double value);
+    void updateGraphParam2(double value);
+    void updateGraphParam3(double value);
+    void updateGraphParam4(double value);
+    void updateGraphParam5(double value);
+    void updateGraphParam6(double value);
+    void updateGraphParam7(double value);
+
+
 protected:
     struct pair_hash {
         template <class T1, class T2>

@@ -36,6 +36,14 @@ public:
     void initGrid();
     void update2Dflag(bool is2D);
 
+    void updateGraphParam1(double value);
+    void updateGraphParam2(double value);
+    void updateGraphParam3(double value);
+    void updateGraphParam4(double value);
+    void updateGraphParam5(double value);
+    void updateGraphParam6(double value);
+    void updateGraphParam7(double value);
+
 protected:
     // later if I need more independent graphs
     Graph                           *m_graph[max_graphs];

@@ -117,7 +117,7 @@ void GLWidget::initializeGL()
     m_mesh->iniShadersVBOs();
     /****************** 3 Initialize Graph  *******************/
     m_graphManager->initVBO(0);
-    m_graphManager->initGrid();
+    //m_graphManager->initGrid();
 
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -145,7 +145,7 @@ void GLWidget::paintGL()
     struct GlobalUniforms grid_uniforms = { m_yaxis, m_xaxis, m_mMatrix.data(),
                                             m_vMatrix.data(), m_projection.data(),
                                             m_model_noRotation.data(), m_rotationMatrix};
-    m_graphManager->drawGrid(grid_uniforms);
+ //   m_graphManager->drawGrid(grid_uniforms);
     m_graphManager->drawNodes(0);
     m_graphManager->drawEdges(0);
 }
@@ -296,6 +296,41 @@ void GLWidget::getSliderY(int value)
 void GLWidget::getIntervalID(int ID)
 {
     m_2dspace->updateID(ID);
+}
+
+void GLWidget::getGraphParam1(double value)
+{
+    m_graphManager->updateGraphParam1(value);
+}
+
+void GLWidget::getGraphParam2(double value)
+{
+    m_graphManager->updateGraphParam2(value);
+}
+
+void GLWidget::getGraphParam3(double value)
+{
+    m_graphManager->updateGraphParam3(value);
+}
+
+void GLWidget::getGraphParam4(double value)
+{
+    m_graphManager->updateGraphParam4(value);
+}
+
+void GLWidget::getGraphParam5(double value)
+{
+    m_graphManager->updateGraphParam5(value);
+}
+
+void GLWidget::getGraphParam6(double value)
+{
+    m_graphManager->updateGraphParam6(value);
+}
+
+void GLWidget::getGraphParam7(double value)
+{
+    m_graphManager->updateGraphParam7(value);
 }
 
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>639</width>
-    <height>480</height>
+    <width>1082</width>
+    <height>710</height>
    </rect>
   </property>
   <property name="cursor">
@@ -17,10 +17,10 @@
    <string>Juxtastrocyte</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
+   <layout class="QGridLayout" name="gridLayout_4">
+    <item row="0" column="0">
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="0">
        <widget class="GLWidget" name="openGLWidget"/>
       </item>
      </layout>
@@ -32,7 +32,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>639</width>
+     <width>1082</width>
      <height>21</height>
     </rect>
    </property>
@@ -47,15 +47,18 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>200</width>
-     <height>200</height>
+     <width>218</width>
+     <height>318</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
      <width>300</width>
-     <height>300</height>
+     <height>800</height>
     </size>
+   </property>
+   <property name="features">
+    <set>QDockWidget::NoDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
     <string>Mouse Pad</string>
@@ -71,46 +74,208 @@
      </size>
     </property>
     <property name="cursor">
-     <cursorShape>CrossCursor</cursorShape>
+     <cursorShape>ArrowCursor</cursorShape>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="1" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-      <widget class="MousePad" name="openGLWidget_2">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
+     <item row="0" column="1">
+      <widget class="QGroupBox" name="groupBox">
        <property name="minimumSize">
         <size>
-         <width>100</width>
-         <height>100</height>
+         <width>200</width>
+         <height>200</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>800</width>
-         <height>800</height>
+         <width>300</width>
+         <height>300</height>
         </size>
        </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="autoFillBackground">
+        <bool>true</bool>
+       </property>
+       <property name="title">
+        <string>GroupBox</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0" rowspan="2">
+         <widget class="QSlider" name="verticalSlider">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="MousePad" name="openGLWidget_2">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>100</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>800</width>
+            <height>800</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSlider" name="horizontalSlider">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+       <zorder>openGLWidget_2</zorder>
+       <zorder>horizontalSlider</zorder>
+       <zorder>verticalSlider</zorder>
+       <zorder>openGLWidget_2</zorder>
+       <zorder>horizontalSlider</zorder>
+       <zorder>verticalSlider</zorder>
+       <zorder>openGLWidget_2</zorder>
+       <zorder>horizontalSlider</zorder>
+       <zorder>verticalSlider</zorder>
       </widget>
      </item>
-     <item row="0" column="0" alignment="Qt::AlignLeft">
-      <widget class="QSlider" name="verticalSlider">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+     <item row="1" column="1">
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>0</number>
        </property>
-      </widget>
-     </item>
-     <item row="1" column="1" alignment="Qt::AlignBottom">
-      <widget class="QSlider" name="horizontalSlider">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>Tab 1</string>
+        </attribute>
+        <widget class="QWidget" name="">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>181</width>
+           <height>361</height>
+          </rect>
+         </property>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Repulsion Constant</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox">
+            <property name="singleStep">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Attraction Constant</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>AABB dim</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_3"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Max Distance</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_7"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>Slow Factor</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_8"/>
+          </item>
+          <item row="5" column="1">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_9"/>
+          </item>
+          <item row="6" column="1">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_10"/>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>Max Vertex Movement</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>Max Force</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="tab_2">
+        <attribute name="title">
+         <string>Tab 2</string>
+        </attribute>
+        <widget class="QComboBox" name="comboBox">
+         <property name="geometry">
+          <rect>
+           <x>110</x>
+           <y>60</y>
+           <width>69</width>
+           <height>22</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_4">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>70</y>
+           <width>47</width>
+           <height>13</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </widget>
       </widget>
      </item>
     </layout>
@@ -145,104 +310,31 @@
     <slot>getSliderX(int)</slot>
     <slot>getSliderY(int)</slot>
     <slot>getIntervalID(int)</slot>
+    <slot>getGraphParam1(double)</slot>
+    <slot>getGraphParam2(double)</slot>
+    <slot>getGraphParam3(double)</slot>
+    <slot>gerGraphParam4(double)</slot>
+    <slot>getGraphParam5(double)</slot>
+    <slot>getGraphParam6(double)</slot>
+    <slot>getGraphParam7(double)</slot>
    </slots>
   </customwidget>
  </customwidgets>
  <resources/>
  <connections>
   <connection>
-   <sender>openGLWidget_2</sender>
-   <signal>setSliderY(int)</signal>
-   <receiver>verticalSlider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>94</x>
-     <y>189</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>23</x>
-     <y>91</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>openGLWidget_2</sender>
-   <signal>setSliderX(int)</signal>
-   <receiver>horizontalSlider</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>112</x>
-     <y>165</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>89</x>
-     <y>311</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>openGLWidget_2</sender>
-   <signal>setSignalX(int)</signal>
-   <receiver>openGLWidget</receiver>
-   <slot>getSliderX(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>161</x>
-     <y>194</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>239</x>
-     <y>93</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>openGLWidget_2</sender>
-   <signal>setSignalY(int)</signal>
-   <receiver>openGLWidget</receiver>
-   <slot>getSliderY(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>156</x>
-     <y>140</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>224</x>
-     <y>139</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>openGLWidget_2</sender>
-   <signal>setIntervalID(int)</signal>
-   <receiver>openGLWidget</receiver>
-   <slot>getIntervalID(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>152</x>
-     <y>198</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>232</x>
-     <y>205</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>openGLWidget</sender>
-   <signal>setAbstractionData(AbstractionSpace*)</signal>
+   <sender>verticalSlider</sender>
+   <signal>valueChanged(int)</signal>
    <receiver>openGLWidget_2</receiver>
-   <slot>getAbstractionData(AbstractionSpace*)</slot>
+   <slot>getSlotsY(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>218</x>
-     <y>178</y>
+     <x>29</x>
+     <y>172</y>
     </hint>
     <hint type="destinationlabel">
-     <x>147</x>
-     <y>182</y>
+     <x>56</x>
+     <y>109</y>
     </hint>
    </hints>
   </connection>
@@ -253,28 +345,220 @@
    <slot>getSlotsX(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>134</x>
-     <y>300</y>
+     <x>144</x>
+     <y>230</y>
     </hint>
     <hint type="destinationlabel">
-     <x>126</x>
-     <y>218</y>
+     <x>108</x>
+     <y>174</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>verticalSlider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>openGLWidget_2</receiver>
-   <slot>getSlotsY(int)</slot>
+   <sender>openGLWidget_2</sender>
+   <signal>setSliderX(int)</signal>
+   <receiver>horizontalSlider</receiver>
+   <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>19</x>
-     <y>149</y>
+     <x>94</x>
+     <y>121</y>
     </hint>
     <hint type="destinationlabel">
-     <x>74</x>
-     <y>153</y>
+     <x>99</x>
+     <y>241</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget</sender>
+   <signal>setAbstractionData(AbstractionSpace*)</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>getAbstractionData(AbstractionSpace*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>236</x>
+     <y>178</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>129</x>
+     <y>138</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget_2</sender>
+   <signal>setSignalX(int)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getSliderX(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>143</x>
+     <y>150</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>239</x>
+     <y>93</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget_2</sender>
+   <signal>setIntervalID(int)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getIntervalID(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>134</x>
+     <y>154</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>232</x>
+     <y>205</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget_2</sender>
+   <signal>setSignalY(int)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getSliderY(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>138</x>
+     <y>96</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>242</x>
+     <y>139</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget_2</sender>
+   <signal>setSliderY(int)</signal>
+   <receiver>verticalSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>76</x>
+     <y>145</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>33</x>
+     <y>114</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphParam1(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>182</x>
+     <y>301</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>258</x>
+     <y>302</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_2</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphParam2(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>182</x>
+     <y>327</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>273</x>
+     <y>327</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_3</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphParam3(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>189</x>
+     <y>353</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>268</x>
+     <y>346</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_7</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>gerGraphParam4(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>189</x>
+     <y>379</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>288</x>
+     <y>378</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_8</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphParam5(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>187</x>
+     <y>400</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>271</x>
+     <y>403</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_9</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphParam6(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>181</x>
+     <y>433</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>265</x>
+     <y>434</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_10</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphParam7(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>182</x>
+     <y>457</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>255</x>
+     <y>455</y>
     </hint>
    </hints>
   </connection>
