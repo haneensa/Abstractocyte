@@ -11,22 +11,64 @@ Graph::Graph(Graph_t graphType)
     m_gType = graphType;
 
     // force directed layout parameters
-    m_Cr = 1.5;
+    m_Cr = 0.5;
     m_Ca = 0.5;
-    m_AABBdim = 0.15f; // used for spatial hashing query dim
-    m_MAX_DISTANCE = 0.1f;
+    m_AABBdim = 1.5f; // used for spatial hashing query dim
+    m_MAX_DISTANCE = 1.0f;
     m_ITERATIONS = 10000;
-    m_MAX_VERTEX_MOVEMENT = 0.05f;
+    m_MAX_VERTEX_MOVEMENT = 0.1f;
     m_SLOW_FACTOR = 0.01f;
     m_MAX_FORCE = 1.0f;
 
     // spatial hashing
-    int gridCol = 1;
-    float gridMin = 0.0f;
-    float gridMax = 1.0f;
-    hashGrid = new SpatialHash(gridCol, gridMin, gridMax);
+//    int gridCol = 1;
+//    float gridMin = 0.0f;
+//    float gridMax = 5.0f;
+//    hashGrid = new SpatialHash(gridCol, gridMin, gridMax);
 }
 
+// later refactor this
+void Graph::updateGraphParam1(double value)
+{
+    qDebug() << "Updating Cr to " << value;
+    m_Cr = value;
+}
+
+void Graph::updateGraphParam2(double value)
+{
+    qDebug() << "Updating Ca to " << value;
+    m_Ca = value;
+}
+
+void Graph::updateGraphParam3(double value)
+{
+    qDebug() << "Updating AABBdim to " << value;
+    m_AABBdim = value;
+}
+
+void Graph::updateGraphParam4(double value)
+{
+    qDebug() << "Updating m_MAX_DISTANCE to " << value;
+    m_MAX_DISTANCE = value;
+}
+
+void Graph::updateGraphParam5(double value)
+{
+    qDebug() << "Updating m_MAX_VERTEX_MOVEMENT to " << value;
+    m_MAX_VERTEX_MOVEMENT = value;
+}
+
+void Graph::updateGraphParam6(double value)
+{
+    qDebug() << "Updating m_SLOW_FACTOR to " << value;
+    m_SLOW_FACTOR = value;
+}
+
+void Graph::updateGraphParam7(double value)
+{
+    qDebug() << "Updating m_MAX_FORCE to " << value;
+    m_MAX_FORCE = value;
+}
 
 Graph::~Graph()
 {
@@ -35,7 +77,7 @@ Graph::~Graph()
         delete (*iter).second;
     }
 
-    delete hashGrid;
+//    delete hashGrid;
 }
 
 bool Graph::createGraph(ObjectManager *objectManager)
@@ -220,36 +262,36 @@ void Graph::allocateBIndices(QOpenGLBuffer indexVbo)
 /************************ Spatial Hashing *********************************/
 void Graph::updateNode(Node *node)
 {
-    hashGrid->updateNode(node);
+   // hashGrid->updateNode(node);
     return;
 }
 
 void Graph::initGridBuffers()
 {
-    qDebug() << "initGridBuffers";
-    hashGrid->initOpenGLFunctions();
-    if (hashGrid->init_Shaders_Buffers() == false) {
-        qDebug() << "error!";
-        return;
-    }
+//    qDebug() << "initGridBuffers";
+//    hashGrid->initOpenGLFunctions();
+//    if (hashGrid->init_Shaders_Buffers() == false) {
+//        qDebug() << "error!";
+//        return;
+//    }
 }
 
 void Graph::drawGrid(struct GlobalUniforms grid_uniforms)
 {
-    hashGrid->drawGrid(grid_uniforms);
+//    hashGrid->drawGrid(grid_uniforms);
 }
 
 /************************ Force Directed Layout ****************************/
 // when we switch to 2D we use the other vertex with the no rotation matrix
 void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
 {
-    hashGrid->clear();
+  //  hashGrid->clear();
     for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
         Node *node = (*iter).second;
         node->resetLayout(rotationMatrix);
         m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
         // add to the spatial hash
-        hashGrid->insert((*iter).second);
+//        hashGrid->insert((*iter).second);
     }
 
 }
@@ -260,21 +302,20 @@ void Graph::runforceDirectedLayout()
     m_FDL_terminate = false;
     float area = 25.0;
     float k = std::sqrt( area / m_nodesCounter );
-    std::vector<Node*> nearNodes;
+    //std::vector<Node*> nearNodes;
     // reset layouted coordinates to original values
     for ( int i = 0; i < m_ITERATIONS; i++ ) {
         if (m_FDL_terminate) goto quit;
 
         qDebug() << "Iteration # " << i;
 
-
         // forces on nodes due to node-node repulsion
         for ( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++ ) {
             if (m_FDL_terminate) goto quit;
 
             Node *node1 = (*iter).second;
-            nearNodes.clear();
-            hashGrid->queryAABB(node1, m_AABBdim, nearNodes);
+           // nearNodes.clear();
+           // hashGrid->queryAABB(node1, m_AABBdim, nearNodes);
             for ( auto iter2 = m_nodes.begin(); iter2 != m_nodes.end(); iter2++ ) {
                 if (m_FDL_terminate) goto quit;
 
@@ -436,7 +477,7 @@ QVector2D Graph::repulsiveForce(float x1, float y1, float x2, float y2, float k)
     // Coulomb's Law: F = k(Qq/r^2)
 
     if (distance <= m_AABBdim) {
-       // qDebug() << "distance <= m_MAX_DISTANCE: " << distance;
+       qDebug() << "distance <= m_MAX_DISTANCE: " << distance;
         repulsion =    (k * k) / distance;
        // repulsion =    (k * k) * (distance - m_MAX_DISTANCE);
 
