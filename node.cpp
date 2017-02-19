@@ -9,7 +9,7 @@ Node::Node(int nID, int idxID, float x, float y, float z, Node_t node_type)
 
     // force directed layout
     m_forceSum = QVector2D(0.0, 0.0);
-    m_layouted = QVector3D(x, y, z);
+    m_layouted = QVector3D(x, y, 0.0);
 }
 
 Node::~Node()
@@ -48,6 +48,7 @@ void Node::resetLayout(QMatrix4x4 rotationMatrix)
 {
     QVector3D vec = rotationMatrix * m_nodeXYZ;
     m_layouted = vec;
+    m_layouted.setZ(0);
     resetForce();
 }
 

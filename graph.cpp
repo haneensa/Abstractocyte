@@ -11,20 +11,37 @@ Graph::Graph(Graph_t graphType)
     m_gType = graphType;
 
     // force directed layout parameters
-    m_Cr = 0.5;
+    m_Cr = 1.5;
     m_Ca = 0.5;
-    m_AABBdim = 1.5f; // used for spatial hashing query dim
-    m_MAX_DISTANCE = 1.0f;
+    m_AABBdim = 0.15f; // used for spatial hashing query dim
+    m_MAX_DISTANCE = 0.5f;
     m_ITERATIONS = 10000;
-    m_MAX_VERTEX_MOVEMENT = 0.1f;
+    m_MAX_VERTEX_MOVEMENT = 0.01f;
     m_SLOW_FACTOR = 0.01f;
     m_MAX_FORCE = 1.0f;
 
     // spatial hashing
-//    int gridCol = 1;
-//    float gridMin = 0.0f;
-//    float gridMax = 5.0f;
-//    hashGrid = new SpatialHash(gridCol, gridMin, gridMax);
+    int gridCol = 10;
+    float gridMin = 0.0f;
+    float gridMax = 1.0f;
+    hashGrid = new SpatialHash(gridCol, gridMin, gridMax);
+}
+
+void Graph::initGemParameters()
+{
+    m_nrm = 0.0015;  // normalization factor
+    m_gravity = 1/16;  // gravitational constant
+    m_edge_size = 128 * m_nrm;    // desired edge size
+    m_Tmin = 3;         // min temperature
+    m_Tmax = 256;
+    m_a_r = PI/6;          // PI/6
+    m_a_o = PI/2;          // PI/2
+    m_s_r = 1/(2*m_nodesCounter);          // 1/2n
+    m_s_o = 1/3;          // 1/3
+    m_Tinit = std::sqrt(m_nodesCounter);        // initial temperature for a vertex
+    m_Tglobal;      // Tinit * n (temperature sum)
+    m_rounds;       // max number of rounds
+
 }
 
 // later refactor this
@@ -77,7 +94,7 @@ Graph::~Graph()
         delete (*iter).second;
     }
 
-//    delete hashGrid;
+    delete hashGrid;
 }
 
 bool Graph::createGraph(ObjectManager *objectManager)
@@ -108,6 +125,9 @@ bool Graph::parseNODE_NODE(ObjectManager *objectManager)
     for ( auto iter = objects_map.begin(); iter != objects_map.end(); iter++) {
         Object *objectP = (*iter).second;
         int nID = objectP->getHVGXID();
+        Object_t type = objectP->getObjectType();
+        if (type == Object_t::SYNAPSE || type == Object_t::MITO)
+            continue;
         QVector4D center = objectP->getCenter();
         std::pair<int, int> id_tuple =  std::make_pair(nID, -1);
         this->addNode(id_tuple, center.x(), center.y(), center.z());
@@ -262,36 +282,36 @@ void Graph::allocateBIndices(QOpenGLBuffer indexVbo)
 /************************ Spatial Hashing *********************************/
 void Graph::updateNode(Node *node)
 {
-   // hashGrid->updateNode(node);
+    hashGrid->updateNode(node);
     return;
 }
 
 void Graph::initGridBuffers()
 {
-//    qDebug() << "initGridBuffers";
-//    hashGrid->initOpenGLFunctions();
-//    if (hashGrid->init_Shaders_Buffers() == false) {
-//        qDebug() << "error!";
-//        return;
-//    }
+    qDebug() << "initGridBuffers";
+    hashGrid->initOpenGLFunctions();
+    if (hashGrid->init_Shaders_Buffers() == false) {
+        qDebug() << "error!";
+        return;
+    }
 }
 
 void Graph::drawGrid(struct GlobalUniforms grid_uniforms)
 {
-//    hashGrid->drawGrid(grid_uniforms);
+    hashGrid->drawGrid(grid_uniforms);
 }
 
 /************************ Force Directed Layout ****************************/
 // when we switch to 2D we use the other vertex with the no rotation matrix
 void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
 {
-  //  hashGrid->clear();
+    hashGrid->clear();
     for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
         Node *node = (*iter).second;
         node->resetLayout(rotationMatrix);
         m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
         // add to the spatial hash
-//        hashGrid->insert((*iter).second);
+        hashGrid->insert((*iter).second);
     }
 
 }
@@ -302,7 +322,7 @@ void Graph::runforceDirectedLayout()
     m_FDL_terminate = false;
     float area = 25.0;
     float k = std::sqrt( area / m_nodesCounter );
-    //std::vector<Node*> nearNodes;
+    std::vector<Node*> nearNodes;
     // reset layouted coordinates to original values
     for ( int i = 0; i < m_ITERATIONS; i++ ) {
         if (m_FDL_terminate) goto quit;
@@ -314,12 +334,13 @@ void Graph::runforceDirectedLayout()
             if (m_FDL_terminate) goto quit;
 
             Node *node1 = (*iter).second;
-           // nearNodes.clear();
-           // hashGrid->queryAABB(node1, m_AABBdim, nearNodes);
-            for ( auto iter2 = m_nodes.begin(); iter2 != m_nodes.end(); iter2++ ) {
+            nearNodes.clear();
+            hashGrid->queryAABB(node1, m_AABBdim, nearNodes);
+            for ( auto iter2 = nearNodes.begin(); iter2 != nearNodes.end(); iter2++ ) {
                 if (m_FDL_terminate) goto quit;
 
-                Node *node2 = (*iter2).second;
+               // Node *node2 = (*iter2).second;
+                Node *node2 = (*iter2);
                 if ( node1->getIdxID() == node2->getIdxID() )
                     continue;
                 // this one,
@@ -486,3 +507,89 @@ QVector2D Graph::repulsiveForce(float x1, float y1, float x2, float y2, float k)
 
     return force;
 }
+
+void Graph::runGEM()
+{
+    qDebug() << "Run GEM Layouting Algorithm";
+    int rounds = 0;
+
+    while(m_Tglobal/m_nodesCounter < m_Tmin && rounds < m_rounds) {
+        for (int i = 0; i < m_nodesCounter; i++) {
+            if (m_Tglobal/m_nodesCounter < m_Tmin)
+                break;
+
+            // get a vertex v
+            // Tglobal = Tglobal - v.t
+            // p = compute_impulse(v)
+            // update(v, p) // update position and temperature
+            // Tglobal = Tglobal + v.t
+
+        }
+
+        rounds++;
+    }
+}
+
+double Graph::computeImpulse(/*vertex*/)
+{
+    // attract to original projected location
+    // p = (v.opos - v.pos) * g * function_growing(v)
+
+    // random disturbance
+    // b = small random vector (length of < 0.07)
+    // p = p + b
+
+    // repulsive forces
+    // for all neighboring nodes u within a distance d
+        // delta = v.pos - u.pos
+        // if (delta != 0)
+            // p = p + delta * E * E/(delta_length^2)
+
+    // attractive forces
+        // for nodes u connected to v
+            // delta = v.pos - u.pos
+            // p = p - delta * (delta_length^2)/(E*E * function_growing(v))
+
+    // return p
+    return 0.1;
+}
+
+double Graph::function_growing(/*vertex*/)
+{
+    double result;
+    // (deg(v) + deg(v)/2) * nrm
+    return result;
+}
+
+void Graph::update_node(/*vertex and impulse*/)
+{
+    /*
+     * if p != 0
+     *      p = v.t * normalize(p) * nrm // scale p by temperature
+     *      v.pos = v.pos + p // move v to new position
+     *      c = c + p // update sum of points
+     *
+     * if v.p != 0:
+     *      // cehck previous p
+     *      B = get_angle(p, v.p)
+     *      if (sin(B) >= sim(PI/2 + ar)
+     *          v.d = v.d + s_r  sign(sin B) // rotation
+     *
+     *      if abs( cos(B) ) > cos(a_o)
+     *          v.t = v.t * s_o * cos(B) // oscillation
+     *
+     *      v.t = v.t * ( 1 - abs(v.d) )
+     *      v.t = min(v.t, Tmax)    // cap to mximum
+     *
+     *      v.p = p // save impulse
+     */
+}
+
+double Graph::get_angle()
+{
+    double angle;
+    // angle = arc_cosine(dot(u, v) / length(v) * length(u) )
+    return angle;
+}
+
+

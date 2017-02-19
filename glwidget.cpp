@@ -29,7 +29,7 @@ GLWidget::GLWidget(QWidget *parent)
 
     // todo: one graph manager, with all the graphs manipulations
 
-    m_distance = 0.2;
+    m_distance = 1.0;
     m_rotation = QQuaternion();
     //reset rotation
     m_rotation.setScalar(1.0f);
@@ -117,7 +117,7 @@ void GLWidget::initializeGL()
     m_mesh->iniShadersVBOs();
     /****************** 3 Initialize Graph  *******************/
     m_graphManager->initVBO(0);
-    //m_graphManager->initGrid();
+    m_graphManager->initGrid();
 
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -140,12 +140,12 @@ void GLWidget::paintGL()
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
     updateMVPAttrib();
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
- // m_mesh->draw();
+    //m_mesh->draw();
 
     struct GlobalUniforms grid_uniforms = { m_yaxis, m_xaxis, m_mMatrix.data(),
                                             m_vMatrix.data(), m_projection.data(),
                                             m_model_noRotation.data(), m_rotationMatrix};
- //   m_graphManager->drawGrid(grid_uniforms);
+    m_graphManager->drawGrid(grid_uniforms);
     m_graphManager->drawNodes(0);
     m_graphManager->drawEdges(0);
 }
@@ -158,15 +158,14 @@ void GLWidget::resizeGL(int w, int h)
     glViewport(0, 0, w * retinaScale, h * retinaScale);
 
     m_projection.setToIdentity();
-    m_projection.ortho(GLfloat(-w) / GLfloat(h),  GLfloat(w) / GLfloat(h), -1.0,  1.0f, -10.0, 10.0 );
+    m_projection.ortho(GLfloat(-w) / GLfloat(h),  GLfloat(w) / GLfloat(h), -1.0,  1.0f, -5.0, 5.0 );
 
     // set up view
     // view matrix: transform a model's vertices from world space to view space, represents the camera
-    m_center = QVector3D(0.0, 0.0, 0.0);
-    m_cameraPosition = QVector3D(2.5, 2.5, 2.5);
+    m_cameraPosition = QVector3D(0.5, 0.5, 0.5);
     QVector3D  cameraUpDirection = QVector3D(0.0, 1.0, 0.0);
     m_vMatrix.setToIdentity();
-    m_vMatrix.lookAt(m_cameraPosition, QVector3D(0.0, 0.0, 0.0), cameraUpDirection);
+    m_vMatrix.lookAt(QVector3D(0.5, 0.5, 1.0) /*m_cameraPosition*/, m_cameraPosition /*center*/, cameraUpDirection);
 
     update();
 }

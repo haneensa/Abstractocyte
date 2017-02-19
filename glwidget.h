@@ -64,7 +64,6 @@ protected:
     QMatrix4x4                  m_rotationMatrix;
 
     QVector3D                   m_cameraPosition;
-    QVector3D                   m_center;
 
 
     /* rotation */

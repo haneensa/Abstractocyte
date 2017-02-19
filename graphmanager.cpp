@@ -200,7 +200,7 @@ bool GraphManager::initVBO(int graphIdx)
 
 void GraphManager::initGrid()
 {
-  //  m_graph[0]->initGridBuffers();
+    m_graph[0]->initGridBuffers();
 }
 
 void GraphManager::drawGrid(struct GlobalUniforms grid_uniforms)
@@ -263,13 +263,14 @@ void GraphManager::updateUniformsLocation(GLuint program)
 
     // initialize uniforms
     GLuint mMatrix = glGetUniformLocation(program, "mMatrix");
+    GLuint vMatrix = glGetUniformLocation(program, "vMatrix");
+
     if (m_2D) { // force directed layout started, them use model without rotation
         glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
-    } else {
+     } else {
         glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
     }
 
-    GLuint vMatrix = glGetUniformLocation(program, "vMatrix");
     glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
 
     GLuint pMatrix = glGetUniformLocation(program, "pMatrix");

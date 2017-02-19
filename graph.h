@@ -5,6 +5,9 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+
+#define PI 3.14159265358979f
+
 #include "node.h"
 #include "edge.h"
 #include "spatialhash.h"
@@ -98,6 +101,14 @@ public:
     void updateGraphParam7(double value);
 
 
+    // GEM
+    void initGemParameters();
+    void runGEM();
+    double computeImpulse(/*vertex*/);
+    double function_growing(/*vertex*/);
+    void update_node(/*vertex and impulse*/);
+    double get_angle(/*vertex 1, vertex 2*/);
+
 protected:
     struct pair_hash {
         template <class T1, class T2>
@@ -127,6 +138,12 @@ protected:
     std::vector<struct BufferNode>  m_bufferNodes;
     std::vector<GLuint>             m_bufferIndices;
 
+    bool                            m_FDL_terminate;
+
+    // spatial hashing
+    SpatialHash                     *hashGrid;
+
+
     // force directed laout
     float                           m_MAX_DISTANCE;
     float                           m_AABBdim;
@@ -137,10 +154,20 @@ protected:
     float                           m_SLOW_FACTOR;
     float                           m_MAX_FORCE;
 
-    bool                            m_FDL_terminate;
+    // GEM constants
+    float                           m_nrm;  // normalization factor
+    float                           m_gravity;  // gravitational constant
+    float                           m_edge_size;    // desired edge size
+    int                             m_Tmin;         // min temperature
+    int                             m_Tmax;
+    float                           m_a_r;          // PI/6
+    float                           m_a_o;          // PI/2
+    float                           m_s_r;          // 1/2n
+    float                           m_s_o;          // 1/3
+    float                           m_Tinit;        // initial temperature for a vertex
+    float                           m_Tglobal;      // Tinit * n (temperature sum)
+    int                             m_rounds;       // max number of rounds
 
-    // spatial hashing
-    SpatialHash                     *hashGrid;
 
 };
 

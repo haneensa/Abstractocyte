@@ -20,7 +20,7 @@ ObjectManager::ObjectManager()
 {
     m_indices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 500;
+    m_limit = 2000;
     m_vertex_offset = 0;
     m_ssbo_data.resize(1200);
     m_mesh = new Mesh();
@@ -74,6 +74,7 @@ bool ObjectManager::importXML(QString path)
                     break;
                 }
                 Object *obj = NULL;
+
                 parseObject(xml, obj); // fills the object with obj info
             } else if (xml.name() == "conn") {
                 parseConnGraph(xml);
@@ -165,7 +166,7 @@ void ObjectManager::parseObject(QXmlStreamReader &xml, Object *obj)
                 float y = stringlist.at(1).toDouble();
                 float z = stringlist.at(2).toDouble();
                 qDebug() << "center: " << x << " " << y << " " << z;
-                obj->setCenter(QVector4D(x, y, z, 0));
+                obj->setCenter(QVector4D(x/5.0, y/5.0, z/5.0, 0));
                 // set ssbo with this center
             }
         } // if start element
@@ -211,9 +212,9 @@ void ObjectManager::parseMesh(QXmlStreamReader &xml, Object *obj)
                     continue;
                 }
 
-                float x1 = stringlist.at(0).toDouble();
-                float y1 = stringlist.at(1).toDouble();
-                float z1 = stringlist.at(2).toDouble();
+                float x1 = stringlist.at(0).toDouble()/5.0;
+                float y1 = stringlist.at(1).toDouble()/5.0;
+                float z1 = stringlist.at(2).toDouble()/5.0;
 
                 QVector4D mesh_vertex(x1, y1, z1,  obj->getHVGXID());
                 struct VertexData v;
@@ -225,9 +226,9 @@ void ObjectManager::parseMesh(QXmlStreamReader &xml, Object *obj)
                     // place holder
                     v.skeleton_vertex = mesh_vertex;
                 } else {
-                    float x2 = stringlist.at(3).toDouble();
-                    float y2 = stringlist.at(4).toDouble();
-                    float z2 = stringlist.at(5).toDouble();
+                    float x2 = stringlist.at(3).toDouble()/5.0;
+                    float y2 = stringlist.at(4).toDouble()/5.0;
+                    float z2 = stringlist.at(5).toDouble()/5.0;
                     QVector4D skeleton_vertex(x2, y2, z2, 0);
                     v.skeleton_vertex = skeleton_vertex;
                 }
@@ -333,9 +334,9 @@ void ObjectManager::parseSkeletonNodes(QXmlStreamReader &xml, Object *obj)
                     continue;
                 }
 
-                float x = stringlist.at(0).toDouble();
-                float y = stringlist.at(1).toDouble();
-                float z = stringlist.at(2).toDouble();
+                float x = stringlist.at(0).toDouble()/5.0;
+                float y = stringlist.at(1).toDouble()/5.0;
+                float z = stringlist.at(2).toDouble()/5.0;
                 QVector3D node(x, y, z);
                 obj->addSkeletonNode(node);
             }
@@ -375,9 +376,9 @@ void ObjectManager::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
                     continue;
                 }
 
-                float x = stringlist.at(0).toDouble();
-                float y = stringlist.at(1).toDouble();
-                float z = stringlist.at(2).toDouble();
+                float x = stringlist.at(0).toDouble()/5.0;
+                float y = stringlist.at(1).toDouble()/5.0;
+                float z = stringlist.at(2).toDouble()/5.0;
                 QVector3D node(x, y, z);
                 obj->addSkeletonPoint(node);
             }
