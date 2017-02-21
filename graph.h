@@ -29,6 +29,23 @@ struct BufferNode
     int ID;
 };
 
+// allocate vbo with enough space for all skeletons using this struct
+// use this for all skeleton stages (simplified one)
+struct Skeleton_Node {
+    QVector4D vertex;   // original position    -> w: hvgx ID
+    QVector2D layout1;  // layouted position (all skeletons)
+    QVector2D layout2;  // layouted position (no astrocyte)
+    QVector2D layout3;  // layouted position (no neurites)
+};
+
+
+// store this in the common ssbo so all can access it.
+struct Neurite_Node {
+    QVector4D center;   // center of object     -> w: hvgx ID
+    QVector2D layout1;  // layouted position (only neurties)
+    QVector2D layout2;  // layouted position (with astrocyte)
+};
+
 /*
  * NODE_NODE:
  * nodes IDs are hvgx ID

@@ -75,10 +75,10 @@ QVector4D Object::getColor()
         m_color = gold;
         break;
     case Object_t::SPINE:
-        m_color = darkmagenta;
+        m_color = orange;
         break;
     case Object_t::BOUTON:
-        m_color = greenyellow;
+        m_color = green;
         break;
     case Object_t::MITO:
         m_color = mediumslateblue;

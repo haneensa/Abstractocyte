@@ -125,7 +125,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu4.pos_alpha  = QVector2D(0, 1);
     neu4.trans_alpha = QVector2D(1, 1);
     neu4.color_alpha = QVector2D(1, 1);
-    neu4.point_size = QVector2D(7, 30);
+    neu4.point_size = QVector2D(7, 35);
     neu4.extra_info = QVector4D(x_interval.x(), x_interval.y(),  4, 3);       // alpha limit, div, pos1, pos2
     neu4.render_type = QVector4D(0, 0, 1, 0);
     m_x_axis_states[std::make_pair(x_interval.x(), x_interval.y())] = neu4;
