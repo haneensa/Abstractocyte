@@ -135,6 +135,9 @@ void MousePad::initBuffer()
     m_buffer_color_data.push_back(seagreen);
     m_buffer_color_data.push_back(brown);
     m_buffer_color_data.push_back(violet);
+    m_buffer_color_data.push_back(peru);
+    m_buffer_color_data.push_back(mediumspringgreen);
+    m_buffer_color_data.push_back(gainsboro);
 
     int bufferSize =  m_buffer_color_data.size() * sizeof(QVector4D);
 
