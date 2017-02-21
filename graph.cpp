@@ -201,6 +201,7 @@ Node* Graph::addNode(std::pair<int, int> id_tuple, float x, float y, float z)
 
     struct BufferNode bnode = {coord3D, coord2D, nID};
     // ids assigned to nods should match the indices in this vector!
+
     m_bufferNodes.push_back(bnode); // use skeleton_node
 
     return newNode;
@@ -329,7 +330,7 @@ void Graph::update_node_data(Node* node)
     {
         // layout1 using hvgx ID and -1
         struct ssbo_mesh data;
-        data.layout1 = QVector2D(0, 0);
+        data.layout1 = node->getLayoutedPosition();
         m_obj_mngr->update_ssbo_data(data, node->getID() /*hvgx*/);
         break;
     }
@@ -337,13 +338,15 @@ void Graph::update_node_data(Node* node)
     {
         // if node belong to neurite then
         // layout2 using hvgx ID and -1
-        struct ssbo_mesh data;
-        data.layout2 = QVector2D(0, 0);
-        m_obj_mngr->update_ssbo_data(data, node->getID() /*hvgx*/);
+
         // else, astrocyte skeleton
         if (node->getNodeType() == Node_t::ASTROCYTE) {
             // update astrocyte skeleton
             // layout 2
+        } else {
+            struct ssbo_mesh data;
+            data.layout2 = node->getLayoutedPosition();
+            m_obj_mngr->update_ssbo_data(data, node->getID() /*hvgx*/);
         }
 
         break;

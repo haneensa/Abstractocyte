@@ -11,7 +11,6 @@
 #include "glsluniform_structs.h"
 #include "mesh.h"
 
-
 class ObjectManager : public MainOpenGL
 {
 public:
@@ -61,7 +60,6 @@ protected:
     int                                 m_vertex_offset;
     int                                 m_limit;
 
-    //std::vector<Object*>                m_objects; // make this map by hvgx ID instead of vector
     std::map<int, Object*>              m_objects;
 
     // shared data

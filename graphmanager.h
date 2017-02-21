@@ -7,6 +7,16 @@
 #include "glsluniform_structs.h"
 #include <thread>
 
+// allocate vbo with enough space for all skeletons using this struct
+// use this for all skeleton stages (simplified one)
+// initialize this when while contructing the skeletons
+// with their edges
+struct Skeleton_Node {
+    QVector4D vertex;   // original position  (simplified)  -> w: hvgx ID
+    QVector2D layout1;  // layouted position (all skeletons)
+    QVector2D layout2;  // layouted position (no neurites)
+    QVector2D layout3;  // layouted position (no astrocyte)
+};
 
 // (1) neurite-neurite graph (2) neurite-astrocyte skeleton (3) neurites skeletons - astrocyte skeleton (4) neuries skeletons
 #define max_graphs 4
@@ -45,12 +55,12 @@ public:
     void updateGraphParam7(double value);
 
 protected:
-    // later if I need more independent graphs
     ObjectManager                       *m_obj_mngr;
     Graph                               *m_graph[max_graphs];
 
+    //
     std::vector<struct Skeleton_Node>   m_skeletons_data; // all skeletons here
-
+    std::vector<GLuint>                 m_skeletons_edges;
 
     bool                                m_glFunctionsSet;
 
@@ -71,9 +81,6 @@ protected:
     std::thread                         m_layout_thread1;
     bool                                m_FDL_running;
     bool                                m_2D;
-
-    // todo: flag that stops the FDL and kill the thread
-    // todo: ?
 };
 
 #endif // GRAPHMANAGER_H

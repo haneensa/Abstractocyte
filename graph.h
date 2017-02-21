@@ -2,6 +2,16 @@
 // all the nodes of a skeleton should have the same hvgx id
 // so I cant index the map with it
 
+
+// each graph have its own nodes and edges
+// gloal buffer to update the relative data their
+
+// need away to unite the access method for global and unique
+// so when we update one the other get updated simultaneusly
+
+// one global ssbo to update center positions
+// so here skeleton nodes and edges only
+
 #ifndef GRAPH_H
 #define GRAPH_H
 
@@ -45,17 +55,6 @@ struct BufferNode
   3: (N) Skeleton_Node->layout 1, (A) Skeleton_Node->layout 1
   4: (N) struct ssbo_mesh->layout 2, (A) Skeleton_Node->layout 2
 */
-
-
-
-// allocate vbo with enough space for all skeletons using this struct
-// use this for all skeleton stages (simplified one)
-struct Skeleton_Node {
-    QVector4D vertex;   // original position  (simplified)  -> w: hvgx ID
-    QVector2D layout1;  // layouted position (all skeletons)
-    QVector2D layout2;  // layouted position (no neurites)
-    QVector2D layout3;  // layouted position (no astrocyte)
-};
 
 // edge info is always present. only display it in certain states
 
