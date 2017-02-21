@@ -66,15 +66,21 @@ void GraphManager::update2Dflag(bool is2D)
     // connectivity info from them
 void GraphManager::ExtractGraphFromMesh(ObjectManager *objectManager)
 {
+
+     // render skeletons then interpolate to nodes by accessing the nodes positions from ssbo
+     // use object manager to initialize them
+
+     // init the edges and they never change except when to display them
+
      m_graph[0] = new Graph( Graph_t::NODE_NODE ); // neurite-neurite
-//     m_graph[1] = new Graph(Graph_t::NODE_SKELETON); // neurite-astrocyte skeleton
-//     m_graph[2] = new Graph(Graph_t::SKELETON_SKELETON); //  neurites skeletons - astrocyte skeleton
-//     m_graph[3] = new Graph(Graph_t::SKELETON_SKELETON); // neuries skeletons
+     m_graph[1] = new Graph( Graph_t::NODE_SKELETON ); // neurite-astrocyte skeleton
+     m_graph[2] = new Graph( Graph_t::ALL_SKELETONS ); //  neurites skeletons - astrocyte skeleton
+     m_graph[3] = new Graph( Graph_t::NEURITE_SKELETONS ); // neuries skeletons
 
      m_graph[0]->createGraph(objectManager);
-//     m_graph[1]->createGraph(objectManager);
-//     m_graph[2]->createGraph(objectManager);
-//     m_graph[3]->createGraph(objectManager);
+     m_graph[1]->createGraph(objectManager);
+     m_graph[2]->createGraph(objectManager);
+     m_graph[3]->createGraph(objectManager);
 }
 
 void GraphManager::stopForceDirectedLayout(int graphIdx)

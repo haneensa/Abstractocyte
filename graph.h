@@ -29,32 +29,65 @@ struct BufferNode
     int ID;
 };
 
+
+
+/*
+    5-----1----2
+    |     |    |
+    |     3----4
+    |          |
+    |          |
+    6----------7
+
+  5: (N) Skeleton_Node->vertex, (A) alpha = 0
+  6: (N) Skeleton_Node->vertex, (A) Skeleton_Node->vertex
+  7: (N) Neurite_Node->center, (A) Skeleton_Node->vertex
+  1: (N) Skeleton_Node->layout3, (A) alpha = 0
+  2: (N) Neurite_Node->layout 1, (A) alpha = 0
+  3: (N) Skeleton_Node->layout 1, (A) Skeleton_Node->layout 1
+  4: (N) Neurite_Node->layout 2, (A) Skeleton_Node->layout 2
+*/
+
+
+
 // allocate vbo with enough space for all skeletons using this struct
 // use this for all skeleton stages (simplified one)
 struct Skeleton_Node {
-    QVector4D vertex;   // original position    -> w: hvgx ID
+    QVector4D vertex;   // original position  (simplified)  -> w: hvgx ID
     QVector2D layout1;  // layouted position (all skeletons)
-    QVector2D layout2;  // layouted position (no astrocyte)
-    QVector2D layout3;  // layouted position (no neurites)
+    QVector2D layout2;  // layouted position (no neurites)
+    QVector2D layout3;  // layouted position (no astrocyte)
 };
 
 
 // store this in the common ssbo so all can access it.
+// one per object
 struct Neurite_Node {
     QVector4D center;   // center of object     -> w: hvgx ID
     QVector2D layout1;  // layouted position (only neurties)
     QVector2D layout2;  // layouted position (with astrocyte)
 };
 
+// edge info is always present. only display it in certain states
+
 /*
  * NODE_NODE:
  * nodes IDs are hvgx ID
  * edges simple edge between nodes using hvgx ID
+ * update: Neurite_Node->layout 1
  *
  * NODE_SKELETON:
+ * update: Neurite_Node->layout 2
+ * update: Skeleton_Node->layout 2
+ *
+ * ALL_SKELETONS:
+ * update: Skeleton_Node->layout 1
+ *
+ * NEURITE_SKELETONS:
+ * update: Skeleton_Node->layout 3
  *
  */
-enum class Graph_t { NODE_NODE, NODE_SKELETON,  SKELETON_SKELETON };
+enum class Graph_t { NODE_NODE, NODE_SKELETON,  ALL_SKELETONS, NEURITE_SKELETONS};
 
 
 class Graph

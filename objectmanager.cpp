@@ -20,7 +20,7 @@ ObjectManager::ObjectManager()
 {
     m_indices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 100;
+    m_limit = 120;
     m_vertex_offset = 0;
     m_ssbo_data.resize(1200);
     m_mesh = new Mesh();
@@ -510,6 +510,7 @@ bool ObjectManager::initBuffer()
     return true;
 }
 
+
 bool ObjectManager::initMeshShaders()
 {
     /* start initializing mesh */
@@ -546,10 +547,11 @@ bool ObjectManager::initMeshShaders()
     m_vbo_IndexMesh.allocate( NULL, m_indices_size * sizeof(GLuint) );
     int offset = 0;
     for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++) {
+
         Object *object_p = (*iter).second;
-        if (object_p->getObjectType() != Object_t::AXON  || object_p->getObjectType() == Object_t::DENDRITE   ) {
-            continue;
-        }
+        if (object_p->getObjectType() == Object_t::BOUTON  || object_p->getObjectType()  == Object_t::SPINE   ) {
+              continue;
+          }
         int count = object_p->get_indices_Size() * sizeof(GLuint);
         qDebug() << " allocating: " << object_p->getName().data();
         m_vbo_IndexMesh.write(offset, object_p->get_indices(), count);
@@ -626,7 +628,7 @@ bool ObjectManager::initSkeletonShaders()
     int offset = 0;
     for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++) { // todo: skip if the object has no skeleton
         Object *object_p = (*iter).second;
-        if (object_p->getObjectType() != Object_t::AXON  || object_p->getObjectType() == Object_t::DENDRITE   ) {
+        if (object_p->getObjectType() == Object_t::BOUTON  || object_p->getObjectType()  == Object_t::SPINE   ) {
             continue;
         }
         int count = object_p->writeSkeletontoVBO(m_vbo_skeleton, offset);

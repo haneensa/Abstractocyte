@@ -103,7 +103,7 @@ bool Graph::createGraph(ObjectManager *objectManager)
     switch(m_gType) {
     case Graph_t::NODE_NODE : result = parseNODE_NODE(objectManager);
         break;
-    case Graph_t::SKELETON_SKELETON :  result = parseSKELETON(objectManager);
+    case Graph_t::ALL_SKELETONS :  result = parseSKELETON(objectManager);
         break;
     }
 
@@ -199,7 +199,7 @@ Node* Graph::addNode(std::pair<int, int> id_tuple, float x, float y, float z)
 
     struct BufferNode bnode = {coord3D, coord2D, nID};
     // ids assigned to nods should match the indices in this vector!
-    m_bufferNodes.push_back(bnode);
+    m_bufferNodes.push_back(bnode); // use skeleton_node
 
     return newNode;
 }

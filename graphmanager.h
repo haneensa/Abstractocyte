@@ -47,6 +47,10 @@ public:
 protected:
     // later if I need more independent graphs
     Graph                           *m_graph[max_graphs];
+    std::vector< struct Skeleton_Node > m_skeletons_data; // all skeletons here
+    std::vector< struct Neurite_Node > m_neurites_nodes; // all neurites centers init here
+
+
     bool                            m_glFunctionsSet;
 
     // one for the 2D space

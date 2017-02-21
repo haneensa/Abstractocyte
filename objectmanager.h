@@ -44,6 +44,8 @@ public:
     void updateUniforms(struct MeshUniforms mesh_uniforms);
     void updateUniformsLocation(GLuint program);
 
+    bool filterByType(Object *object_p );
+
 protected:
     // store all vertices of the mesh.
     // unique vertices, faces to index them.
