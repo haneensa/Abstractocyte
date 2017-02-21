@@ -46,6 +46,11 @@ public:
 
     bool filterByType(Object *object_p );
 
+    // ssbo management
+    // function to update ssbo data (layout 1, layout 2)
+    void update_ssbo_data(struct ssbo_mesh, int hvgxID); // access them using IDs
+    void write_ssbo_data();
+
 protected:
     // store all vertices of the mesh.
     // unique vertices, faces to index them.
@@ -58,7 +63,11 @@ protected:
 
     //std::vector<Object*>                m_objects; // make this map by hvgx ID instead of vector
     std::map<int, Object*>              m_objects;
+
+    // shared data
     std::vector<struct ssbo_mesh>       m_ssbo_data; // Color, Cenert, Type
+
+
     GLuint                              m_ssbo;
     GLuint                              m_bindIdx;
 

@@ -14,10 +14,10 @@
 class GraphManager : public MainOpenGL
 {
 public:
-    GraphManager();
+    GraphManager(ObjectManager *objectManager);
     ~GraphManager();
 
-    void ExtractGraphFromMesh(ObjectManager *instance);
+    void ExtractGraphFromMesh();
 
     bool initOpenGLFunctions();
     void drawNodes(int graphIdx);
@@ -46,30 +46,31 @@ public:
 
 protected:
     // later if I need more independent graphs
-    Graph                           *m_graph[max_graphs];
-    std::vector< struct Skeleton_Node > m_skeletons_data; // all skeletons here
-    std::vector< struct Neurite_Node > m_neurites_nodes; // all neurites centers init here
+    ObjectManager                       *m_obj_mngr;
+    Graph                               *m_graph[max_graphs];
+
+    std::vector<struct Skeleton_Node>   m_skeletons_data; // all skeletons here
 
 
-    bool                            m_glFunctionsSet;
+    bool                                m_glFunctionsSet;
 
     // one for the 2D space
-    QOpenGLVertexArrayObject        m_IndexVAO;
-    QOpenGLBuffer                   m_IndexVBO;
+    QOpenGLVertexArrayObject            m_IndexVAO;
+    QOpenGLBuffer                       m_IndexVBO;
 
-    QOpenGLVertexArrayObject        m_NodesVAO;
-    QOpenGLBuffer                   m_NodesVBO;
+    QOpenGLVertexArrayObject            m_NodesVAO;
+    QOpenGLBuffer                       m_NodesVBO;
 
     // shaders
-    GLuint                          m_program_nodes;
-    GLuint                          m_program_Index;
+    GLuint                              m_program_nodes;
+    GLuint                              m_program_Index;
 
-    struct GlobalUniforms            m_uniforms;
+    struct GlobalUniforms               m_uniforms;
 
     // thread management
-    std::thread                     m_layout_thread1;
-    bool                            m_FDL_running;
-    bool                            m_2D;
+    std::thread                         m_layout_thread1;
+    bool                                m_FDL_running;
+    bool                                m_2D;
 
     // todo: flag that stops the FDL and kill the thread
     // todo: ?

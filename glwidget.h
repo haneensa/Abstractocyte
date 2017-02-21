@@ -45,43 +45,44 @@ protected:
     void updateMVPAttrib();
     void loadMesh();
 
-    AbstractionSpace            *m_2dspace;
-    bool                        m_2D;
+
+    AbstractionSpace                    *m_2dspace;
+    bool                                m_2D;
 
     /* mesh */
-    ObjectManager                        *m_mesh;
+    ObjectManager                       *m_object_mngr;
 
-    GraphManager                *m_graphManager;
+    GraphManager                        *m_graphManager;
 
-    struct MeshUniforms         m_mesh_uniforms;
-    struct GlobalUniforms        m_graph_uniforms;
+    struct MeshUniforms                 m_mesh_uniforms;
+    struct GlobalUniforms               m_graph_uniforms;
 
     /* matrices */
-    QMatrix4x4                  m_projection;
-    QMatrix4x4                  m_mMatrix;
-    QMatrix4x4                  m_vMatrix;
-    QMatrix4x4                  m_model_noRotation;
-    QMatrix4x4                  m_rotationMatrix;
+    QMatrix4x4                          m_projection;
+    QMatrix4x4                          m_mMatrix;
+    QMatrix4x4                          m_vMatrix;
+    QMatrix4x4                          m_model_noRotation;
+    QMatrix4x4                          m_rotationMatrix;
 
-    QVector3D                   m_cameraPosition;
+    QVector3D                           m_cameraPosition;
 
 
     /* rotation */
-    QPoint                      m_lastPos;
-    double                      m_distance;
-    bool                        m_isRotatable;
-    QQuaternion                 m_rotation;
-    QVector3D                   m_rotationAxis;
-    QVector3D                   m_translation;
+    QPoint                              m_lastPos;
+    double                              m_distance;
+    bool                                m_isRotatable;
+    QQuaternion                         m_rotation;
+    QVector3D                           m_rotationAxis;
+    QVector3D                           m_translation;
 
     /* mouse pad */
-    int                         m_yaxis;
-    int                         m_xaxis;
+    int                                 m_yaxis;
+    int                                 m_xaxis;
 
     // force directed layout
-    bool                        m_FDL_running;
+    bool                                m_FDL_running;
 
-    QTimer                      *timer;
+    QTimer                              *timer;
 
 };
 

@@ -9,7 +9,7 @@ Node::Node(int nID, int idxID, float x, float y, float z, Node_t node_type)
 
     // force directed layout
     m_forceSum = QVector2D(0.0, 0.0);
-    m_layouted = QVector3D(x, y, 0.0);
+    m_layouted = QVector2D(x, y);
 }
 
 Node::~Node()
@@ -33,7 +33,7 @@ void Node::addEdge(Edge *e)
 }
 
 // force based layout related functions
-QVector3D Node::getLayoutedPosition()
+QVector2D Node::getLayoutedPosition()
 {
     return m_layouted;
 }
@@ -41,14 +41,13 @@ QVector3D Node::getLayoutedPosition()
 
 void Node::addToLayoutedPosition(QVector2D newPos)
 {
-    m_layouted += QVector3D(newPos.x(), newPos.y(), 0.0);
+    m_layouted += QVector2D(newPos.x(), newPos.y());
 }
 
 void Node::resetLayout(QMatrix4x4 rotationMatrix)
 {
     QVector3D vec = rotationMatrix * m_nodeXYZ;
-    m_layouted = vec;
-    m_layouted.setZ(0);
+    m_layouted = vec.toVector2D();
     resetForce();
 }
 

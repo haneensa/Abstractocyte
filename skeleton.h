@@ -12,6 +12,7 @@ struct SkeletonVertex {
     QVector4D   knot2;   // end points of the segment
 };
 
+
 class Skeleton
 {
 public:

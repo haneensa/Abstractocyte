@@ -19,7 +19,7 @@ public:
     int getIdxID()              { return m_idxID; }
 
     Node_t getNodeType()        { return m_node_t; }
-    QVector3D get3DPosition()   {return m_nodeXYZ; }
+    QVector3D get3DPosition()   { return m_nodeXYZ; }
     void addEdge(Edge *e);
 
 
@@ -42,6 +42,7 @@ private:
     int                     m_idxID;    // index in buffer
 
     // could belong to a skeleton or just one neurite node
+    bool                    m_is_skeleton;
 
     QVector3D               m_nodeXYZ;  // original 3D position
 

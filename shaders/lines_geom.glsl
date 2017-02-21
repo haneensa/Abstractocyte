@@ -15,6 +15,8 @@ struct SSBO_datum {
     vec4 color;
     vec4 center;
     vec4 info;
+    vec2 layout1;
+    vec2 layout2;
 };
 
 layout (std430, binding=2) buffer mesh_data

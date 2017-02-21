@@ -1,8 +1,3 @@
-// todo:    1- render 3d segmentation (done)
-//          2- render the skeleton
-//          3- mesh normals (to be fixed)
-
-
 /*
  * FinalMatrix = Projection * View * Model
  * Model = RotationAroundOrigin * TranslationFromOrigin * RotationAroundObjectCenter
@@ -21,13 +16,15 @@ GLWidget::GLWidget(QWidget *parent)
         m_FDL_running(false),
         m_2D(false)
 {
-
+    // 2D abstraction space, with intervals properties intializaiton and geometry
     m_2dspace = new AbstractionSpace(100, 100);
-    m_mesh = new ObjectManager();
-    m_graphManager = new GraphManager();
-    m_graphManager->ExtractGraphFromMesh(m_mesh);
 
-    // todo: one graph manager, with all the graphs manipulations
+    // objects manager with all objects data
+    m_object_mngr = new ObjectManager();
+
+    // graph manager with 4 graphs and 2D space layouted data
+    m_graphManager = new GraphManager(m_object_mngr);
+    m_graphManager->ExtractGraphFromMesh();
 
     m_distance = 1.0;
     m_rotation = QQuaternion();
@@ -42,7 +39,6 @@ GLWidget::GLWidget(QWidget *parent)
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
 
-
     setFocusPolicy(Qt::StrongFocus);
 }
 
@@ -53,7 +49,7 @@ GLWidget::~GLWidget()
     makeCurrent();
     delete m_2dspace;
     delete m_graphManager;
-    delete m_mesh;
+    delete m_object_mngr;
 
     doneCurrent();
 }
@@ -94,7 +90,7 @@ void GLWidget::updateMVPAttrib()
     // todo: whenver the rotation matrix changes then update
     // the nodes buffer after reseting the nodes with rotation matrix
     m_graphManager->updateUniforms(m_graph_uniforms);
-    m_mesh->updateUniforms(m_mesh_uniforms);
+    m_object_mngr->updateUniforms(m_mesh_uniforms);
 }
 
 void GLWidget::initializeGL()
@@ -102,7 +98,7 @@ void GLWidget::initializeGL()
     qDebug() << "initializeGL";
     initializeOpenGLFunctions();
     m_2dspace->initOpenGLFunctions();
-    m_mesh->initOpenGLFunctions();
+    m_object_mngr->initOpenGLFunctions();
     m_graphManager->initOpenGLFunctions();
 
     updateMVPAttrib();
@@ -114,7 +110,7 @@ void GLWidget::initializeGL()
     m_2dspace->initBuffer();
     emit setAbstractionData(m_2dspace);
     /******************** 2 initialize Mesh **********************/
-    m_mesh->iniShadersVBOs();
+    m_object_mngr->iniShadersVBOs();
     /****************** 3 Initialize Graph  *******************/
     m_graphManager->initVBO(0);
     m_graphManager->initGrid();
@@ -140,7 +136,8 @@ void GLWidget::paintGL()
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
     updateMVPAttrib();
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    m_mesh->draw();
+
+    m_object_mngr->draw();
 
     struct GlobalUniforms grid_uniforms = { m_yaxis, m_xaxis, m_mMatrix.data(),
                                             m_vMatrix.data(), m_projection.data(),

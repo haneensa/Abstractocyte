@@ -1,12 +1,14 @@
 #include "graphmanager.h"
 
-GraphManager::GraphManager()
+GraphManager::GraphManager(ObjectManager *objectManager)
     : m_IndexVBO( QOpenGLBuffer::IndexBuffer ),
       m_NodesVBO( QOpenGLBuffer::VertexBuffer ),
       m_glFunctionsSet(false),
       m_FDL_running(false),
       m_2D(false)
 {
+    m_obj_mngr = objectManager;
+
 }
 
 GraphManager::~GraphManager()
@@ -64,7 +66,7 @@ void GraphManager::update2Dflag(bool is2D)
 // 4) object nodes and their connectivity information
     // object nodes
     // connectivity info from them
-void GraphManager::ExtractGraphFromMesh(ObjectManager *objectManager)
+void GraphManager::ExtractGraphFromMesh()
 {
 
      // render skeletons then interpolate to nodes by accessing the nodes positions from ssbo
@@ -77,10 +79,10 @@ void GraphManager::ExtractGraphFromMesh(ObjectManager *objectManager)
      m_graph[2] = new Graph( Graph_t::ALL_SKELETONS ); //  neurites skeletons - astrocyte skeleton
      m_graph[3] = new Graph( Graph_t::NEURITE_SKELETONS ); // neuries skeletons
 
-     m_graph[0]->createGraph(objectManager);
-     m_graph[1]->createGraph(objectManager);
-     m_graph[2]->createGraph(objectManager);
-     m_graph[3]->createGraph(objectManager);
+     m_graph[0]->createGraph(m_obj_mngr);
+     m_graph[1]->createGraph(m_obj_mngr);
+     m_graph[2]->createGraph(m_obj_mngr);
+     m_graph[3]->createGraph(m_obj_mngr);
 }
 
 void GraphManager::stopForceDirectedLayout(int graphIdx)
@@ -225,6 +227,8 @@ void GraphManager::drawNodes(int graphIdx)
 
     if (m_glFunctionsSet == false)
         return;
+
+    m_obj_mngr->write_ssbo_data();
 
     m_NodesVAO.bind();
     m_NodesVBO.bind();

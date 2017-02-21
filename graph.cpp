@@ -99,6 +99,7 @@ Graph::~Graph()
 
 bool Graph::createGraph(ObjectManager *objectManager)
 {
+    m_obj_mngr = objectManager;
     bool result;
     switch(m_gType) {
     case Graph_t::NODE_NODE : result = parseNODE_NODE(objectManager);
@@ -110,6 +111,7 @@ bool Graph::createGraph(ObjectManager *objectManager)
     return true;
 }
 
+// init m_neurites_nodes ssbo here
 bool Graph::parseNODE_NODE(ObjectManager *objectManager)
 {
     // iterate over mesh''s objects, and add all the center nodes except astrocyte
@@ -316,6 +318,52 @@ void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
 
 }
 
+void Graph::update_node_data(Node* node)
+{
+    if (m_obj_mngr == NULL)
+        return;
+
+    // depends on graph type, if node-ndoe
+    switch(m_gType) {
+    case Graph_t::NODE_NODE :
+    {
+        // layout1 using hvgx ID and -1
+        struct ssbo_mesh data;
+        data.layout1 = QVector2D(0, 0);
+        m_obj_mngr->update_ssbo_data(data, node->getID() /*hvgx*/);
+        break;
+    }
+    case Graph_t::NODE_SKELETON :
+    {
+        // if node belong to neurite then
+        // layout2 using hvgx ID and -1
+        struct ssbo_mesh data;
+        data.layout2 = QVector2D(0, 0);
+        m_obj_mngr->update_ssbo_data(data, node->getID() /*hvgx*/);
+        // else, astrocyte skeleton
+        if (node->getNodeType() == Node_t::ASTROCYTE) {
+            // update astrocyte skeleton
+            // layout 2
+        }
+
+        break;
+    }
+    case Graph_t::NEURITE_SKELETONS :
+    {
+        // update skeleton node
+        // layout 3
+        break;
+    }
+    case Graph_t::ALL_SKELETONS :
+    {
+        // update skeleton node
+        // layout 1
+        break;
+    } }
+
+     m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
+}
+
 void Graph::runforceDirectedLayout()
 {
     qDebug() << "run force directed layout";
@@ -400,7 +448,9 @@ void Graph::runforceDirectedLayout()
             node->addToLayoutedPosition(QVector2D(xMove, yMove)); // add to 2D position
 
             // update node value in m_nodes buffer
-            m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
+
+            update_node_data(node);
+
             // reset node force
             node->resetForce();
             // update node position in spatial hash

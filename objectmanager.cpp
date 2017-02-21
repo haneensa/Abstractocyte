@@ -20,7 +20,7 @@ ObjectManager::ObjectManager()
 {
     m_indices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 120;
+    m_limit = 20;
     m_vertex_offset = 0;
     m_ssbo_data.resize(1200);
     m_mesh = new Mesh();
@@ -502,14 +502,21 @@ bool ObjectManager::initBuffer()
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_bindIdx, m_ssbo);
     qDebug() << "mesh buffer size: " << bufferSize;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
-    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-    memcpy(p,   m_ssbo_data.data(),  bufferSize);
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+
+    write_ssbo_data();
 
     return true;
 }
 
+void ObjectManager::write_ssbo_data()
+{
+    int bufferSize =  m_ssbo_data.size() * sizeof(struct ssbo_mesh);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
+    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    memcpy(p,   m_ssbo_data.data(),  bufferSize);
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+}
 
 bool ObjectManager::initMeshShaders()
 {
@@ -735,4 +742,12 @@ std::map<int, Object*>  ObjectManager::getObjectsMap()
 std::vector<QVector2D> ObjectManager::getNeuritesEdges()
 {
     return neurites_neurite_edge;
+}
+
+void ObjectManager::update_ssbo_data(struct ssbo_mesh data, int hvgxID)
+{
+    if (m_ssbo_data.size() < hvgxID)
+        return;
+
+    m_ssbo_data[hvgxID] = data;
 }

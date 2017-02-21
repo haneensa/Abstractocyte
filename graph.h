@@ -29,8 +29,6 @@ struct BufferNode
     int ID;
 };
 
-
-
 /*
     5-----1----2
     |     |    |
@@ -41,11 +39,11 @@ struct BufferNode
 
   5: (N) Skeleton_Node->vertex, (A) alpha = 0
   6: (N) Skeleton_Node->vertex, (A) Skeleton_Node->vertex
-  7: (N) Neurite_Node->center, (A) Skeleton_Node->vertex
+  7: (N) struct ssbo_mesh->center, (A) Skeleton_Node->vertex
   1: (N) Skeleton_Node->layout3, (A) alpha = 0
-  2: (N) Neurite_Node->layout 1, (A) alpha = 0
+  2: (N) struct ssbo_mesh->layout 1, (A) alpha = 0
   3: (N) Skeleton_Node->layout 1, (A) Skeleton_Node->layout 1
-  4: (N) Neurite_Node->layout 2, (A) Skeleton_Node->layout 2
+  4: (N) struct ssbo_mesh->layout 2, (A) Skeleton_Node->layout 2
 */
 
 
@@ -59,25 +57,16 @@ struct Skeleton_Node {
     QVector2D layout3;  // layouted position (no astrocyte)
 };
 
-
-// store this in the common ssbo so all can access it.
-// one per object
-struct Neurite_Node {
-    QVector4D center;   // center of object     -> w: hvgx ID
-    QVector2D layout1;  // layouted position (only neurties)
-    QVector2D layout2;  // layouted position (with astrocyte)
-};
-
 // edge info is always present. only display it in certain states
 
 /*
  * NODE_NODE:
  * nodes IDs are hvgx ID
  * edges simple edge between nodes using hvgx ID
- * update: Neurite_Node->layout 1
+ * update: struct ssbo_mesh->layout 1
  *
  * NODE_SKELETON:
- * update: Neurite_Node->layout 2
+ * update: struct ssbo_mesh->layout 2
  * update: Skeleton_Node->layout 2
  *
  * ALL_SKELETONS:
@@ -87,7 +76,7 @@ struct Neurite_Node {
  * update: Skeleton_Node->layout 3
  *
  */
-enum class Graph_t { NODE_NODE, NODE_SKELETON,  ALL_SKELETONS, NEURITE_SKELETONS};
+enum class Graph_t { NODE_NODE = 0, NODE_SKELETON = 1,  ALL_SKELETONS = 2, NEURITE_SKELETONS =3};
 
 
 class Graph
@@ -126,6 +115,8 @@ public:
     QVector2D attractionForce(float x1, float y1, float x2, float y2, float k);
     QVector2D repulsiveForce(float x1, float y1, float x2, float y2, float k);
     void resetCoordinates(QMatrix4x4 rotationMatrix);
+
+    void update_node_data(Node* node);
 
     // opengl related functions
     size_t vertexBufferSize() { return m_bufferNodes.size(); }
@@ -170,6 +161,8 @@ protected:
     };
 
     Graph_t                                         m_gType;
+
+    ObjectManager                                   *m_obj_mngr;
 
     std::map<std::pair<int, int>, Node*>            m_nodes;    // IDs are unique to identify nodes
                                                 // if more than a skeleton
