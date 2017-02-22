@@ -108,7 +108,7 @@ void GLWidget::initializeGL()
     /******************** 2 initialize Mesh **********************/
     m_object_mngr->iniShadersVBOs();
     /****************** 3 Initialize Graph  *******************/
-    m_graphManager->initVBO(0);
+    m_graphManager->initVBO();
     m_graphManager->initGrid();
 
 
@@ -133,14 +133,14 @@ void GLWidget::paintGL()
     updateMVPAttrib();
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    m_object_mngr->draw();
+//    m_object_mngr->draw();
 
     struct GlobalUniforms grid_uniforms = { m_yaxis, m_xaxis, m_mMatrix.data(),
                                             m_vMatrix.data(), m_projection.data(),
                                             m_model_noRotation.data(), m_rotationMatrix};
     m_graphManager->drawGrid(grid_uniforms);
-    m_graphManager->drawNodes(0);
-    m_graphManager->drawEdges(0);
+    m_graphManager->drawNodes();
+    m_graphManager->drawEdges();
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -244,6 +244,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
                 if (!m_2D) {
                     m_2D = true;
                     m_graphManager->update2Dflag(m_2D);
+                    updateMVPAttrib();      // update uniforms
                 }
             }
 
@@ -257,7 +258,6 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
                 timer->start(0);
                 // pass rotation matrix
                 m_FDL_running = true;   // run force layout
-                updateMVPAttrib();      // update uniforms
                 m_graphManager->startForceDirectedLayout(0);
             }
         break;

@@ -32,12 +32,6 @@
 #include <QOpenGLVertexArrayObject>
 // store graph per object?
 
-struct BufferNode
-{
-    QVector3D coord3D; // vertex center, todo: w: ID
-    QVector2D coord2D; // layouted coordinate
-    int ID;
-};
 
 /*
     5-----1----2
@@ -117,13 +111,6 @@ public:
 
     void update_node_data(Node* node);
 
-    // opengl related functions
-    size_t vertexBufferSize() { return m_bufferNodes.size(); }
-    size_t indexBufferSize() { return m_bufferIndices.size(); }
-
-    void allocateBVertices(QOpenGLBuffer vertexVbo);
-    void allocateBIndices(QOpenGLBuffer indexVbo);
-
     void terminateFDL()  { m_FDL_terminate = true; }
 
     // spatial hashing
@@ -170,15 +157,10 @@ protected:
 
     std::map<int, Edge*>            m_edges;    // IDs refer to m_nodes IDs
 
-    std::map<int, Skeleton*>        m_skeletons; // ID are hvgx
-
     int m_nodesCounter;
     int m_edgesCounter;
     int m_dupEdges;
 
-    // for opengl buffer
-    std::vector<struct BufferNode>  m_bufferNodes;
-    std::vector<GLuint>             m_bufferIndices;
 
     bool                            m_FDL_terminate;
 

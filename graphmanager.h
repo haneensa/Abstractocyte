@@ -30,9 +30,9 @@ public:
     void ExtractGraphFromMesh();
 
     bool initOpenGLFunctions();
-    void drawNodes(int graphIdx);
-    void drawEdges(int graphIdx);
-    bool initVBO(int graphIdx);
+    void drawNodes();
+    void drawEdges();
+    bool initVBO();
     void updateUniformsLocation(GLuint program);
     void updateUniforms(struct GlobalUniforms graph_uniforms);
 
@@ -58,7 +58,10 @@ protected:
     ObjectManager                       *m_obj_mngr;
     Graph                               *m_graph[max_graphs];
 
-    //
+    // most abstract data
+    std::vector<GLuint>                 m_bufferNodes;
+    std::vector<GLuint>                 m_bufferIndices;
+
     std::vector<struct Skeleton_Node>   m_skeletons_data; // all skeletons here
     std::vector<GLuint>                 m_skeletons_edges;
 

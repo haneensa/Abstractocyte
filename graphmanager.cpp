@@ -9,6 +9,53 @@ GraphManager::GraphManager(ObjectManager *objectManager)
 {
     m_obj_mngr = objectManager;
 
+    std::map<int, Object*> objects_map = m_obj_mngr->getObjectsMap();
+
+    // add nodes
+    for ( auto iter = objects_map.begin(); iter != objects_map.end(); iter++) {
+        Object *objectP = (*iter).second;
+        if (objectP->getObjectType() == Object_t::ASTROCYTE)
+            continue;
+
+        if (objectP->getObjectType() == Object_t::MITO  || objectP->getObjectType()  == Object_t::SYNAPSE   ) {
+            continue;
+        }
+
+        int ID = objectP->getHVGXID();
+        objectP->setNodeIdx(m_bufferNodes.size());
+        m_bufferNodes.push_back(ID);
+
+        // find a way to fill the skeleton with data
+        // get skeleton of the object
+        Skeleton *skeleton = objectP->getSkeleton();
+        std::vector<QVector3D> nodes3D = skeleton->getGraphNodes();
+        std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
+
+        // add nodes
+        for ( int i = 0; i < nodes3D.size(); i++) {
+            std::pair<int, int> id_tuple =  std::make_pair(hvgxID, i);
+        }
+
+        // add edges
+        for (int i = 0; i < edges2D.size(); ++i) {
+            int nID1 = edges2D[i].x();
+            int nID2 = edges2D[i].y();
+            this->addEdge(eID, hvgxID, nID1, nID2);
+        }
+    }
+    std::vector<QVector2D> edges_info = objectManager->getNeuritesEdges();
+    // add edges
+    for (int i = 0; i < edges_info.size(); ++i) {
+        int nID1 = edges_info[i].x();
+        int nID2 = edges_info[i].y();
+        qDebug() << nID1 << " " << nID2;
+        if (objects_map.find(nID1) == objects_map.end() || objects_map.find(nID2) == objects_map.end()) {
+            continue;
+        }
+        m_bufferIndices.push_back(objects_map[nID1]->getNodeIdx());
+        m_bufferIndices.push_back(objects_map[nID2]->getNodeIdx());
+    }
+
 }
 
 GraphManager::~GraphManager()
@@ -103,8 +150,6 @@ void GraphManager::startForceDirectedLayout(int graphIdx)
     // update the 2D node position at the start and whenever the m_mvp change, -> when m_value == 1.0 and m_mvp changed
     stopForceDirectedLayout(graphIdx);
 
-
-
     m_FDL_running = true;
     m_layout_thread1 = std::thread(&Graph::runforceDirectedLayout, m_graph[graphIdx]);
 
@@ -122,25 +167,13 @@ void GraphManager::initVertexAttribPointer()
 {
     int offset = 0;
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(struct BufferNode),  0);
-    offset += sizeof(QVector3D);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(struct BufferNode),  (void*)offset);
-    offset += sizeof(QVector2D);
-    glEnableVertexAttribArray(2);
-    glVertexAttribIPointer(2, 1, GL_INT, sizeof(BufferNode), (void*)offset);
+    glVertexAttribIPointer(0, 1, GL_INT, 0, (void*)offset);
+
 }
 
 // we initialize the vbos for drawing
-bool GraphManager::initVBO(int graphIdx)
+bool GraphManager::initVBO()
 {
-    if (max_graphs < graphIdx) {
-        qDebug() << "graph index out of range";
-        return false;
-    }
-
     if (m_glFunctionsSet == false)
         return false;
 
@@ -166,8 +199,8 @@ bool GraphManager::initVBO(int graphIdx)
     m_NodesVBO.create();
     m_NodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
     m_NodesVBO.bind();
-    m_graph[graphIdx]->allocateBVertices(m_NodesVBO);
-
+    m_NodesVBO.allocate( m_bufferNodes.data(),
+                            m_bufferNodes.size() * sizeof(GLuint) );
 
     glUseProgram(m_program_nodes);
     GL_Error();
@@ -194,8 +227,8 @@ bool GraphManager::initVBO(int graphIdx)
 
     m_IndexVBO.create();
     m_IndexVBO.bind();
-    m_graph[graphIdx]->allocateBIndices(m_IndexVBO);
-
+    m_IndexVBO.allocate( m_bufferIndices.data(),
+                            m_bufferIndices.size() * sizeof(GLuint) );
     glUseProgram(m_program_Index);
     updateUniformsLocation(m_program_Index);
 
@@ -217,13 +250,8 @@ void GraphManager::drawGrid(struct GlobalUniforms grid_uniforms)
 }
 
 
-void GraphManager::drawNodes(int graphIdx)
+void GraphManager::drawNodes()
 {
-
-    if (max_graphs < graphIdx) {
-        qDebug() << "graph index out of range";
-        return;
-    }
 
     if (m_glFunctionsSet == false)
         return;
@@ -232,23 +260,18 @@ void GraphManager::drawNodes(int graphIdx)
 
     m_NodesVAO.bind();
     m_NodesVBO.bind();
-    m_graph[graphIdx]->allocateBVertices(m_NodesVBO);
 
     glUseProgram(m_program_nodes);
     updateUniformsLocation(m_program_nodes);
 
-    glDrawArrays(GL_POINTS, 0, m_graph[graphIdx]->vertexBufferSize() );
+    glDrawArrays(GL_POINTS, 0, m_bufferNodes.size() );
+
     m_NodesVBO.release();
     m_NodesVAO.release();
 }
 
-void GraphManager::drawEdges(int graphIdx)
+void GraphManager::drawEdges()
 {
-    if (max_graphs < graphIdx) {
-        qDebug() << "graph index out of range";
-        return;
-    }
-
     if (m_glFunctionsSet == false)
         return;
 
@@ -260,7 +283,8 @@ void GraphManager::drawEdges(int graphIdx)
     updateUniformsLocation(m_program_Index);
 
     glLineWidth(10.0f);
-    glDrawElements(GL_LINES, m_graph[graphIdx]->indexBufferSize(), GL_UNSIGNED_INT, 0 );
+    glDrawElements(GL_LINES, m_bufferIndices.size(), GL_UNSIGNED_INT, 0 );
+
     m_NodesVBO.release();
     m_IndexVBO.release();
     m_IndexVAO.release();
@@ -274,12 +298,17 @@ void GraphManager::updateUniformsLocation(GLuint program)
     // initialize uniforms
     GLuint mMatrix = glGetUniformLocation(program, "mMatrix");
     GLuint vMatrix = glGetUniformLocation(program, "vMatrix");
+    GLint is2D = glGetUniformLocation(program, "is2D");
+    int is2D_value;
 
     if (m_2D) { // force directed layout started, them use model without rotation
         glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
+        is2D_value = 1;
      } else {
         glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+        is2D_value = 0;
     }
+    glUniform1iv(is2D, 1, &is2D_value);
 
     glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
 

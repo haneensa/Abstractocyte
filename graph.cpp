@@ -11,10 +11,10 @@ Graph::Graph(Graph_t graphType)
     m_gType = graphType;
 
     // force directed layout parameters
-    m_Cr = 1.5;
-    m_Ca = 0.5;
+    m_Cr = 2.5;
+    m_Ca = 1.5;
     m_AABBdim = 0.15f; // used for spatial hashing query dim
-    m_MAX_DISTANCE = 0.5f;
+    m_MAX_DISTANCE = 0.2f;
     m_ITERATIONS = 10000;
     m_MAX_VERTEX_MOVEMENT = 0.01f;
     m_SLOW_FACTOR = 0.01f;
@@ -180,7 +180,6 @@ bool Graph::parseSKELETON(ObjectManager *objectManager)
             this->addEdge(eID, hvgxID, nID1, nID2);
         }
 
-        m_skeletons[hvgxID] = skeleton;
        // break; // test one skeleton
     }
     return true;
@@ -190,19 +189,11 @@ bool Graph::parseSKELETON(ObjectManager *objectManager)
 
 Node* Graph::addNode(std::pair<int, int> id_tuple, float x, float y, float z)
 {
-    size_t idxID = m_bufferNodes.size();
+    size_t idxID = 0;
     int nID = id_tuple.first;
     Node* newNode = new Node(nID, idxID, x, y, z);
     m_nodes[id_tuple] = newNode; // these IDs should be unique per graph!q
     m_nodesCounter++;
-
-    QVector3D coord3D = QVector3D(x, y, z);
-    QVector2D coord2D = QVector2D(x, y);
-
-    struct BufferNode bnode = {coord3D, coord2D, nID};
-    // ids assigned to nods should match the indices in this vector!
-
-    m_bufferNodes.push_back(bnode); // use skeleton_node
 
     return newNode;
 }
@@ -241,8 +232,8 @@ Edge* Graph::addEdge(int eID, int hvgxID, int nID1, int nID2)
 
     m_edges[newEdge->getID()] = newEdge; // ID should be unique then!
 
-    m_bufferIndices.push_back(n1->getIdxID());
-    m_bufferIndices.push_back(n2->getIdxID());
+//    m_bufferIndices.push_back(n1->getIdxID());
+//    m_bufferIndices.push_back(n2->getIdxID());
 
     return newEdge;
 }
@@ -265,20 +256,6 @@ Edge* Graph::getEdge(int eID)
 
     qDebug() << eID << " doesnt exist.";
     return NULL;
-}
-
-void Graph::allocateBVertices(QOpenGLBuffer vertexVbo)
-{
-    vertexVbo.allocate( m_bufferNodes.data(),
-                        m_bufferNodes.size() * sizeof(struct BufferNode) );
-}
-
-
-void Graph::allocateBIndices(QOpenGLBuffer indexVbo)
-{
-
-    indexVbo.allocate( m_bufferIndices.data(),
-                        m_bufferIndices.size() * sizeof(GLuint) );
 }
 
 
@@ -312,7 +289,7 @@ void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
     for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
         Node *node = (*iter).second;
         node->resetLayout(rotationMatrix);
-        m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
+        //m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
         // add to the spatial hash
         hashGrid->insert((*iter).second);
     }
@@ -329,9 +306,7 @@ void Graph::update_node_data(Node* node)
     case Graph_t::NODE_NODE :
     {
         // layout1 using hvgx ID and -1
-        struct ssbo_mesh data;
-        data.layout1 = node->getLayoutedPosition();
-        m_obj_mngr->update_ssbo_data(data, node->getID() /*hvgx*/);
+        m_obj_mngr->update_ssbo_data_layout1(node->getLayoutedPosition(), node->getID() /*hvgx*/);
         break;
     }
     case Graph_t::NODE_SKELETON :
@@ -344,9 +319,7 @@ void Graph::update_node_data(Node* node)
             // update astrocyte skeleton
             // layout 2
         } else {
-            struct ssbo_mesh data;
-            data.layout2 = node->getLayoutedPosition();
-            m_obj_mngr->update_ssbo_data(data, node->getID() /*hvgx*/);
+            m_obj_mngr->update_ssbo_data_layout2(node->getLayoutedPosition(), node->getID() /*hvgx*/);
         }
 
         break;
@@ -364,7 +337,7 @@ void Graph::update_node_data(Node* node)
         break;
     } }
 
-     m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
+    // m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
 }
 
 void Graph::runforceDirectedLayout()

@@ -47,9 +47,16 @@ public:
     void addSkeletonBranch(SkeletonBranch *branch);
     Skeleton* getSkeleton()            { return m_skeleton; }
 
+    void setNodeIdx(int node_index)    { m_nodeIndx = node_index ; }
+    int  getNodeIdx()                  { return m_nodeIndx; }
+
+
 private:
     std::string                             m_name;
     int                                     m_ID; // hvgx
+
+    int                                     m_nodeIndx;
+
     // object properties
     Object_t                                m_object_t;     /* object type */
     int                                     m_volume;

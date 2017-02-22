@@ -56,10 +56,6 @@ void main() {
     vec4 alpha5 = space_properties.extra_info; // additional info
     vec4 alpha6 = space_properties.render_type; // additional info
 
-   // if ( alpha6.w == 0 || (y_axis < 98 || x_axis < 98) ) {
-  //      return;
-   // }
-
     color_val = SSBO_data[ID].color;
     gl_PointSize = 20;
 

@@ -20,12 +20,12 @@ ObjectManager::ObjectManager()
 {
     m_indices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 20;
+    m_limit = 500;
     m_vertex_offset = 0;
     m_ssbo_data.resize(1200);
     m_mesh = new Mesh();
 
-    importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+//    importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     importXML("://scripts/m3_neurites.xml");    // neurites time:  28802 ms
 }
 
@@ -443,6 +443,7 @@ void ObjectManager::parseBranch(QXmlStreamReader &xml, Object *obj)
     } // while
 }
 
+
 bool ObjectManager::initVertexAttrib()
 {
     if (m_glFunctionsSet == false)
@@ -463,11 +464,6 @@ bool ObjectManager::initVertexAttrib()
 
 }
 
-// temp functions until we think of way to represent the data
-int ObjectManager::getNodesCount()
-{
-    return m_skeleton_nodes_size;
-}
 
 bool ObjectManager::initOpenGLFunctions()
 {
@@ -556,7 +552,7 @@ bool ObjectManager::initMeshShaders()
     for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++) {
 
         Object *object_p = (*iter).second;
-        if (object_p->getObjectType() == Object_t::BOUTON  || object_p->getObjectType()  == Object_t::SPINE   ) {
+        if (object_p->getObjectType() == Object_t::MITO  || object_p->getObjectType()  == Object_t::SYNAPSE   ) {
               continue;
           }
         int count = object_p->get_indices_Size() * sizeof(GLuint);
@@ -635,7 +631,7 @@ bool ObjectManager::initSkeletonShaders()
     int offset = 0;
     for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++) { // todo: skip if the object has no skeleton
         Object *object_p = (*iter).second;
-        if (object_p->getObjectType() == Object_t::BOUTON  || object_p->getObjectType()  == Object_t::SPINE   ) {
+        if (object_p->getObjectType() == Object_t::MITO  || object_p->getObjectType()  == Object_t::SYNAPSE   ) {
             continue;
         }
         int count = object_p->writeSkeletontoVBO(m_vbo_skeleton, offset);
@@ -744,10 +740,18 @@ std::vector<QVector2D> ObjectManager::getNeuritesEdges()
     return neurites_neurite_edge;
 }
 
-void ObjectManager::update_ssbo_data(struct ssbo_mesh data, int hvgxID)
+void ObjectManager::update_ssbo_data_layout1(QVector2D layout1, int hvgxID)
 {
     if (m_ssbo_data.size() < hvgxID)
         return;
 
-    m_ssbo_data[hvgxID] = data;
+    m_ssbo_data[hvgxID].layout1 = layout1;
+}
+
+void ObjectManager::update_ssbo_data_layout2(QVector2D layout2, int hvgxID)
+{
+    if (m_ssbo_data.size() < hvgxID)
+        return;
+
+    m_ssbo_data[hvgxID].layout2 = layout2;
 }

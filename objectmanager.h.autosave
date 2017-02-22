@@ -48,6 +48,8 @@ public:
     // ssbo management
     // function to update ssbo data (layout 1, layout 2)
     void update_ssbo_data_layout1(QVector2D layout1, int hvgxID); // access them using IDs
+    void update_ssbo_data_layout2(QVector2D layout2, int hvgxID); // access them using IDs
+    
     void write_ssbo_data();
 
 
