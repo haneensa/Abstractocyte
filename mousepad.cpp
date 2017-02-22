@@ -36,7 +36,7 @@ MousePad::~MousePad()
 void MousePad::initSelectionPointerGL()
 {
     m_program_circle = new QOpenGLShaderProgram(this);
-    bool res = initShader(m_program_circle, ":/shaders/shader_vert.glsl", ":/shaders/shader_geom.glsl", ":/shaders/shader_frag.glsl");
+    bool res = initShader(m_program_circle, ":/shaders/space_pointer_vert.glsl", ":/shaders/space_pointer_geom.glsl", ":/shaders/space_pointer_frag.glsl");
     if(res == false)
         return;
 

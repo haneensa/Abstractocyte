@@ -139,8 +139,7 @@ void GLWidget::paintGL()
                                             m_vMatrix.data(), m_projection.data(),
                                             m_model_noRotation.data(), m_rotationMatrix};
     m_graphManager->drawGrid(grid_uniforms);
-    m_graphManager->drawNodes();
-    m_graphManager->drawEdges();
+    m_graphManager->drawNeuritesGraph();
 }
 
 void GLWidget::resizeGL(int w, int h)

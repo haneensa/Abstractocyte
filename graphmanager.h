@@ -30,8 +30,7 @@ public:
     void ExtractGraphFromMesh();
 
     bool initOpenGLFunctions();
-    void drawNodes();
-    void drawEdges();
+    void drawNeuritesGraph();
     bool initVBO();
     void updateUniformsLocation(GLuint program);
     void updateUniforms(struct GlobalUniforms graph_uniforms);
@@ -60,8 +59,8 @@ protected:
 
     // most abstract data
     // todo: flag in ssbo to indicate this object on/off
-    std::vector<GLuint>                 m_bufferNodes; // (place holders for neurites nodes) this initialized once and not changed after words
-    std::vector<GLuint>                 m_bufferIndices; // (place holders for neurites edges) this as well
+    std::vector<GLuint>                 m_neurites_nodes; // (place holders for neurites nodes) this initialized once and not changed after words
+    std::vector<GLuint>                 m_neurites_edges; // (place holders for neurites edges) this as well
 
     std::vector<struct Skeleton_Node>   m_skeletons_data; // all skeletons here
     std::vector<GLuint>                 m_skeletons_edges;
@@ -69,11 +68,11 @@ protected:
     bool                                m_glFunctionsSet;
 
     // one for the 2D space
-    QOpenGLVertexArrayObject            m_IndexVAO;
-    QOpenGLBuffer                       m_IndexVBO;
+    QOpenGLVertexArrayObject            m_NeuritesGraphVAO;
+    QOpenGLBuffer                       m_NeuritesIndexVBO;
+    QOpenGLBuffer                       m_NeuritesNodesVBO;
 
-    QOpenGLVertexArrayObject            m_NodesVAO;
-    QOpenGLBuffer                       m_NodesVBO;
+
 
     // shaders
     GLuint                              m_program_nodes;
