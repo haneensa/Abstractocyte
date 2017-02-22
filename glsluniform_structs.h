@@ -3,15 +3,6 @@
 
 #include <QMatrix4x4>
 
-// todo: combine them into one uniform
-struct MeshUniforms {
-    int y_axis;
-    int x_axis;
-    float* mMatrix;
-    float* vMatrix;
-    float* pMatrix;
-};
-
 struct GlobalUniforms {
     int y_axis;
     int x_axis;

@@ -80,17 +80,13 @@ void GLWidget::updateMVPAttrib()
     m_mMatrix *= m_rotationMatrix;
 
     // graph model matrix without rotation, apply rotation to nodes directly
-    m_graph_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
+    m_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
                         m_model_noRotation.data(), m_rotationMatrix};
-
-
-   // m_graph_uniforms.mMatrix = m_mMatrix.data();
-    m_mesh_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
 
     // todo: whenver the rotation matrix changes then update
     // the nodes buffer after reseting the nodes with rotation matrix
-    m_graphManager->updateUniforms(m_graph_uniforms);
-    m_object_mngr->updateUniforms(m_mesh_uniforms);
+    m_graphManager->updateUniforms(m_uniforms);
+    m_object_mngr->updateUniforms(m_uniforms);
 }
 
 void GLWidget::initializeGL()
@@ -137,7 +133,7 @@ void GLWidget::paintGL()
     updateMVPAttrib();
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  //  m_object_mngr->draw();
+    m_object_mngr->draw();
 
     struct GlobalUniforms grid_uniforms = { m_yaxis, m_xaxis, m_mMatrix.data(),
                                             m_vMatrix.data(), m_projection.data(),

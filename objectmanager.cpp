@@ -707,9 +707,9 @@ void ObjectManager::draw()
     m_vao_mesh.release();
 }
 
-void ObjectManager::updateUniforms(struct MeshUniforms mesh_uniforms)
+void ObjectManager::updateUniforms(struct GlobalUniforms uniforms)
 {
-    m_uniforms = mesh_uniforms;
+    m_uniforms = uniforms;
 }
 
 void ObjectManager::updateUniformsLocation(GLuint program)

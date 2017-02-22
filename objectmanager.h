@@ -40,7 +40,7 @@ public:
     bool initMeshShaders();
     bool initMeshPointsShaders();
     bool initSkeletonShaders();
-    void updateUniforms(struct MeshUniforms mesh_uniforms);
+    void updateUniforms(struct GlobalUniforms uniforms);
     void updateUniformsLocation(GLuint program);
 
     bool filterByType(Object *object_p );
@@ -72,7 +72,7 @@ protected:
     bool                                m_glFunctionsSet;
 
     /* opengl buffers and vars */
-    struct MeshUniforms                 m_uniforms;
+    struct GlobalUniforms                 m_uniforms;
 
     QOpenGLVertexArrayObject            m_vao_mesh;
     QOpenGLBuffer                       m_vbo_mesh;
