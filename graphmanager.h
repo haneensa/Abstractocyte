@@ -59,8 +59,9 @@ protected:
     Graph                               *m_graph[max_graphs];
 
     // most abstract data
-    std::vector<GLuint>                 m_bufferNodes;
-    std::vector<GLuint>                 m_bufferIndices;
+    // todo: flag in ssbo to indicate this object on/off
+    std::vector<GLuint>                 m_bufferNodes; // (place holders for neurites nodes) this initialized once and not changed after words
+    std::vector<GLuint>                 m_bufferIndices; // (place holders for neurites edges) this as well
 
     std::vector<struct Skeleton_Node>   m_skeletons_data; // all skeletons here
     std::vector<GLuint>                 m_skeletons_edges;

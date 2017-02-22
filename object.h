@@ -47,6 +47,8 @@ public:
     void addSkeletonBranch(SkeletonBranch *branch);
     Skeleton* getSkeleton()            { return m_skeleton; }
 
+    void setSkeletonOffset(int offset) { m_skeleton->setIndexOffset(offset);}
+    int  getSkeletonOffset()           { return m_skeleton->getIndexOffset(); }
     void setNodeIdx(int node_index)    { m_nodeIndx = node_index ; }
     int  getNodeIdx()                  { return m_nodeIndx; }
 

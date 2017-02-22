@@ -29,8 +29,12 @@ public:
     std::vector<QVector3D> getGraphNodes();
     std::vector<QVector2D> getGraphEdges();
 
+    void setIndexOffset(int offset) { m_idx_offset = offset; }
+    int getIndexOffset()            { return m_idx_offset; }
 protected:
     int                             m_ID;
+
+    int                             m_idx_offset;
 
     // a skeleton consists of: nodes, points, and segments
     // local IDs!!

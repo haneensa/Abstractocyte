@@ -11,38 +11,50 @@ GraphManager::GraphManager(ObjectManager *objectManager)
 
     std::map<int, Object*> objects_map = m_obj_mngr->getObjectsMap();
 
-    // add nodes
     for ( auto iter = objects_map.begin(); iter != objects_map.end(); iter++) {
         Object *objectP = (*iter).second;
-        if (objectP->getObjectType() == Object_t::ASTROCYTE)
-            continue;
 
-        if (objectP->getObjectType() == Object_t::MITO  || objectP->getObjectType()  == Object_t::SYNAPSE   ) {
+        if (objectP->getObjectType() != Object_t::ASTROCYTE) {
             continue;
         }
-
         int ID = objectP->getHVGXID();
-        objectP->setNodeIdx(m_bufferNodes.size());
-        m_bufferNodes.push_back(ID);
 
         // find a way to fill the skeleton with data
         // get skeleton of the object
         Skeleton *skeleton = objectP->getSkeleton();
         std::vector<QVector3D> nodes3D = skeleton->getGraphNodes();
         std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
-
+        objectP->setSkeletonOffset(m_skeletons_data.size());
         // add nodes
         for ( int i = 0; i < nodes3D.size(); i++) {
-            std::pair<int, int> id_tuple =  std::make_pair(hvgxID, i);
+            QVector4D vertex = nodes3D[i];
+            vertex.setW(ID);
+            struct Skeleton_Node skel_node = {vertex, vertex.toVector2D(), vertex.toVector2D(), vertex.toVector2D() };
+            m_skeletons_data.push_back(skel_node);
         }
 
+        int skeleton_offset = objectP->getSkeletonOffset();
         // add edges
         for (int i = 0; i < edges2D.size(); ++i) {
-            int nID1 = edges2D[i].x();
-            int nID2 = edges2D[i].y();
-            this->addEdge(eID, hvgxID, nID1, nID2);
+            int nID1 = edges2D[i].x() + skeleton_offset;
+            int nID2 = edges2D[i].y() + skeleton_offset;
+            m_skeletons_edges.push_back(nID1);
+            m_skeletons_edges.push_back(nID2);
         }
     }
+    // add nodes
+    for ( auto iter = objects_map.begin(); iter != objects_map.end(); iter++) {
+        Object *objectP = (*iter).second;
+
+        if (objectP->getObjectType() == Object_t::ASTROCYTE || objectP->getObjectType() == Object_t::MITO  || objectP->getObjectType()  == Object_t::SYNAPSE   ) {
+            continue;
+        }
+
+        int ID = objectP->getHVGXID();
+        objectP->setNodeIdx(m_bufferNodes.size());
+        m_bufferNodes.push_back(ID);
+    }
+
     std::vector<QVector2D> edges_info = objectManager->getNeuritesEdges();
     // add edges
     for (int i = 0; i < edges_info.size(); ++i) {
@@ -122,14 +134,14 @@ void GraphManager::ExtractGraphFromMesh()
      // init the edges and they never change except when to display them
 
      m_graph[0] = new Graph( Graph_t::NODE_NODE ); // neurite-neurite
-     m_graph[1] = new Graph( Graph_t::NODE_SKELETON ); // neurite-astrocyte skeleton
-     m_graph[2] = new Graph( Graph_t::ALL_SKELETONS ); //  neurites skeletons - astrocyte skeleton
-     m_graph[3] = new Graph( Graph_t::NEURITE_SKELETONS ); // neuries skeletons
+//     m_graph[1] = new Graph( Graph_t::NODE_SKELETON ); // neurite-astrocyte skeleton
+//     m_graph[2] = new Graph( Graph_t::ALL_SKELETONS ); //  neurites skeletons - astrocyte skeleton
+//     m_graph[3] = new Graph( Graph_t::NEURITE_SKELETONS ); // neuries skeletons
 
      m_graph[0]->createGraph(m_obj_mngr);
-     m_graph[1]->createGraph(m_obj_mngr);
-     m_graph[2]->createGraph(m_obj_mngr);
-     m_graph[3]->createGraph(m_obj_mngr);
+//     m_graph[1]->createGraph(m_obj_mngr);
+//     m_graph[2]->createGraph(m_obj_mngr);
+//     m_graph[3]->createGraph(m_obj_mngr);
 }
 
 void GraphManager::stopForceDirectedLayout(int graphIdx)

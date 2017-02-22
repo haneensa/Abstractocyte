@@ -11,17 +11,17 @@ Graph::Graph(Graph_t graphType)
     m_gType = graphType;
 
     // force directed layout parameters
-    m_Cr = 2.5;
-    m_Ca = 1.5;
+    m_Cr = 1.5;
+    m_Ca = 0.5;
     m_AABBdim = 0.15f; // used for spatial hashing query dim
-    m_MAX_DISTANCE = 0.2f;
+    m_MAX_DISTANCE = 0.1f;
     m_ITERATIONS = 10000;
     m_MAX_VERTEX_MOVEMENT = 0.01f;
     m_SLOW_FACTOR = 0.01f;
     m_MAX_FORCE = 1.0f;
 
     // spatial hashing
-    int gridCol = 10;
+    int gridCol = 5;
     float gridMin = 0.0f;
     float gridMax = 1.0f;
     hashGrid = new SpatialHash(gridCol, gridMin, gridMax);
@@ -289,6 +289,8 @@ void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
     for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
         Node *node = (*iter).second;
         node->resetLayout(rotationMatrix);
+        m_obj_mngr->update_ssbo_data_layout1(node->getLayoutedPosition(), node->getID() /*hvgx*/);
+        m_obj_mngr->update_ssbo_data_layout2(node->getLayoutedPosition(), node->getID() /*hvgx*/);
         //m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
         // add to the spatial hash
         hashGrid->insert((*iter).second);
@@ -344,7 +346,7 @@ void Graph::runforceDirectedLayout()
 {
     qDebug() << "run force directed layout";
     m_FDL_terminate = false;
-    float area = 25.0;
+    float area = 1.0;
     float k = std::sqrt( area / m_nodesCounter );
     std::vector<Node*> nearNodes;
     // reset layouted coordinates to original values
@@ -365,7 +367,7 @@ void Graph::runforceDirectedLayout()
 
                // Node *node2 = (*iter2).second;
                 Node *node2 = (*iter2);
-                if ( node1->getIdxID() == node2->getIdxID() )
+                if ( node1->getID() == node2->getID() )
                     continue;
                 // this one,
                 repulseNodes(node1, node2, m_Cr * k);

@@ -20,13 +20,13 @@ ObjectManager::ObjectManager()
 {
     m_indices_size = 0;
     m_skeleton_nodes_size = 0;
-    m_limit = 500;
+    m_limit = 20;
     m_vertex_offset = 0;
     m_ssbo_data.resize(1200);
     m_mesh = new Mesh();
 
-//    importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
-    importXML("://scripts/m3_neurites.xml");    // neurites time:  28802 ms
+    importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+//    importXML("://scripts/m3_neurites.xml");    // neurites time:  28802 ms
 }
 
 ObjectManager::~ObjectManager()
