@@ -21,7 +21,8 @@
 #include "node.h"
 #include "edge.h"
 #include "spatialhash.h"
-#include "objectmanager.h"
+#include "datacontainer.h"
+#include "openglmanager.h"
 
 #include <QDebug>
 #include <QFile>
@@ -75,12 +76,12 @@ enum class Graph_t { NODE_NODE = 0, NODE_SKELETON = 1,  ALL_SKELETONS = 2, NEURI
 class Graph
 {
 public:
-    Graph(Graph_t graphType);
+    Graph(Graph_t graphType,  OpenGLManager *opengl_mnger);
     ~Graph();
 
-    bool createGraph(ObjectManager *objectManager);
-    bool parseNODE_NODE(ObjectManager *objectManager);
-    bool parseSKELETON(ObjectManager *objectManager);
+    bool createGraph(DataContainer *objectManager);
+    bool parseNODE_NODE(DataContainer *objectManager);
+    bool parseSKELETON(DataContainer *objectManager);
 
     Node* addNode(std::pair<int, int> id_tuple, float x, float y, float z);
     Edge* addEdge(int eID, int hvgxID, int nID1, int nID2);
@@ -148,7 +149,8 @@ protected:
 
     Graph_t                                         m_gType;
 
-    ObjectManager                                   *m_obj_mngr;
+    DataContainer                                   *m_obj_mngr;
+    OpenGLManager                                   *m_opengl_mngr;
 
     std::map<std::pair<int, int>, Node*>            m_nodes;    // IDs are unique to identify nodes
                                                 // if more than a skeleton

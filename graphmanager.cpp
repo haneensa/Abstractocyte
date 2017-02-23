@@ -2,11 +2,12 @@
 // and updating their data, and drawing
 #include "graphmanager.h"
 
-GraphManager::GraphManager(ObjectManager *objectManager)
+GraphManager::GraphManager(DataContainer *objectManager, OpenGLManager *opengl_mnger)
     : m_FDL_running(false),
       m_2D(false)
 {
     m_obj_mngr = objectManager;
+    m_opengl_mngr = opengl_mnger;
 }
 
 GraphManager::~GraphManager()
@@ -58,7 +59,7 @@ void GraphManager::ExtractGraphFromMesh()
 
      // init the edges and they never change except when to display them
 
-     m_graph[0] = new Graph( Graph_t::NODE_SKELETON ); // neurite-neurite
+     m_graph[0] = new Graph( Graph_t::NODE_SKELETON, m_opengl_mngr ); // neurite-neurite
 //     m_graph[1] = new Graph( Graph_t::NODE_SKELETON ); // neurite-astrocyte skeleton
 //     m_graph[2] = new Graph( Graph_t::ALL_SKELETONS ); //  neurites skeletons - astrocyte skeleton
 //     m_graph[3] = new Graph( Graph_t::NEURITE_SKELETONS ); // neuries skeletons

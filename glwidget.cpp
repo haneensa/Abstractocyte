@@ -20,11 +20,11 @@ GLWidget::GLWidget(QWidget *parent)
     m_2dspace = new AbstractionSpace(100, 100);
 
     // objects manager with all objects data
-    m_object_mngr = new ObjectManager();
+    m_object_mngr = new DataContainer();
     m_opengl_mngr = new OpenGLManager(m_object_mngr);
 
     // graph manager with 4 graphs and 2D space layouted data
-    m_graphManager = new GraphManager(m_object_mngr);
+    m_graphManager = new GraphManager( m_object_mngr, m_opengl_mngr );
     m_graphManager->ExtractGraphFromMesh();
 
     m_distance = 1.0;

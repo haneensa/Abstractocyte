@@ -1,14 +1,12 @@
 #include <chrono>
-#include "objectmanager.h"
+#include "datacontainer.h"
 
 /*
  * m_objects -> object class for each object (astrocyte, dendrite, ..)
  *           -> get from this the indices of the mesh
  *           -> get the skeleton vertices
- *
- * m_buffer_data for ssbo initialization which I can take by looping over all m_objects
  */
-ObjectManager::ObjectManager()
+DataContainer::DataContainer()
 {
     m_indices_size = 0;
     m_skeleton_points_size = 0;
@@ -20,7 +18,7 @@ ObjectManager::ObjectManager()
    importXML("://scripts/m3_neurites.xml");    // neurites time:  28802 ms
 }
 
-ObjectManager::~ObjectManager()
+DataContainer::~DataContainer()
 {
     qDebug() << "~Mesh()";
     for (std::size_t i = 0; i != m_objects.size(); i++) {
@@ -28,7 +26,7 @@ ObjectManager::~ObjectManager()
     }
 }
 
-bool ObjectManager::importXML(QString path)
+bool DataContainer::importXML(QString path)
 {
     qDebug() << "Func: importXML";
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -68,7 +66,7 @@ bool ObjectManager::importXML(QString path)
     qDebug() << "time: " << ms.count() << "ms";
 }
 
-void ObjectManager::parseConnGraph(QXmlStreamReader &xml)
+void DataContainer::parseConnGraph(QXmlStreamReader &xml)
 {
     if (xml.tokenType() != QXmlStreamReader::StartElement && xml.name() != "conn") {
         qDebug() << "Called XML parseObejct without attribs";
@@ -100,7 +98,7 @@ void ObjectManager::parseConnGraph(QXmlStreamReader &xml)
 }
 
 // load the object with all its related informations
-void ObjectManager::parseObject(QXmlStreamReader &xml, Object *obj)
+void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
 {
     if (xml.tokenType() != QXmlStreamReader::StartElement && xml.name() != "o") {
         qDebug() << "Called XML parseObejct without attribs";
@@ -161,7 +159,7 @@ void ObjectManager::parseObject(QXmlStreamReader &xml, Object *obj)
 }
 
 
-void ObjectManager::parseMesh(QXmlStreamReader &xml, Object *obj)
+void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
 {
     // read vertices and their faces into the mesh
     if (xml.tokenType() != QXmlStreamReader::StartElement && xml.name() != "mesh") {
@@ -253,7 +251,7 @@ void ObjectManager::parseMesh(QXmlStreamReader &xml, Object *obj)
 }
 
 //
-void ObjectManager::parseSkeleton(QXmlStreamReader &xml, Object *obj)
+void DataContainer::parseSkeleton(QXmlStreamReader &xml, Object *obj)
 {
     // read skeleton vertices and their edges
     // read vertices and their faces into the mesh
@@ -284,7 +282,7 @@ void ObjectManager::parseSkeleton(QXmlStreamReader &xml, Object *obj)
     } // while
 }
 
-void ObjectManager::parseSkeletonNodes(QXmlStreamReader &xml, Object *obj)
+void DataContainer::parseSkeletonNodes(QXmlStreamReader &xml, Object *obj)
 {
     // read vertices and their faces into the mesh
     if (xml.tokenType() != QXmlStreamReader::StartElement && xml.name() != "nodes") {
@@ -324,7 +322,7 @@ void ObjectManager::parseSkeletonNodes(QXmlStreamReader &xml, Object *obj)
     qDebug() << "nodes count: " << nodes;
 }
 
-void ObjectManager::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
+void DataContainer::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
 {
     // read vertices and their faces into the mesh
     if (xml.tokenType() != QXmlStreamReader::StartElement && xml.name() != "points") {
@@ -365,7 +363,7 @@ void ObjectManager::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
     qDebug() << "nodes count: " << nodes;
 }
 
-void ObjectManager::parseBranch(QXmlStreamReader &xml, Object *obj)
+void DataContainer::parseBranch(QXmlStreamReader &xml, Object *obj)
 {
     // b -> one branch
     // knots
@@ -419,82 +417,27 @@ void ObjectManager::parseBranch(QXmlStreamReader &xml, Object *obj)
     } // while
 }
 
-int ObjectManager::getSkeletonPointsSize()
+int DataContainer::getSkeletonPointsSize()
 {
     return m_skeleton_points_size;
 }
 
-Mesh* ObjectManager::getMeshPointer()
+Mesh* DataContainer::getMeshPointer()
 {
     return m_mesh;
 }
 
-int ObjectManager::getMeshIndicesSize()
+int DataContainer::getMeshIndicesSize()
 {
     return m_indices_size;
 }
 
-std::map<int, Object*>  ObjectManager::getObjectsMap()
+std::map<int, Object*>  DataContainer::getObjectsMap()
 {
     return m_objects;
 }
 
-std::vector<QVector2D> ObjectManager::getNeuritesEdges()
+std::vector<QVector2D> DataContainer::getNeuritesEdges()
 {
     return neurites_neurite_edge;
-}
-
-void ObjectManager::update_ssbo_data_layout1(QVector2D layout1, int hvgxID)
-{
-//    if (m_ssbo_data.size() < hvgxID)
-//        return;
-
-//    m_ssbo_data[hvgxID].layout1 = layout1;
-}
-
-void ObjectManager::update_ssbo_data_layout2(QVector2D layout2, int hvgxID)
-{
-//    if (m_ssbo_data.size() < hvgxID)
-//        return;
-
-//    m_ssbo_data[hvgxID].layout2 = layout2;
-}
-
-void ObjectManager::update_skeleton_layout1(QVector2D layout1, int node_index, int hvgxID)
-{
-//    // get the object -> get its skeleton -> update the layout
-//    if (m_objects.find(hvgxID) == m_objects.end()) {
-//        return;
-//    }
-
-//    Skeleton *skel = m_objects[hvgxID]->getSkeleton();
-//    int nodes_offset = skel->getIndexOffset();
-//    m_abstract_skel_nodes[node_index + nodes_offset].layout1 = layout1;
-}
-
-void ObjectManager::update_skeleton_layout2(QVector2D layout2, int node_index, int hvgxID)
-{
-//    // get the object -> get its skeleton -> update the layout
-//    // get the object -> get its skeleton -> update the layout
-//    if (m_objects.find(hvgxID) == m_objects.end()) {
-//        qDebug() << "Object not found";
-//        return;
-//    }
-
-//    Skeleton *skel = m_objects[hvgxID]->getSkeleton();
-//    int nodes_offset = skel->getIndexOffset();
-//    m_abstract_skel_nodes[node_index + nodes_offset].layout2 = layout2;
-}
-
-void ObjectManager::update_skeleton_layout3(QVector2D layout3,int node_index, int hvgxID)
-{
-//    // get the object -> get its skeleton -> update the layout
-//    // get the object -> get its skeleton -> update the layout
-//    if (m_objects.find(hvgxID) == m_objects.end()) {
-//        return;
-//    }
-
-//    Skeleton *skel = m_objects[hvgxID]->getSkeleton();
-//    int nodes_offset = skel->getIndexOffset();
-//    m_abstract_skel_nodes[node_index + nodes_offset].layout3 = layout3;
 }

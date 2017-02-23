@@ -29,9 +29,9 @@ SOURCES += main.cpp\
     spatialhash.cpp \
     skeleton.cpp \
     skeletonbranch.cpp \
-    objectmanager.cpp \
     mesh.cpp \
-    openglmanager.cpp
+    openglmanager.cpp \
+    datacontainer.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -47,11 +47,11 @@ HEADERS  += mainwindow.h \
     spatialhash.h \
     skeleton.h \
     skeletonbranch.h \
-    objectmanager.h \
     mesh.h \
     ssbo_structs.h \
     glsluniform_structs.h \
-    openglmanager.h
+    openglmanager.h \
+    datacontainer.h
 
 FORMS    += mainwindow.ui
 

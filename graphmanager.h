@@ -2,7 +2,8 @@
 #define GRAPHMANAGER_H
 
 #include "graph.h"
-#include "objectmanager.h"
+#include "datacontainer.h"
+#include "openglmanager.h"
 #include "glsluniform_structs.h"
 #include <thread>
 
@@ -13,7 +14,7 @@
 class GraphManager
 {
 public:
-    GraphManager(ObjectManager *objectManager);
+    GraphManager(DataContainer *objectManager, OpenGLManager *opengl_mnger);
     ~GraphManager();
 
     void ExtractGraphFromMesh();
@@ -42,7 +43,8 @@ public:
     void updateGraphParam7(double value);
 
 protected:
-    ObjectManager                       *m_obj_mngr;
+    DataContainer                       *m_obj_mngr;
+    OpenGLManager                       *m_opengl_mngr;
     Graph                               *m_graph[max_graphs];
 
     struct GlobalUniforms               m_uniforms;

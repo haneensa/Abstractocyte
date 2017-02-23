@@ -11,13 +11,13 @@
 #define OPENGLMANAGER_H
 
 #include "mainopengl.h"
-#include "objectmanager.h"
+#include "datacontainer.h"
 #include "glsluniform_structs.h"
 
 class OpenGLManager : public MainOpenGL
 {
 public:
-    OpenGLManager(ObjectManager * obj_mnger);
+    OpenGLManager(DataContainer * obj_mnger);
     ~OpenGLManager();
     void fillVBOsData();
     bool initOpenGLFunctions();
@@ -55,8 +55,21 @@ public:
     void initNeuritesVertexAttribPointer();
     void drawNeuritesGraph(struct GlobalUniforms grid_uniforms);
 
+
+
+    // ssbo management
+    // function to update ssbo data (layout 1, layout 2)
+    void update_ssbo_data_layout1(QVector2D layout1, int hvgxID); // access them using IDs
+    void update_ssbo_data_layout2(QVector2D layout2, int hvgxID); // access them using IDs
+
+    void update_skeleton_layout1(QVector2D layout1, int node_index, int hvgxID);
+    void update_skeleton_layout2(QVector2D layout2, int node_index, int hvgxID);
+    void update_skeleton_layout3(QVector2D layout3, int node_index, int hvgxID);
+
+
+
 protected:
-    ObjectManager                       *m_obj_mnger; // get the data to render from here
+    DataContainer                       *m_obj_mnger; // get the data to render from here
 
     bool                                m_glFunctionsSet;
     bool                                m_2D;

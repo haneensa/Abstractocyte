@@ -50,7 +50,7 @@ protected:
     bool                                m_2D;
 
     /* mesh */
-    ObjectManager                       *m_object_mngr;
+    DataContainer                       *m_object_mngr;
     OpenGLManager                       *m_opengl_mngr;
     GraphManager                        *m_graphManager;
 

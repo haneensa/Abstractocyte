@@ -1,6 +1,6 @@
 #include "graph.h"
 
-Graph::Graph(Graph_t graphType)
+Graph::Graph(Graph_t graphType, OpenGLManager *opengl_mnger)
     : m_FDL_terminate(true),
       m_nodesCounter(0),
       m_edgesCounter(0),
@@ -9,7 +9,7 @@ Graph::Graph(Graph_t graphType)
 
 {
     m_gType = graphType;
-
+    m_opengl_mngr = opengl_mnger;
     // force directed layout parameters
     m_Cr = 1.5;
     m_Ca = 0.5;
@@ -97,7 +97,7 @@ Graph::~Graph()
     delete hashGrid;
 }
 
-bool Graph::createGraph(ObjectManager *objectManager)
+bool Graph::createGraph(DataContainer *objectManager)
 {
     m_obj_mngr = objectManager;
     bool result;
@@ -123,7 +123,7 @@ bool Graph::createGraph(ObjectManager *objectManager)
 }
 
 // init m_neurites_nodes ssbo here
-bool Graph::parseNODE_NODE(ObjectManager *objectManager)
+bool Graph::parseNODE_NODE(DataContainer *objectManager)
 {
     // iterate over mesh''s objects, and add all the center nodes except astrocyte
     // create the a node for each object and store it in neurites_nodes
@@ -160,7 +160,7 @@ bool Graph::parseNODE_NODE(ObjectManager *objectManager)
 // I need away to mark all nodes skeleton with the same ID,
 // and give each node unique ID
 // combination? <hvgxID, local node ID>
-bool Graph::parseSKELETON(ObjectManager *objectManager)
+bool Graph::parseSKELETON(DataContainer *objectManager)
 {
     qDebug() << "parseSKELETON";
     // eventually all graph nodes are in one map with unique IDs regardless of which skeleton
@@ -296,12 +296,15 @@ void Graph::drawGrid(struct GlobalUniforms grid_uniforms)
 // when we switch to 2D we use the other vertex with the no rotation matrix
 void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
 {
+    if (m_opengl_mngr == NULL)
+        return;
+
     hashGrid->clear();
     for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
         Node *node = (*iter).second;
         node->resetLayout(rotationMatrix);
-        m_obj_mngr->update_ssbo_data_layout1(node->getLayoutedPosition(), node->getID() /*hvgx*/);
-        m_obj_mngr->update_ssbo_data_layout2(node->getLayoutedPosition(), node->getID() /*hvgx*/);
+        m_opengl_mngr->update_ssbo_data_layout1(node->getLayoutedPosition(), node->getID() /*hvgx*/);
+        m_opengl_mngr->update_ssbo_data_layout2(node->getLayoutedPosition(), node->getID() /*hvgx*/);
         //m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
         // add to the spatial hash
         hashGrid->insert((*iter).second);
@@ -311,7 +314,7 @@ void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
 
 void Graph::update_node_data(Node* node)
 {
-    if (m_obj_mngr == NULL)
+    if (m_opengl_mngr == NULL)
         return;
 
     // depends on graph type, if node-ndoe
@@ -319,7 +322,7 @@ void Graph::update_node_data(Node* node)
     case Graph_t::NODE_NODE :
     {
         // layout1 using hvgx ID and -1
-        m_obj_mngr->update_ssbo_data_layout1(node->getLayoutedPosition(), node->getID() /*hvgx*/);
+        m_opengl_mngr->update_ssbo_data_layout1(node->getLayoutedPosition(), node->getID() /*hvgx*/);
         break;
     }
     case Graph_t::NODE_SKELETON :
@@ -332,9 +335,9 @@ void Graph::update_node_data(Node* node)
             // update astrocyte skeleton
             // layout 2
             qDebug() << "Update skeleton layout 2 vertex";
-            m_obj_mngr->update_skeleton_layout2(node->getLayoutedPosition(), node->getIdxID(), node->getID() /*hvgx*/);
+            m_opengl_mngr->update_skeleton_layout2(node->getLayoutedPosition(), node->getIdxID(), node->getID() /*hvgx*/);
         } else {
-            m_obj_mngr->update_ssbo_data_layout2(node->getLayoutedPosition(), node->getID() /*hvgx*/);
+            m_opengl_mngr->update_ssbo_data_layout2(node->getLayoutedPosition(), node->getID() /*hvgx*/);
         }
 
         break;
@@ -343,14 +346,14 @@ void Graph::update_node_data(Node* node)
     {
         // update skeleton node
         // layout 3
-        m_obj_mngr->update_skeleton_layout3(node->getLayoutedPosition(), node->getIdxID(), node->getID() /*hvgx*/);
+        m_opengl_mngr->update_skeleton_layout3(node->getLayoutedPosition(), node->getIdxID(), node->getID() /*hvgx*/);
         break;
     }
     case Graph_t::ALL_SKELETONS :
     {
         // update skeleton node
         // layout 1
-        m_obj_mngr->update_skeleton_layout1(node->getLayoutedPosition(), node->getIdxID(), node->getID() /*hvgx*/);
+        m_opengl_mngr->update_skeleton_layout1(node->getLayoutedPosition(), node->getIdxID(), node->getID() /*hvgx*/);
         break;
     } }
 
