@@ -5,10 +5,10 @@
 #include <QWidget>
 #include <QtOpenGL>
 
-#include "graphmanager.h"
 #include "mainopengl.h"
+#include "graphmanager.h"
 #include "abstractionspace.h"
-#include "objectmanager.h"
+#include "openglmanager.h"
 
 class GLWidget : public QOpenGLWidget, MainOpenGL
 {
@@ -51,7 +51,7 @@ protected:
 
     /* mesh */
     ObjectManager                       *m_object_mngr;
-
+    OpenGLManager                       *m_opengl_mngr;
     GraphManager                        *m_graphManager;
 
     struct GlobalUniforms               m_uniforms;

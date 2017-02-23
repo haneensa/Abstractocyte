@@ -21,6 +21,7 @@ GLWidget::GLWidget(QWidget *parent)
 
     // objects manager with all objects data
     m_object_mngr = new ObjectManager();
+    m_opengl_mngr = new OpenGLManager(m_object_mngr);
 
     // graph manager with 4 graphs and 2D space layouted data
     m_graphManager = new GraphManager(m_object_mngr);
@@ -82,11 +83,6 @@ void GLWidget::updateMVPAttrib()
     // graph model matrix without rotation, apply rotation to nodes directly
     m_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
                         m_model_noRotation.data(), m_rotationMatrix};
-
-    // todo: whenver the rotation matrix changes then update
-    // the nodes buffer after reseting the nodes with rotation matrix
-    m_graphManager->updateUniforms(m_uniforms);
-    m_object_mngr->updateUniforms(m_uniforms);
 }
 
 void GLWidget::initializeGL()
@@ -94,8 +90,7 @@ void GLWidget::initializeGL()
     qDebug() << "initializeGL";
     initializeOpenGLFunctions();
     m_2dspace->initOpenGLFunctions();
-    m_object_mngr->initOpenGLFunctions();
-    m_graphManager->initOpenGLFunctions();
+    m_opengl_mngr->initOpenGLFunctions();
 
     updateMVPAttrib();
 
@@ -105,12 +100,6 @@ void GLWidget::initializeGL()
     /******************** 1 Abstraction Space ********************/
     m_2dspace->initBuffer();
     emit setAbstractionData(m_2dspace);
-    /******************** 2 initialize Mesh **********************/
-    m_object_mngr->iniShadersVBOs();
-    /****************** 3 Initialize Graph  *******************/
-    m_graphManager->initVBO();
-    m_graphManager->initGrid();
-
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
@@ -133,14 +122,13 @@ void GLWidget::paintGL()
     updateMVPAttrib();
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-//    m_object_mngr->draw();
 
     struct GlobalUniforms grid_uniforms = { m_yaxis, m_xaxis, m_mMatrix.data(),
                                             m_vMatrix.data(), m_projection.data(),
                                             m_model_noRotation.data(), m_rotationMatrix};
-    m_graphManager->drawGrid(grid_uniforms);
-//    m_graphManager->drawNeuritesGraph();
-    m_graphManager->drawSkeletonsGraph();
+
+    m_opengl_mngr->drawAll(grid_uniforms);
+
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -239,11 +227,13 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
                     qDebug() << "switching to 3D";
                     m_isRotatable = true;
                     m_graphManager->update2Dflag(m_2D);
+                    m_opengl_mngr->update2Dflag(m_2D);
                 }
             } else {
                 if (!m_2D) {
                     m_2D = true;
                     m_graphManager->update2Dflag(m_2D);
+                    m_opengl_mngr->update2Dflag(m_2D);
                     updateMVPAttrib();      // update uniforms
                 }
             }

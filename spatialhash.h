@@ -12,7 +12,7 @@
 #include "node.h"
 #include "glsluniform_structs.h"
 
-class SpatialHash: public MainOpenGL
+class SpatialHash
 {
 public:
     SpatialHash(int col, float min, float max);

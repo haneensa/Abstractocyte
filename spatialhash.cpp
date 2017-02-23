@@ -127,7 +127,7 @@ void SpatialHash::clear()
 bool SpatialHash::initOpenGLFunctions()
 {
     m_glFunctionsSet = true;
-    initializeOpenGLFunctions();
+    //initializeOpenGLFunctions();
 
     return true;
 }
@@ -168,65 +168,65 @@ void SpatialHash::fillGridDataPoints()
 
 bool SpatialHash::init_Shaders_Buffers()
 {
-    if (m_glFunctionsSet == false)
-        return false;
+//    if (m_glFunctionsSet == false)
+//        return false;
 
-    qDebug() << "SpatialHash::init_Shaders_Buffers";
+//    qDebug() << "SpatialHash::init_Shaders_Buffers";
 
-    // 1) initialize shaders
-    m_program_grid = glCreateProgram();
-    bool res = initShader(m_program_grid,  ":/shaders/grid_vert.glsl", ":/shaders/grid_geom.glsl", ":/shaders/grid_frag.glsl");
-    GL_Error();
+//    // 1) initialize shaders
+//    m_program_grid = glCreateProgram();
+//    bool res = initShader(m_program_grid,  ":/shaders/grid_vert.glsl", ":/shaders/grid_geom.glsl", ":/shaders/grid_frag.glsl");
+//    GL_Error();
 
-    if (res == false)
-        return res;
+//    if (res == false)
+//        return res;
 
-    m_GridVAO.create();
-    m_GridVAO.bind();
+//    m_GridVAO.create();
+//    m_GridVAO.bind();
 
-    m_GridVBO.create();
-    m_GridVBO.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    m_GridVBO.bind();
-    // allocate buffer values
-    fillGridDataPoints();
-    m_GridVBO.allocate( m_gridDataPoints.data(),
-                        m_gridDataPoints.size() * sizeof(QVector2D) );
+//    m_GridVBO.create();
+//    m_GridVBO.setUsagePattern( QOpenGLBuffer::StaticDraw );
+//    m_GridVBO.bind();
+//    // allocate buffer values
+//    fillGridDataPoints();
+//    m_GridVBO.allocate( m_gridDataPoints.data(),
+//                        m_gridDataPoints.size() * sizeof(QVector2D) );
 
-    glUseProgram(m_program_grid);
+//    glUseProgram(m_program_grid);
 
-    // enable vertix attribs to access buffer from shaders
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(QVector2D),  0);
+//    // enable vertix attribs to access buffer from shaders
+//    glEnableVertexAttribArray(0);
+//    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
+//                          sizeof(QVector2D),  0);
 
-    m_GridVBO.release();
-    m_GridVAO.release();
+//    m_GridVBO.release();
+//    m_GridVAO.release();
 
-    GL_Error();
+//    GL_Error();
 
     return true;
 }
 
 void SpatialHash::drawGrid(struct GlobalUniforms grid_uniforms)
 {
-    if (m_glFunctionsSet == false)
-        return;
+//    if (m_glFunctionsSet == false)
+//        return;
 
-    m_GridVAO.bind();
+//    m_GridVAO.bind();
 
-    glUseProgram(m_program_grid);
-    m_uniforms = grid_uniforms;
+//    glUseProgram(m_program_grid);
+//    m_uniforms = grid_uniforms;
 
-    GLuint mMatrix = glGetUniformLocation(m_program_grid, "mMatrix");
-    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+//    GLuint mMatrix = glGetUniformLocation(m_program_grid, "mMatrix");
+//    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
 
-    GLuint vMatrix = glGetUniformLocation(m_program_grid, "vMatrix");
-    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+//    GLuint vMatrix = glGetUniformLocation(m_program_grid, "vMatrix");
+//    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
 
-    GLuint pMatrix = glGetUniformLocation(m_program_grid, "pMatrix");
-    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+//    GLuint pMatrix = glGetUniformLocation(m_program_grid, "pMatrix");
+//    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
 
-    glDrawArrays(GL_POINTS, 0, m_gridDataPoints.size() );
+//    glDrawArrays(GL_POINTS, 0, m_gridDataPoints.size() );
 
-    m_GridVAO.release();
+//    m_GridVAO.release();
 }
