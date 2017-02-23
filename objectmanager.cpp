@@ -25,8 +25,8 @@ ObjectManager::ObjectManager()
     m_ssbo_data.resize(1200);
     m_mesh = new Mesh();
 
-//    importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
-    importXML("://scripts/m3_neurites.xml");    // neurites time:  28802 ms
+   importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+//   importXML("://scripts/m3_neurites.xml");    // neurites time:  28802 ms
 }
 
 ObjectManager::~ObjectManager()
@@ -475,8 +475,10 @@ bool ObjectManager::initOpenGLFunctions()
 
 bool ObjectManager::iniShadersVBOs()
 {
-    initBuffer();
+    // fill all data through iterating over objects(ssbo, vbos)
+    fillVBOsData();
 
+    initSSBO();
     initMeshShaders();
     initMeshPointsShaders();
     initSkeletonShaders();
@@ -484,7 +486,141 @@ bool ObjectManager::iniShadersVBOs()
     return true;
 }
 
-bool ObjectManager::initBuffer()
+void ObjectManager::fillVBOsData()
+{
+    m_vbo_skeleton.create();
+    m_vbo_skeleton.setUsagePattern( QOpenGLBuffer::StaticDraw);
+    m_vbo_skeleton.bind();
+    m_vbo_skeleton.allocate(NULL, m_skeleton_nodes_size * sizeof(SkeletonPoint));
+
+
+    // initialize index buffers
+    m_vbo_IndexMesh.create();
+    m_vbo_IndexMesh.bind();
+    m_vbo_IndexMesh.allocate( NULL, m_indices_size * sizeof(GLuint) );
+
+    for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++) { // todo: skip if the object has no skeleton
+        Object *object_p = (*iter).second;
+
+
+   }
+
+    int vbo_IndexMesh_offset = 0;
+    int vbo_skeleton_offset = 0;
+    for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++) {
+        Object *object_p = (*iter).second;
+
+        // todo: fill ssbo here
+
+        if (object_p->getObjectType() == Object_t::MITO  || object_p->getObjectType()  == Object_t::SYNAPSE   ) {
+              continue;
+        }
+
+        int ID = object_p->getHVGXID();
+
+        qDebug() << " allocating: " << object_p->getName().data();
+
+        // allocating mesh indices
+        int vbo_IndexMesh_count = object_p->get_indices_Size() * sizeof(GLuint);
+        m_vbo_IndexMesh.write(vbo_IndexMesh_offset, object_p->get_indices(), vbo_IndexMesh_count);
+        vbo_IndexMesh_offset += vbo_IndexMesh_count;
+
+        // allocating skeleton vertices
+        int vbo_skeleton_count = object_p->writeSkeletontoVBO(m_vbo_skeleton, vbo_skeleton_offset);
+        vbo_skeleton_offset += vbo_skeleton_count;
+
+        // allocate neurites nodes place holders
+        object_p->setNodeIdx(m_neurites_nodes.size());
+        m_neurites_nodes.push_back(ID);
+
+
+        // initialize abstract skeleton data
+        // find a way to fill the skeleton with data
+        // get skeleton of the object
+        Skeleton *skeleton = object_p->getSkeleton();
+        std::vector<QVector3D> nodes3D = skeleton->getGraphNodes();
+        std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
+        object_p->setSkeletonOffset(m_abstract_skel_nodes.size());
+        // add nodes
+        for ( int i = 0; i < nodes3D.size(); i++) {
+            QVector4D vertex = nodes3D[i];
+            vertex.setW(ID);
+            struct AbstractSkelNode skel_node = {vertex, vertex.toVector2D(), vertex.toVector2D(), vertex.toVector2D() };
+            m_abstract_skel_nodes.push_back(skel_node);
+        }
+
+        int skeleton_offset = object_p->getSkeletonOffset();
+        // add edges
+        for (int i = 0; i < edges2D.size(); ++i) {
+            int nID1 = edges2D[i].x() + skeleton_offset;
+            int nID2 = edges2D[i].y() + skeleton_offset;
+            m_abstract_skel_edges.push_back(nID1);
+            m_abstract_skel_edges.push_back(nID2);
+        }
+   }
+
+    // allocate neurites nodes edges
+    std::vector<QVector2D> edges_info = neurites_neurite_edge;
+    for (int i = 0; i < edges_info.size(); ++i) {
+        int nID1 = edges_info[i].x();
+        int nID2 = edges_info[i].y();
+        if (m_objects.find(nID1) == m_objects.end() || m_objects.find(nID2) == m_objects.end()) {
+            continue;
+        }
+        m_neurites_edges.push_back(m_objects[nID1]->getNodeIdx());
+        m_neurites_edges.push_back(m_objects[nID2]->getNodeIdx());
+    }
+
+    m_vbo_IndexMesh.release();
+    m_vbo_skeleton.release();
+}
+
+void ObjectManager::allocate_neurites_nodes(QOpenGLBuffer vbo)
+{
+    vbo.allocate( m_neurites_nodes.data(),
+                            m_neurites_nodes.size() * sizeof(GLuint) );
+}
+
+void ObjectManager::allocate_neurites_edges(QOpenGLBuffer vbo)
+{
+    vbo.allocate( m_neurites_edges.data(),
+                                 m_neurites_edges.size() * sizeof(GLuint) );
+}
+
+int ObjectManager::get_neurites_nodes_size()
+{
+    return m_neurites_nodes.size();
+}
+
+int ObjectManager::get_neurites_edges_size()
+{
+    return m_neurites_edges.size();
+}
+
+
+void ObjectManager::allocate_abs_skel_nodes(QOpenGLBuffer vbo)
+{
+    vbo.allocate( m_abstract_skel_nodes.data(),
+                                  m_abstract_skel_nodes.size() * sizeof(struct AbstractSkelNode) );
+}
+
+void ObjectManager::allocate_abs_skel_edges(QOpenGLBuffer vbo)
+{
+    vbo.allocate( m_abstract_skel_edges.data(),
+                                  m_abstract_skel_edges.size() * sizeof(GLuint) );
+}
+
+int ObjectManager::get_abs_skel_nodes_size()
+{
+    return m_abstract_skel_nodes.size();
+}
+
+int ObjectManager::get_abs_skel_edges_size()
+{
+    return m_abstract_skel_edges.size();
+}
+
+bool ObjectManager::initSSBO()
 {
     if (m_glFunctionsSet == false)
         return false;
@@ -545,22 +681,7 @@ bool ObjectManager::initMeshShaders()
     m_mesh->allocateVerticesVBO(m_vbo_mesh);
 
     // initialize index buffers
-    m_vbo_IndexMesh.create();
     m_vbo_IndexMesh.bind();
-    m_vbo_IndexMesh.allocate( NULL, m_indices_size * sizeof(GLuint) );
-    int offset = 0;
-    for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++) {
-
-        Object *object_p = (*iter).second;
-        if (object_p->getObjectType() == Object_t::MITO  || object_p->getObjectType()  == Object_t::SYNAPSE   ) {
-              continue;
-          }
-        int count = object_p->get_indices_Size() * sizeof(GLuint);
-        qDebug() << " allocating: " << object_p->getName().data();
-        m_vbo_IndexMesh.write(offset, object_p->get_indices(), count);
-        offset += count;
-   }
-
     m_vbo_IndexMesh.release();
 
     initVertexAttrib();
@@ -620,39 +741,25 @@ bool ObjectManager::initSkeletonShaders()
 
     updateUniformsLocation(m_program_skeleton);
 
-    m_vbo_skeleton.create();
-    m_vbo_skeleton.setUsagePattern( QOpenGLBuffer::StaticDraw);
-    if ( !m_vbo_skeleton.bind() ) {
-        qDebug() << "Could not bind vertex buffer to the context.";
-    }
 
-    m_vbo_skeleton.allocate(NULL, m_skeleton_nodes_size * sizeof(SkeletonVertex));
+    m_vbo_skeleton.bind();
 
-    int offset = 0;
-    for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++) { // todo: skip if the object has no skeleton
-        Object *object_p = (*iter).second;
-        if (object_p->getObjectType() == Object_t::MITO  || object_p->getObjectType()  == Object_t::SYNAPSE   ) {
-            continue;
-        }
-        int count = object_p->writeSkeletontoVBO(m_vbo_skeleton, offset);
-        offset += count;
-   }
 
     qDebug() << "writeSkeletontoVBO done ";
 
     GL_Error();
 
-    offset = 0;
+    int offset = 0;
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonVertex),  0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  0);
 
     offset += sizeof(QVector4D);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonVertex),  (GLvoid*)offset);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  (GLvoid*)offset);
 
     offset += sizeof(QVector4D);
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonVertex),  (GLvoid*)offset);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  (GLvoid*)offset);
 
     GL_Error();
 
@@ -754,4 +861,19 @@ void ObjectManager::update_ssbo_data_layout2(QVector2D layout2, int hvgxID)
         return;
 
     m_ssbo_data[hvgxID].layout2 = layout2;
+}
+
+void ObjectManager::update_skeleton_layout1(QVector2D layout2, int hvgxID)
+{
+    // get the object -> get its skeleton -> update the layout
+}
+
+void ObjectManager::update_skeleton_layout2(QVector2D layout2, int hvgxID)
+{
+    // get the object -> get its skeleton -> update the layout
+}
+
+void ObjectManager::update_skeleton_layout3(QVector2D layout2, int hvgxID)
+{
+    // get the object -> get its skeleton -> update the layout
 }

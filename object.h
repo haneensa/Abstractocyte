@@ -19,7 +19,7 @@ public:
     ~Object();
 
     // temporary skeleton data points handleing function
-    void add_s_vertex(struct SkeletonVertex vertex_data);
+    void add_s_vertex(struct SkeletonPoint vertex_data);
 
     int writeSkeletontoVBO(QOpenGLBuffer vbo, int offset);
     // mesh indices functions

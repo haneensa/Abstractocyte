@@ -102,10 +102,21 @@ bool Graph::createGraph(ObjectManager *objectManager)
     m_obj_mngr = objectManager;
     bool result;
     switch(m_gType) {
-    case Graph_t::NODE_NODE : result = parseNODE_NODE(objectManager);
-        break;
-    case Graph_t::ALL_SKELETONS :  result = parseSKELETON(objectManager);
-        break;
+        case Graph_t::NODE_NODE :
+        {
+            result = parseNODE_NODE(objectManager);
+            break;
+        }
+        case Graph_t::ALL_SKELETONS :
+        {
+            result = parseSKELETON(objectManager);
+            break;
+        }
+        case Graph_t::NODE_SKELETON :
+        {
+            result = parseSKELETON(objectManager);
+            break;
+        }
     }
 
     return true;
@@ -320,6 +331,7 @@ void Graph::update_node_data(Node* node)
         if (node->getNodeType() == Node_t::ASTROCYTE) {
             // update astrocyte skeleton
             // layout 2
+            m_obj_mngr->update_skeleton_layout2(node->getLayoutedPosition(), node->getID() /*hvgx*/);
         } else {
             m_obj_mngr->update_ssbo_data_layout2(node->getLayoutedPosition(), node->getID() /*hvgx*/);
         }
@@ -330,12 +342,14 @@ void Graph::update_node_data(Node* node)
     {
         // update skeleton node
         // layout 3
+        m_obj_mngr->update_skeleton_layout3(node->getLayoutedPosition(), node->getID() /*hvgx*/);
         break;
     }
     case Graph_t::ALL_SKELETONS :
     {
         // update skeleton node
         // layout 1
+        m_obj_mngr->update_skeleton_layout1(node->getLayoutedPosition(), node->getID() /*hvgx*/);
         break;
     } }
 

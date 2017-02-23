@@ -140,7 +140,7 @@ int Object::writeSkeletontoVBO(QOpenGLBuffer vbo, int offset)
         return 0;
     }
 
-    int count = size * sizeof(SkeletonVertex);
+    int count = size * sizeof(SkeletonPoint);
     vbo.write(offset, m_skeleton->getSkeletonPoints(), count);
     qDebug() <<  " allocating: " <<  getName().data() << " count: " << count;
 

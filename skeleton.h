@@ -6,10 +6,21 @@
 
 // skeleton vertex
 // todo: use union instead to represent fields?
-struct SkeletonVertex {
+struct SkeletonPoint {
     QVector4D   vertex; // w: ID
     QVector4D   knot1;   // end points of the segment
     QVector4D   knot2;   // end points of the segment
+};
+
+// allocate vbo with enough space for all skeletons using this struct
+// use this for all skeleton stages (simplified one)
+// initialize this when while contructing the skeletons
+// with their edges
+struct AbstractSkelNode { // -> Abstract_Skel_Node
+    QVector4D vertex;   // original position  (simplified)  -> w: hvgx ID
+    QVector2D layout1;  // layouted position (all skeletons)
+    QVector2D layout2;  // layouted position (no neurites)
+    QVector2D layout3;  // layouted position (no astrocyte)
 };
 
 
@@ -43,7 +54,7 @@ protected:
     // segments has IDs but they are not useful to track anything, so I can use any order
 
     std::vector<QVector3D>              m_nodes; // vector or map?
-    std::vector<struct SkeletonVertex>  m_points;
+    std::vector<struct SkeletonPoint>  m_points;
     std::vector<SkeletonBranch *>       m_branches;
 };
 

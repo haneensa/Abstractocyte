@@ -1,7 +1,10 @@
 #version 430
 
 // in: per vertex data
-layout (location = 0) in int ID;
+layout (location = 0) in vec4 vertex;
+layout (location = 1) in vec2 layout1;
+layout (location = 2) in vec2 layout2;
+layout (location = 3) in vec2 layout3;
 
 out int V_ID;
 
@@ -29,6 +32,7 @@ layout (std430, binding=2) buffer mesh_data
 
 void main(void)
 {
+    int ID = int(vertex.w);
     // two positions to interpolate between:
     // 3D with rotation
     // projected 2D without rotation
@@ -37,9 +41,9 @@ void main(void)
 
     // todo: interpolate between different layouts based on state
     if (is2D == 1) {
-        position = vec3(SSBO_data[ID].layout1, 0);
+        position = vec3(layout1, 0.0);
     } else {
-        position = SSBO_data[ID].center.xyz;
+        position =  vertex.xyz ;
     }
 
     gl_Position =  mvpMatrix * vec4(position, 1.0); // original position

@@ -45,7 +45,7 @@ void Skeleton::addBranch(SkeletonBranch *branch)
     std::vector<int> pointsIndices = branch->getPointsIndxs();
     for (int i = 0; i < pointsIndices.size(); i++) {
         int index = pointsIndices[i];
-        struct SkeletonVertex v = m_points[index];
+        struct SkeletonPoint v = m_points[index];
         QVector3D n1 = m_nodes[knots.x()];
         QVector3D n2 = m_nodes[knots.y()];
         v.knot1 = QVector4D(n1.x(), n1.y(), n1.z(), 1.0);
