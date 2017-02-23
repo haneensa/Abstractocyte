@@ -499,12 +499,6 @@ void ObjectManager::fillVBOsData()
     m_vbo_IndexMesh.bind();
     m_vbo_IndexMesh.allocate( NULL, m_indices_size * sizeof(GLuint) );
 
-    for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++) { // todo: skip if the object has no skeleton
-        Object *object_p = (*iter).second;
-
-
-   }
-
     int vbo_IndexMesh_offset = 0;
     int vbo_skeleton_offset = 0;
     for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++) {
@@ -863,17 +857,41 @@ void ObjectManager::update_ssbo_data_layout2(QVector2D layout2, int hvgxID)
     m_ssbo_data[hvgxID].layout2 = layout2;
 }
 
-void ObjectManager::update_skeleton_layout1(QVector2D layout2, int hvgxID)
+void ObjectManager::update_skeleton_layout1(QVector2D layout1, int node_index, int hvgxID)
 {
     // get the object -> get its skeleton -> update the layout
+    if (m_objects.find(hvgxID) == m_objects.end()) {
+        return;
+    }
+
+    Skeleton *skel = m_objects[hvgxID]->getSkeleton();
+    int nodes_offset = skel->getIndexOffset();
+    m_abstract_skel_nodes[node_index + nodes_offset].layout1 = layout1;
 }
 
-void ObjectManager::update_skeleton_layout2(QVector2D layout2, int hvgxID)
+void ObjectManager::update_skeleton_layout2(QVector2D layout2, int node_index, int hvgxID)
 {
     // get the object -> get its skeleton -> update the layout
+    // get the object -> get its skeleton -> update the layout
+    if (m_objects.find(hvgxID) == m_objects.end()) {
+        qDebug() << "Object not found";
+        return;
+    }
+
+    Skeleton *skel = m_objects[hvgxID]->getSkeleton();
+    int nodes_offset = skel->getIndexOffset();
+    m_abstract_skel_nodes[node_index + nodes_offset].layout2 = layout2;
 }
 
-void ObjectManager::update_skeleton_layout3(QVector2D layout2, int hvgxID)
+void ObjectManager::update_skeleton_layout3(QVector2D layout3,int node_index, int hvgxID)
 {
     // get the object -> get its skeleton -> update the layout
+    // get the object -> get its skeleton -> update the layout
+    if (m_objects.find(hvgxID) == m_objects.end()) {
+        return;
+    }
+
+    Skeleton *skel = m_objects[hvgxID]->getSkeleton();
+    int nodes_offset = skel->getIndexOffset();
+    m_abstract_skel_nodes[node_index + nodes_offset].layout3 = layout3;
 }

@@ -200,7 +200,7 @@ bool Graph::parseSKELETON(ObjectManager *objectManager)
 
 Node* Graph::addNode(std::pair<int, int> id_tuple, float x, float y, float z)
 {
-    size_t idxID = 0;
+    size_t idxID = id_tuple.second;
     int nID = id_tuple.first;
     Node* newNode = new Node(nID, idxID, x, y, z);
     m_nodes[id_tuple] = newNode; // these IDs should be unique per graph!q
@@ -331,7 +331,8 @@ void Graph::update_node_data(Node* node)
         if (node->getNodeType() == Node_t::ASTROCYTE) {
             // update astrocyte skeleton
             // layout 2
-            m_obj_mngr->update_skeleton_layout2(node->getLayoutedPosition(), node->getID() /*hvgx*/);
+            qDebug() << "Update skeleton layout 2 vertex";
+            m_obj_mngr->update_skeleton_layout2(node->getLayoutedPosition(), node->getIdxID(), node->getID() /*hvgx*/);
         } else {
             m_obj_mngr->update_ssbo_data_layout2(node->getLayoutedPosition(), node->getID() /*hvgx*/);
         }
@@ -342,14 +343,14 @@ void Graph::update_node_data(Node* node)
     {
         // update skeleton node
         // layout 3
-        m_obj_mngr->update_skeleton_layout3(node->getLayoutedPosition(), node->getID() /*hvgx*/);
+        m_obj_mngr->update_skeleton_layout3(node->getLayoutedPosition(), node->getIdxID(), node->getID() /*hvgx*/);
         break;
     }
     case Graph_t::ALL_SKELETONS :
     {
         // update skeleton node
         // layout 1
-        m_obj_mngr->update_skeleton_layout1(node->getLayoutedPosition(), node->getID() /*hvgx*/);
+        m_obj_mngr->update_skeleton_layout1(node->getLayoutedPosition(), node->getIdxID(), node->getID() /*hvgx*/);
         break;
     } }
 

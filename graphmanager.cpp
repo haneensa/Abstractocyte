@@ -321,6 +321,7 @@ void GraphManager::drawSkeletonsGraph()
 
     glUseProgram(m_program_neurites_nodes);
     updateUniformsLocation(m_program_neurites_nodes);
+    m_obj_mngr->allocate_abs_skel_nodes(m_SkeletonsNodesVBO);
 
     glDrawArrays(GL_POINTS, 0,  m_obj_mngr->get_abs_skel_nodes_size() );
 

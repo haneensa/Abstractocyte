@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     skeleton.cpp \
     skeletonbranch.cpp \
     objectmanager.cpp \
-    mesh.cpp
+    mesh.cpp \
+    openglmanager.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -49,7 +50,8 @@ HEADERS  += mainwindow.h \
     objectmanager.h \
     mesh.h \
     ssbo_structs.h \
-    glsluniform_structs.h
+    glsluniform_structs.h \
+    openglmanager.h
 
 FORMS    += mainwindow.ui
 

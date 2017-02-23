@@ -41,7 +41,7 @@ void main(void)
 
     // todo: interpolate between different layouts based on state
     if (is2D == 1) {
-        position = vec3(layout1, 0.0);
+        position = vec3(layout2, 0.0);
     } else {
         position =  vertex.xyz ;
     }
