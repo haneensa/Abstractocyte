@@ -1,73 +1,17 @@
+// this should only handle the 4 graphs, their construction, layouting algorithms
+// and updating their data, and drawing
 #include "graphmanager.h"
 
 GraphManager::GraphManager(ObjectManager *objectManager)
     : m_NeuritesIndexVBO( QOpenGLBuffer::IndexBuffer ),
       m_NeuritesNodesVBO( QOpenGLBuffer::VertexBuffer ),
+      m_SkeletonsIndexVBO( QOpenGLBuffer::IndexBuffer ),
+      m_SkeletonsNodesVBO( QOpenGLBuffer::VertexBuffer ),
       m_glFunctionsSet(false),
       m_FDL_running(false),
       m_2D(false)
 {
     m_obj_mngr = objectManager;
-
-    std::map<int, Object*> objects_map = m_obj_mngr->getObjectsMap();
-
-//    for ( auto iter = objects_map.begin(); iter != objects_map.end(); iter++) {
-//        Object *objectP = (*iter).second;
-
-//        if (objectP->getObjectType() != Object_t::ASTROCYTE) {
-//            continue;
-//        }
-//        int ID = objectP->getHVGXID();
-
-//        // find a way to fill the skeleton with data
-//        // get skeleton of the object
-//        Skeleton *skeleton = objectP->getSkeleton();
-//        std::vector<QVector3D> nodes3D = skeleton->getGraphNodes();
-//        std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
-//        objectP->setSkeletonOffset(m_skeletons_data.size());
-//        // add nodes
-//        for ( int i = 0; i < nodes3D.size(); i++) {
-//            QVector4D vertex = nodes3D[i];
-//            vertex.setW(ID);
-//            struct Skeleton_Node skel_node = {vertex, vertex.toVector2D(), vertex.toVector2D(), vertex.toVector2D() };
-//            m_skeletons_data.push_back(skel_node);
-//        }
-
-//        int skeleton_offset = objectP->getSkeletonOffset();
-//        // add edges
-//        for (int i = 0; i < edges2D.size(); ++i) {
-//            int nID1 = edges2D[i].x() + skeleton_offset;
-//            int nID2 = edges2D[i].y() + skeleton_offset;
-//            m_skeletons_edges.push_back(nID1);
-//            m_skeletons_edges.push_back(nID2);
-//        }
-//    }
-    // add nodes
-    for ( auto iter = objects_map.begin(); iter != objects_map.end(); iter++) {
-        Object *objectP = (*iter).second;
-
-        if (objectP->getObjectType() == Object_t::ASTROCYTE || objectP->getObjectType() == Object_t::MITO  || objectP->getObjectType()  == Object_t::SYNAPSE   ) {
-            continue;
-        }
-
-        int ID = objectP->getHVGXID();
-        objectP->setNodeIdx(m_neurites_nodes.size());
-        m_neurites_nodes.push_back(ID);
-    }
-
-    std::vector<QVector2D> edges_info = objectManager->getNeuritesEdges();
-    // add edges
-    for (int i = 0; i < edges_info.size(); ++i) {
-        int nID1 = edges_info[i].x();
-        int nID2 = edges_info[i].y();
-        qDebug() << nID1 << " " << nID2;
-        if (objects_map.find(nID1) == objects_map.end() || objects_map.find(nID2) == objects_map.end()) {
-            continue;
-        }
-        m_neurites_edges.push_back(objects_map[nID1]->getNodeIdx());
-        m_neurites_edges.push_back(objects_map[nID2]->getNodeIdx());
-    }
-
 }
 
 GraphManager::~GraphManager()
@@ -83,7 +27,6 @@ GraphManager::~GraphManager()
     if (m_glFunctionsSet == true) {
         m_NeuritesGraphVAO.destroy();
         m_NeuritesNodesVBO.destroy();
-
         m_NeuritesIndexVBO.destroy();
     }
 
@@ -104,8 +47,8 @@ void GraphManager::update2Dflag(bool is2D)
         m_graph[0]->resetCoordinates(m_uniforms.rMatrix);
 
     }
-    updateUniformsLocation(m_program_nodes);
-    updateUniformsLocation(m_program_Index);
+    updateUniformsLocation(m_program_neurites_nodes);
+    updateUniformsLocation(m_program_neurites_index);
 }
 // I have 4 graphs:
 // so here extract the object nodes in a list because more than a graph use them
@@ -132,7 +75,7 @@ void GraphManager::ExtractGraphFromMesh()
 
      // init the edges and they never change except when to display them
 
-     m_graph[0] = new Graph( Graph_t::NODE_NODE ); // neurite-neurite
+     m_graph[0] = new Graph( Graph_t::NODE_SKELETON ); // neurite-neurite
 //     m_graph[1] = new Graph( Graph_t::NODE_SKELETON ); // neurite-astrocyte skeleton
 //     m_graph[2] = new Graph( Graph_t::ALL_SKELETONS ); //  neurites skeletons - astrocyte skeleton
 //     m_graph[3] = new Graph( Graph_t::NEURITE_SKELETONS ); // neuries skeletons
@@ -174,11 +117,39 @@ bool GraphManager::initOpenGLFunctions()
     return true;
 }
 
-void GraphManager::initVertexAttribPointer()
+void GraphManager::initNeuritesVertexAttribPointer()
 {
     int offset = 0;
     glEnableVertexAttribArray(0);
     glVertexAttribIPointer(0, 1, GL_INT, 0, (void*)offset);
+
+}
+void GraphManager::initSkeletonsVertexAttribPointer()
+{
+   // QVector4D vertex;   // original position  (simplified)  -> w: hvgx ID
+   // QVector2D layout1;  // layouted position (all skeletons)
+   // QVector2D layout2;  // layouted position (no neurites)
+   // QVector2D layout3;  // layouted position (no astrocyte)
+    int offset = 0;
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+                          sizeof(struct AbstractSkelNode),  0);
+
+
+    offset +=  sizeof(QVector4D);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
+                          sizeof(AbstractSkelNode), (GLvoid*)offset);
+
+    offset +=  sizeof(QVector2D);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
+                          sizeof(AbstractSkelNode), (GLvoid*)offset);
+
+    offset +=  sizeof(QVector2D);
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE,
+                          sizeof(AbstractSkelNode), (GLvoid*)offset);
 
 }
 
@@ -190,14 +161,20 @@ bool GraphManager::initVBO()
 
     qDebug() << "graph->initVBO";
 
+    /* neurites nodes */
     // 1) initialize shaders
-    m_program_nodes = glCreateProgram();
-    bool res = initShader(m_program_nodes,  ":/shaders/nodes_vert.glsl", ":/shaders/nodes_geom.glsl", ":/shaders/nodes_frag.glsl");
+    m_program_neurites_nodes = glCreateProgram();
+    bool res = initShader(m_program_neurites_nodes, ":/shaders/nodes_vert.glsl",
+                                                    ":/shaders/nodes_geom.glsl",
+                                                    ":/shaders/nodes_frag.glsl");
+
     if (res == false)
         return res;
 
-    m_program_Index = glCreateProgram();
-    res = initShader(m_program_Index,  ":/shaders/nodes_vert.glsl", ":/shaders/lines_geom.glsl", ":/shaders/lines_frag.glsl");
+    m_program_neurites_index = glCreateProgram();
+    res = initShader(m_program_neurites_index,  ":/shaders/nodes_vert.glsl",
+                                       ":/shaders/lines_geom.glsl",
+                                       ":/shaders/lines_frag.glsl");
     if (res == false)
         return res;
 
@@ -210,33 +187,83 @@ bool GraphManager::initVBO()
     m_NeuritesNodesVBO.create();
     m_NeuritesNodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
     m_NeuritesNodesVBO.bind();
-    m_NeuritesNodesVBO.allocate( m_neurites_nodes.data(),
-                            m_neurites_nodes.size() * sizeof(GLuint) );
 
-    glUseProgram(m_program_nodes);
+    m_obj_mngr->allocate_neurites_nodes(m_NeuritesNodesVBO);
+
+    glUseProgram(m_program_neurites_nodes);
     GL_Error();
 
-    initVertexAttribPointer();
+    initNeuritesVertexAttribPointer();
 
     GL_Error();
 
     // initialize uniforms
-    updateUniformsLocation(m_program_nodes);
+    updateUniformsLocation(m_program_neurites_nodes);
 
     m_NeuritesNodesVBO.release();
 
     m_NeuritesIndexVBO.create();
     m_NeuritesIndexVBO.bind();
-    m_NeuritesIndexVBO.allocate( m_neurites_edges.data(),
-                            m_neurites_edges.size() * sizeof(GLuint) );
-    glUseProgram(m_program_Index);
-    updateUniformsLocation(m_program_Index);
+
+    m_obj_mngr->allocate_neurites_edges(m_NeuritesNodesVBO);
+
+    glUseProgram(m_program_neurites_index);
+    updateUniformsLocation(m_program_neurites_index);
 
 
     m_NeuritesIndexVBO.release();
-
-
     m_NeuritesGraphVAO.release();
+
+
+
+    /* skeletons */
+
+    m_program_skeletons_index = glCreateProgram();
+    res = initShader(m_program_skeletons_index, ":/shaders/abstract_skeleton_node_vert.glsl",
+                                                ":/shaders/nodes_geom.glsl",
+                                                ":/shaders/nodes_frag.glsl");
+    if (res == false)
+        return res;
+
+    m_program_neurites_index = glCreateProgram();
+    res = initShader(m_program_neurites_index,  ":/shaders/abstract_skeleton_node_vert.glsl",
+                                       ":/shaders/lines_geom.glsl",
+                                       ":/shaders/lines_frag.glsl");
+    if (res == false)
+        return res;
+
+    m_SkeletonsGraphVAO.create();
+    m_SkeletonsGraphVAO.bind();
+
+    m_SkeletonsNodesVBO.create();
+    m_SkeletonsNodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
+    m_SkeletonsNodesVBO.bind();
+
+    m_obj_mngr->allocate_abs_skel_nodes(m_SkeletonsNodesVBO);
+
+    glUseProgram(m_program_neurites_nodes);
+    GL_Error();
+
+    initSkeletonsVertexAttribPointer();
+
+    GL_Error();
+
+    // initialize uniforms
+    updateUniformsLocation(m_program_neurites_nodes);
+
+    m_SkeletonsNodesVBO.release();
+
+    m_SkeletonsIndexVBO.create();
+    m_SkeletonsIndexVBO.bind();
+
+    m_obj_mngr->allocate_abs_skel_edges(m_SkeletonsIndexVBO);
+
+    glUseProgram(m_program_neurites_index);
+    updateUniformsLocation(m_program_neurites_index);
+
+
+    m_SkeletonsIndexVBO.release();
+    m_SkeletonsGraphVAO.release();
 
 
     return true;
@@ -255,7 +282,6 @@ void GraphManager::drawGrid(struct GlobalUniforms grid_uniforms)
 
 void GraphManager::drawNeuritesGraph()
 {
-
     if (m_glFunctionsSet == false)
         return;
 
@@ -264,25 +290,53 @@ void GraphManager::drawNeuritesGraph()
     m_NeuritesGraphVAO.bind();
     m_NeuritesNodesVBO.bind();
 
-    glUseProgram(m_program_nodes);
-    updateUniformsLocation(m_program_nodes);
+    glUseProgram(m_program_neurites_nodes);
+    updateUniformsLocation(m_program_neurites_nodes);
 
-    glDrawArrays(GL_POINTS, 0, m_neurites_nodes.size() );
+    glDrawArrays(GL_POINTS, 0, m_obj_mngr->get_neurites_nodes_size() );
 
     m_NeuritesIndexVBO.bind();
 
-    glUseProgram(m_program_Index);
-    updateUniformsLocation(m_program_Index);
+    glUseProgram(m_program_neurites_index);
+    updateUniformsLocation(m_program_neurites_index);
 
     glLineWidth(10.0f);
-    glDrawElements(GL_LINES, m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
-    m_NeuritesIndexVBO.release();
+    glDrawElements(GL_LINES,  m_obj_mngr->get_neurites_edges_size(), GL_UNSIGNED_INT, 0 );
 
+    m_NeuritesIndexVBO.release();
 
     m_NeuritesNodesVBO.release();
     m_NeuritesGraphVAO.release();
 }
 
+void GraphManager::drawSkeletonsGraph()
+{
+    if (m_glFunctionsSet == false)
+        return;
+
+    // update skeleton data from object manager
+
+    m_SkeletonsGraphVAO.bind();
+    m_SkeletonsNodesVBO.bind();
+
+    glUseProgram(m_program_neurites_nodes);
+    updateUniformsLocation(m_program_neurites_nodes);
+
+    glDrawArrays(GL_POINTS, 0,  m_obj_mngr->get_abs_skel_nodes_size() );
+
+    m_SkeletonsIndexVBO.bind();
+
+    glUseProgram(m_program_neurites_index);
+    updateUniformsLocation(m_program_neurites_index);
+
+    glLineWidth(10.0f);
+    glDrawElements(GL_LINES, m_obj_mngr->get_abs_skel_edges_size(), GL_UNSIGNED_INT, 0 );
+    m_SkeletonsIndexVBO.release();
+
+
+    m_SkeletonsNodesVBO.release();
+    m_SkeletonsGraphVAO.release();
+}
 
 void GraphManager::updateUniformsLocation(GLuint program)
 {
