@@ -29,5 +29,6 @@
         <file>shaders/space_pointer_geom.glsl</file>
         <file>shaders/space_pointer_vert.glsl</file>
         <file>shaders/abstract_skeleton_node_vert.glsl</file>
+        <file>shaders/abstract_skeleton_node_geom.glsl</file>
     </qresource>
 </RCC>

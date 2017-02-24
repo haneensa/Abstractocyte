@@ -366,7 +366,7 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     m_program_skeletons_nodes = glCreateProgram();
     bool res = initShader(m_program_skeletons_nodes,
                           ":/shaders/abstract_skeleton_node_vert.glsl",
-                          ":/shaders/nodes_geom.glsl",
+                          ":/shaders/abstract_skeleton_node_geom.glsl",
                           ":/shaders/nodes_frag.glsl");
     if (res == false)
         return res;
@@ -642,10 +642,10 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     m_uniforms = grid_uniforms;
 
     // 1) Mesh Triangles
-//    drawMeshTriangles(grid_uniforms);
-//    // 2) Mesh Points
-//    drawMeshPoints(grid_uniforms);
-//    // 3) Skeleton Points
+    drawMeshTriangles(grid_uniforms);
+    // 2) Mesh Points
+    drawMeshPoints(grid_uniforms);
+    // 3) Skeleton Points
     drawSkeletonPoints(grid_uniforms);
     // 3) Abstract Skeleton Graph (Nodes and Edges)
     drawSkeletonsGraph(grid_uniforms);

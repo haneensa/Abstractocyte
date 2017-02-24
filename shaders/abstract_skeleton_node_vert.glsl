@@ -8,6 +8,11 @@ layout (location = 3) in vec2 layout3;
 
 out int V_ID;
 
+out vec4 v_vertex;
+out vec4 v_layout1;
+out vec4 v_layout2;
+out vec4 v_layout3;
+
 // World transformation
 uniform mat4 mMatrix;
 // View Transformation
@@ -30,14 +35,16 @@ layout (std430, binding=2) buffer mesh_data
     SSBO_datum SSBO_data[];
 };
 
+
+
 void main(void)
 {
     int ID = int(vertex.w);
+
     // two positions to interpolate between:
     // 3D with rotation
     // projected 2D without rotation
     mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
-    vec3 position;
 
     // between (60, 60) and (80, 80)
     // vec4 new_position = mix(vertex , layout1, position_intp);
@@ -57,12 +64,12 @@ void main(void)
 
 
     // todo: interpolate between different layouts based on state
-    if (is2D == 1) {
-        position = vec3(layout1, 0.0);
-    } else {
-        position =  vertex.xyz ;
-    }
 
-    gl_Position =  mvpMatrix * vec4(position, 1.0); // original position
+    v_vertex =  mvpMatrix * vec4(vertex.xyz, 1); // original position
+    v_layout1 =  mvpMatrix * vec4(layout1, 0, 1); // original position
+    v_layout2 =  mvpMatrix * vec4(layout2, 0, 1); // original position
+    v_layout3 =  mvpMatrix * vec4(layout3, 0, 1); // original position
+
+    gl_Position = v_vertex;
     V_ID = ID;
 }

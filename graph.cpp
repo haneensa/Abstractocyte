@@ -168,7 +168,6 @@ Node* Graph::addNode(std::pair<int, int> id_tuple, float x, float y, float z)
 {
     size_t idxID = id_tuple.second;
     int nID = id_tuple.first;
-    qDebug() << "add nodes: " << nID <<  " " <<  idxID <<  " " << x <<  " " << y << " " << z;
     Node* newNode = new Node(nID, idxID, x, y, z);
     m_nodes[id_tuple] = newNode; // these IDs should be unique per graph!q
     m_nodesCounter++;
@@ -203,7 +202,6 @@ Edge* Graph::addEdge(int eID, int hvgxID, int nID1, int nID2)
         return NULL;
     }
 
-    qDebug() << "create edges: " << nID1 << " " << nID2;
     int idxID = m_edgesCounter++;
     Edge* newEdge = new Edge(eID, idxID, n1, n2);
     n1->addEdge(newEdge);
