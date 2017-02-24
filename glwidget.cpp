@@ -25,7 +25,6 @@ GLWidget::GLWidget(QWidget *parent)
 
     // graph manager with 4 graphs and 2D space layouted data
     m_graphManager = new GraphManager( m_data_containter, m_opengl_mngr );
-    m_graphManager->ExtractGraphFromMesh();
 
     m_distance = 1.0;
     m_rotation = QQuaternion();
@@ -91,6 +90,8 @@ void GLWidget::initializeGL()
     initializeOpenGLFunctions();
     m_2dspace->initOpenGLFunctions();
     m_opengl_mngr->initOpenGLFunctions();
+    m_graphManager->ExtractGraphFromMesh();
+
 
     updateMVPAttrib();
 

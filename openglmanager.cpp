@@ -148,6 +148,8 @@ void OpenGLManager::fillVBOsData()
         std::vector<QVector3D> nodes3D = skeleton->getGraphNodes();
         std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
         object_p->setSkeletonOffset(m_abstract_skel_nodes.size());
+        // each skeleton node has local index within its list of nodes
+        // and an offset within list of abstract skel nodes
         // add nodes
         for ( int i = 0; i < nodes3D.size(); i++) {
             QVector4D vertex = nodes3D[i];
@@ -159,7 +161,6 @@ void OpenGLManager::fillVBOsData()
         int skeleton_offset = object_p->getSkeletonOffset();
         // add edges
         for (int i = 0; i < edges2D.size(); ++i) {
-
             int nID1 = edges2D[i].x() + skeleton_offset;
             int nID2 = edges2D[i].y() + skeleton_offset;
             m_abstract_skel_edges.push_back(nID1);
@@ -600,11 +601,6 @@ void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms)
 void OpenGLManager::update2Dflag(bool is2D)
 {
     m_2D = is2D;
-
-    updateAbstractUniformsLocation(m_program_neurites_nodes);
-    updateAbstractUniformsLocation(m_program_neurites_index);
-    updateAbstractUniformsLocation(m_program_skeletons_nodes);
-    updateAbstractUniformsLocation(m_program_skeletons_index);
 }
 
 void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
@@ -619,7 +615,6 @@ void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
     int is2D_value;
 
     if (m_2D) { // force directed layout started, them use model without rotation
-        qDebug() << "switch to 2D";
         glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
         is2D_value = 1;
     } else {
@@ -653,9 +648,9 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
 //    // 3) Skeleton Points
 //    drawSkeletonPoints(grid_uniforms);
     // 3) Abstract Skeleton Graph (Nodes and Edges)
-//    drawSkeletonsGraph(grid_uniforms);
+    drawSkeletonsGraph(grid_uniforms);
     // 4) Neurites Graph (Nodes and Edges)
-    drawNeuritesGraph(grid_uniforms);
+//    drawNeuritesGraph(grid_uniforms);
 }
 
 void OpenGLManager::updateUniformsLocation(GLuint program)
@@ -698,6 +693,7 @@ void OpenGLManager::update_ssbo_data_layout2(QVector2D layout2, int hvgxID)
     m_ssbo_data[hvgxID].layout2 = layout2;
 }
 
+// Graph_t::ALL_SKELETONS, dont discriminate between types
 void OpenGLManager::update_skeleton_layout1(QVector2D layout1, int node_index, int hvgxID)
 {
     // get the object -> get its skeleton -> update the layout
@@ -712,9 +708,13 @@ void OpenGLManager::update_skeleton_layout1(QVector2D layout1, int node_index, i
         qDebug() << "No Skeleton " << hvgxID;
         return;
     }
-    qDebug() << "skel not null";
-    int nodes_offset = skel->getIndexOffset();
-    m_abstract_skel_nodes[node_index + nodes_offset].layout1 = layout1;
+
+    if (node_index  > m_abstract_skel_nodes.size()) {
+        qDebug() << "out of range " << m_abstract_skel_nodes.size();
+        return;
+    }
+
+    m_abstract_skel_nodes[node_index].layout1 = layout1;
 }
 
 void OpenGLManager::update_skeleton_layout2(QVector2D layout2, int node_index, int hvgxID)

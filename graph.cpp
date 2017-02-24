@@ -99,22 +99,22 @@ Graph::~Graph()
 
 bool Graph::createGraph(DataContainer *objectManager)
 {
-    m_obj_mngr = objectManager;
+    m_data_containter = objectManager;
     bool result;
     switch(m_gType) {
         case Graph_t::NODE_NODE :
         {
-            result = parseNODE_NODE(objectManager);
+           // result = parseNODE_NODE(objectManager);
             break;
         }
         case Graph_t::ALL_SKELETONS :
         {
-            result = parseSKELETON(objectManager);
+            //result = parseSKELETON(objectManager);
             break;
         }
         case Graph_t::NODE_SKELETON :
         {
-            result = parseSKELETON(objectManager);
+            //result = parseSKELETON(objectManager);
             break;
         }
     }
@@ -122,38 +122,24 @@ bool Graph::createGraph(DataContainer *objectManager)
     return true;
 }
 
+// to construct nodes list
+// I need: hvgxID, type, center,
 // init m_neurites_nodes ssbo here
-bool Graph::parseNODE_NODE(DataContainer *objectManager)
+
+// edges simple just end points
+bool Graph::parseNODE_NODE(std::vector<Node*> neurites_nodes, std::vector<QVector2D> neurites_edges)
 {
-    // iterate over mesh''s objects, and add all the center nodes except astrocyte
-    // create the a node for each object and store it in neurites_nodes
-    std::map<int, Object*> objects_map = objectManager->getObjectsMap();
-    // create skeleton for each obeject and add it to skeleton_segments
-
-    // create connectivity information (neurite-neurite) and add it to neurites_conn_edges
-    std::vector<QVector2D> edges_info = objectManager->getNeuritesEdges();
-
-
-    // add nodes
-    for ( auto iter = objects_map.begin(); iter != objects_map.end(); iter++) {
-        Object *objectP = (*iter).second;
-        int nID = objectP->getHVGXID();
-        Object_t type = objectP->getObjectType();
-        if (type == Object_t::ASTROCYTE)
-            continue;
-        if (type == Object_t::SYNAPSE || type == Object_t::MITO)
-            continue;
-        QVector4D center = objectP->getCenter();
-        std::pair<int, int> id_tuple =  std::make_pair(nID, -1);
-        this->addNode(id_tuple, center.x(), center.y(), center.z());
+    for (int i = 0; i < neurites_nodes.size(); i++) {
+        Node *node = neurites_nodes[i];
+        QVector3D position = node->get3DPosition();
+        std::pair<int, int> id_tuple =  std::make_pair(node->getID(), -1);
+        this->addNode(id_tuple, position.x(), position.y(), position.z());
     }
 
-    // add edges
-    for (int i = 0; i < edges_info.size(); ++i) {
-        int eID = i;
-        int nID1 = edges_info[i].x();
-        int nID2 = edges_info[i].y();
-        this->addEdge(eID, -1, nID1, nID2);
+    for (int i = 0; i < neurites_edges.size(); i++) {
+        int nID1 = neurites_edges[i].x();
+        int nID2 = neurites_edges[i].y();
+        this->addEdge(i, -1, nID1, nID2);
     }
 
     return true;
@@ -162,41 +148,38 @@ bool Graph::parseNODE_NODE(DataContainer *objectManager)
 // I need away to mark all nodes skeleton with the same ID,
 // and give each node unique ID
 // combination? <hvgxID, local node ID>
-bool Graph::parseSKELETON(DataContainer *objectManager)
+
+// to construct skeleton list
+// I need: hvgxID, type, center,
+// init m_neurites_nodes ssbo here
+
+// edges simple just end points
+
+// std::pair<int, int> id_tuple, float x, float y, float z
+// int eID, int hvgxID, int nID1, int nID2
+bool Graph::parseSKELETON(std::vector<Node*> neurites_skeletons_nodes,
+                          std::vector<QVector4D> neurites_skeletons_edges)
 {
     qDebug() << "parseSKELETON";
     // eventually all graph nodes are in one map with unique IDs regardless of which skeleton
     // they belong to.
     // iterate over the objets
-    std::map<int, Object*> objects_map = objectManager->getObjectsMap();
-    for ( auto iter = objects_map.begin(); iter != objects_map.end(); iter++) {
-        Object *objectP = (*iter).second;
-        int hvgxID = objectP->getHVGXID();
-        qDebug() << "object ID: " << hvgxID;
-        // get skeleton of the object
-        Skeleton *skeleton = objectP->getSkeleton();
-        std::vector<QVector3D> nodes3D = skeleton->getGraphNodes();
-        std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
-
-        qDebug() << nodes3D.size() << " " << edges2D.size();
-        // add nodes
-        for ( int i = 0; i < nodes3D.size(); i++) {
-            std::pair<int, int> id_tuple =  std::make_pair(hvgxID, i);
-            this->addNode(id_tuple, nodes3D[i].x(), nodes3D[i].y(), nodes3D[i].z());
-        }
-
-        // add edges
-        for (int i = 0; i < edges2D.size(); ++i) {
-            int eID = i;
-            int nID1 = edges2D[i].x();
-            int nID2 = edges2D[i].y();
-            this->addEdge(eID, hvgxID, nID1, nID2);
-        }
-
-       // break; // test one skeleton
+    for (int i = 0; i < neurites_skeletons_nodes.size(); i++) {
+        Node *node = neurites_skeletons_nodes[i];
+        QVector3D position = node->get3DPosition();
+        std::pair<int, int> id_tuple =  std::make_pair(node->getID(),  node->getIdxID());
+        this->addNode(id_tuple, position.x(), position.y(), position.z());
     }
-    return true;
 
+    for (int i = 0; i < neurites_skeletons_edges.size(); i++) {
+        int j = neurites_skeletons_edges[i].x();
+        int hvgxID = neurites_skeletons_edges[i].y();
+        int nID1 = neurites_skeletons_edges[i].z();
+        int nID2 = neurites_skeletons_edges[i].w();
+        this->addEdge(j, hvgxID, nID1, nID2);
+    }
+
+    return true;
 }
 
 
@@ -204,22 +187,18 @@ Node* Graph::addNode(std::pair<int, int> id_tuple, float x, float y, float z)
 {
     size_t idxID = id_tuple.second;
     int nID = id_tuple.first;
+    qDebug() << "add nodes: " << nID <<  " " <<  idxID <<  " " << x <<  " " << y << " " << z;
     Node* newNode = new Node(nID, idxID, x, y, z);
     m_nodes[id_tuple] = newNode; // these IDs should be unique per graph!q
     m_nodesCounter++;
-
     return newNode;
 }
 
 
 Edge* Graph::addEdge(int eID, int hvgxID, int nID1, int nID2)
 {
-    if (nID1 == nID2) {
-        m_dupEdges++;
-        return NULL;
-    }
-
     std::pair<int, int> id_tuple1, id_tuple2;
+
 
     if (m_gType == Graph_t::NODE_NODE) {
         id_tuple1 =  std::make_pair(nID1, -1); // this could be between two different hvgx IDs
@@ -227,6 +206,12 @@ Edge* Graph::addEdge(int eID, int hvgxID, int nID1, int nID2)
     } else {
         id_tuple1 =  std::make_pair(hvgxID, nID1);
         id_tuple2 =  std::make_pair(hvgxID, nID2);
+    }
+
+    if (id_tuple1 == id_tuple2) {
+        qDebug() << "Duplicates " << nID1 << " " << nID2;
+        m_dupEdges++;
+        return NULL;
     }
 
     Node *n1 = getNode(id_tuple1);
@@ -244,9 +229,6 @@ Edge* Graph::addEdge(int eID, int hvgxID, int nID1, int nID2)
     n2->addEdge(newEdge);
 
     m_edges[newEdge->getID()] = newEdge; // ID should be unique then!
-
-//    m_bufferIndices.push_back(n1->getIdxID());
-//    m_bufferIndices.push_back(n2->getIdxID());
 
     return newEdge;
 }
@@ -305,10 +287,8 @@ void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
     hashGrid->clear();
     for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
         Node *node = (*iter).second;
-        qDebug() << "reset node " ;
 
         node->resetLayout(rotationMatrix);
-        qDebug() << "reset rotationMatrix " ;
         update_node_data(node);
 
         // add to the spatial hash
@@ -322,49 +302,47 @@ void Graph::update_node_data(Node* node)
     if (m_opengl_mngr == NULL)
         return;
 
-    qDebug() << "update node: " << node->getID();
 
-    // depends on graph type, if node-ndoe
     switch(m_gType) {
-    case Graph_t::NODE_NODE :
-    {
-        // layout1 using hvgx ID and -1
-        m_opengl_mngr->update_ssbo_data_layout1(node->getLayoutedPosition(), node->getID() /*hvgx*/);
-        break;
-    }
-    case Graph_t::NODE_SKELETON :
-    {
-        // if node belong to neurite then
-        // layout2 using hvgx ID and -1
-
-        // else, astrocyte skeleton
-        if (node->getNodeType() == Node_t::ASTROCYTE) {
-            // update astrocyte skeleton
-            // layout 2
-            qDebug() << "Update skeleton layout 2 vertex";
-            m_opengl_mngr->update_skeleton_layout2(node->getLayoutedPosition(), node->getIdxID(), node->getID() /*hvgx*/);
-        } else {
-            m_opengl_mngr->update_ssbo_data_layout2(node->getLayoutedPosition(), node->getID() /*hvgx*/);
+        case Graph_t::NODE_NODE :
+        {
+            // layout1 using hvgx ID and -1
+            m_opengl_mngr->update_ssbo_data_layout1(node->getLayoutedPosition(),
+                                                    node->getID() /*hvgx*/);
+            break;
         }
+        case Graph_t::NODE_SKELETON :
+        {
+            // if node belong to neurite then
+            // layout2 using hvgx ID and -1
 
-        break;
-    }
-    case Graph_t::NEURITE_SKELETONS :
-    {
-        // update skeleton node
-        // layout 3
-        m_opengl_mngr->update_skeleton_layout3(node->getLayoutedPosition(), node->getIdxID(), node->getID() /*hvgx*/);
-        break;
-    }
-    case Graph_t::ALL_SKELETONS :
-    {
-        // update skeleton node
-        // layout 1
-        m_opengl_mngr->update_skeleton_layout1(node->getLayoutedPosition(), node->getIdxID(), node->getID() /*hvgx*/);
-        break;
-    } }
+            // else, astrocyte skeleton
+            if (node->getNodeType() == Node_t::ASTROCYTE) {
+                // update astrocyte skeleton
+                // layout 2
+                qDebug() << "Update skeleton layout 2 vertex";
+                m_opengl_mngr->update_skeleton_layout2(node->getLayoutedPosition(),
+                                                       node->getIdxID(), node->getID() /*hvgx*/);
+            } else {
+                m_opengl_mngr->update_ssbo_data_layout2(node->getLayoutedPosition(),
+                                                        node->getID() /*hvgx*/);
+            }
 
-    // m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
+            break;
+        }
+        case Graph_t::NEURITE_SKELETONS :
+        {
+            m_opengl_mngr->update_skeleton_layout3(node->getLayoutedPosition(),
+                                                   node->getIdxID(), node->getID() /*hvgx*/);
+            break;
+        }
+        case Graph_t::ALL_SKELETONS :
+        {
+            m_opengl_mngr->update_skeleton_layout1(node->getLayoutedPosition(),
+                                                   node->getIdxID(), node->getID() /*hvgx*/);
+            break;
+        }
+    }
 }
 
 void Graph::runforceDirectedLayout()
@@ -392,14 +370,15 @@ void Graph::runforceDirectedLayout()
 
                // Node *node2 = (*iter2).second;
                 Node *node2 = (*iter2);
-                if ( node1->getID() == node2->getID() )
-                    continue;
+
+                // be careful with this condition, because a skeleton has the same ID for all its nodes
+                //if ( node1->getID() == node2->getID() ) {
+                //    continue;
+                //}
                 // this one,
                 repulseNodes(node1, node2, m_Cr * k);
             }
         }
-
-
 
         // forcs due to edge attraction
         for ( auto iter = m_edges.begin(); iter != m_edges.end(); iter++ ) {
@@ -451,16 +430,15 @@ void Graph::runforceDirectedLayout()
             node->addToLayoutedPosition(QVector2D(xMove, yMove)); // add to 2D position
 
             // update node value in m_nodes buffer
-
             update_node_data(node);
 
             // reset node force
             node->resetForce();
+
             // update node position in spatial hash
             updateNode(node);
         }
     } // end iterations
-
 
 quit:
 qDebug() << "Exist Thread" ;
@@ -551,7 +529,6 @@ QVector2D Graph::repulsiveForce(float x1, float y1, float x2, float y2, float k)
     // Coulomb's Law: F = k(Qq/r^2)
 
     if (distance <= m_AABBdim) {
-       qDebug() << "distance <= m_MAX_DISTANCE: " << distance;
         repulsion =    (k * k) / distance;
        // repulsion =    (k * k) * (distance - m_MAX_DISTANCE);
 

@@ -57,7 +57,7 @@ void main() {
     vec4 alpha6 = space_properties.render_type; // additional info
 
     color_val = SSBO_data[ID].color;
-    gl_PointSize = 5;
+    gl_PointSize = 2;
 
     EmitVertex();
     EndPrimitive();

@@ -72,7 +72,7 @@
  */
 enum class Graph_t { NODE_NODE = 0, NODE_SKELETON = 1,  ALL_SKELETONS = 2, NEURITE_SKELETONS =3};
 
-
+class Node;
 class Graph
 {
 public:
@@ -80,8 +80,8 @@ public:
     ~Graph();
 
     bool createGraph(DataContainer *objectManager);
-    bool parseNODE_NODE(DataContainer *objectManager);
-    bool parseSKELETON(DataContainer *objectManager);
+    bool parseNODE_NODE(std::vector<Node*> neurites_nodes, std::vector<QVector2D> neurites_edges);
+    bool parseSKELETON(std::vector<Node*> neurites_skeletons_nodes, std::vector<QVector4D> neurites_skeletons_edges);
 
     Node* addNode(std::pair<int, int> id_tuple, float x, float y, float z);
     Edge* addEdge(int eID, int hvgxID, int nID1, int nID2);

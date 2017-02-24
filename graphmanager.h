@@ -1,3 +1,6 @@
+// this should only handle the 4 graphs, their construction, layouting algorithms
+// and updating their data, and drawing
+
 #ifndef GRAPHMANAGER_H
 #define GRAPHMANAGER_H
 
