@@ -11,12 +11,14 @@ GraphManager::GraphManager(DataContainer *objectManager, OpenGLManager *opengl_m
 GraphManager::~GraphManager()
 {
     qDebug() << "~GraphManager()";
-    stopForceDirectedLayout(0);
-    if (m_layout_thread1.joinable()) {
-        m_layout_thread1.join();
-    }
+    for (int i = 0; i < max_graphs; i++) {
+        stopForceDirectedLayout(i);
+        if (m_layout_threads[i].joinable()) {
+            m_layout_threads[i].join();
+        }
 
-    delete m_graph[0]; // todo: if more than one iterate over all
+        delete m_graph[i]; // todo: if more than one iterate over all
+    }
 }
 
 void GraphManager::update2Dflag(bool is2D, struct GlobalUniforms uniforms)
@@ -27,17 +29,20 @@ void GraphManager::update2Dflag(bool is2D, struct GlobalUniforms uniforms)
         // reset the cooridnates of the graphs
         QMatrix4x4 identitiy;
         m_graph[0]->resetCoordinates(identitiy); // for now later I will have two separate variables one for 2D one for 3D
+        m_graph[1]->resetCoordinates(identitiy); // for now later I will have two separate variables one for 2D one for 3D
+        m_graph[2]->resetCoordinates(identitiy); // for now later I will have two separate variables one for 2D one for 3D
+        m_graph[3]->resetCoordinates(identitiy); // for now later I will have two separate variables one for 2D one for 3D
 
     } else {
         // reset graph
         m_graph[0]->resetCoordinates(uniforms.rMatrix);
+        m_graph[1]->resetCoordinates(uniforms.rMatrix);
+        m_graph[2]->resetCoordinates(uniforms.rMatrix);
+        m_graph[3]->resetCoordinates(uniforms.rMatrix);
+
     }
 }
 // I have 4 graphs:
-// so here extract the object nodes in a list because more than a graph use them
-// extract skeletons graph in another list
-// extract connectivity between neurites in a list
-// extract connectivity between astrocyte and neurties in another list
 // 1) all skeleton with astrocyte
     // (nodes are object skeleton nodes, and edges are the edges that connect them)
     // + connection points between astrocyte and neurites if that vertex is close to the astrocyte
@@ -52,7 +57,6 @@ void GraphManager::update2Dflag(bool is2D, struct GlobalUniforms uniforms)
     // connectivity info from them
 void GraphManager::ExtractGraphFromMesh()
 {
-
      // render skeletons then interpolate to nodes by accessing the nodes positions from ssbo
      // use object manager to initialize them
 
@@ -64,8 +68,11 @@ void GraphManager::ExtractGraphFromMesh()
     // std::pair<int, int> id_tuple, float x, float y, float z
     // int eID, int hvgxID, int nID1, int nID2
     std::vector<Node*> neurites_nodes;
+    std::vector<QVector2D> edges_info = m_data_containter->getNeuritesEdges();
+
     std::vector<Node*> neurites_skeletons_nodes;
     std::vector<QVector4D> neurites_skeletons_edges;
+
     std::vector<Node*> astrocyte_skeleton_nodes;
     std::vector<QVector4D> astrocyte_skeleton_edges;
 
@@ -73,7 +80,6 @@ void GraphManager::ExtractGraphFromMesh()
     // create skeleton for each obeject and add it to skeleton_segments
 
     // create connectivity information (neurite-neurite) and add it to neurites_conn_edges
-    std::vector<QVector2D> edges_info = m_data_containter->getNeuritesEdges();
     // add nodes
     for ( auto iter = objects_map.begin(); iter != objects_map.end(); iter++) {
         Object *objectP = (*iter).second;
@@ -118,15 +124,33 @@ void GraphManager::ExtractGraphFromMesh()
     }
 
 
-//     m_graph[0] = new Graph( Graph_t::NODE_NODE, m_opengl_mngr ); // neurite-neurite
-//     m_graph[1] = new Graph( Graph_t::NODE_SKELETON ); // neurite-astrocyte skeleton
-     m_graph[0] = new Graph( Graph_t::ALL_SKELETONS, m_opengl_mngr ); //  neurites skeletons - astrocyte skeleton
-//     m_graph[3] = new Graph( Graph_t::NEURITE_SKELETONS ); // neuries skeletons
+     m_graph[0] = new Graph( Graph_t::NODE_NODE, m_opengl_mngr ); // neurite-neurite
+     m_graph[0]->parseNODE_NODE(neurites_nodes, edges_info);
 
-//     m_graph[0]->parseNODE_NODE(neurites_nodes, edges_info);
-//     m_graph[1]->createGraph(m_data_containter);
-     m_graph[0]->parseSKELETON(neurites_skeletons_nodes, neurites_skeletons_edges);
-//     m_graph[3]->createGraph(m_data_containter);
+     m_graph[1] = new Graph( Graph_t::NODE_SKELETON , m_opengl_mngr ); // neurite-astrocyte skeleton
+     m_graph[1]->parseSKELETON(astrocyte_skeleton_nodes, astrocyte_skeleton_edges);
+     m_graph[1]->parseNODE_NODE(neurites_nodes, edges_info);
+
+     m_graph[2] = new Graph( Graph_t::ALL_SKELETONS, m_opengl_mngr ); //  neurites skeletons - astrocyte skeleton
+     m_graph[2]->parseSKELETON(astrocyte_skeleton_nodes, astrocyte_skeleton_edges);
+     m_graph[2]->parseSKELETON(neurites_skeletons_nodes, neurites_skeletons_edges);
+
+     m_graph[3] = new Graph( Graph_t::NEURITE_SKELETONS, m_opengl_mngr  ); // neuries skeletons
+     m_graph[3]->parseSKELETON(neurites_skeletons_nodes, neurites_skeletons_edges);
+
+     // delete the nodes and edges
+    for (std::size_t i = 0; i != neurites_nodes.size(); i++) {
+        delete neurites_nodes[i];
+    }
+
+    for (std::size_t i = 0; i != neurites_skeletons_nodes.size(); i++) {
+        delete neurites_skeletons_nodes[i];
+    }
+
+    for (std::size_t i = 0; i != astrocyte_skeleton_nodes.size(); i++) {
+        delete astrocyte_skeleton_nodes[i];
+    }
+
 }
 
 void GraphManager::stopForceDirectedLayout(int graphIdx)
@@ -136,8 +160,8 @@ void GraphManager::stopForceDirectedLayout(int graphIdx)
     m_graph[graphIdx]->terminateFDL();
     m_FDL_running = false; // todo: get this from the graph itself, since it is per graph, even the thread?
 
-    if (m_layout_thread1.joinable()) {
-        m_layout_thread1.join();
+    if (m_layout_threads[graphIdx].joinable()) {
+        m_layout_threads[graphIdx].join();
     }
 
 }
@@ -148,7 +172,7 @@ void GraphManager::startForceDirectedLayout(int graphIdx)
     stopForceDirectedLayout(graphIdx);
 
     m_FDL_running = true;
-    m_layout_thread1 = std::thread(&Graph::runforceDirectedLayout, m_graph[graphIdx]);
+    m_layout_threads[graphIdx] = std::thread(&Graph::runforceDirectedLayout, m_graph[graphIdx]);
 
 }
 

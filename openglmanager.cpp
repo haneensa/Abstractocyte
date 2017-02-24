@@ -646,11 +646,11 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
 //    // 2) Mesh Points
 //    drawMeshPoints(grid_uniforms);
 //    // 3) Skeleton Points
-//    drawSkeletonPoints(grid_uniforms);
+    drawSkeletonPoints(grid_uniforms);
     // 3) Abstract Skeleton Graph (Nodes and Edges)
     drawSkeletonsGraph(grid_uniforms);
     // 4) Neurites Graph (Nodes and Edges)
-//    drawNeuritesGraph(grid_uniforms);
+    drawNeuritesGraph(grid_uniforms);
 }
 
 void OpenGLManager::updateUniformsLocation(GLuint program)
@@ -732,8 +732,13 @@ void OpenGLManager::update_skeleton_layout2(QVector2D layout2, int node_index, i
         qDebug() << "No Skeleton " << hvgxID;
         return;
     }
-    int nodes_offset = skel->getIndexOffset();
-    m_abstract_skel_nodes[node_index + nodes_offset].layout2 = layout2;
+
+    if (node_index  > m_abstract_skel_nodes.size()) {
+        qDebug() << "out of range " << m_abstract_skel_nodes.size();
+        return;
+    }
+
+    m_abstract_skel_nodes[node_index].layout2 = layout2;
 }
 
 void OpenGLManager::update_skeleton_layout3(QVector2D layout3,int node_index, int hvgxID)
@@ -750,6 +755,11 @@ void OpenGLManager::update_skeleton_layout3(QVector2D layout3,int node_index, in
         qDebug() << "No Skeleton " << hvgxID;
         return;
     }
-    int nodes_offset = skel->getIndexOffset();
-    m_abstract_skel_nodes[node_index + nodes_offset].layout3 = layout3;
+
+    if (node_index  > m_abstract_skel_nodes.size()) {
+        qDebug() << "out of range " << m_abstract_skel_nodes.size();
+        return;
+    }
+
+    m_abstract_skel_nodes[node_index].layout3 = layout3;
 }

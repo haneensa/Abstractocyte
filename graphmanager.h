@@ -54,7 +54,7 @@ protected:
     Graph                               *m_graph[max_graphs];
 
     // thread management
-    std::thread                         m_layout_thread1;
+    std::thread                         m_layout_threads[max_graphs];
     bool                                m_FDL_running;
     bool                                m_2D;
 };

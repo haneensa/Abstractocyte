@@ -251,11 +251,19 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
                 // pass rotation matrix
                 m_FDL_running = true;   // run force layout
                 m_graphManager->startForceDirectedLayout(0);
+                m_graphManager->startForceDirectedLayout(1);
+                m_graphManager->startForceDirectedLayout(2);
+                m_graphManager->startForceDirectedLayout(3);
+
             }
         break;
         case(Qt::Key_X):
             timer->stop();
             m_graphManager->stopForceDirectedLayout(0);
+            m_graphManager->stopForceDirectedLayout(1);
+            m_graphManager->stopForceDirectedLayout(2);
+            m_graphManager->stopForceDirectedLayout(3);
+
             m_FDL_running = false;
         break;
     }

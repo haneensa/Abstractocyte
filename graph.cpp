@@ -99,25 +99,6 @@ Graph::~Graph()
 
 bool Graph::createGraph(DataContainer *objectManager)
 {
-    m_data_containter = objectManager;
-    bool result;
-    switch(m_gType) {
-        case Graph_t::NODE_NODE :
-        {
-           // result = parseNODE_NODE(objectManager);
-            break;
-        }
-        case Graph_t::ALL_SKELETONS :
-        {
-            //result = parseSKELETON(objectManager);
-            break;
-        }
-        case Graph_t::NODE_SKELETON :
-        {
-            //result = parseSKELETON(objectManager);
-            break;
-        }
-    }
 
     return true;
 }
