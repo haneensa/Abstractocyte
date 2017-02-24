@@ -28,6 +28,7 @@ DataContainer::~DataContainer()
     }
 }
 
+// need away to optimize this!!!!!
 bool DataContainer::importXML(QString path)
 {
     qDebug() << "Func: importXML";

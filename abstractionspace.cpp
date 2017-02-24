@@ -1,6 +1,10 @@
 #include "abstractionspace.h"
 #include <QDebug>
 
+/*
+ * Todo: add the interpolation states for the abstract graph and the 3D data
+ * complete the space
+ */
 AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     : m_xaxis(xdim),
       m_yaxis(ydim),

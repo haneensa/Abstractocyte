@@ -8,6 +8,12 @@ layout (line_strip, max_vertices = 2) out;
 in int          V_ID[];
 out vec4        color_val;
 
+in vec4 v_vertex[];
+in vec4 v_layout1[];
+in vec4 v_layout2[];
+in vec4 v_layout3[];
+
+
 uniform int     y_axis;
 uniform int     x_axis;
 
