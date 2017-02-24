@@ -39,9 +39,26 @@ void main(void)
     mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
     vec3 position;
 
+    // between (60, 60) and (80, 80)
+    // vec4 new_position = mix(vertex , layout1, position_intp);
+
+    // between  (80, 80) and (100, 80)
+    // vec4 new_position = mix(layout1 , layout2, position_intp);
+    // vec4 new_position = mix(layout1 , center, position_intp);
+
+    // between (80, 80) and (80, 100)
+    // vec4 new_position = mix(layout1 , layout3, position_intp);
+
+    // between (80, 100) and (100, 100)
+    // vec4 new_position = mix(layout3 , center, position_intp);
+
+    // between (100, 80) and (100, 100)
+    // vec4 new_position = mix(layout2 , center, position_intp);
+
+
     // todo: interpolate between different layouts based on state
     if (is2D == 1) {
-        position = vec3(layout2, 0.0);
+        position = vec3(layout1, 0.0);
     } else {
         position =  vertex.xyz ;
     }

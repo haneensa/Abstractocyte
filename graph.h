@@ -149,7 +149,7 @@ protected:
 
     Graph_t                                         m_gType;
 
-    DataContainer                                   *m_obj_mngr;
+    DataContainer                                   *m_data_containter;
     OpenGLManager                                   *m_opengl_mngr;
 
     std::map<std::pair<int, int>, Node*>            m_nodes;    // IDs are unique to identify nodes

@@ -139,6 +139,8 @@ bool Graph::parseNODE_NODE(DataContainer *objectManager)
         Object *objectP = (*iter).second;
         int nID = objectP->getHVGXID();
         Object_t type = objectP->getObjectType();
+        if (type == Object_t::ASTROCYTE)
+            continue;
         if (type == Object_t::SYNAPSE || type == Object_t::MITO)
             continue;
         QVector4D center = objectP->getCenter();
@@ -299,13 +301,16 @@ void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
     if (m_opengl_mngr == NULL)
         return;
 
+    qDebug() << "2D";
     hashGrid->clear();
     for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
         Node *node = (*iter).second;
+        qDebug() << "reset node " ;
+
         node->resetLayout(rotationMatrix);
-        m_opengl_mngr->update_ssbo_data_layout1(node->getLayoutedPosition(), node->getID() /*hvgx*/);
-        m_opengl_mngr->update_ssbo_data_layout2(node->getLayoutedPosition(), node->getID() /*hvgx*/);
-        //m_bufferNodes[node->getIdxID()].coord3D = node->getLayoutedPosition();
+        qDebug() << "reset rotationMatrix " ;
+        update_node_data(node);
+
         // add to the spatial hash
         hashGrid->insert((*iter).second);
     }
@@ -316,6 +321,8 @@ void Graph::update_node_data(Node* node)
 {
     if (m_opengl_mngr == NULL)
         return;
+
+    qDebug() << "update node: " << node->getID();
 
     // depends on graph type, if node-ndoe
     switch(m_gType) {

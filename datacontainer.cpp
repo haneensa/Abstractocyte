@@ -1,6 +1,8 @@
 #include <chrono>
 #include "datacontainer.h"
 
+// todo: each object has to have all elements (mesh, skeleton, ..)
+// if it doesnt then take care of this case (missing data)
 /*
  * m_objects -> object class for each object (astrocyte, dendrite, ..)
  *           -> get from this the indices of the mesh
@@ -10,11 +12,11 @@ DataContainer::DataContainer()
 {
     m_indices_size = 0;
     m_skeleton_points_size = 0;
-    m_limit = 20;
+    m_limit = 100;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
-   importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+   //importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
    importXML("://scripts/m3_neurites.xml");    // neurites time:  28802 ms
 }
 

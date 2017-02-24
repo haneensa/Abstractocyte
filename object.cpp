@@ -8,7 +8,7 @@
 #include <QDebug>
 #include <algorithm>
 
-#include "colors.h"
+#include "colors.h" //bouton1insolid.044
 
 Object::Object(std::string name, int ID)
 {

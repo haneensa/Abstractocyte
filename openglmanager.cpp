@@ -17,21 +17,20 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger)
 
 OpenGLManager::~OpenGLManager()
 {
-    glDeleteProgram(m_program_skeleton);
+    if (m_glFunctionsSet == false)
+        return;
 
+    glDeleteProgram(m_program_skeleton);
     glDeleteProgram(m_program_mesh);
     glDeleteProgram(m_program_mesh_points);
 
     m_vao_mesh.destroy();
     m_vbo_mesh.destroy();
 
-    // destroy all vbo and vao and programs and graphs
+    m_NeuritesGraphVAO.destroy();
+    m_NeuritesNodesVBO.destroy();
+    m_NeuritesIndexVBO.destroy();
 
-    if (m_glFunctionsSet == true) {
-        m_NeuritesGraphVAO.destroy();
-        m_NeuritesNodesVBO.destroy();
-        m_NeuritesIndexVBO.destroy();
-    }
 }
 
 bool OpenGLManager::initOpenGLFunctions()
@@ -59,14 +58,14 @@ bool OpenGLManager::initSSBO()
     if (m_glFunctionsSet == false)
         return false;
 
-    qDebug() <<  " m_buffer_data.size() : " << m_ssbo_data.size() ;
+    qDebug() <<  " m_ssbo_data.size() : " << m_ssbo_data.size() ;
     int bufferSize =  m_ssbo_data.size() * sizeof(struct ssbo_mesh);
 
     glGenBuffers(1, &m_ssbo);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize , NULL, GL_DYNAMIC_COPY);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_bindIdx, m_ssbo);
-    qDebug() << "mesh buffer size: " << bufferSize;
+    qDebug() << "m_ssbo_data buffer size: " << bufferSize;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     write_ssbo_data();
@@ -85,6 +84,15 @@ void OpenGLManager::write_ssbo_data()
 }
 
 
+/*
+ * allocates: m_vbo_skeleton with skeleton points
+ * allocates: m_vbo_IndexMesh with mesh indices
+ * allocates: m_ssbo_data with object data
+ * allocates: m_neurites_nodes with neurites IDs
+ * allocates: m_neurites_edges with connectivity info between m_neurites_nodes using their index in the list
+ * allocates: m_abstract_skel_nodes with abstract skeleton nodes
+ * allocates: m_abstract_skel_edges of abstract skeleton
+ * */
 void OpenGLManager::fillVBOsData()
 {
     m_ssbo_data.resize(1000);
@@ -106,18 +114,13 @@ void OpenGLManager::fillVBOsData()
         Object *object_p = (*iter).second;
         int ID = object_p->getHVGXID();
 
-        // todo: fill ssbo here
-        if (m_ssbo_data.size() < ID) {
+        /* fill ssbo data per object */
+        if (m_ssbo_data.size() <= ID) {
             qDebug() << "resizing m_ssbo_data.";
             m_ssbo_data.resize(ID + 100);
         }
 
         m_ssbo_data[ID] = object_p->getSSBOData();
-
-        if (object_p->getObjectType() == Object_t::MITO  || object_p->getObjectType()  == Object_t::SYNAPSE   ) {
-              continue;
-        }
-
 
         qDebug() << " allocating: " << object_p->getName().data();
 
@@ -126,19 +129,22 @@ void OpenGLManager::fillVBOsData()
         m_vbo_IndexMesh.write(vbo_IndexMesh_offset, object_p->get_indices(), vbo_IndexMesh_count);
         vbo_IndexMesh_offset += vbo_IndexMesh_count;
 
-        // allocating skeleton vertices
+        // allocating skeleton vertices, if this object hash no skeleton, then this will return and wont write anything
         int vbo_skeleton_count = object_p->writeSkeletontoVBO(m_vbo_skeleton, vbo_skeleton_offset);
         vbo_skeleton_offset += vbo_skeleton_count;
 
         // allocate neurites nodes place holders
-        object_p->setNodeIdx(m_neurites_nodes.size());
-        m_neurites_nodes.push_back(ID);
+        if (object_p->getObjectType() != Object_t::ASTROCYTE  || object_p->getObjectType() != Object_t::MITO  || object_p->getObjectType()  != Object_t::SYNAPSE) {
+            object_p->setNodeIdx(m_neurites_nodes.size());
+            m_neurites_nodes.push_back(ID);
+        }
 
 
         // initialize abstract skeleton data
         // find a way to fill the skeleton with data
         // get skeleton of the object
-        Skeleton *skeleton = object_p->getSkeleton();
+        // if no skeleton, this will be skipped, thus no graph for this object
+        Skeleton *skeleton = object_p->getSkeleton(); // not null as long as the object exist
         std::vector<QVector3D> nodes3D = skeleton->getGraphNodes();
         std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
         object_p->setSkeletonOffset(m_abstract_skel_nodes.size());
@@ -153,6 +159,7 @@ void OpenGLManager::fillVBOsData()
         int skeleton_offset = object_p->getSkeletonOffset();
         // add edges
         for (int i = 0; i < edges2D.size(); ++i) {
+
             int nID1 = edges2D[i].x() + skeleton_offset;
             int nID2 = edges2D[i].y() + skeleton_offset;
             m_abstract_skel_edges.push_back(nID1);
@@ -175,6 +182,13 @@ void OpenGLManager::fillVBOsData()
 
     m_vbo_IndexMesh.release();
     m_vbo_skeleton.release();
+
+    qDebug() << "m_abstract_skel_nodes.size(): " << m_abstract_skel_nodes.size();
+    qDebug() << "m_abstract_skel_edges.size(): " << m_abstract_skel_edges.size();
+    qDebug() << "m_neurites_edges.size(): " << m_neurites_edges.size();
+    qDebug() << "m_neurites_nodes.size(): " << m_neurites_nodes.size();
+
+
 }
 
 bool OpenGLManager::initMeshVertexAttrib()
@@ -198,8 +212,7 @@ bool OpenGLManager::initMeshVertexAttrib()
 
 bool OpenGLManager::initMeshTrianglesShaders()
 {
-    /* start initializing mesh */
-    qDebug() << "Initializing MESH";
+    qDebug() << "initMeshTrianglesShaders";
     m_program_mesh = glCreateProgram();
     bool res = initShader(m_program_mesh, ":/shaders/mesh_vert.glsl",
                                           ":/shaders/mesh_geom.glsl",
@@ -349,16 +362,16 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     if (m_glFunctionsSet == false)
         return false;
 
-    m_program_skeletons_index = glCreateProgram();
-    bool res = initShader(m_program_skeletons_index,
+    m_program_skeletons_nodes = glCreateProgram();
+    bool res = initShader(m_program_skeletons_nodes,
                           ":/shaders/abstract_skeleton_node_vert.glsl",
                           ":/shaders/nodes_geom.glsl",
                           ":/shaders/nodes_frag.glsl");
     if (res == false)
         return res;
 
-    m_program_neurites_index = glCreateProgram();
-    res = initShader(m_program_neurites_index,
+    m_program_skeletons_index = glCreateProgram();
+    res = initShader(m_program_skeletons_index,
                      ":/shaders/abstract_skeleton_node_vert.glsl",
                      ":/shaders/lines_geom.glsl",
                      ":/shaders/lines_frag.glsl");
@@ -367,17 +380,16 @@ bool OpenGLManager::initAbstractSkeletonShaders()
 
     m_SkeletonsGraphVAO.create();
     m_SkeletonsGraphVAO.bind();
-
+    GL_Error();
     m_SkeletonsNodesVBO.create();
     m_SkeletonsNodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
     m_SkeletonsNodesVBO.bind();
 
     m_SkeletonsNodesVBO.allocate( m_abstract_skel_nodes.data(),
-                                  m_abstract_skel_nodes.size() *
-                                  sizeof(struct AbstractSkelNode) );
-
-    glUseProgram(m_program_neurites_nodes);
+                                  m_abstract_skel_nodes.size() * sizeof(struct AbstractSkelNode) );
     GL_Error();
+
+    glUseProgram(m_program_skeletons_nodes);
 
     initSkeletonsVertexAttribPointer();
 
@@ -391,7 +403,7 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     m_SkeletonsIndexVBO.allocate( m_abstract_skel_edges.data(),
                                   m_abstract_skel_edges.size() * sizeof(GLuint) );
 
-    glUseProgram(m_program_neurites_index);
+    glUseProgram(m_program_skeletons_index);
 
 
     m_SkeletonsIndexVBO.release();
@@ -523,7 +535,7 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
     if (m_glFunctionsSet == false)
         return;
 
-   // m_obj_mngr->write_ssbo_data();
+    write_ssbo_data();
 
     m_NeuritesGraphVAO.bind();
     m_NeuritesNodesVBO.bind();
@@ -539,7 +551,7 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
     m_NeuritesIndexVBO.bind();
 
     glUseProgram(m_program_neurites_index);
-    updateUniformsLocation(m_program_neurites_index);
+    updateAbstractUniformsLocation(m_program_neurites_index);
 
     glLineWidth(10.0f);
     glDrawElements(GL_LINES,  m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
@@ -560,8 +572,8 @@ void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms)
     m_SkeletonsGraphVAO.bind();
     m_SkeletonsNodesVBO.bind();
 
-    glUseProgram(m_program_neurites_nodes);
-    updateAbstractUniformsLocation(m_program_neurites_nodes);
+    glUseProgram(m_program_skeletons_nodes);
+    updateAbstractUniformsLocation(m_program_skeletons_nodes);
     m_SkeletonsNodesVBO.allocate( m_abstract_skel_nodes.data(),
                                   m_abstract_skel_nodes.size() *
                                   sizeof(struct AbstractSkelNode) );
@@ -570,10 +582,10 @@ void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms)
 
     m_SkeletonsIndexVBO.bind();
 
-    glUseProgram(m_program_neurites_index);
+    glUseProgram(m_program_skeletons_index);
     m_uniforms = grid_uniforms;
 
-    updateUniformsLocation(m_program_neurites_index);
+    updateAbstractUniformsLocation(m_program_skeletons_index);
 
     glLineWidth(10.0f);
     glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
@@ -591,6 +603,8 @@ void OpenGLManager::update2Dflag(bool is2D)
 
     updateAbstractUniformsLocation(m_program_neurites_nodes);
     updateAbstractUniformsLocation(m_program_neurites_index);
+    updateAbstractUniformsLocation(m_program_skeletons_nodes);
+    updateAbstractUniformsLocation(m_program_skeletons_index);
 }
 
 void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
@@ -605,12 +619,14 @@ void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
     int is2D_value;
 
     if (m_2D) { // force directed layout started, them use model without rotation
+        qDebug() << "switch to 2D";
         glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
         is2D_value = 1;
-     } else {
+    } else {
         glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
         is2D_value = 0;
     }
+
     glUniform1iv(is2D, 1, &is2D_value);
 
     glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
@@ -628,16 +644,18 @@ void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
 
 void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
 {
+    m_uniforms = grid_uniforms;
+
     // 1) Mesh Triangles
-    drawMeshTriangles(grid_uniforms);
-    // 2) Mesh Points
-    drawMeshPoints(grid_uniforms);
-    // 3) Skeleton Points
-    drawSkeletonPoints(grid_uniforms);
+//    drawMeshTriangles(grid_uniforms);
+//    // 2) Mesh Points
+//    drawMeshPoints(grid_uniforms);
+//    // 3) Skeleton Points
+//    drawSkeletonPoints(grid_uniforms);
     // 3) Abstract Skeleton Graph (Nodes and Edges)
-    drawSkeletonPoints(grid_uniforms);
+//    drawSkeletonsGraph(grid_uniforms);
     // 4) Neurites Graph (Nodes and Edges)
-    drawSkeletonPoints(grid_uniforms);
+    drawNeuritesGraph(grid_uniforms);
 }
 
 void OpenGLManager::updateUniformsLocation(GLuint program)
@@ -690,6 +708,11 @@ void OpenGLManager::update_skeleton_layout1(QVector2D layout1, int node_index, i
     }
 
     Skeleton *skel = objects_map[hvgxID]->getSkeleton();
+    if (skel == NULL) {
+        qDebug() << "No Skeleton " << hvgxID;
+        return;
+    }
+    qDebug() << "skel not null";
     int nodes_offset = skel->getIndexOffset();
     m_abstract_skel_nodes[node_index + nodes_offset].layout1 = layout1;
 }
@@ -705,6 +728,10 @@ void OpenGLManager::update_skeleton_layout2(QVector2D layout2, int node_index, i
     }
 
     Skeleton *skel = objects_map[hvgxID]->getSkeleton();
+    if (skel == NULL) {
+        qDebug() << "No Skeleton " << hvgxID;
+        return;
+    }
     int nodes_offset = skel->getIndexOffset();
     m_abstract_skel_nodes[node_index + nodes_offset].layout2 = layout2;
 }
@@ -719,6 +746,10 @@ void OpenGLManager::update_skeleton_layout3(QVector2D layout3,int node_index, in
     }
 
     Skeleton *skel = objects_map[hvgxID]->getSkeleton();
+    if (skel == NULL) {
+        qDebug() << "No Skeleton " << hvgxID;
+        return;
+    }
     int nodes_offset = skel->getIndexOffset();
     m_abstract_skel_nodes[node_index + nodes_offset].layout3 = layout3;
 }

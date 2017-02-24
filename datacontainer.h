@@ -28,12 +28,9 @@ public:
     std::map<int, Object*>  getObjectsMap();
     std::vector<QVector2D> getNeuritesEdges();
 
-    // OpenGL initialization
     int getSkeletonPointsSize();
     int getMeshIndicesSize();
     Mesh* getMeshPointer();
-
-    bool filterByType(Object *object_p );
 
 
 protected:

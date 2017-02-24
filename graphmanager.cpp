@@ -1,5 +1,6 @@
 // this should only handle the 4 graphs, their construction, layouting algorithms
 // and updating their data, and drawing
+
 #include "graphmanager.h"
 
 GraphManager::GraphManager(DataContainer *objectManager, OpenGLManager *opengl_mnger)
@@ -21,9 +22,10 @@ GraphManager::~GraphManager()
     delete m_graph[0]; // todo: if more than one iterate over all
 }
 
-void GraphManager::update2Dflag(bool is2D)
+void GraphManager::update2Dflag(bool is2D, struct GlobalUniforms uniforms)
 {
     m_2D = is2D;
+
     if (!m_2D) {
         // reset the cooridnates of the graphs
         QMatrix4x4 identitiy;
@@ -31,7 +33,7 @@ void GraphManager::update2Dflag(bool is2D)
 
     } else {
         // reset graph
-        m_graph[0]->resetCoordinates(m_uniforms.rMatrix);
+        m_graph[0]->resetCoordinates(uniforms.rMatrix);
     }
 }
 // I have 4 graphs:
@@ -59,7 +61,7 @@ void GraphManager::ExtractGraphFromMesh()
 
      // init the edges and they never change except when to display them
 
-     m_graph[0] = new Graph( Graph_t::NODE_SKELETON, m_opengl_mngr ); // neurite-neurite
+     m_graph[0] = new Graph( Graph_t::NODE_NODE, m_opengl_mngr ); // neurite-neurite
 //     m_graph[1] = new Graph( Graph_t::NODE_SKELETON ); // neurite-astrocyte skeleton
 //     m_graph[2] = new Graph( Graph_t::ALL_SKELETONS ); //  neurites skeletons - astrocyte skeleton
 //     m_graph[3] = new Graph( Graph_t::NEURITE_SKELETONS ); // neuries skeletons

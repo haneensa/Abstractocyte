@@ -20,11 +20,11 @@ GLWidget::GLWidget(QWidget *parent)
     m_2dspace = new AbstractionSpace(100, 100);
 
     // objects manager with all objects data
-    m_object_mngr = new DataContainer();
-    m_opengl_mngr = new OpenGLManager(m_object_mngr);
+    m_data_containter = new DataContainer();
+    m_opengl_mngr = new OpenGLManager(m_data_containter);
 
     // graph manager with 4 graphs and 2D space layouted data
-    m_graphManager = new GraphManager( m_object_mngr, m_opengl_mngr );
+    m_graphManager = new GraphManager( m_data_containter, m_opengl_mngr );
     m_graphManager->ExtractGraphFromMesh();
 
     m_distance = 1.0;
@@ -50,7 +50,7 @@ GLWidget::~GLWidget()
     makeCurrent();
     delete m_2dspace;
     delete m_graphManager;
-    delete m_object_mngr;
+    delete m_data_containter;
 
     doneCurrent();
 }
@@ -226,15 +226,16 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
                     m_2D = false;
                     qDebug() << "switching to 3D";
                     m_isRotatable = true;
-                    m_graphManager->update2Dflag(m_2D);
+                    updateMVPAttrib();      // update uniforms
+                    m_graphManager->update2Dflag(m_2D, m_uniforms);
                     m_opengl_mngr->update2Dflag(m_2D);
                 }
             } else {
                 if (!m_2D) {
                     m_2D = true;
-                    m_graphManager->update2Dflag(m_2D);
-                    m_opengl_mngr->update2Dflag(m_2D);
                     updateMVPAttrib();      // update uniforms
+                    m_graphManager->update2Dflag(m_2D, m_uniforms);
+                    m_opengl_mngr->update2Dflag(m_2D);
                 }
             }
 

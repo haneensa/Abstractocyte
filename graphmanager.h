@@ -8,7 +8,10 @@
 #include <thread>
 
 
-// (1) neurite-neurite graph (2) neurite-astrocyte skeleton (3) neurites skeletons - astrocyte skeleton (4) neuries skeletons
+// (1) neurite-neurite graph
+// (2) neurite-astrocyte skeleton
+// (3) neurites skeletons - astrocyte skeleton
+// (4) neuries skeletons
 #define max_graphs 4
 
 class GraphManager
@@ -32,7 +35,7 @@ public:
     void startForceDirectedLayout(int graphIdx);
     void stopForceDirectedLayout(int graphIdx);
 
-    void update2Dflag(bool is2D);
+    void update2Dflag(bool is2D, struct GlobalUniforms uniforms);
 
     void updateGraphParam1(double value);
     void updateGraphParam2(double value);
@@ -43,11 +46,9 @@ public:
     void updateGraphParam7(double value);
 
 protected:
-    DataContainer                       *m_obj_mngr;
+    DataContainer                       *m_data_containter;
     OpenGLManager                       *m_opengl_mngr;
     Graph                               *m_graph[max_graphs];
-
-    struct GlobalUniforms               m_uniforms;
 
     // thread management
     std::thread                         m_layout_thread1;
