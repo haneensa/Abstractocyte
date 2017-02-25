@@ -10,9 +10,6 @@
         <file>shaders/mesh_points_frag.glsl</file>
         <file>shaders/mesh_points_geom.glsl</file>
         <file>shaders/mesh_vert.glsl</file>
-        <file>shaders/nodes_frag.glsl</file>
-        <file>shaders/nodes_geom.glsl</file>
-        <file>shaders/nodes_vert.glsl</file>
         <file>shaders/selection_frag.glsl</file>
         <file>shaders/selection_geom.glsl</file>
         <file>shaders/selection_vert.glsl</file>
@@ -29,6 +26,7 @@
         <file>shaders/space_pointer_geom.glsl</file>
         <file>shaders/space_pointer_vert.glsl</file>
         <file>shaders/abstract_skeleton_node_vert.glsl</file>
-        <file>shaders/abstract_skeleton_node_geom.glsl</file>
+        <file>shaders/abstract_skeleton_line_geom.glsl</file>
+        <file>shaders/nodes_vert.glsl</file>
     </qresource>
 </RCC>

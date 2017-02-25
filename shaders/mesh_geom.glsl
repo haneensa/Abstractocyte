@@ -43,6 +43,7 @@ struct properties {
     vec2 interval;
     vec2 positions;
     vec4 render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
+    vec4 extra_info;  // x: axis type, y, z, w: empty slots
 };
 
 struct ast_neu_properties {
@@ -86,10 +87,6 @@ void main() {
     else
         color_val = SSBO_data[ID].color;
 
-
-    // astrocyte or neurites?
-    int slider = (type == 0) ? y_axis : x_axis;
-
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
     vec2 pos_alpha = space_properties.pos_alpha; // position interpolation (pos1, pos2)
@@ -98,6 +95,9 @@ void main() {
     vec2 interval = space_properties.interval; // additional info
     vec2 positions = space_properties.positions; // additional info
     vec4 render_type = space_properties.render_type; // additional info
+    vec4 extra_info = space_properties.extra_info;   // x: axis type (0: x_axis, 1: y_axis)
+
+    int slider = (extra_info.x == 1) ? y_axis : x_axis;  // need to make this general and not tied to object type
 
     if (render_type.x == 0) {
         return;

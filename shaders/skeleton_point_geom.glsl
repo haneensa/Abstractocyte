@@ -21,6 +21,7 @@ uniform mat4 vMatrix;
 // Projection transformation
 uniform mat4 pMatrix;
 
+// make common header and add all these shared data together!
 struct SSBO_datum {
     vec4 color;
     vec4 center;
@@ -42,6 +43,7 @@ struct properties {
     vec2 interval;
     vec2 positions;
     vec4 render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
+    vec4 extra_info;  // x: axis type, y, z, w: empty slots
 };
 
 struct ast_neu_properties {
@@ -99,7 +101,6 @@ vec4 project_point_to_lint(vec4 A, vec4 B, vec4 p)
 void main() {
     int ID = V_ID[0];
     int type = int(SSBO_data[ID].center.w);     // 0: astrocyte, 1: neurite
-    int slider = (type == 0) ? y_axis : x_axis; // astrocyte or neurites?
 
     color_val = SSBO_data[ID].color;
 
@@ -112,6 +113,9 @@ void main() {
     vec2 interval = space_properties.interval; // additional info
     vec2 positions = space_properties.positions; // additional info
     vec4 render_type = space_properties.render_type; // additional info
+    vec4 extra_info = space_properties.extra_info;   // x: axis type (0: x_axis, 1: y_axis)
+
+    int slider = (extra_info.x == 1) ? y_axis : x_axis;  // need to make this general and not tied to object type
 
     if (render_type.z == 0) {
         return;
@@ -130,7 +134,6 @@ void main() {
     color_intp = translate(slider, leftMin, leftMax, color_alpha.y, color_alpha.x);
 
     gl_PointSize =  translate(slider, leftMin, leftMax, point_size.x, point_size.y);
-
 
     // project the points onto line here
     vec4 A = V_knot1[0];

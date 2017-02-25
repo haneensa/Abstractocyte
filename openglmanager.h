@@ -105,7 +105,6 @@ protected:
     QOpenGLBuffer                       m_SkeletonsIndexVBO;
     QOpenGLBuffer                       m_SkeletonsNodesVBO;
 
-    GLuint                              m_program_skeletons_nodes;
     GLuint                              m_program_skeletons_index;
 
     // ***********  5) Neurites Graph (Nodes and Edges) ***********

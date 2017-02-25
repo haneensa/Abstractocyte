@@ -363,18 +363,11 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     if (m_glFunctionsSet == false)
         return false;
 
-    m_program_skeletons_nodes = glCreateProgram();
-    bool res = initShader(m_program_skeletons_nodes,
-                          ":/shaders/abstract_skeleton_node_vert.glsl",
-                          ":/shaders/abstract_skeleton_node_geom.glsl",
-                          ":/shaders/nodes_frag.glsl");
-    if (res == false)
-        return res;
 
     m_program_skeletons_index = glCreateProgram();
-    res = initShader(m_program_skeletons_index,
+    bool res = initShader(m_program_skeletons_index,
                      ":/shaders/abstract_skeleton_node_vert.glsl",
-                     ":/shaders/lines_geom.glsl",
+                     ":/shaders/abstract_skeleton_line_geom.glsl",
                      ":/shaders/lines_frag.glsl");
     if (res == false)
         return res;
@@ -390,7 +383,6 @@ bool OpenGLManager::initAbstractSkeletonShaders()
                                   m_abstract_skel_nodes.size() * sizeof(struct AbstractSkelNode) );
     GL_Error();
 
-    glUseProgram(m_program_skeletons_nodes);
 
     initSkeletonsVertexAttribPointer();
 
@@ -419,18 +411,8 @@ bool OpenGLManager::initNeuritesGraphShaders()
     if (m_glFunctionsSet == false)
         return false;
 
-    /* neurites nodes */
-    // 1) initialize shaders
-    m_program_neurites_nodes = glCreateProgram();
-    bool res = initShader(m_program_neurites_nodes, ":/shaders/nodes_vert.glsl",
-                                                    ":/shaders/nodes_geom.glsl",
-                                                    ":/shaders/nodes_frag.glsl");
-
-    if (res == false)
-        return res;
-
     m_program_neurites_index = glCreateProgram();
-    res = initShader(m_program_neurites_index,  ":/shaders/nodes_vert.glsl",
+    bool res = initShader(m_program_neurites_index,  ":/shaders/nodes_vert.glsl",
                                        ":/shaders/lines_geom.glsl",
                                        ":/shaders/lines_frag.glsl");
     if (res == false)
@@ -449,7 +431,6 @@ bool OpenGLManager::initNeuritesGraphShaders()
     m_NeuritesNodesVBO.allocate( m_neurites_nodes.data(),
                             m_neurites_nodes.size() * sizeof(GLuint) );
 
-    glUseProgram(m_program_neurites_nodes);
     GL_Error();
 
     initNeuritesVertexAttribPointer();
@@ -531,6 +512,7 @@ void OpenGLManager::drawSkeletonPoints(struct GlobalUniforms grid_uniforms)
 
 }
 
+// only the edges, because the skeleton itself will collabse into a node
 void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
 {
     if (m_glFunctionsSet == false)
@@ -541,13 +523,8 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
     m_NeuritesGraphVAO.bind();
     m_NeuritesNodesVBO.bind();
 
-    glUseProgram(m_program_neurites_nodes);
 
     m_uniforms = grid_uniforms;
-
-    updateAbstractUniformsLocation(m_program_neurites_nodes);
-
-    glDrawArrays(GL_POINTS, 0, m_neurites_nodes.size() );
 
     m_NeuritesIndexVBO.bind();
 
@@ -563,6 +540,8 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
     m_NeuritesGraphVAO.release();
 }
 
+// only the edges, the nodes itself they are not needed to be visible
+// this will collabse into a node for the neurites at the most abstract view
 void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms)
 {
     if (m_glFunctionsSet == false)
@@ -573,13 +552,9 @@ void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms)
     m_SkeletonsGraphVAO.bind();
     m_SkeletonsNodesVBO.bind();
 
-    glUseProgram(m_program_skeletons_nodes);
-    updateAbstractUniformsLocation(m_program_skeletons_nodes);
     m_SkeletonsNodesVBO.allocate( m_abstract_skel_nodes.data(),
                                   m_abstract_skel_nodes.size() *
                                   sizeof(struct AbstractSkelNode) );
-
-    glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
 
     m_SkeletonsIndexVBO.bind();
 
