@@ -8,18 +8,14 @@ layout (location = 3) in vec2 layout3;
 
 out int V_ID;
 
-out vec4 v_vertex;
-out vec4 v_layout1;
-out vec4 v_layout2;
-out vec4 v_layout3;
-
 // World transformation
 uniform mat4 mMatrix;
 // View Transformation
 uniform mat4 vMatrix;
 // Projection transformation
 uniform mat4 pMatrix;
-
+uniform int  y_axis;
+uniform int  x_axis;
 uniform int is2D;
 
 struct SSBO_datum {
@@ -35,39 +31,121 @@ layout (std430, binding=2) buffer mesh_data
     SSBO_datum SSBO_data[];
 };
 
+struct properties {
+    vec2 pos_alpha;
+    vec2 trans_alpha;
+    vec2 color_alpha;
+    vec2 point_size;
+    vec2 interval;
+    vec2 positions;
+    vec4 render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
+    vec4 extra_info;  // x: axis type, y, z, w: empty slots
+};
+
+struct ast_neu_properties {
+    properties ast;
+    properties neu;
+};
+
+layout (std430, binding=3) buffer space2d_data
+{
+    ast_neu_properties space2d;
+};
+
+float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
+{
+    // if value < leftMin -> value = leftMin
+    value = max(value, leftMin);
+    // if value > leftMax -> value = leftMax
+    value = min(value, leftMax);
+    // Figure out how 'wide' each range is
+    float leftSpan = leftMax - leftMin;
+    float rightSpan = rightMax - rightMin;
+
+    // Convert the left range into a 0-1 range (float)
+    float valueScaled = float(value - leftMin) / float(leftSpan);
+
+    // Convert the 0-1 range into a value in the right range.
+    return rightMin + (valueScaled * rightSpan);
+}
+
+// here I should lock the rotation matrix
 void main(void)
 {
     int ID = int(vertex.w);
-
-    // two positions to interpolate between:
-    // 3D with rotation
-    // projected 2D without rotation
+    V_ID = ID;
     mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
 
-    // between (60, 60) and (80, 80)
-    // vec4 new_position = mix(vertex , layout1, position_intp);
+    vec4 v_vertex =  mvpMatrix * vec4(vertex.xyz, 1); // original position
+    vec4 v_layout1 =  mvpMatrix * vec4(layout1, 0, 1); // original position
+    vec4 v_layout2 =  mvpMatrix * vec4(layout2, 0, 1); // original position
+    vec4 v_layout3 =  mvpMatrix * vec4(layout3, 0, 1); // original position
 
-    // between  (80, 80) and (100, 80)
-    // vec4 new_position = mix(layout1 , layout2, position_intp);
-    // vec4 new_position = mix(layout1 , center, position_intp);
+    int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
 
-    // between (80, 80) and (80, 100)
-    // vec4 new_position = mix(layout1 , layout3, position_intp);
+    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
-    // between (80, 100) and (100, 100)
-    // vec4 new_position = mix(layout3 , center, position_intp);
+    vec2 interval = space_properties.interval; // additional info
+    vec2 positions = space_properties.positions; // additional info
+    vec4 render_type = space_properties.render_type; // additional info
+    vec4 extra_info = space_properties.extra_info;   // x: axis type (0: x_axis, 1: y_axis)
 
-    // between (100, 80) and (100, 100)
-    // vec4 new_position = mix(layout2 , center, position_intp);
+    int slider = (extra_info.x == 1) ? y_axis : x_axis;  // need to make this general and not tied to object type
+
+    float leftMin = interval.x;
+    float leftMax = interval.y;
 
 
-    // todo: interpolate between different layouts based on state
+    float position_intp;
+    int pos1_flag, pos2_flag;
 
-    v_vertex =  mvpMatrix * vec4(vertex.xyz, 1); // original position
-    v_layout1 =  mvpMatrix * vec4(layout1, 0, 1); // original position
-    v_layout2 =  mvpMatrix * vec4(layout2, 0, 1); // original position
-    v_layout3 =  mvpMatrix * vec4(layout3, 0, 1); // original position
+    if (type == 0) {
+        // astrocyte, along the y axis it will disappear,
+        // along the x axis it will be interpolated between layout 1 and layout 2
 
-    gl_Position = v_vertex;
-    V_ID = ID;
+        // alpha =  translate(y_axis, 80, 100,  1, 0);
+        position_intp = translate(x_axis, 80, 100, 0, 1);
+        pos1_flag = 1;
+        pos2_flag = 2;
+    } else {
+        // if we are in the 2D space, then we have two interpolation for the neurites
+        // for the nodes and skeletons along the y axis (node layout 1 and node layout 2)
+        // for the neurites skeleton as well along the y axis (layout 1 and layout 3)
+        // then we interpolate along the x axis using these two values
+
+        //alpha = 1.0;
+        position_intp = translate(x_axis, 80, 100, 0, 1);
+        pos1_flag = 1;
+        pos2_flag = 5;
+        gl_PointSize =  translate(x_axis, 80, 100, 1, 20);
+
+        // for skeleton get the value between v_layout3 and v_layout1 using mix with y_axis
+        // then get another position for node in layout 1 and layout 2
+        // then use these two new values to get the final one along the x axis
+
+    }
+
+
+    vec4 pos1, pos2;
+    switch (pos1_flag) {
+        case 1: pos1 = v_vertex; break;
+        case 2: pos1 = v_layout1; break;
+        case 3: pos1 = v_layout2; break;
+        case 4: pos1 = v_layout3; break;
+        case 5: pos1 = mvpMatrix * vec4(SSBO_data[ID].center.xy, 0, 1); break;
+    }
+
+    switch (pos2_flag) {
+        case 1: pos2 = v_vertex; break;
+        case 2: pos2 = v_layout1; break;
+        case 3: pos2 = v_layout2; break;
+        case 4: pos2 = v_layout3; break;
+        case 5: pos1 = mvpMatrix * vec4(SSBO_data[ID].center.xy, 0, 1); break;
+    }
+
+    vec4 new_position = mix(pos1 , pos2, position_intp);
+
+
+    gl_Position = new_position;
+
 }

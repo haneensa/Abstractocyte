@@ -363,12 +363,12 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     if (m_glFunctionsSet == false)
         return false;
 
-
     m_program_skeletons_index = glCreateProgram();
     bool res = initShader(m_program_skeletons_index,
                      ":/shaders/abstract_skeleton_node_vert.glsl",
                      ":/shaders/abstract_skeleton_line_geom.glsl",
                      ":/shaders/lines_frag.glsl");
+
     if (res == false)
         return res;
 
@@ -410,6 +410,7 @@ bool OpenGLManager::initNeuritesGraphShaders()
 
     if (m_glFunctionsSet == false)
         return false;
+
 
     m_program_neurites_index = glCreateProgram();
     bool res = initShader(m_program_neurites_index,  ":/shaders/nodes_vert.glsl",
@@ -625,7 +626,7 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     // 3) Abstract Skeleton Graph (Nodes and Edges)
     drawSkeletonsGraph(grid_uniforms);
     // 4) Neurites Graph (Nodes and Edges)
-    drawNeuritesGraph(grid_uniforms);
+//    drawNeuritesGraph(grid_uniforms);
 }
 
 void OpenGLManager::updateUniformsLocation(GLuint program)

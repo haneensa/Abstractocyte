@@ -1,21 +1,29 @@
 #version 430
 
-// todo: draw thick lines with 3D effects
+/* todo: draw thick lines with 3D effects
+1) get 4 vertices
+    1.a) start of previous segment
+    1.b) end of previous segment
+    1.c) end of current segment
+    1.d) end of next segment
+
+2) naive culling
+3) get direction of each 3 segments
+4) get the normal of each of the 3 segments
+5) miter lines
+6) length of the miter by projecting it onto normal then inverse it
+7) prevent long miters at sharp corners
+8) close the gap
+9) generate triangle strip
+*/
 
 layout (lines) in;
 layout (line_strip, max_vertices = 2) out;
 
 in int          V_ID[];
+
 out vec4        color_val;
-
-in vec4 v_vertex[];
-in vec4 v_layout1[];
-in vec4 v_layout2[];
-in vec4 v_layout3[];
-
-
-uniform int     y_axis;
-uniform int     x_axis;
+out float       alpha;
 
 struct SSBO_datum {
     vec4 color;
@@ -46,64 +54,33 @@ struct ast_neu_properties {
     properties neu;
 };
 
-
 layout (std430, binding=3) buffer space2d_data
 {
     ast_neu_properties space2d;
 };
 
+
 void main() {
     int ID = V_ID[0];
-    int type = int(SSBO_data[ID].center.w);
     color_val = SSBO_data[ID].color;
 
-    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
+    alpha = 1.0;
+    for(int i = 0; i < 2; i++) {
+        int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
 
-    vec2 interval = space_properties.interval; // additional info
-    vec2 positions = space_properties.positions; // additional info
-    vec4 render_type = space_properties.render_type; // additional info
-    vec4 extra_info = space_properties.extra_info;   // x: axis type (0: x_axis, 1: y_axis)
+        properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
-    int slider = (extra_info.x == 1) ? y_axis : x_axis;  // need to make this general and not tied to object type
+        vec4 render_type = space_properties.render_type; // additional info
 
-    float leftMin = interval.x;
-    float leftMax = interval.y;
+        if ( render_type.w == 0  ) {
+            return;
+        }
 
-    if ( render_type.w == 0  ) {
-        return;
+        gl_Position = gl_in[i].gl_Position;
+        EmitVertex();
+
     }
 
-    //  Ideally I would interpolate betweeen the edges transparency to show it smothly?
-
-    gl_Position = gl_in[0].gl_Position;
-    gl_PointSize = gl_in[0].gl_PointSize;
-    EmitVertex();
-
-    gl_Position = gl_in[1].gl_Position;
-    gl_PointSize = gl_in[1].gl_PointSize;
-    EmitVertex();
     EndPrimitive();
-
-/*
-
-1) get 4 vertices
-    1.a) start of previous segment
-    1.b) end of previous segment
-    1.c) end of current segment
-    1.d) end of next segment
-
-2) naive culling
-3) get direction of each 3 segments
-4) get the normal of each of the 3 segments
-5) miter lines
-6) length of the miter by projecting it onto normal then inverse it
-7) prevent long miters at sharp corners
-8) close the gap
-9) generate triangle strip
-
-
-*/
-
-
 
 }
