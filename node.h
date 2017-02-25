@@ -19,12 +19,12 @@ public:
     int getIdxID()              { return m_idxID; }
 
     Node_t getNodeType()        { return m_node_t; }
-    QVector3D get3DPosition()   {return m_nodeXYZ; }
+    QVector3D get3DPosition()   { return m_nodeXYZ; }
     void addEdge(Edge *e);
 
 
     // force based layout related functions
-    QVector3D getLayoutedPosition();
+    QVector2D getLayoutedPosition();
     void addToLayoutedPosition(QVector2D newPos);
     void resetLayout(QMatrix4x4 rotationMatrix);
 
@@ -38,22 +38,30 @@ public:
     std::pair<int, int>  getHashMapCell();
 
 private:
-    int                     m_nID;
-    int                     m_idxID;
-    // original 3D position
-    QVector3D               m_nodeXYZ;
+    int                     m_nID;      // hvgx ID
+    int                     m_idxID;    // index in buffer
 
-    Node_t                  m_node_t;
+    // could belong to a skeleton or just one neurite node
+    bool                    m_is_skeleton;
+
+    QVector3D               m_nodeXYZ;  // original 3D position
+
+    Node_t                  m_node_t;   // node type
 
     std::map<int, Edge*>    m_adjEdges;
 
-    // force directed layout
-    QVector2D               m_forceSum; // force to be applied on 2D position
-    QVector3D               m_layouted; // 2D position after applying force
 
     // hashmap
     std::pair<int, int>     m_hashMapCell;
 
+    // GEM Algorithm
+    QVector2D               impulse;  // impulse vector
+    double                  t;  // local temperature
+    double                  skew_gauge;
+
+    // force directed layout
+    QVector2D               m_forceSum; // force to be applied on 2D position
+    QVector2D               m_layouted; // 2D position after applying force
 };
 
 #endif // NODE_H

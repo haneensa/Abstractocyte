@@ -16,6 +16,7 @@ MousePad::MousePad(QWidget *parent)
     qDebug() << "MousePad";
     circle.x = 0.0;
     circle.y = 0.0;
+    m_2dspace = NULL;
 }
 
 MousePad::~MousePad()
@@ -29,20 +30,13 @@ MousePad::~MousePad()
 
     m_vao_selection.destroy();
 
-    glDeleteRenderbuffers(1, &m_rbo_depth);
-    glDeleteTextures(1, &m_fbo_texture);
-    glDeleteFramebuffers(1, &m_fbo);
-
-    /* free_resources */
-    glDeleteBuffers(1, &m_vbo_fbo_vertices);
-
     doneCurrent();
 }
 
 void MousePad::initSelectionPointerGL()
 {
     m_program_circle = new QOpenGLShaderProgram(this);
-    bool res = initShader(m_program_circle, ":/shaders/shader.vert", ":/shaders/shader.geom", ":/shaders/shader.frag");
+    bool res = initShader(m_program_circle, ":/shaders/space_pointer_vert.glsl", ":/shaders/space_pointer_geom.glsl", ":/shaders/space_pointer_frag.glsl");
     if(res == false)
         return;
 
@@ -73,7 +67,7 @@ void MousePad::initSelectionPointerGL()
     /* selection buffer */
 
     m_program_selection = new QOpenGLShaderProgram(this);
-    res = initShader(m_program_selection, ":/shaders/selection.vert", ":/shaders/selection.geom", ":/shaders/selection.frag");
+    res = initShader(m_program_selection, ":/shaders/selection_vert.glsl", ":/shaders/selection_geom.glsl", ":/shaders/selection_frag.glsl");
     if(res == false)
         return;
 
@@ -95,143 +89,22 @@ void MousePad::initSelectionPointerGL()
     m_vao_selection.release();
 }
 
-void MousePad::initRect(QVector2D x_interval, QVector2D y_interval, int ID)
-{
-    QVector2D p00 = QVector2D(x_interval.x()/100.0, y_interval.x()/100.0);
-    float dimX = (x_interval.y() - x_interval.x())/100.0;
-    float dimY = (y_interval.y() - y_interval.x())/100.0;
 
-
-    struct abstractionPoint p = {p00, ID};
-    int offset = m_vertices.size();
-
-    m_vertices.push_back(p);        // p00
-
-    p.point.setX(p00.x() + dimX);   // p10
-    p.point.setY(p00.y());
-    m_vertices.push_back(p);
-
-    p.point.setX(p00.x());          // p01
-    p.point.setY(p00.y() + dimY);
-    m_vertices.push_back(p);
-
-    p.point.setX(p00.x() + dimX);   // p11
-    p.point.setY(p00.y() + dimY);
-    m_vertices.push_back(p);
-
-
-    m_indices.push_back(offset + 0);
-    m_indices.push_back(offset + 1);
-    m_indices.push_back(offset + 2);
-
-    m_indices.push_back(offset + 1);
-    m_indices.push_back(offset + 3);
-    m_indices.push_back(offset + 2);
-}
-
-void MousePad::initTriangle(QVector2D coords1, QVector2D coords2,QVector2D coords3, int ID)
-{
-    int offset = m_vertices.size();
-    struct abstractionPoint p1 = {coords1/100.0, ID};
-    struct abstractionPoint p2 = {coords2/100.0, ID};
-    struct abstractionPoint p3 = {coords3/100.0, ID};
-
-    m_vertices.push_back(p1);
-    m_vertices.push_back(p2);
-    m_vertices.push_back(p3);
-
-    m_indices.push_back(offset + 0);
-    m_indices.push_back(offset + 1);
-    m_indices.push_back(offset + 2);
-}
 
 void MousePad::initData()
 {
-
     // init intervals
-
     // TODO: refactor this and make it easier to construct the space with fewer parameters
     // TODO: connect abstraction space buffer update data with this one
     // find a place to decide on the data and group them together instead on seperate classes
 
-    int ID = 1;
-    QVector2D x_interval, y_interval;
+    if (m_2dspace == NULL) {
+        qDebug() << "m_2dspace is NULL";
+        return;
+    }
 
-
-    // ################## 0-20
-    x_interval = QVector2D(0, 20);
-
-    y_interval = QVector2D(0, 20);
-    //m_IntervalXY.push_back({ast1, neu1});
-    initRect(x_interval, y_interval, ID++); // 0
-
-    y_interval = QVector2D(20, 40);
-    //m_IntervalXY.push_back({ast2, neu1});
-    initRect(x_interval, y_interval, ID++); // 1
-
-    y_interval = QVector2D(40, 60);
-    //  m_IntervalXY.push_back({ast3, neu1});
-    initRect(x_interval, y_interval, ID++); // 2
-
-    y_interval = QVector2D(60, 100);
-    //  m_IntervalXY.push_back({ast4, neu1});
-    initRect(x_interval, y_interval, ID++); // 3
-
-
-
-    // ################## 20-60
-    x_interval = QVector2D(20, 60);
-
-    y_interval = QVector2D(0, 20);
-    //  m_IntervalXY.push_back({ast1, neu2});
-    initRect(x_interval, y_interval, ID++); // 4
-
-    y_interval = QVector2D(20, 40);
-    //  m_IntervalXY.push_back({ast2, neu2});
-    initRect(x_interval, y_interval, ID++);  // 6
-
-    y_interval = QVector2D(40, 60);
-    //  m_IntervalXY.push_back({ast3, neu2});
-    initRect(x_interval, y_interval, ID++); // 7
-
-    y_interval = QVector2D(60, 100);
-    //  m_IntervalXY.push_back({ast4, neu2});
-    initRect(x_interval, y_interval, ID++);  // 8
-
-
-
-    // ################## 60-100
-    x_interval = QVector2D(60, 100);
-
-    y_interval = QVector2D(0, 20);
-    //   m_IntervalXY.push_back({ast1, neu3});
-    initRect(x_interval, y_interval, ID++);  // 5
-
-    y_interval = QVector2D(20, 40);
-    // m_IntervalXY.push_back({ast2, neu3});
-    initRect(x_interval, y_interval, ID++);  // 9
-
-    y_interval = QVector2D(40, 60);
-    //m_IntervalXY.push_back({ast3, neu3});
-    initRect(x_interval, y_interval, ID++);  // 10
-
-//    y_interval = QVector2D(70, 100);
-//    // m_IntervalXY.push_back({ast4, neu3});
-//    initRect(x_interval, y_interval, ID++); // 11
-
-
-    // ################## x: 60-100 , y: 70-100
-    x_interval = QVector2D(80, 100);
-    y_interval = QVector2D(80, 100);
-//    // m_IntervalXY.push_back({ast4, neu3});
-   initRect(x_interval, y_interval, ID++);  // 12
-
-    ID++;
-   initTriangle(  QVector2D(80, 80),QVector2D(80, 100), QVector2D(60, 100), ID);
-   initTriangle(  QVector2D(60, 60), QVector2D(80, 80),QVector2D(60, 100), ID);
-
-   initTriangle(  QVector2D(60, 60), QVector2D(100, 60), QVector2D(80, 80), ID);
-   initTriangle(  QVector2D(100, 60),  QVector2D(100, 80), QVector2D(80, 80), ID);
+    m_vertices = m_2dspace->get2DSpaceVertices();
+    m_indices = m_2dspace->get2DSpaceIndices();
 }
 
 void MousePad::initBuffer()
@@ -252,7 +125,19 @@ void MousePad::initBuffer()
     m_buffer_color_data.push_back(gray);
     m_buffer_color_data.push_back(lightsalmon);
     m_buffer_color_data.push_back(orchid);
+    m_buffer_color_data.push_back(peachpuff);
     m_buffer_color_data.push_back(royalblue);
+    m_buffer_color_data.push_back(darkorchid);
+    m_buffer_color_data.push_back(lemonchiffon);
+    m_buffer_color_data.push_back(orange);
+    m_buffer_color_data.push_back(blueviolet);
+    m_buffer_color_data.push_back(steelblue);
+    m_buffer_color_data.push_back(seagreen);
+    m_buffer_color_data.push_back(brown);
+    m_buffer_color_data.push_back(violet);
+    m_buffer_color_data.push_back(peru);
+    m_buffer_color_data.push_back(mediumspringgreen);
+    m_buffer_color_data.push_back(gainsboro);
 
     int bufferSize =  m_buffer_color_data.size() * sizeof(QVector4D);
 
@@ -265,55 +150,13 @@ void MousePad::initBuffer()
     GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
     memcpy(p,   m_buffer_color_data.data(),  bufferSize);
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-
-    /* init selection buffer */
-    // texture
-    glActiveTexture(GL_TEXTURE1);
-    glGenTextures(1, &m_fbo_texture);
-    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_w, m_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // Depth buffer
-    glGenRenderbuffers(1, &m_rbo_depth);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_rbo_depth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, m_w, m_h);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-    // Framebuffer to link everything together
-    glGenFramebuffers(1, &m_fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fbo_texture, 0); // attach 2D tex image to fbo
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_rbo_depth);
-    GLenum status;
-    if ((status = glCheckFramebufferStatus(GL_FRAMEBUFFER)) != GL_FRAMEBUFFER_COMPLETE) {
-      fprintf(stderr, "glCheckFramebufferStatus: error %p", status);
-      return;
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    /* init_resources */
-      GLfloat fbo_vertices[] = {
-        -1, -1,
-         1, -1,
-        -1,  1,
-         1,  1,
-      };
-      glGenBuffers(1, &m_vbo_fbo_vertices);
-      glBindBuffer(GL_ARRAY_BUFFER, m_vbo_fbo_vertices);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(fbo_vertices), fbo_vertices, GL_STATIC_DRAW);
-      glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void MousePad::init2DSpaceGL()
 {
     m_program_2DSpace = glCreateProgram();
-    bool res = initShader(m_program_2DSpace, ":/shaders/space2d.vert", ":/shaders/space2d.geom",
-                          ":/shaders/space2d.frag");
+    bool res = initShader(m_program_2DSpace, ":/shaders/space2d_vert.glsl", ":/shaders/space2d_geom.glsl",
+                          ":/shaders/space2d_frag.glsl");
     if(res == false)
         return;
 
@@ -354,8 +197,8 @@ void MousePad::init2DSpaceGL()
 
     /* selection buffer */
     m_program_2DSpace_Selection  = glCreateProgram();
-    res = initShader(m_program_2DSpace_Selection, ":/shaders/space2d.vert", ":/shaders/space2d.geom",
-                     ":/shaders/space2d.frag");
+    res = initShader(m_program_2DSpace_Selection, ":/shaders/space2d_vert.glsl", ":/shaders/space2d_geom.glsl",
+                     ":/shaders/space2d_frag.glsl");
     if(res == false)
         return;
 
@@ -468,15 +311,6 @@ void MousePad::resizeGL(int w, int h)
     m_projection.setToIdentity();
     m_projection.ortho( 0.0f,  1.0f, 0.0f, 1.0f, -1.0, 1.0 );
 
-    /* onReshape */
-    // Rescale FBO and RBO as well
-    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_w, m_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glBindRenderbuffer(GL_RENDERBUFFER, m_rbo_depth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, m_w, m_h);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     update();
 }
@@ -526,7 +360,7 @@ void MousePad::mouseReleaseEvent(QMouseEvent *event)
     event->accept();
 }
 
-void MousePad::setSlotsX(int value)
+void MousePad::getSlotsX(int value)
 {
     if (m_x == value)
         return;
@@ -544,8 +378,7 @@ void MousePad::setSlotsX(int value)
 
 }
 
-
-void MousePad::setSlotsY(int value)
+void MousePad::getSlotsY(int value)
 {
     if (m_y == value)
         return;
@@ -560,6 +393,12 @@ void MousePad::setSlotsY(int value)
     m_vbo_circle.release();
     m_updatedPointer = true;
     update();
+}
+
+void MousePad::getAbstractionData(AbstractionSpace *space_instance)
+{
+    qDebug() << "************ SLOT ";
+    m_2dspace = space_instance;
 }
 
 void MousePad::renderSelection(void)

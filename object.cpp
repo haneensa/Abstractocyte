@@ -1,22 +1,30 @@
+// todo:
+// filter objects by properties
+// color objects by different properties: funtion, type, ?
+// label
+//
+
 #include "object.h"
 #include <QDebug>
 #include <algorithm>
 
-#include "colors.h"
+#include "colors.h" //bouton1insolid.044
 
-Object::Object(std::string name, int idx, int ID)
+Object::Object(std::string name, int ID)
 {
     if (name[name.size()-1] == '\n') {
         name.erase(name.size()-1, name.size()-1);
     }
 
     m_name  = name; // obj name
-    m_idxID = idx;  // index ID in the object list
     m_ID    = ID;   // hvgx ID
     m_object_t = getObjectType(); // obect type
     m_color = QVector4D(1.0, 1.0, 0.0, 1.0);    // default one
     m_volume = 0;
     m_center = QVector4D(0, 0, 0, 0);
+
+    m_skeleton = new Skeleton(m_ID);
+
     qDebug() << "create " << m_name.data() << " hvgxID: " << m_ID;
 }
 
@@ -49,36 +57,9 @@ Object_t Object::getObjectType()
     }
 }
 
-void Object::add_s_vertex(struct SkeletonVertex vertex)
-{
-    m_skeleton_vertices.push_back(vertex);
-}
-
 void Object::addTriangleIndex(GLuint face)
 {
     m_meshIndices.push_back(face);
-}
-
-
-std::vector<struct SkeletonVertex> Object::get_s_Vertices()
-{
-    return m_skeleton_vertices;
-}
-
-
-std::string Object::getName()
-{
-    return m_name;
-}
-
-size_t Object::get_s_Size()
-{
-    return m_skeleton_vertices.size();
-}
-
-void Object::setColor(QVector4D color)
-{
-    m_color = color;
 }
 
 QVector4D Object::getColor()
@@ -94,10 +75,10 @@ QVector4D Object::getColor()
         m_color = gold;
         break;
     case Object_t::SPINE:
-        m_color = darkmagenta;
+        m_color = orange;
         break;
     case Object_t::BOUTON:
-        m_color = greenyellow;
+        m_color = green;
         break;
     case Object_t::MITO:
         m_color = mediumslateblue;
@@ -119,20 +100,53 @@ QVector4D Object::getColor()
 
 void Object::setCenter(QVector4D center)
 {
+    if (m_object_t == Object_t::ASTROCYTE ) {
+        center.setW(0); // w: indicates the type of the object (glia, neurite)
+    } else {
+        center.setW(1);
+    }
+
     m_center = center;
 }
 
-QVector4D Object::getCenter()
+struct ssbo_mesh Object::getSSBOData()
 {
-    return m_center;
+    struct ssbo_mesh ssbo_data;
+    ssbo_data.color = m_color;
+    ssbo_data.center = m_center;
+    ssbo_data.info.setX(m_volume);
+    ssbo_data.layout1 = m_center.toVector2D();
+    ssbo_data.layout2 = m_center.toVector2D();
+
+    return ssbo_data;
 }
 
-void Object::setVolume(int volume)
+// skeleton management
+void Object::addSkeletonNode(QVector3D coords)
 {
-    m_volume = volume;
+    m_skeleton->addNode(coords);
 }
 
-int Object::getVolume()
+void Object::addSkeletonPoint(QVector3D coords)
 {
-    return m_volume;
+    m_skeleton->addPoint(coords);
+}
+
+int Object::writeSkeletontoVBO(QOpenGLBuffer vbo, int offset)
+{
+    int size = m_skeleton->getSkeletonPointsSize();
+    if (size == 0) {
+        qDebug() << "no skeleton";
+        return 0;
+    }
+
+    int count = size * sizeof(SkeletonPoint);
+    vbo.write(offset, m_skeleton->getSkeletonPoints(), count);
+    qDebug() <<  " allocating: " <<  getName().data() << " count: " << count;
+
+    return count;
+}
+void Object::addSkeletonBranch(SkeletonBranch *branch)
+{
+    m_skeleton->addBranch(branch);
 }

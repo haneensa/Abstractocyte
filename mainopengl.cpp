@@ -161,7 +161,7 @@ void MainOpenGL::initText( const QFont &_f  )
 {
     flag = true;
     m_program_text = new QOpenGLShaderProgram();
-    bool res = initShader(m_program_text, ":/shaders/text.vert", ":/shaders/text.geom", ":/shaders/text.frag");
+    bool res = initShader(m_program_text, ":/shaders/text_vert.glsl", ":/shaders/text_geom.glsl", ":/shaders/text_frag.glsl");
     if(res == false)
         return;
 

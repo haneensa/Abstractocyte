@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl
+QT       += core gui opengl xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,10 +24,14 @@ SOURCES += main.cpp\
     node.cpp \
     edge.cpp \
     graph.cpp \
-    mesh.cpp \
     abstractionspace.cpp \
     graphmanager.cpp \
-    spatialhash.cpp
+    spatialhash.cpp \
+    skeleton.cpp \
+    skeletonbranch.cpp \
+    mesh.cpp \
+    openglmanager.cpp \
+    datacontainer.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -37,11 +41,17 @@ HEADERS  += mainwindow.h \
     node.h \
     edge.h \
     graph.h \
-    mesh.h \
     colors.h \
     abstractionspace.h \
     graphmanager.h \
-    spatialhash.h
+    spatialhash.h \
+    skeleton.h \
+    skeletonbranch.h \
+    mesh.h \
+    ssbo_structs.h \
+    glsluniform_structs.h \
+    openglmanager.h \
+    datacontainer.h
 
 FORMS    += mainwindow.ui
 

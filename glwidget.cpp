@@ -1,8 +1,3 @@
-// todo:    1- render 3d segmentation (done)
-//          2- render the skeleton
-//          3- mesh normals (to be fixed)
-
-
 /*
  * FinalMatrix = Projection * View * Model
  * Model = RotationAroundOrigin * TranslationFromOrigin * RotationAroundObjectCenter
@@ -18,17 +13,20 @@ GLWidget::GLWidget(QWidget *parent)
         m_isRotatable(true),
         m_yaxis(0),
         m_xaxis(0),
-        m_FDL_running(false)
+        m_FDL_running(false),
+        m_2D(false)
 {
-
+    // 2D abstraction space, with intervals properties intializaiton and geometry
     m_2dspace = new AbstractionSpace(100, 100);
-    m_mesh = new Mesh();
-    m_graphManager = new GraphManager();
-    m_graphManager->ExtractGraphFromMesh(m_mesh);
 
-    // todo: one graph manager, with all the graphs manipulations
+    // objects manager with all objects data
+    m_data_containter = new DataContainer();
+    m_opengl_mngr = new OpenGLManager(m_data_containter);
 
-    m_distance = 0.2;
+    // graph manager with 4 graphs and 2D space layouted data
+    m_graphManager = new GraphManager( m_data_containter, m_opengl_mngr );
+
+    m_distance = 1.0;
     m_rotation = QQuaternion();
     //reset rotation
     m_rotation.setScalar(1.0f);
@@ -41,7 +39,6 @@ GLWidget::GLWidget(QWidget *parent)
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
 
-
     setFocusPolicy(Qt::StrongFocus);
 }
 
@@ -52,7 +49,7 @@ GLWidget::~GLWidget()
     makeCurrent();
     delete m_2dspace;
     delete m_graphManager;
-    delete m_mesh;
+    delete m_data_containter;
 
     doneCurrent();
 }
@@ -83,17 +80,8 @@ void GLWidget::updateMVPAttrib()
     m_mMatrix *= m_rotationMatrix;
 
     // graph model matrix without rotation, apply rotation to nodes directly
-    m_graph_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
+    m_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
                         m_model_noRotation.data(), m_rotationMatrix};
-
-
-   // m_graph_uniforms.mMatrix = m_mMatrix.data();
-    m_mesh_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data()};
-
-    // todo: whenver the rotation matrix changes then update
-    // the nodes buffer after reseting the nodes with rotation matrix
-    m_graphManager->updateUniforms(m_graph_uniforms);
-    m_mesh->updateUniforms(m_mesh_uniforms);
 }
 
 void GLWidget::initializeGL()
@@ -101,8 +89,9 @@ void GLWidget::initializeGL()
     qDebug() << "initializeGL";
     initializeOpenGLFunctions();
     m_2dspace->initOpenGLFunctions();
-    m_mesh->initOpenGLFunctions();
-    m_graphManager->initOpenGLFunctions();
+    m_opengl_mngr->initOpenGLFunctions();
+    m_graphManager->ExtractGraphFromMesh();
+
 
     updateMVPAttrib();
 
@@ -111,41 +100,7 @@ void GLWidget::initializeGL()
 
     /******************** 1 Abstraction Space ********************/
     m_2dspace->initBuffer();
-    /******************** 2 initialize Mesh **********************/
-    m_mesh->iniShadersVBOs();
-    /****************** 3 Initialize Graph  *******************/
-    m_graphManager->initVBO(0);
-    m_graphManager->initGrid();
-
-
-    /**************** INIT OIT *******************************/
-//    glGenBuffers(2, m_buffers);
-//    GLuint maxNodes = 20 * m_width * m_height;
-//    GLint nodeSize = 5 * sizeof(GLfloat) + sizeof(GLuint); // The size of a linked list node
-
-//     // Our atomic counter
-//    glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, m_buffers[COUNTER_BUFFER]);
-//    glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), NULL, GL_DYNAMIC_DRAW);
-
-//    // The buffer for the head pointers, as an image texture
-//    glGenTextures(1, &m_headPtrTex);
-//    glBindTexture(GL_TEXTURE_2D, m_headPtrTex);
-//    glTexStorage2D(GL_TEXTURE_2D, 1, GL_R32UI, m_width, m_height);
-//    glBindImageTexture(0, m_headPtrTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32UI);
-
-//    // The buffer of linked lists
-//    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_buffers[LINKED_LIST_BUFFER]);
-//    glBufferData(GL_SHADER_STORAGE_BUFFER, maxNodes * nodeSize, NULL, GL_DYNAMIC_DRAW);
-
-//    // prog.setUniform("MaxNodes", maxNodes);
-
-//    std::vector<GLuint> headPtrClearBuf(width*height, 0xffffffff);
-//    glGenBuffers(1, &m_clearBuf);
-//    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_clearBuf);
-//    glBufferData(GL_PIXEL_UNPACK_BUFFER, headPtrClearBuf.size() * sizeof(GLuint),
-//                &headPtrClearBuf[0], GL_STATIC_COPY);
-
-    /**************** End data initialization *****************/
+    emit setAbstractionData(m_2dspace);
 
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_MULTISAMPLE);
@@ -167,13 +122,14 @@ void GLWidget::paintGL()
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
     updateMVPAttrib();
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    m_mesh->draw();
 
-    struct GridUniforms grid_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
-                m_model_noRotation.data(), m_rotationMatrix};
-    m_graphManager->drawGrid(grid_uniforms);
-    m_graphManager->drawNodes(0);
-    m_graphManager->drawEdges(0);
+
+    struct GlobalUniforms grid_uniforms = { m_yaxis, m_xaxis, m_mMatrix.data(),
+                                            m_vMatrix.data(), m_projection.data(),
+                                            m_model_noRotation.data(), m_rotationMatrix};
+
+    m_opengl_mngr->drawAll(grid_uniforms);
+
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -184,15 +140,14 @@ void GLWidget::resizeGL(int w, int h)
     glViewport(0, 0, w * retinaScale, h * retinaScale);
 
     m_projection.setToIdentity();
-    m_projection.ortho(GLfloat(-w) / GLfloat(h),  GLfloat(w) / GLfloat(h), -1.0,  1.0f, -10.0, 10.0 );
+    m_projection.ortho(GLfloat(-w) / GLfloat(h),  GLfloat(w) / GLfloat(h), -1.0,  1.0f, -5.0, 5.0 );
 
     // set up view
     // view matrix: transform a model's vertices from world space to view space, represents the camera
-    m_center = QVector3D(0.0, 0.0, 0.0);
-    m_cameraPosition = QVector3D(2.5, 2.5, 2.5);
+    m_cameraPosition = QVector3D(0.5, 0.5, 0.5);
     QVector3D  cameraUpDirection = QVector3D(0.0, 1.0, 0.0);
     m_vMatrix.setToIdentity();
-    m_vMatrix.lookAt(m_cameraPosition, QVector3D(0.0, 0.0, 0.0), cameraUpDirection);
+    m_vMatrix.lookAt(QVector3D(0.5, 0.5, 1.0) /*m_cameraPosition*/, m_cameraPosition /*center*/, cameraUpDirection);
 
     update();
 }
@@ -264,33 +219,68 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             if(!m_FDL_running)
                 m_isRotatable = !m_isRotatable;
         break;
-        case(Qt::Key_F):
+        case(Qt::Key_2): // start force directed layout
+            if (m_FDL_running) {
+                qDebug() << "cant switch to 2D. layouting algorithm is running";
+            } else if (!m_FDL_running && m_2D) {
+                if (m_2D) {
+                    m_2D = false;
+                    qDebug() << "switching to 3D";
+                    m_isRotatable = true;
+                    updateMVPAttrib();      // update uniforms
+                    m_graphManager->update2Dflag(m_2D, m_uniforms);
+                    m_opengl_mngr->update2Dflag(m_2D);
+                }
+            } else {
+                if (!m_2D) {
+                    m_2D = true;
+                    updateMVPAttrib();      // update uniforms
+                    m_graphManager->update2Dflag(m_2D, m_uniforms);
+                    m_opengl_mngr->update2Dflag(m_2D);
+                }
+            }
 
-            timer->start(0);
+        break;
+        case(Qt::Key_F): // start force directed layout
+            if (!m_2D) {
+               qDebug() << "can't run force layout on 3D";
+            } else if (m_FDL_running)
+                qDebug() << "force layout is already running.";
+            else {
+                timer->start(0);
+                // pass rotation matrix
+                m_FDL_running = true;   // run force layout
+                m_graphManager->startForceDirectedLayout(0);
+                m_graphManager->startForceDirectedLayout(1);
+                m_graphManager->startForceDirectedLayout(2);
+                m_graphManager->startForceDirectedLayout(3);
 
-            // pass rotation matrix
-            m_isRotatable = false;
-            m_FDL_running = true;
-            updateMVPAttrib();
-            m_graphManager->startForceDirectedLayout(0);
+            }
         break;
         case(Qt::Key_X):
             timer->stop();
-            m_isRotatable = true;
-            m_FDL_running = false;
             m_graphManager->stopForceDirectedLayout(0);
+            m_graphManager->stopForceDirectedLayout(1);
+            m_graphManager->stopForceDirectedLayout(2);
+            m_graphManager->stopForceDirectedLayout(3);
+
+            m_FDL_running = false;
         break;
     }
 }
 
 void GLWidget::getSliderX(int value)
 {
+    if (value > 96)
+        value = 100;
     m_xaxis = value;
     update();
 }
 
 void GLWidget::getSliderY(int value)
 {
+    if (value > 98)
+        value = 100;
     m_yaxis = value;
     update();
 }
@@ -299,3 +289,40 @@ void GLWidget::getIntervalID(int ID)
 {
     m_2dspace->updateID(ID);
 }
+
+void GLWidget::getGraphParam1(double value)
+{
+    m_graphManager->updateGraphParam1(value);
+}
+
+void GLWidget::getGraphParam2(double value)
+{
+    m_graphManager->updateGraphParam2(value);
+}
+
+void GLWidget::getGraphParam3(double value)
+{
+    m_graphManager->updateGraphParam3(value);
+}
+
+void GLWidget::getGraphParam4(double value)
+{
+    m_graphManager->updateGraphParam4(value);
+}
+
+void GLWidget::getGraphParam5(double value)
+{
+    m_graphManager->updateGraphParam5(value);
+}
+
+void GLWidget::getGraphParam6(double value)
+{
+    m_graphManager->updateGraphParam6(value);
+}
+
+void GLWidget::getGraphParam7(double value)
+{
+    m_graphManager->updateGraphParam7(value);
+}
+
+

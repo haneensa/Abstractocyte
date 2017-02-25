@@ -5,21 +5,10 @@
 #include <QWidget>
 #include <QtOpenGL>
 
-#include "graphmanager.h"
 #include "mainopengl.h"
-#include "mesh.h"
+#include "graphmanager.h"
 #include "abstractionspace.h"
-
-enum BufferNames {
-    COUNTER_BUFFER = 0,
-    LINKED_LIST_BUFFER
-};
-
-struct ListNode {
-    QVector4D color;
-    GLfloat depth;
-    GLuint next;
-};
+#include "openglmanager.h"
 
 class GLWidget : public QOpenGLWidget, MainOpenGL
 {
@@ -33,6 +22,16 @@ public slots:
     void getSliderX(int value);
     void getSliderY(int value);
     void getIntervalID(int ID);
+    void getGraphParam1(double value);
+    void getGraphParam2(double value);
+    void getGraphParam3(double value);
+    void getGraphParam4(double value);
+    void getGraphParam5(double value);
+    void getGraphParam6(double value);
+    void getGraphParam7(double value);
+
+signals:
+    void setAbstractionData(AbstractionSpace *space_instance);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -46,52 +45,44 @@ protected:
     void updateMVPAttrib();
     void loadMesh();
 
-    AbstractionSpace            *m_2dspace;
+
+    AbstractionSpace                    *m_2dspace;
+    bool                                m_2D;
 
     /* mesh */
-    Mesh                        *m_mesh;
-    GraphManager                *m_graphManager;
+    DataContainer                       *m_data_containter;
+    OpenGLManager                       *m_opengl_mngr;
+    GraphManager                        *m_graphManager;
 
-    struct MeshUniforms         m_mesh_uniforms;
-    struct GraphUniforms        m_graph_uniforms;
+    struct GlobalUniforms               m_uniforms;
 
     /* matrices */
-    QMatrix4x4                  m_projection;
-    QMatrix4x4                  m_mMatrix;
-    QMatrix4x4                  m_vMatrix;
-    QMatrix4x4                  m_model_noRotation;
-    QMatrix4x4                  m_rotationMatrix;
+    QMatrix4x4                          m_projection;
+    QMatrix4x4                          m_mMatrix;
+    QMatrix4x4                          m_vMatrix;
+    QMatrix4x4                          m_model_noRotation;
+    QMatrix4x4                          m_rotationMatrix;
 
-    QVector3D                   m_cameraPosition;
-    QVector3D                   m_center;
+    QVector3D                           m_cameraPosition;
 
 
     /* rotation */
-    QPoint                      m_lastPos;
-    double                      m_distance;
-    bool                        m_isRotatable;
-    QQuaternion                 m_rotation;
-    QVector3D                   m_rotationAxis;
-    QVector3D                   m_translation;
+    QPoint                              m_lastPos;
+    double                              m_distance;
+    bool                                m_isRotatable;
+    QQuaternion                         m_rotation;
+    QVector3D                           m_rotationAxis;
+    QVector3D                           m_translation;
 
     /* mouse pad */
-    int                         m_yaxis;
-    int                         m_xaxis;
+    int                                 m_yaxis;
+    int                                 m_xaxis;
 
     // force directed layout
-    bool                        m_FDL_running;
+    bool                                m_FDL_running;
 
-    QTimer                      *timer;
+    QTimer                              *timer;
 
-    // OIT
-    int m_width, m_height;
-    GLuint m_buffers[2], m_fsQuad, m_headPtrTex;
-    GLuint m_pass1Index, m_pass2Index;
-    GLuint m_clearBuf;
-
-    void pass1();
-    void pass2();
-    void clearBuffers();
 };
 
 

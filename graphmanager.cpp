@@ -1,41 +1,48 @@
 #include "graphmanager.h"
 
-GraphManager::GraphManager()
-    : m_IndexVBO( QOpenGLBuffer::IndexBuffer ),
-      m_NodesVBO( QOpenGLBuffer::VertexBuffer ),
-      m_glFunctionsSet(false),
-      m_FDL_running(false)
+GraphManager::GraphManager(DataContainer *objectManager, OpenGLManager *opengl_mnger)
+    : m_FDL_running(false),
+      m_2D(false)
 {
+    m_data_containter = objectManager;
+    m_opengl_mngr = opengl_mnger;
 }
 
 GraphManager::~GraphManager()
 {
     qDebug() << "~GraphManager()";
-    stopForceDirectedLayout(0);
-    if (m_layout_thread1.joinable()) {
-        m_layout_thread1.join();
+    for (int i = 0; i < max_graphs; i++) {
+        stopForceDirectedLayout(i);
+        if (m_layout_threads[i].joinable()) {
+            m_layout_threads[i].join();
+        }
+
+        delete m_graph[i]; // todo: if more than one iterate over all
     }
-
-    // destroy all vbo and vao and programs and graphs
-
-    if (m_glFunctionsSet == true) {
-
-        m_NodesVAO.destroy();
-        m_NodesVBO.destroy();
-
-        m_IndexVAO.destroy();
-        m_IndexVBO.destroy();
-    }
-
-    delete m_graph[0]; // todo: if more than one iterate over all
-
 }
 
+void GraphManager::update2Dflag(bool is2D, struct GlobalUniforms uniforms)
+{
+    m_2D = is2D;
+
+    if (!m_2D) {
+        // reset the cooridnates of the graphs
+        QMatrix4x4 identitiy;
+        m_graph[0]->resetCoordinates(identitiy); // for now later I will have two separate variables one for 2D one for 3D
+        m_graph[1]->resetCoordinates(identitiy); // for now later I will have two separate variables one for 2D one for 3D
+        m_graph[2]->resetCoordinates(identitiy); // for now later I will have two separate variables one for 2D one for 3D
+        m_graph[3]->resetCoordinates(identitiy); // for now later I will have two separate variables one for 2D one for 3D
+
+    } else {
+        // reset graph
+        m_graph[0]->resetCoordinates(uniforms.rMatrix);
+        m_graph[1]->resetCoordinates(uniforms.rMatrix);
+        m_graph[2]->resetCoordinates(uniforms.rMatrix);
+        m_graph[3]->resetCoordinates(uniforms.rMatrix);
+
+    }
+}
 // I have 4 graphs:
-// so here extract the object nodes in a list because more than a graph use them
-// extract skeletons graph in another list
-// extract connectivity between neurites in a list
-// extract connectivity between astrocyte and neurties in another list
 // 1) all skeleton with astrocyte
     // (nodes are object skeleton nodes, and edges are the edges that connect them)
     // + connection points between astrocyte and neurites if that vertex is close to the astrocyte
@@ -48,31 +55,113 @@ GraphManager::~GraphManager()
 // 4) object nodes and their connectivity information
     // object nodes
     // connectivity info from them
-void GraphManager::ExtractGraphFromMesh(Mesh *mesh)
+void GraphManager::ExtractGraphFromMesh()
 {
+     // render skeletons then interpolate to nodes by accessing the nodes positions from ssbo
+     // use object manager to initialize them
+
+     // init the edges and they never change except when to display them
+
     // iterate over mesh''s objects, and add all the center nodes except astrocyte
     // create the a node for each object and store it in neurites_nodes
-     m_neurites_nodes_info = mesh->getNeuriteNodes();
+
+    // std::pair<int, int> id_tuple, float x, float y, float z
+    // int eID, int hvgxID, int nID1, int nID2
+    std::vector<Node*> neurites_nodes;
+    std::vector<QVector2D> edges_info = m_data_containter->getNeuritesEdges();
+
+    std::vector<Node*> neurites_skeletons_nodes;
+    std::vector<QVector4D> neurites_skeletons_edges;
+
+    std::vector<Node*> astrocyte_skeleton_nodes;
+    std::vector<QVector4D> astrocyte_skeleton_edges;
+
+    std::map<int, Object*> objects_map = m_data_containter->getObjectsMap();
     // create skeleton for each obeject and add it to skeleton_segments
 
     // create connectivity information (neurite-neurite) and add it to neurites_conn_edges
-     m_nerites_edges_info = mesh->getNeuritesEdges();
+    // add nodes
+    for ( auto iter = objects_map.begin(); iter != objects_map.end(); iter++) {
+        Object *objectP = (*iter).second;
+        int hvgxID = objectP->getHVGXID();
+        Object_t type = objectP->getObjectType();
+        if (type != Object_t::ASTROCYTE || type != Object_t::SYNAPSE || type != Object_t::MITO) {
+            // neurite
+            QVector4D center = objectP->getCenter();
+            Node* newNode = new Node(hvgxID, -1,  center.x(), center.y(), center.z());
+            neurites_nodes.push_back(newNode);
+        }
 
-     m_graph[0] = new Graph(); // neurite-neurite
-     m_graph[1] = new Graph(); // neurite-astrocyte skeleton
-     m_graph[2] = new Graph(); //  neurites skeletons - astrocyte skeleton
-     m_graph[3] = new Graph(); // neuries skeletons
+        // get skeleton of the object
+        Skeleton *skeleton = objectP->getSkeleton();
+        std::vector<QVector3D> nodes3D = skeleton->getGraphNodes();
+        std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
+        // add nodes
+        int skeleton_offset = objectP->getSkeletonOffset();
+        for ( int i = 0; i < nodes3D.size(); i++) {
+            int nIndx = i + skeleton_offset;
+            Node* newNode = new Node(hvgxID, nIndx,  nodes3D[i].x(), nodes3D[i].y(), nodes3D[i].z());
+            if (type == Object_t::ASTROCYTE) {
+                astrocyte_skeleton_nodes.push_back(newNode);
+            } else {
+                neurites_skeletons_nodes.push_back(newNode);
+            }
 
-     m_graph[0]->createGraph(m_neurites_nodes_info, m_nerites_edges_info);
+        }
+
+        // add edges
+        for (int i = 0; i < edges2D.size(); ++i) {
+            int nID1 = edges2D[i].x() + skeleton_offset;
+            int nID2 = edges2D[i].y() + skeleton_offset;
+            QVector4D edge_info = QVector4D(i, hvgxID, nID1, nID2);
+
+            if (type == Object_t::ASTROCYTE) {
+                astrocyte_skeleton_edges.push_back(edge_info);
+            } else {
+                neurites_skeletons_edges.push_back(edge_info);
+            }
+        }
+    }
+
+
+     m_graph[0] = new Graph( Graph_t::NODE_NODE, m_opengl_mngr ); // neurite-neurite
+     m_graph[0]->parseNODE_NODE(neurites_nodes, edges_info);
+
+     m_graph[1] = new Graph( Graph_t::NODE_SKELETON , m_opengl_mngr ); // neurite-astrocyte skeleton
+     m_graph[1]->parseSKELETON(astrocyte_skeleton_nodes, astrocyte_skeleton_edges);
+     m_graph[1]->parseNODE_NODE(neurites_nodes, edges_info);
+
+     m_graph[2] = new Graph( Graph_t::ALL_SKELETONS, m_opengl_mngr ); //  neurites skeletons - astrocyte skeleton
+     m_graph[2]->parseSKELETON(astrocyte_skeleton_nodes, astrocyte_skeleton_edges);
+     m_graph[2]->parseSKELETON(neurites_skeletons_nodes, neurites_skeletons_edges);
+
+     m_graph[3] = new Graph( Graph_t::NEURITE_SKELETONS, m_opengl_mngr  ); // neuries skeletons
+     m_graph[3]->parseSKELETON(neurites_skeletons_nodes, neurites_skeletons_edges);
+
+     // delete the nodes and edges
+    for (std::size_t i = 0; i != neurites_nodes.size(); i++) {
+        delete neurites_nodes[i];
+    }
+
+    for (std::size_t i = 0; i != neurites_skeletons_nodes.size(); i++) {
+        delete neurites_skeletons_nodes[i];
+    }
+
+    for (std::size_t i = 0; i != astrocyte_skeleton_nodes.size(); i++) {
+        delete astrocyte_skeleton_nodes[i];
+    }
+
 }
 
 void GraphManager::stopForceDirectedLayout(int graphIdx)
 {
+    // problem the rotation is still on the nodes
+
     m_graph[graphIdx]->terminateFDL();
     m_FDL_running = false; // todo: get this from the graph itself, since it is per graph, even the thread?
-    updateUniformsLocation();
-    if (m_layout_thread1.joinable()) {
-        m_layout_thread1.join();
+
+    if (m_layout_threads[graphIdx].joinable()) {
+        m_layout_threads[graphIdx].join();
     }
 
 }
@@ -82,191 +171,42 @@ void GraphManager::startForceDirectedLayout(int graphIdx)
     // update the 2D node position at the start and whenever the m_mvp change, -> when m_value == 1.0 and m_mvp changed
     stopForceDirectedLayout(graphIdx);
 
-    // reset graph
-    m_graph[graphIdx]->resetCoordinates(m_uniforms.rMatrix);
-
-
     m_FDL_running = true;
-    m_layout_thread1 = std::thread(&Graph::runforceDirectedLayout, m_graph[graphIdx]);
+    m_layout_threads[graphIdx] = std::thread(&Graph::runforceDirectedLayout, m_graph[graphIdx]);
 
 }
 
-bool GraphManager::initOpenGLFunctions()
+void GraphManager::updateGraphParam1(double value)
 {
-    m_glFunctionsSet = true;
-    initializeOpenGLFunctions();
-
-    return true;
+    m_graph[0]->updateGraphParam1(value);
 }
 
-void GraphManager::initVertexAttribPointer()
+void GraphManager::updateGraphParam2(double value)
 {
-    int offset = 0;
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(struct BufferNode),  0);
-    offset += sizeof(QVector3D);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(struct BufferNode),  (void*)offset);
-    offset += sizeof(QVector2D);
-    glEnableVertexAttribArray(2);
-    glVertexAttribIPointer(2, 1, GL_INT, sizeof(BufferNode), (void*)offset);
+    m_graph[0]->updateGraphParam2(value);
 }
 
-// we initialize the vbos for drawing
-bool GraphManager::initVBO(int graphIdx)
+void GraphManager::updateGraphParam3(double value)
 {
-    if (max_graphs < graphIdx) {
-        qDebug() << "graph index out of range";
-        return false;
-    }
-
-    if (m_glFunctionsSet == false)
-        return false;
-
-    qDebug() << "graph->initVBO";
-
-    // 1) initialize shaders
-    m_program_nodes = glCreateProgram();
-    bool res = initShader(m_program_nodes,  ":/shaders/nodes.vert", ":/shaders/nodes.geom", ":/shaders/nodes.frag");
-    if (res == false)
-        return res;
-
-    m_program_Index = glCreateProgram();
-    res = initShader(m_program_Index,  ":/shaders/nodes.vert", ":/shaders/lines.geom", ":/shaders/lines.frag");
-    if (res == false)
-        return res;
-
-    GL_Error();
-
-    // initialize buffers
-    m_NodesVAO.create();
-    m_NodesVAO.bind();
-
-    m_NodesVBO.create();
-    m_NodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
-    m_NodesVBO.bind();
-    m_graph[graphIdx]->allocateBVertices(m_NodesVBO);
-
-
-    glUseProgram(m_program_nodes);
-    GL_Error();
-
-    initVertexAttribPointer();
-
-    GL_Error();
-
-    // initialize uniforms
-    updateUniformsLocation();
-
-    m_NodesVBO.release();
-    m_NodesVAO.release();
-
-
-    m_IndexVAO.create();
-    m_IndexVAO.bind();
-    m_NodesVBO.bind();
-
-    initVertexAttribPointer();
-
-    m_NodesVBO.release();
-
-
-    m_IndexVBO.create();
-    m_IndexVBO.bind();
-    m_graph[graphIdx]->allocateBIndices(m_IndexVBO);
-
-    glUseProgram(m_program_Index);
-    updateUniformsLocation();
-
-
-    m_IndexVBO.release();
-    m_IndexVAO.release();
-
-    return true;
+    m_graph[0]->updateGraphParam3(value);
 }
 
-void GraphManager::initGrid()
+void GraphManager::updateGraphParam4(double value)
 {
-    m_graph[0]->initGridBuffers();
+    m_graph[0]->updateGraphParam4(value);
 }
 
-void GraphManager::drawGrid(struct GridUniforms grid_uniforms)
+void GraphManager::updateGraphParam5(double value)
 {
-    m_graph[0]->drawGrid(grid_uniforms);
+    m_graph[0]->updateGraphParam5(value);
 }
 
-
-void GraphManager::drawNodes(int graphIdx)
+void GraphManager::updateGraphParam6(double value)
 {
-
-    if (max_graphs < graphIdx) {
-        qDebug() << "graph index out of range";
-        return;
-    }
-
-    if (m_glFunctionsSet == false)
-        return;
-
-    m_NodesVAO.bind();
-    m_NodesVBO.bind();
-    m_graph[graphIdx]->allocateBVertices(m_NodesVBO);
-
-    glUseProgram(m_program_nodes);
-    updateUniformsLocation();
-
-    glDrawArrays(GL_POINTS, 0, m_graph[graphIdx]->vertexBufferSize() );
-    m_NodesVBO.release();
-    m_NodesVAO.release();
+    m_graph[0]->updateGraphParam6(value);
 }
 
-void GraphManager::drawEdges(int graphIdx)
+void GraphManager::updateGraphParam7(double value)
 {
-    if (max_graphs < graphIdx) {
-        qDebug() << "graph index out of range";
-        return;
-    }
-
-    if (m_glFunctionsSet == false)
-        return;
-
-    m_IndexVAO.bind();
-    m_NodesVBO.bind();
-    m_IndexVBO.bind();
-
-    glUseProgram(m_program_Index);
-    updateUniformsLocation();
-
-    glDrawElements(GL_LINES, m_graph[graphIdx]->indexBufferSize(), GL_UNSIGNED_INT, 0 );
-    m_NodesVBO.release();
-    m_IndexVBO.release();
-    m_IndexVAO.release();
-}
-
-void GraphManager::updateUniformsLocation()
-{
-    if (m_glFunctionsSet == false)
-        return;
-
-    // initialize uniforms
-    GLuint mMatrix = glGetUniformLocation(m_program_nodes, "mMatrix");
-    if (m_FDL_running) { // force directed layout started, them use model without rotation
-        glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
-    } else {
-        glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
-    }
-
-    GLuint vMatrix = glGetUniformLocation(m_program_nodes, "vMatrix");
-    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
-
-    GLuint pMatrix = glGetUniformLocation(m_program_nodes, "pMatrix");
-    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
-
-
-}
-
-void GraphManager::updateUniforms(struct GraphUniforms graph_uniforms)
-{
-    m_uniforms = graph_uniforms;
+    m_graph[0]->updateGraphParam7(value);
 }

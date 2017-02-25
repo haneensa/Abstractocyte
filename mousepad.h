@@ -4,7 +4,7 @@
 #include <QOpenGLWidget>
 #include <QWidget>
 
-
+#include "abstractionspace.h"
 #include "mainopengl.h"
 
 struct point {
@@ -12,10 +12,6 @@ struct point {
     float y;
 };
 
-struct abstractionPoint {
-    QVector2D point;
-    int       ID;
-};
 
 class MousePad : public QOpenGLWidget, MainOpenGL
 {
@@ -28,8 +24,9 @@ public:
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
 public slots:
-    void setSlotsX(int value);
-    void setSlotsY(int value);
+    void getSlotsX(int value);
+    void getSlotsY(int value);
+    void getAbstractionData(AbstractionSpace *space_instance);
 
 signals:
     void setSignalX(int value);
@@ -53,9 +50,6 @@ protected:
 
     void initSelectionPointerGL();
     void init2DSpaceGL();
-
-    void initRect(QVector2D x_interval, QVector2D y_interval, int ID);
-    void initTriangle(QVector2D coords1, QVector2D coords2,QVector2D coords3, int ID);
 
     void initBuffer();
     void initData();
@@ -99,11 +93,7 @@ private:
     GLuint                                  m_program_2DSpace;
     GLuint                                  m_program_2DSpace_Selection;
 
-    GLuint                                  m_fbo;
-    GLuint                                  m_fbo_texture;
-    GLuint                                  m_rbo_depth;
-    GLuint                                  m_vbo_fbo_vertices;
-
+    AbstractionSpace                        *m_2dspace;
 
 };
 

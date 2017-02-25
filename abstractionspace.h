@@ -1,3 +1,6 @@
+// todo: tie this with mousepad
+// generalize itnervals properties more
+
 #ifndef ABSTRACTIONSPACE_H
 #define ABSTRACTIONSPACE_H
 
@@ -5,16 +8,13 @@
 #include <string>
 #include <QVector4D>
 #include "mainopengl.h"
+#include "ssbo_structs.h"
 
-
-struct ssbo_2DState {
-    QVector4D  states[2][6]; // val, alpha, color_intp, point_size, additional infos
+struct abstractionPoint {
+    QVector2D point;
+    int       ID;
 };
 
-struct ast_neu_properties {
-    struct properties ast;
-    struct properties neu;
-};
 
 class AbstractionSpace : public MainOpenGL
 {
@@ -25,13 +25,19 @@ public:
     void defineAbstractionState(int x, int y, std::string name, int dx = -1, int dy = -1);
     void initOpenGLFunctions();
     // ssbo buffer data
-    int getBufferSize();
-    void* getBufferData();
     bool initBuffer();
     bool updateBuffer();
 
     void defineQuadrant(QVector2D leftMin, int dim, struct ssbo_2DState data);
     void updateID(int ID);
+
+
+    void initRect(QVector2D x_interval, QVector2D y_interval, int ID);
+    void initTriangle(QVector2D coords1, QVector2D coords2,QVector2D coords3, int ID);
+
+
+    std::vector<struct abstractionPoint> get2DSpaceVertices() { return m_vertices; }
+    std::vector<GLuint> get2DSpaceIndices() { return m_indices; }
 
 private:
     struct pair_hash {
@@ -43,20 +49,26 @@ private:
         }
     };
 
-    int                                 m_xaxis;
-    int                                 m_yaxis;
+    int                                         m_xaxis;
+    int                                         m_yaxis;
 
-    int                                 m_intervalID;
+    int                                         m_intervalID;
     // OpenGL
-    GLuint                              m_buffer;
-    GLuint                              m_bindIdx;
-    bool                                m_glFunctionsSet;
+    GLuint                                      m_buffer;
+    GLuint                                      m_bindIdx;
+    bool                                        m_glFunctionsSet;
 
-    // Data
-    struct ssbo_2DState                 m_2DState;
+    // Datas
+    struct ssbo_2DState                         *m_2DState;
 
-    std::vector< struct ast_neu_properties >  m_IntervalXY;
+    std::vector< struct ast_neu_properties >    m_IntervalXY;
 
+    std::vector<struct abstractionPoint>        m_vertices;
+    std::vector<GLuint>                         m_indices;
+    std::map<std::pair<int, int>, struct properties>
+                                                m_x_axis_states;
+    std::map<std::pair<int, int>, struct properties>
+                                                m_y_axis_states;
 };
 
 #endif // ABSTRACTIONSPACE_H

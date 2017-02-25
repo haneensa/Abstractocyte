@@ -1,93 +1,29 @@
 #ifndef MESH_H
 #define MESH_H
 
-// file manipulations
-#include <QString>
-#include <QFile>
 #include "mainopengl.h"
 
-#include "graph.h"
-#include "object.h"
-
-
-struct ssbo_mesh {
-    QVector4D color;
-    QVector4D center;   // center.w = neurite/astrocyte
-    QVector4D info;     // volume, type (axon, bouton, spine, dendrite, ..), ?, ?
+// mesh vertex
+struct VertexData {
+    QVector4D   mesh_vertex;        // w: ID
+    QVector4D   skeleton_vertex;    // w: markers
 };
 
-struct MeshUniforms {
-    GLint y_axis;
-    GLint x_axis;
-    float* mMatrix;
-    float* vMatrix;
-    float* pMatrix;
-};
-
-class Mesh : public MainOpenGL
+class Mesh
 {
 public:
     Mesh();
-    ~Mesh();
-    int getVertixCount();
-
-    bool loadDataset(QString path);
-
-    int getNodesCount();
-    // graph related function
-    std::vector<Object*> getNeuriteNodes();
-    std::vector<QVector2D> getNeuritesEdges();
-
-    // OpenGL initialization
-    bool initOpenGLFunctions();
-    bool iniShadersVBOs();
-    bool initBuffer();
-    bool initVertexAttrib();
-    void draw();
-    bool initMeshShaders();
-    bool initMeshPointsShaders();
-    bool initSkeletonShaders();
-    void updateUniforms(struct MeshUniforms mesh_uniforms);
-    void updateUniformsLocation(GLuint program);
+    void addVertex(struct VertexData vdata);
+    bool isValidFaces(int f1, int f2, int f3);
+    void MarkBleedingVertices(QStringList markersList, int vertex_offset); // for xml
+    int getVerticesSize()       { return verticesList.size(); }
+    void allocateVerticesVBO(QOpenGLBuffer vbo_mesh);
 
 protected:
-    int                                 m_vertices_size;
-    int                                 m_skeleton_nodes_size;
-
-    int                                 m_limit;
-
-    std::vector<Object*>                m_objects; // make this map by hvgx ID instead of vector
-    std::vector<struct ssbo_mesh>       m_buffer_data; // Color, Cenert, Type
-    GLuint                              m_buffer;
-    GLuint                              m_bindIdx;
-
-    bool                                m_glFunctionsSet;
-
-    /* opengl buffers and vars */
-    QOpenGLVertexArrayObject            m_vao_mesh;
-    QOpenGLBuffer                       m_vbo_mesh;
-    QOpenGLBuffer                       m_vbo_IndexMesh;
-    GLuint                              m_program_mesh;
-
-
-    QOpenGLVertexArrayObject            m_vao_mesh_points;
-    GLuint                              m_program_mesh_points;
-
-
-    QOpenGLVertexArrayObject            m_vao_skeleton;
-    QOpenGLBuffer                       m_vbo_skeleton;
-    GLuint                              m_program_skeleton;
-    struct MeshUniforms                 m_uniforms;
-
-    // store all vertices of the mesh.
-    // vertices are sequential increasing for all objects
+    // faces indices
+    // set of faces
     std::vector< struct VertexData >    verticesList;
-    int                                 m_indices_size;
 
-    int                                 m_vertex_offset;
-
-    // graph related data
-    std::vector<QVector2D>              neurites_neurite_edge;
 };
 
 #endif // MESH_H

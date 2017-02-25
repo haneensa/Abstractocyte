@@ -10,20 +10,9 @@
 
 #include "mainopengl.h"
 #include "node.h"
+#include "glsluniform_structs.h"
 
-struct GridUniforms {
-        GLint y_axis;
-        GLint x_axis;
-        float* mMatrix;
-        float* vMatrix;
-        float* pMatrix;
-        float* modelNoRotMatrix;
-        QMatrix4x4 rMatrix;
- };
-
-
-
-class SpatialHash: public MainOpenGL
+class SpatialHash
 {
 public:
     SpatialHash(int col, float min, float max);
@@ -40,7 +29,7 @@ public:
 
     // opengl functions
      bool initOpenGLFunctions();
-     void drawGrid(struct GridUniforms grid_uniforms);
+     void drawGrid(struct GlobalUniforms grid_uniforms);
      bool init_Shaders_Buffers();
      void fillGridDataPoints();
 
@@ -67,7 +56,7 @@ protected:
 
     bool                            m_glFunctionsSet;
     std::vector< QVector2D >        m_gridDataPoints;
-    struct GridUniforms             m_uniforms;
+    struct GlobalUniforms             m_uniforms;
 };
 
 #endif // SPATIALHASH_H
