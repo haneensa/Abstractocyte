@@ -324,7 +324,6 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
     m_IntervalXY.push_back({y_states, x_states});
 
-
     // 2D space
     x_interval = x_intervals[4];
     y_interval =  y_intervals[5];
@@ -332,7 +331,6 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
     x_states = m_x_axis_states[std::make_pair(x_interval.x(), x_interval.y())];
     m_IntervalXY.push_back({y_states, x_states});
-
 
 //    // invalid states
 //    ID++;
@@ -348,8 +346,6 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
 //    initTriangle(  QVector2D(80, 80),
 //                   QVector2D(80, 100),
 //                   QVector2D(62, 100), 0);
-
-
 }
 
 AbstractionSpace::~AbstractionSpace()

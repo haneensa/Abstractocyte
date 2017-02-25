@@ -7,6 +7,7 @@ layout (location = 2) in vec2 layout2;
 layout (location = 3) in vec2 layout3;
 
 out int V_ID;
+out float V_alpha;
 
 // World transformation
 uniform mat4 mMatrix;
@@ -97,54 +98,38 @@ void main(void)
 
 
     float position_intp;
-    int pos1_flag, pos2_flag;
+    vec4 new_position;
 
     if (type == 0) {
         // astrocyte, along the y axis it will disappear,
         // along the x axis it will be interpolated between layout 1 and layout 2
-
-        // alpha =  translate(y_axis, 80, 100,  1, 0);
+        V_alpha =  translate(y_axis, 80, 100,  1, 0);
         position_intp = translate(x_axis, 80, 100, 0, 1);
-        pos1_flag = 1;
-        pos2_flag = 2;
+        new_position = mix(v_layout1 , v_layout2, position_intp);
     } else {
         // if we are in the 2D space, then we have two interpolation for the neurites
         // for the nodes and skeletons along the y axis (node layout 1 and node layout 2)
         // for the neurites skeleton as well along the y axis (layout 1 and layout 3)
         // then we interpolate along the x axis using these two values
 
-        //alpha = 1.0;
-        position_intp = translate(x_axis, 80, 100, 0, 1);
-        pos1_flag = 1;
-        pos2_flag = 5;
+        V_alpha = 1.0;
         gl_PointSize =  translate(x_axis, 80, 100, 1, 20);
 
         // for skeleton get the value between v_layout3 and v_layout1 using mix with y_axis
         // then get another position for node in layout 1 and layout 2
         // then use these two new values to get the final one along the x axis
 
+        position_intp = translate(y_axis, 80, 100, 0, 1);
+        vec4 skeleton_pos = mix(v_layout1 , v_layout3, position_intp);
+
+        vec4 node_layout1 = mvpMatrix * vec4(SSBO_data[ID].layout1, 0, 1);
+        vec4 node_layout2 = mvpMatrix * vec4(SSBO_data[ID].layout2, 0, 1);
+
+        vec4 node_pos  = mix(node_layout1 , node_layout2, position_intp);
+
+        position_intp = translate(x_axis, 80, 100, 0, 1);
+        new_position = mix( skeleton_pos, node_pos ,position_intp);
     }
-
-
-    vec4 pos1, pos2;
-    switch (pos1_flag) {
-        case 1: pos1 = v_vertex; break;
-        case 2: pos1 = v_layout1; break;
-        case 3: pos1 = v_layout2; break;
-        case 4: pos1 = v_layout3; break;
-        case 5: pos1 = mvpMatrix * vec4(SSBO_data[ID].center.xy, 0, 1); break;
-    }
-
-    switch (pos2_flag) {
-        case 1: pos2 = v_vertex; break;
-        case 2: pos2 = v_layout1; break;
-        case 3: pos2 = v_layout2; break;
-        case 4: pos2 = v_layout3; break;
-        case 5: pos1 = mvpMatrix * vec4(SSBO_data[ID].center.xy, 0, 1); break;
-    }
-
-    vec4 new_position = mix(pos1 , pos2, position_intp);
-
 
     gl_Position = new_position;
 

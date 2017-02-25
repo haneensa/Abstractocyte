@@ -6,5 +6,5 @@ out vec4 outcol;
 
 void main() {
     outcol = color_val;
-    outcol.a = 1.0;
+    outcol.a = alpha;
 }

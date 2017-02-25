@@ -21,6 +21,7 @@ layout (lines) in;
 layout (line_strip, max_vertices = 2) out;
 
 in int          V_ID[];
+in float        V_alpha[];
 
 out vec4        color_val;
 out float       alpha;
@@ -64,8 +65,8 @@ void main() {
     int ID = V_ID[0];
     color_val = SSBO_data[ID].color;
 
-    alpha = 1.0;
     for(int i = 0; i < 2; i++) {
+        alpha = V_alpha[i];
         int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
 
         properties space_properties = (type == 0) ? space2d.ast : space2d.neu;

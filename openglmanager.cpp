@@ -480,8 +480,6 @@ void OpenGLManager::drawMeshPoints(struct GlobalUniforms grid_uniforms)
 {
     qDebug() << "OpenGLManager::drawMeshPoints()";
 
-    glDisable (GL_BLEND);
-    glBlendFunc (GL_ONE, GL_ONE);
 
     // I need this because transitioning from mesh to skeleton is not smooth
     m_vao_mesh_points.bind();
