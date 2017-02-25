@@ -35,7 +35,8 @@ struct properties {
     vec2 trans_alpha;
     vec2 color_alpha;
     vec2 point_size;
-    vec4 extra_info;
+    vec2 interval;
+    vec2 positions;
     vec4 render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
 };
 
@@ -57,15 +58,12 @@ void main() {
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
-    vec2 alpha1 = space_properties.pos_alpha; // position interpolation (pos1, pos2)
-    vec2 alpha2 = space_properties.trans_alpha; // alpha
-    vec2 alpha3 = space_properties.color_alpha; // color_intp
-    vec2 alpha4 = space_properties.point_size; // point_size
-    vec4 alpha5 = space_properties.extra_info; // additional info
-    vec4 alpha6 = space_properties.render_type; // additional info
+    vec2 interval = space_properties.interval; // additional info
+    vec2 positions = space_properties.positions; // additional info
+    vec4 render_type = space_properties.render_type; // additional info
 
-    float leftMin = alpha5.x;
-    float leftMax = alpha5.y;
+    float leftMin = interval.x;
+    float leftMax = interval.y;
 
   //  if ( alpha6.w == 0 || (y_axis < 98  || x_axis < 98) ) {
   //      return;

@@ -58,7 +58,8 @@ struct properties {
     vec2 trans_alpha;
     vec2 color_alpha;
     vec2 point_size;
-    vec4 extra_info;
+    vec2 interval;
+    vec2 positions;
     vec4 render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
 };
 
@@ -76,7 +77,8 @@ layout (std430, binding=3) buffer space2d_data
 void main() {
     int ID = V_ID[0]; // ID here is the index of this object in ssbo array
     int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
-    int slider = (type == 0) ? y_axis : x_axis;  // astrocyte or neurites?
+
+
 
     if (V_bleeding[0] == 1)
         color_val = vec4(1.0, 0.0, 0.0, 1.0);
@@ -84,39 +86,39 @@ void main() {
         color_val = SSBO_data[ID].color;
 
     vec4 pos1, pos2;
+    // use type to chose which properties this vertex needs
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
-    vec2 alpha1 = space_properties.pos_alpha; // position interpolation (pos1, pos2)
-    vec2 alpha2 = space_properties.trans_alpha; // alpha
-    vec2 alpha3 = space_properties.color_alpha; // color_intp
-    vec2 alpha4 = space_properties.point_size; // point_size
-    vec4 alpha5 = space_properties.extra_info; // additional info
-    vec4 alpha6 = space_properties.render_type; // additional info
+    vec2 pos_alpha = space_properties.pos_alpha; // position interpolation (pos1, pos2)
+    vec2 trans_alpha = space_properties.trans_alpha; // alpha
+    vec2 color_alpha = space_properties.color_alpha; // color_intp
+    vec2 point_size = space_properties.point_size; // point_size
+    vec2 interval = space_properties.interval; // additional info
+    vec2 positions = space_properties.positions; // additional info
+    vec4 render_type = space_properties.render_type; // additional info
 
-    if (alpha6.y == 0) {
+    int slider = (type == 0) ? y_axis : x_axis;  // need to make this general and not tied to object type
+
+    if (render_type.y == 0) {
         return;
     }
 
-    float leftMin = alpha5.x;
-    float leftMax = alpha5.y;
+    float leftMin = interval.x;
+    float leftMax = interval.y;
 
     // use the space2D values to get: value of interpolation between pos1 and pos2, alpha, color_interpolation, point size
-    alpha =  translate(slider, leftMin, leftMax, alpha2.x, alpha2.y);
+    alpha =  translate(slider, leftMin, leftMax, trans_alpha.x, trans_alpha.y);
     if (alpha < 0.01){
         return;
     }
 
-    float position_intp = translate(slider,leftMin, leftMax,  alpha1.x, alpha1.y);
-    color_intp = translate(slider, leftMin, leftMax, alpha3.y, alpha3.x);
+    float position_intp = translate(slider,leftMin, leftMax,  pos_alpha.x, pos_alpha.y);
+    color_intp = translate(slider, leftMin, leftMax, color_alpha.y, color_alpha.x);
 
-   // if (type == 1)
-   //     max_size = (1 + SSBO_data[ID].info.x/1000000.0)  * alpha4.w ; // todo: normalize outside
-   // else
+    gl_PointSize =  translate(slider, leftMin, leftMax, point_size.x, point_size.y);
 
-    gl_PointSize =  translate(slider, leftMin, leftMax, alpha4.x, alpha4.y);
-
-    int pos1_flag = int(alpha5.z);
-    int pos2_flag = int(alpha5.w);
+    int pos1_flag = int(positions.x);
+    int pos2_flag = int(positions.y);
 
     mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
     vec4 center4d  = pvmMatrix * vec4(SSBO_data[ID].center.xyz, 1.0);

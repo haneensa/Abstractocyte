@@ -35,8 +35,6 @@ layout (std430, binding=2) buffer mesh_data
     SSBO_datum SSBO_data[];
 };
 
-
-
 void main(void)
 {
     int ID = int(vertex.w);

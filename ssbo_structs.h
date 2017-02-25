@@ -11,8 +11,11 @@ struct properties {
     QVector2D trans_alpha;
     QVector2D color_alpha;
     QVector2D point_size;
-    QVector4D extra_info;
+    QVector2D interval; // x: leftMin, y: leftMax
+    QVector2D positions; // x: position 1, y: position 2
     QVector4D render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
+  //  int axis_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
+
 };
 
 struct ast_neu_properties {

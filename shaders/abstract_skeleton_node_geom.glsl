@@ -33,9 +33,11 @@ struct properties {
     vec2 trans_alpha;
     vec2 color_alpha;
     vec2 point_size;
-    vec4 extra_info;
+    vec2 interval;
+    vec2 positions;
     vec4 render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
 };
+
 
 struct ast_neu_properties {
     properties ast;
@@ -55,12 +57,11 @@ void main() {
     int type = int(SSBO_data[ID].center.w);
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
-    vec2 alpha1 = space_properties.pos_alpha; // position interpolation (pos1, pos2)
-    vec2 alpha2 = space_properties.trans_alpha; // alpha
-    vec2 alpha3 = space_properties.color_alpha; // color_intp
-    vec2 alpha4 = space_properties.point_size; // point_size
-    vec4 alpha5 = space_properties.extra_info; // additional info
-    vec4 alpha6 = space_properties.render_type; // additional info
+    vec4 render_type = space_properties.render_type; // additional info
+
+    if (render_type.w == 0) {
+        return;
+    }
 
     color_val = SSBO_data[ID].color;
     gl_PointSize = 2;

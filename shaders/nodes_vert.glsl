@@ -1,11 +1,13 @@
 #version 430
 
+// this is for neurites nodes at the most abstract point.
+// so only when the curser is at (100, 100) the node of this will show uo
+// do I need this? only for the edges
+
 // in: per vertex data
 layout (location = 0) in int ID;
 
-
 out int V_ID;
-
 
 // World transformation
 uniform mat4 mMatrix;
@@ -13,7 +15,6 @@ uniform mat4 mMatrix;
 uniform mat4 vMatrix;
 // Projection transformation
 uniform mat4 pMatrix;
-
 uniform int is2D;
 
 struct SSBO_datum {
