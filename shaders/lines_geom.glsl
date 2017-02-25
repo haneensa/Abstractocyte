@@ -47,20 +47,6 @@ layout (std430, binding=3) buffer space2d_data
 };
 
 void main() {
-//    int ID = V_ID[0];
-//    int type = int(SSBO_data[ID].center.w);
-//    color_val = SSBO_data[ID].color;
-
-//    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
-
-//    vec4 render_type = space_properties.render_type; // additional info
-
-//    float leftMax = interval.y;
-
-//    if ( render_type.w == 0  ) {
-//        return;
-//    }
-
     //  Ideally I would interpolate betweeen the edges transparency to show it smothly?
 
     gl_Position = gl_in[0].gl_Position;

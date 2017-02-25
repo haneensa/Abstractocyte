@@ -77,6 +77,7 @@ void main() {
             return;
         }
 
+        gl_PointSize = 20;
         gl_Position = gl_in[i].gl_Position;
         EmitVertex();
 

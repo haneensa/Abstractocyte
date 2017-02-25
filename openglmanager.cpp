@@ -363,8 +363,17 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     if (m_glFunctionsSet == false)
         return false;
 
+    m_program_skeletons_nodes = glCreateProgram();
+    bool res = initShader(m_program_skeletons_nodes,
+                          ":/shaders/abstract_skeleton_node_vert.glsl",
+                          ":/shaders/abstract_skeleton_node_geom.glsl",
+                          ":/shaders/skeleton_point_frag.glsl");
+    if (res == false)
+        return res;
+
+
     m_program_skeletons_index = glCreateProgram();
-    bool res = initShader(m_program_skeletons_index,
+    res = initShader(m_program_skeletons_index,
                      ":/shaders/abstract_skeleton_node_vert.glsl",
                      ":/shaders/abstract_skeleton_line_geom.glsl",
                      ":/shaders/lines_frag.glsl");
@@ -378,11 +387,11 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     m_SkeletonsNodesVBO.create();
     m_SkeletonsNodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
     m_SkeletonsNodesVBO.bind();
+    glUseProgram(m_program_skeletons_nodes);
 
     m_SkeletonsNodesVBO.allocate( m_abstract_skel_nodes.data(),
                                   m_abstract_skel_nodes.size() * sizeof(struct AbstractSkelNode) );
     GL_Error();
-
 
     initSkeletonsVertexAttribPointer();
 
@@ -400,6 +409,44 @@ bool OpenGLManager::initAbstractSkeletonShaders()
 
 
     m_SkeletonsIndexVBO.release();
+    m_SkeletonsGraphVAO.release();
+}
+
+
+// only the edges, the nodes itself they are not needed to be visible
+// this will collabse into a node for the neurites at the most abstract view
+void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms)
+{
+    if (m_glFunctionsSet == false)
+        return;
+
+    // update skeleton data from object manager
+    m_uniforms = grid_uniforms;
+
+    m_SkeletonsGraphVAO.bind();
+    m_SkeletonsNodesVBO.bind();
+
+    glUseProgram(m_program_skeletons_nodes);
+    updateAbstractUniformsLocation(m_program_skeletons_nodes);
+
+    m_SkeletonsNodesVBO.allocate( m_abstract_skel_nodes.data(),
+                                  m_abstract_skel_nodes.size() *
+                                  sizeof(struct AbstractSkelNode) );
+
+    glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
+
+    m_SkeletonsIndexVBO.bind();
+
+    glUseProgram(m_program_skeletons_index);
+
+    updateAbstractUniformsLocation(m_program_skeletons_index);
+
+    glLineWidth(10.0f);
+     glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
+    m_SkeletonsIndexVBO.release();
+
+
+    m_SkeletonsNodesVBO.release();
     m_SkeletonsGraphVAO.release();
 }
 
@@ -461,8 +508,6 @@ bool OpenGLManager::initNeuritesGraphShaders()
 void OpenGLManager::drawMeshTriangles(struct GlobalUniforms grid_uniforms)
 {
    qDebug() << "OpenGLManager::drawMeshTriangles()";
-   glEnable (GL_BLEND);
-   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
    m_vao_mesh.bind();
    glUseProgram(m_program_mesh);
@@ -538,39 +583,6 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
     m_NeuritesNodesVBO.release();
     m_NeuritesGraphVAO.release();
 }
-
-// only the edges, the nodes itself they are not needed to be visible
-// this will collabse into a node for the neurites at the most abstract view
-void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms)
-{
-    if (m_glFunctionsSet == false)
-        return;
-
-    // update skeleton data from object manager
-
-    m_SkeletonsGraphVAO.bind();
-    m_SkeletonsNodesVBO.bind();
-
-    m_SkeletonsNodesVBO.allocate( m_abstract_skel_nodes.data(),
-                                  m_abstract_skel_nodes.size() *
-                                  sizeof(struct AbstractSkelNode) );
-
-    m_SkeletonsIndexVBO.bind();
-
-    glUseProgram(m_program_skeletons_index);
-    m_uniforms = grid_uniforms;
-
-    updateAbstractUniformsLocation(m_program_skeletons_index);
-
-    glLineWidth(10.0f);
-    glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
-    m_SkeletonsIndexVBO.release();
-
-
-    m_SkeletonsNodesVBO.release();
-    m_SkeletonsGraphVAO.release();
-}
-
 
 void OpenGLManager::update2Dflag(bool is2D)
 {

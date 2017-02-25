@@ -106,6 +106,7 @@ protected:
     QOpenGLBuffer                       m_SkeletonsNodesVBO;
 
     GLuint                              m_program_skeletons_index;
+    GLuint                              m_program_skeletons_nodes;
 
     // ***********  5) Neurites Graph (Nodes and Edges) ***********
     std::vector<GLuint>                 m_neurites_nodes; // (place holders for neurites nodes) this initialized once and not changed after words
