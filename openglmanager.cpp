@@ -211,113 +211,6 @@ bool OpenGLManager::initMeshVertexAttrib()
     return true;
 }
 
-bool OpenGLManager::initMeshTrianglesShaders()
-{
-    qDebug() << "initMeshTrianglesShaders";
-    m_program_mesh = glCreateProgram();
-    bool res = initShader(m_program_mesh, ":/shaders/mesh_vert.glsl",
-                                          ":/shaders/mesh_geom.glsl",
-                                          ":/shaders/mesh_frag.glsl");
-    if (res == false)
-        return res;
-
-    // create vbos and vaos
-    m_vao_mesh.create();
-    m_vao_mesh.bind();
-
-    glUseProgram(m_program_mesh); // m_program_mesh->bind();
-
-    QVector3D lightDir = QVector3D(-2.5f, -2.5f, -0.9f);
-    GLuint lightDir_loc = glGetUniformLocation(m_program_mesh, "diffuseLightDirection");
-    glUniform3fv(lightDir_loc, 1, &lightDir[0]);
-
-    m_vbo_mesh.create();
-    m_vbo_mesh.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    if ( !m_vbo_mesh.bind() ) {
-        qDebug() << "Could not bind vertex buffer to the context.";
-    }
-
-    Mesh* mesh = m_obj_mnger->getMeshPointer();
-    mesh->allocateVerticesVBO(m_vbo_mesh);
-
-    // initialize index buffers
-    m_vbo_IndexMesh.bind();
-    m_vbo_IndexMesh.release();
-
-    initMeshVertexAttrib();
-
-    m_vbo_mesh.release();
-    m_vao_mesh.release();
-
-}
-
-bool OpenGLManager::initMeshPointsShaders()
-{
-    qDebug() << "OpenGLManager::initMeshPointsShaders()";
-    m_program_mesh_points = glCreateProgram();
-    bool res = initShader(m_program_mesh_points, ":/shaders/mesh_vert.glsl",
-                                                 ":/shaders/mesh_points_geom.glsl",
-                                                 ":/shaders/points_3d_frag.glsl");
-    if (res == false)
-        return res;
-
-    // create vbos and vaos
-    m_vao_mesh_points.create();
-    m_vao_mesh_points.bind();
-
-    glUseProgram(m_program_mesh_points);
-
-    QVector3D lightDir = QVector3D(-2.5f, -2.5f, -0.9f);
-    GLuint lightDir_loc = glGetUniformLocation(m_program_mesh_points, "diffuseLightDirection");
-    glUniform3fv(lightDir_loc, 1, &lightDir[0]);
-
-    m_vbo_mesh.bind();
-
-    initMeshVertexAttrib();
-
-    m_vbo_mesh.release();
-    m_vao_mesh_points.release();
-}
-
-bool OpenGLManager::initSkeletonShaders()
-{
-    qDebug() << "OpenGLManager::initSkeletonShaders()";
-
-    m_program_skeleton = glCreateProgram();
-    bool res = initShader(m_program_skeleton, ":/shaders/skeleton_point_vert.glsl",
-                                              ":/shaders/skeleton_point_geom.glsl",
-                                              ":/shaders/points_3d_frag.glsl");
-    if (res == false)
-        return res;
-
-    m_vao_skeleton.create();
-    m_vao_skeleton.bind();
-
-    glUseProgram(m_program_skeleton);
-
-    m_vbo_skeleton.bind();
-
-    GL_Error();
-
-    int offset = 0;
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  0);
-
-    offset += sizeof(QVector4D);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  (GLvoid*)offset);
-
-    offset += sizeof(QVector4D);
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  (GLvoid*)offset);
-
-    GL_Error();
-
-    m_vbo_skeleton.release();
-    m_vao_skeleton.release();
-}
-
-
 void OpenGLManager::initNeuritesVertexAttribPointer()
 {
     int offset = 0;
@@ -441,14 +334,179 @@ void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms)
 
     updateAbstractUniformsLocation(m_program_skeletons_index);
 
-    glLineWidth(10.0f);
-     glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
+    glLineWidth(50.0f);
+    float linewidth[2];
+    glGetFloatv(GL_LINE_WIDTH_RANGE, linewidth);
+    qDebug() << "min line width: " << linewidth[0] << " max: " << linewidth[1];
+
+    glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
     m_SkeletonsIndexVBO.release();
 
 
     m_SkeletonsNodesVBO.release();
     m_SkeletonsGraphVAO.release();
 }
+
+
+bool OpenGLManager::initMeshTrianglesShaders()
+{
+    qDebug() << "initMeshTrianglesShaders";
+    m_program_mesh = glCreateProgram();
+    bool res = initShader(m_program_mesh, ":/shaders/mesh_vert.glsl",
+                                          ":/shaders/mesh_geom.glsl",
+                                          ":/shaders/mesh_frag.glsl");
+    if (res == false)
+        return res;
+
+    // create vbos and vaos
+    m_vao_mesh.create();
+    m_vao_mesh.bind();
+
+    glUseProgram(m_program_mesh); // m_program_mesh->bind();
+
+    QVector3D lightDir = QVector3D(-2.5f, -2.5f, -0.9f);
+    GLuint lightDir_loc = glGetUniformLocation(m_program_mesh, "diffuseLightDirection");
+    glUniform3fv(lightDir_loc, 1, &lightDir[0]);
+
+    m_vbo_mesh.create();
+    m_vbo_mesh.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    if ( !m_vbo_mesh.bind() ) {
+        qDebug() << "Could not bind vertex buffer to the context.";
+    }
+
+    Mesh* mesh = m_obj_mnger->getMeshPointer();
+    mesh->allocateVerticesVBO(m_vbo_mesh);
+
+    // initialize index buffers
+    m_vbo_IndexMesh.bind();
+    m_vbo_IndexMesh.release();
+
+    initMeshVertexAttrib();
+
+    m_vbo_mesh.release();
+    m_vao_mesh.release();
+
+}
+
+void OpenGLManager::drawMeshTriangles(struct GlobalUniforms grid_uniforms)
+{
+   qDebug() << "OpenGLManager::drawMeshTriangles()";
+
+   m_vao_mesh.bind();
+   glUseProgram(m_program_mesh);
+   m_uniforms = grid_uniforms;
+
+   updateUniformsLocation(m_program_mesh);
+
+   m_vbo_IndexMesh.bind();
+   glDrawElements(GL_TRIANGLES,  m_obj_mnger->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
+   m_vbo_IndexMesh.release();
+   m_vao_mesh.release();
+}
+
+bool OpenGLManager::initMeshPointsShaders()
+{
+    qDebug() << "OpenGLManager::initMeshPointsShaders()";
+    m_program_mesh_points = glCreateProgram();
+    bool res = initShader(m_program_mesh_points, ":/shaders/mesh_vert.glsl",
+                                                 ":/shaders/mesh_points_geom.glsl",
+                                                 ":/shaders/points_3d_frag.glsl");
+    if (res == false)
+        return res;
+
+    // create vbos and vaos
+    m_vao_mesh_points.create();
+    m_vao_mesh_points.bind();
+
+    glUseProgram(m_program_mesh_points);
+
+    QVector3D lightDir = QVector3D(-2.5f, -2.5f, -0.9f);
+    GLuint lightDir_loc = glGetUniformLocation(m_program_mesh_points, "diffuseLightDirection");
+    glUniform3fv(lightDir_loc, 1, &lightDir[0]);
+
+    m_vbo_mesh.bind();
+
+    initMeshVertexAttrib();
+
+    m_vbo_mesh.release();
+    m_vao_mesh_points.release();
+}
+
+void OpenGLManager::drawMeshPoints(struct GlobalUniforms grid_uniforms)
+{
+    qDebug() << "OpenGLManager::drawMeshPoints()";
+
+
+    // I need this because transitioning from mesh to skeleton is not smooth
+    m_vao_mesh_points.bind();
+    glUseProgram(m_program_mesh_points);
+    m_uniforms = grid_uniforms;
+
+    updateUniformsLocation(m_program_mesh_points);
+
+    m_vbo_IndexMesh.bind();
+    glDrawElements(GL_POINTS,  m_obj_mnger->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
+    m_vbo_IndexMesh.release();
+
+    m_vao_mesh_points.release();
+
+}
+
+
+bool OpenGLManager::initSkeletonShaders()
+{
+    qDebug() << "OpenGLManager::initSkeletonShaders()";
+
+    m_program_skeleton = glCreateProgram();
+    bool res = initShader(m_program_skeleton, ":/shaders/skeleton_point_vert.glsl",
+                                              ":/shaders/skeleton_point_geom.glsl",
+                                              ":/shaders/points_3d_frag.glsl");
+    if (res == false)
+        return res;
+
+    m_vao_skeleton.create();
+    m_vao_skeleton.bind();
+
+    glUseProgram(m_program_skeleton);
+
+    m_vbo_skeleton.bind();
+
+    GL_Error();
+
+    int offset = 0;
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  0);
+
+    offset += sizeof(QVector4D);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  (GLvoid*)offset);
+
+    offset += sizeof(QVector4D);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  (GLvoid*)offset);
+
+    GL_Error();
+
+    m_vbo_skeleton.release();
+    m_vao_skeleton.release();
+}
+
+
+void OpenGLManager::drawSkeletonPoints(struct GlobalUniforms grid_uniforms)
+{
+    qDebug() << "OpenGLManager::drawSkeletonPoints";
+    // I need this because vertex <-> skeleton mapping is not complete
+    m_vao_skeleton.bind();
+    glUseProgram(m_program_skeleton);
+
+    m_uniforms = grid_uniforms;
+    updateUniformsLocation(m_program_skeleton);
+
+    glDrawArrays(GL_POINTS, 0,  m_obj_mnger->getSkeletonPointsSize()  );
+    m_vao_skeleton.release();
+
+}
+
 
 // we initialize the vbos for drawing
 bool OpenGLManager::initNeuritesGraphShaders()
@@ -504,58 +562,6 @@ bool OpenGLManager::initNeuritesGraphShaders()
     return true;
 }
 
-
-void OpenGLManager::drawMeshTriangles(struct GlobalUniforms grid_uniforms)
-{
-   qDebug() << "OpenGLManager::drawMeshTriangles()";
-
-   m_vao_mesh.bind();
-   glUseProgram(m_program_mesh);
-   m_uniforms = grid_uniforms;
-
-   updateUniformsLocation(m_program_mesh);
-
-   m_vbo_IndexMesh.bind();
-   glDrawElements(GL_TRIANGLES,  m_obj_mnger->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
-   m_vbo_IndexMesh.release();
-   m_vao_mesh.release();
-}
-
-void OpenGLManager::drawMeshPoints(struct GlobalUniforms grid_uniforms)
-{
-    qDebug() << "OpenGLManager::drawMeshPoints()";
-
-
-    // I need this because transitioning from mesh to skeleton is not smooth
-    m_vao_mesh_points.bind();
-    glUseProgram(m_program_mesh_points);
-    m_uniforms = grid_uniforms;
-
-    updateUniformsLocation(m_program_mesh_points);
-
-    m_vbo_IndexMesh.bind();
-    glDrawElements(GL_POINTS,  m_obj_mnger->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
-    m_vbo_IndexMesh.release();
-
-    m_vao_mesh_points.release();
-
-}
-
-void OpenGLManager::drawSkeletonPoints(struct GlobalUniforms grid_uniforms)
-{
-    qDebug() << "OpenGLManager::drawSkeletonPoints";
-    // I need this because vertex <-> skeleton mapping is not complete
-    m_vao_skeleton.bind();
-    glUseProgram(m_program_skeleton);
-
-    m_uniforms = grid_uniforms;
-    updateUniformsLocation(m_program_skeleton);
-
-    glDrawArrays(GL_POINTS, 0,  m_obj_mnger->getSkeletonPointsSize()  );
-    m_vao_skeleton.release();
-
-}
-
 // only the edges, because the skeleton itself will collabse into a node
 void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
 {
@@ -575,7 +581,7 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
     glUseProgram(m_program_neurites_index);
     updateAbstractUniformsLocation(m_program_neurites_index);
 
-    glLineWidth(10.0f);
+    glLineWidth(50.0f);
     glDrawElements(GL_LINES,  m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
 
     m_NeuritesIndexVBO.release();

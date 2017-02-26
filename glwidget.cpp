@@ -110,6 +110,10 @@ void GLWidget::initializeGL()
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    // for line smoothing
+    glEnable(GL_LINE_SMOOTH);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
@@ -164,7 +168,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     int deltaX = event->x() - m_lastPos.x();
     int deltaY = event->y() - m_lastPos.y();
 
-    if (m_isRotatable) {
+    if (m_isRotatable) {        
         // Mouse release position - mouse press position
         QVector2D diff = QVector2D(deltaX, deltaY);
         // Rotation axis is perpendicular to the mouse position difference
@@ -176,6 +180,11 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         m_rotationAxis = (m_rotationAxis + n).normalized();
         // angle in degrees and rotation axis
         m_rotation = QQuaternion::fromAxisAndAngle(m_rotationAxis, acc) * m_rotation;
+
+        // whenever the rotation matrix is changed, reset the force directed layout and the nodes rotation matrix!
+        // the 2D view is always locked from rotating
+        // and the reset is alway rotatable
+
     } else {
         m_translation = QVector3D( m_translation.x() + deltaX/(float)width(), m_translation.y() +  -1.0 * (deltaY/(float)height()), 0.0);
     }
