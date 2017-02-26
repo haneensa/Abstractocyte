@@ -89,7 +89,7 @@ void main(void)
 
     V_alpha =  translate(y_axis, 80, 100,  0, 1);
     V_alpha = 1;
-    vec4 node_pos  = mix(node_layout1 , node_layout2, position_intp);
+    vec4 node_pos  = mix(node_layout2, node_layout1 ,  position_intp);
 
     gl_Position =  node_pos; // original position
     gl_PointSize = 20;

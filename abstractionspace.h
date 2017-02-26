@@ -33,6 +33,7 @@ public:
 
 
     void initRect(QVector2D x_interval, QVector2D y_interval, int ID);
+    void initLine(QVector2D end1, QVector2D end2, int ID);
     void initTriangle(QVector2D coords1, QVector2D coords2,QVector2D coords3, int ID);
 
 

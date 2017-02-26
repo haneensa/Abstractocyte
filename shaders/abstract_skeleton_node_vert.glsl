@@ -138,7 +138,7 @@ void main(void)
         vec4 node_layout1 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout1, 0, 1);
         vec4 node_layout2 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout2, 0, 1);
 
-        vec4 node_pos  = mix(node_layout1 , node_layout2, position_intp);
+        vec4 node_pos  = mix(node_layout2, node_layout1 ,  position_intp);
 
         position_intp = translate(x_axis, 80, 100, 0, 1);
         new_position = mix( skeleton_pos, node_pos ,position_intp);

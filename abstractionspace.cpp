@@ -332,20 +332,16 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     x_states = m_x_axis_states[std::make_pair(x_interval.x(), x_interval.y())];
     m_IntervalXY.push_back({y_states, x_states});
 
-//    // invalid states
-//    ID++;
-//    initTriangle(  QVector2D(62,  62),
-//                   QVector2D(80, 80),
-//                   QVector2D(62, 100), ID);
-//    initTriangle(  QVector2D(62, 62),
-//                   QVector2D(100, 62),
-//                   QVector2D(80, 80), 0);
-//    initTriangle(  QVector2D(80, 80),
-//                   QVector2D(100, 62),
-//                   QVector2D(100, 80), 0);
-//    initTriangle(  QVector2D(80, 80),
-//                   QVector2D(80, 100),
-//                   QVector2D(62, 100), 0);
+    // interpolate between graph 3D and 2D
+    initLine(QVector2D(60, 60), QVector2D(80, 80), ID++);
+    // interpolate between 3D neurite skeleton to 3D points
+    initLine(QVector2D(60, 60), QVector2D(60, 100), ID++);
+    // interpolate between 3D astrocyte and no astrocyte
+    initLine(QVector2D(60, 60), QVector2D(100, 60), ID++);
+    // interpolate between neurites skeleton 3D and 2D
+    initLine(QVector2D(60, 100), QVector2D(80, 100), ID++);
+    // interpolate between astrocyte and nodes 3D to 2D
+    initLine(QVector2D(100, 60), QVector2D(100, 80), ID++);
 }
 
 AbstractionSpace::~AbstractionSpace()
@@ -389,7 +385,7 @@ bool AbstractionSpace::initBuffer()
 
 bool AbstractionSpace::updateBuffer()
 {
-    qDebug() << " AbstractionSpace::updateBuffer: " << m_intervalID;
+    qDebug() << " AbstractionSpace::updateBuffer : " << m_intervalID;
 
     // update buffer data
     m_2DState = (struct ssbo_2DState*)malloc(sizeof(struct ssbo_2DState));
@@ -438,6 +434,51 @@ void AbstractionSpace::initRect(QVector2D x_interval, QVector2D y_interval, int 
     m_indices.push_back(offset + 3);
     m_indices.push_back(offset + 2);
 }
+
+void AbstractionSpace::initLine(QVector2D end1, QVector2D end2, int ID)
+{
+    // get the normal of the line
+    // add to the end points -/+
+    // construct two triangles for this line
+    float dx = end2.x() - end1.x();
+    float dy = end2.y() - end1.y();
+    QVector2D normal = QVector2D(-dy, dx);
+    normal.normalize();
+    qDebug() << "****normal: " << normal;
+
+    QVector2D p1, p2, p3, p4; // positions for one tirangle
+    int thickness = 2;
+    p1 = (end1 + normal * thickness)/100.0;
+    p2 = (end1 - normal * thickness)/100.0;
+    p3 = (end2 - normal * thickness)/100.0;
+    p4 = (end2 + normal * thickness)/100.0;
+
+    qDebug() << "**** p1: " << p1;
+    qDebug() << "**** p2: " << p2;
+    qDebug() << "**** p3: " << p3;
+    qDebug() << "**** p4: " << p4;
+
+    struct abstractionPoint p = {p1, ID};
+    int offset = m_vertices.size();
+
+    m_vertices.push_back(p);
+    p.point = p2;
+    m_vertices.push_back(p);
+    p.point = p3;
+    m_vertices.push_back(p);
+    p.point = p4;
+    m_vertices.push_back(p);
+
+
+    m_indices.push_back(offset + 0);
+    m_indices.push_back(offset + 1);
+    m_indices.push_back(offset + 2);
+
+    m_indices.push_back(offset + 2);
+    m_indices.push_back(offset + 3);
+    m_indices.push_back(offset + 0);
+}
+
 
 void AbstractionSpace::initTriangle(QVector2D coords1, QVector2D coords2,QVector2D coords3, int ID)
 {

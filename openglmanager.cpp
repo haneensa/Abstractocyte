@@ -576,7 +576,6 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
     if (m_glFunctionsSet == false)
         return;
 
-    write_ssbo_data();
 
     m_NeuritesGraphVAO.bind();
     m_NeuritesNodesVBO.bind();
@@ -644,6 +643,7 @@ void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
 void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
 {
     m_uniforms = grid_uniforms;
+    write_ssbo_data();
 
     // 1) Mesh Triangles
     drawMeshTriangles(grid_uniforms);
@@ -654,7 +654,7 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     // 3) Abstract Skeleton Graph (Nodes and Edges)
     drawSkeletonsGraph(grid_uniforms);
     // 4) Neurites Graph (Nodes and Edges)
-//    drawNeuritesGraph(grid_uniforms);
+    drawNeuritesGraph(grid_uniforms);
 }
 
 void OpenGLManager::updateUniformsLocation(GLuint program)
