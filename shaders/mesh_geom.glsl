@@ -1,8 +1,10 @@
 #version 430
 
-in vec4         Vskeleton_vx[];
 in  int         V_ID[];
-in  int         V_bleeding[];
+
+in vec4         V_color_val[];
+in float        V_alpha[];
+in float        V_color_intp[];
 
 out float       color_intp;
 out vec4        color_val;
@@ -11,16 +13,6 @@ out float       alpha;
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
-
-uniform int     y_axis;
-uniform int     x_axis;
-// World transformation
-uniform mat4 mMatrix;
-// View Transformation
-uniform mat4 vMatrix;
-// Projection transformation
-uniform mat4 pMatrix;
-
 
 struct SSBO_datum {
     vec4 color;
@@ -82,59 +74,21 @@ void main() {
   for(int i = 0; i < 3; i++) {
     int ID = V_ID[i];
     int type = int(SSBO_data[ID].center.w);
-    if (V_bleeding[i] == 1)
-        color_val = vec4(1.0, 0.0, 0.0, 1.0);
-    else
-        color_val = SSBO_data[ID].color;
+    color_val = V_color_val[i];
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
-    vec2 pos_alpha = space_properties.pos_alpha; // position interpolation (pos1, pos2)
-    vec2 trans_alpha = space_properties.trans_alpha; // alpha
-    vec2 color_alpha = space_properties.color_alpha; // color_intp
-    vec2 interval = space_properties.interval; // additional info
-    vec2 positions = space_properties.positions; // additional info
     vec4 render_type = space_properties.render_type; // additional info
-    vec4 extra_info = space_properties.extra_info;   // x: axis type (0: x_axis, 1: y_axis)
-
-    int slider = (extra_info.x == 1) ? y_axis : x_axis;  // need to make this general and not tied to object type
 
     if (render_type.x == 0) {
         return;
     }
 
-    float leftMin = interval.x;
-    float leftMax = interval.y;
+    alpha =  V_alpha[i];
 
-    alpha =  translate(slider, leftMin, leftMax,  trans_alpha.x, trans_alpha.y);
+    color_intp =  V_color_intp[i];
 
-    float position_intp = translate(slider, leftMin, leftMax, pos_alpha.x, pos_alpha.y);
-    color_intp = translate(slider, leftMin, leftMax, color_alpha.x, color_alpha.y);
-
-    mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
-    vec4 center4d  = pvmMatrix * vec4(SSBO_data[ID].center.xyz, 1.0);
-
-    int pos1_flag = int(positions.x);
-    int pos2_flag = int(positions.y);
-
-    vec4 pos1, pos2;
-
-    switch(pos1_flag)
-    {
-    case 1: pos1 = gl_in[i].gl_Position; break;
-    case 2: pos1 = vec4(Vskeleton_vx[i].xyz, 1.0); break;
-    case 3: pos1 = center4d; break;
-    }
-
-    switch(pos2_flag)
-    {
-    case 1: pos2 = gl_in[i].gl_Position; break;
-    case 2: pos2 = vec4(Vskeleton_vx[i].xyz, 1.0); break;
-    case 3: pos2 = center4d; break;
-    }
-
-    vec4 new_position = mix(pos1 , pos2, position_intp);
-    gl_Position = new_position;
+    gl_Position = gl_in[i].gl_Position;
     EmitVertex();
   }
 
