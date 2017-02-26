@@ -52,9 +52,9 @@ void main() {
 
     vec4 render_type = space_properties.render_type; // additional info
 
-//    if ( render_type.w == 0  ) {
-//        return;
-//    }
+    if ( render_type.w == 0  ) {
+        return;
+    }
 
     color_val = SSBO_data[ID].color;
     gl_Position = gl_in[0].gl_Position;

@@ -35,7 +35,7 @@ struct properties {
     vec2 interval;
     vec2 positions;
     vec4 render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
-    vec4 extra_info;  // x: axis type, y, z, w: empty slots
+    vec4 extra_info;  // x: axis type, y: connectivity graph, z, w: empty slots
 };
 
 struct ast_neu_properties {
@@ -50,10 +50,17 @@ layout (std430, binding=3) buffer space2d_data
 };
 
 void main() {
-    //  Ideally I would interpolate betweeen the edges transparency to show it smothly?
-//    if (x_axis < 98) {
-//        return;
-//    }
+    int ID = V_ID[0];
+    int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
+
+    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
+
+    vec4 render_type = space_properties.render_type; // additional info
+    vec4 extra_info = space_properties.extra_info; // additional info
+
+    if ( extra_info.y == 0  ) {
+        return;
+    }
 
     color_val = vec4(1.0, 0, 1, 1);
     alpha = V_alpha[0];

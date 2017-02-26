@@ -90,8 +90,12 @@ void main(void)
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
-    vec2 interval = space_properties.interval; // additional info
-    vec2 positions = space_properties.positions; // additional info
+    vec2 pos_alpha = space_properties.pos_alpha; // position interpolation (pos1, pos2)
+    vec2 trans_alpha = space_properties.trans_alpha; // alpha
+    vec2 color_alpha = space_properties.color_alpha; // color_intp
+    vec2 point_size = space_properties.point_size; // point_size
+    vec2 interval = space_properties.interval; // interval this state is between
+    vec2 positions = space_properties.positions; // which positions to interpolate between them
     vec4 render_type = space_properties.render_type; // additional info
     vec4 extra_info = space_properties.extra_info;   // x: axis type (0: x_axis, 1: y_axis)
 
@@ -100,50 +104,50 @@ void main(void)
     float leftMin = interval.x;
     float leftMax = interval.y;
 
+    gl_PointSize =  translate(slider, leftMin, leftMax, point_size.x, point_size.y);
 
-    float position_intp;
-    vec4 new_position;
 
-    if (type == 0) {
-        V_alpha =  translate(y_axis, 80, 100,  1, 0);
-        position_intp = translate(x_axis, 80, 100, 0, 1);
-            if (x_axis > 80) {
-            // astrocyte, along the y axis it will disappear,
-            // along the x axis it will be interpolated between layout 1 and layout 2
+    V_alpha =  translate(y_axis, leftMin, leftMax, trans_alpha.x, trans_alpha.y);
+    int pos1_flag = int(positions.x);
+    int pos2_flag = int(positions.y);
 
-            // todo: fix the 3d - 2d transitioning (multiply layouts with rotation matrix)
-           // new_position = mix(v_vertex , v_vertex, position_intp);
-            new_position = mix(v_layout1 , v_layout2, position_intp);
-        } else {
-            new_position = mix(v_vertex , v_vertex, position_intp);
-        }
-        gl_PointSize = 1;
-    } else {
-        // if we are in the 2D space, then we have two interpolation for the neurites
-        // for the nodes and skeletons along the y axis (node layout 1 and node layout 2)
-        // for the neurites skeleton as well along the y axis (layout 1 and layout 3)
-        // then we interpolate along the x axis using these two values
+    vec4 pos1, pos2;
 
-        V_alpha = 1.0;
-        gl_PointSize =  translate(x_axis, 95, 100, 1, 20);
+    // if we are in the 2D space, then we have two interpolation for the neurites
+    // for the nodes and skeletons along the y axis (node layout 1 and node layout 2)
+    // for the neurites skeleton as well along the y axis (layout 1 and layout 3)
+    // then we interpolate along the x axis using these two values
 
-        // for skeleton get the value between v_layout3 and v_layout1 using mix with y_axis
-        // then get another position for node in layout 1 and layout 2
-        // then use these two new values to get the final one along the x axis
+    // for skeleton get the value between v_layout3 and v_layout1 using mix with y_axis
+    // then get another position for node in layout 1 and layout 2
+    // then use these two new values to get the final one along the x axis
+    float position_intp_1 = translate(y_axis, 80, 100, 0, 1);
+    vec4 skeleton_pos = mix(v_layout1 , v_layout3, position_intp_1);
+    vec4 node_layout1 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout1, 0, 1);
+    vec4 node_layout2 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout2, 0, 1);
+    vec4 node_pos  = mix(node_layout2, node_layout1 ,  position_intp_1);
 
-        position_intp = translate(y_axis, 80, 100, 0, 1);
-
-        vec4 skeleton_pos = mix(v_layout1 , v_layout3, position_intp);
-
-        vec4 node_layout1 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout1, 0, 1);
-        vec4 node_layout2 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout2, 0, 1);
-
-        vec4 node_pos  = mix(node_layout2, node_layout1 ,  position_intp);
-
-        position_intp = translate(x_axis, 80, 100, 0, 1);
-        new_position = mix( skeleton_pos, node_pos ,position_intp);
+    float position_intp = translate(slider, leftMin, leftMax,  pos_alpha.x, pos_alpha.y);
+    switch(pos1_flag)
+    {
+    case 1: pos1 = v_vertex; break;
+    case 2: pos1 = v_layout1; break;
+    case 3: pos1 = v_layout2; break;
+    case 4: pos1 = v_layout3; break;
+    case 5: pos1 = skeleton_pos; break;
+    case 6: pos1 = node_pos; break;
     }
 
-    gl_Position = new_position;
+    switch(pos2_flag)
+    {
+    case 1: pos2 = v_vertex; break;
+    case 2: pos2 = v_layout1; break;
+    case 3: pos2 = v_layout2; break;
+    case 4: pos2 = v_layout3; break;
+    case 5: pos2 = skeleton_pos; break;
+    case 6: pos2 = node_pos; break;
+    }
 
+
+    gl_Position = pos2 * position_intp + ( 1.0 - position_intp) * pos1;
 }
