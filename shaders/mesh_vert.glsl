@@ -7,6 +7,7 @@ out int         V_ID;
 out vec4        V_color_val;
 out float       V_alpha;
 out float       V_color_intp;
+out int         V_render;
 
 uniform int     y_axis;
 uniform int     x_axis;

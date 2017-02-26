@@ -257,7 +257,7 @@ bool OpenGLManager::initMeshPointsShaders()
     m_program_mesh_points = glCreateProgram();
     bool res = initShader(m_program_mesh_points, ":/shaders/mesh_vert.glsl",
                                                  ":/shaders/mesh_points_geom.glsl",
-                                                 ":/shaders/mesh_points_frag.glsl");
+                                                 ":/shaders/points_3d_frag.glsl");
     if (res == false)
         return res;
 
@@ -286,7 +286,7 @@ bool OpenGLManager::initSkeletonShaders()
     m_program_skeleton = glCreateProgram();
     bool res = initShader(m_program_skeleton, ":/shaders/skeleton_point_vert.glsl",
                                               ":/shaders/skeleton_point_geom.glsl",
-                                              ":/shaders/skeleton_point_frag.glsl");
+                                              ":/shaders/points_3d_frag.glsl");
     if (res == false)
         return res;
 
@@ -367,7 +367,7 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     bool res = initShader(m_program_skeletons_nodes,
                           ":/shaders/abstract_skeleton_node_vert.glsl",
                           ":/shaders/abstract_skeleton_node_geom.glsl",
-                          ":/shaders/skeleton_point_frag.glsl");
+                          ":/shaders/points_3d_frag.glsl");
     if (res == false)
         return res;
 

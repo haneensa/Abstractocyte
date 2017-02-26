@@ -3,7 +3,7 @@
 layout (points) in;
 layout (points, max_vertices = 1) out;
 
-out  float alpha;
+out float       alpha;
 out vec4        color_val;
 
 in int          V_ID[];
