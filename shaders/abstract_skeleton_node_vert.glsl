@@ -105,7 +105,12 @@ void main(void)
         // along the x axis it will be interpolated between layout 1 and layout 2
         V_alpha =  translate(y_axis, 80, 100,  1, 0);
         position_intp = translate(x_axis, 80, 100, 0, 1);
-        new_position = mix(v_layout1 , v_layout2, position_intp);
+
+        // todo: fix the 3d - 2d transitioning (multiply layouts with rotation matrix)
+        new_position = mix(v_vertex , v_vertex, position_intp);
+//        new_position = mix(v_layout1 , v_layout2, position_intp);
+
+        gl_PointSize = 1;
     } else {
         // if we are in the 2D space, then we have two interpolation for the neurites
         // for the nodes and skeletons along the y axis (node layout 1 and node layout 2)

@@ -17,7 +17,6 @@ uniform int     x_axis;
 out int         V_ID;
 out float       V_alpha;
 out float       V_color_intp;
-out int         V_render;
 
 // make common header and add all these shared data together!
 struct SSBO_datum {
@@ -116,8 +115,6 @@ void main(void)
     vec2 positions = space_properties.positions; // additional info
     vec4 render_type = space_properties.render_type; // additional info
     vec4 extra_info = space_properties.extra_info;   // x: axis type (0: x_axis, 1: y_axis)
-
-    V_render = int(render_type.z);
 
     int slider = (extra_info.x == 1) ? y_axis : x_axis;  // need to make this general and not tied to object type
 

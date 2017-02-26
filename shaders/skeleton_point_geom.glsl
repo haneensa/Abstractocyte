@@ -4,7 +4,6 @@ in int      V_ID[];
 
 in float    V_alpha[];
 in float    V_color_intp[];
-in int      V_render[];
 
 out float   color_intp;
 out vec4    color_val;
@@ -52,10 +51,14 @@ layout (std430, binding=3) buffer space2d_data
 
 void main() {
     int ID = V_ID[0];
+    int type = int(SSBO_data[ID].center.w);
 
     color_val = SSBO_data[ID].color;
+    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
-    if (V_render[0] == 0) {
+    vec4 render_type = space_properties.render_type; // additional info
+
+    if (render_type.z == 0) {
         return;
     }
 

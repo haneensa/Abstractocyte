@@ -73,14 +73,10 @@ void main() {
     }
 
     color_intp = V_color_intp[0];
-
     gl_PointSize =  gl_in[0].gl_PointSize;
-
-
-   gl_Position = gl_in[0].gl_Position;
-   EmitVertex();
-   EndPrimitive();
-
+    gl_Position = gl_in[0].gl_Position;
+    EmitVertex();
+    EndPrimitive();
 }
 
 

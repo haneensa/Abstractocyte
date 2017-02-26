@@ -156,7 +156,7 @@ void MousePad::init2DSpaceGL()
 {
     m_program_2DSpace = glCreateProgram();
     bool res = initShader(m_program_2DSpace, ":/shaders/space2d_vert.glsl", ":/shaders/space2d_geom.glsl",
-                          ":/shaders/space2d_frag.glsl");
+                          ":/shaders/points_passthrough_frag.glsl");
     if(res == false)
         return;
 
@@ -198,7 +198,7 @@ void MousePad::init2DSpaceGL()
     /* selection buffer */
     m_program_2DSpace_Selection  = glCreateProgram();
     res = initShader(m_program_2DSpace_Selection, ":/shaders/space2d_vert.glsl", ":/shaders/space2d_geom.glsl",
-                     ":/shaders/space2d_frag.glsl");
+                     ":/shaders/points_passthrough_frag.glsl");
     if(res == false)
         return;
 

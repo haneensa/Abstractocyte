@@ -376,7 +376,7 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     res = initShader(m_program_skeletons_index,
                      ":/shaders/abstract_skeleton_node_vert.glsl",
                      ":/shaders/abstract_skeleton_line_geom.glsl",
-                     ":/shaders/lines_frag.glsl");
+                     ":/shaders/points_passthrough_frag.glsl");
 
     if (res == false)
         return res;
@@ -462,7 +462,7 @@ bool OpenGLManager::initNeuritesGraphShaders()
     m_program_neurites_index = glCreateProgram();
     bool res = initShader(m_program_neurites_index,  ":/shaders/nodes_vert.glsl",
                                        ":/shaders/lines_geom.glsl",
-                                       ":/shaders/lines_frag.glsl");
+                                       ":/shaders/points_passthrough_frag.glsl");
     if (res == false)
         return res;
 

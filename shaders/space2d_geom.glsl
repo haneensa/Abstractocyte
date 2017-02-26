@@ -1,7 +1,8 @@
 #version 430
 
 in int V_ID[];
-out vec4 color;
+out vec4 color_val;
+out float alpha;
 
 layout (std430, binding=1) buffer state_color
 {
@@ -19,11 +20,12 @@ void main() {
         int ID  = V_ID[i];
         float b = ID/255.0;
         if (is_selection_shader == 1)
-             color = vec4(b,  0.0,  0.0, 0.0);
+             color_val = vec4(b,  0.0,  0.0, 0.0);
         else
-            color = SSBO_data[ID-1];
+            color_val = SSBO_data[ID-1];
 
         gl_Position = gl_in[i].gl_Position;
+        alpha = 1.0;
         EmitVertex();
     }
     EndPrimitive();
