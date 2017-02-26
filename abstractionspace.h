@@ -67,9 +67,9 @@ private:
     std::vector<struct abstractionPoint>        m_vertices;
     std::vector<GLuint>                         m_indices;
     std::map<std::pair<int, int>, struct properties>
-                                                m_x_axis_states;
+                                                m_neu_states;
     std::map<std::pair<int, int>, struct properties>
-                                                m_y_axis_states;
+                                                m_ast_states;
 };
 
 #endif // ABSTRACTIONSPACE_H

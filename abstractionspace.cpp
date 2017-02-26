@@ -31,7 +31,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast1.positions = QVector2D(1, 1);
     ast1.render_type = QVector4D(1, 0, 0, 0);
     ast1.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())] = ast1;
+    m_ast_states[std::make_pair(y_interval.x(), y_interval.y())] = ast1;
 
     // 2) Mesh triangles -> point cloud -> skeleton
     y_interval = QVector2D(20, 40);
@@ -44,7 +44,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast2.positions = QVector2D(1, 2);
     ast2.render_type = QVector4D(1, 1, 1, 0);
     ast2.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())] = ast2;
+    m_ast_states[std::make_pair(y_interval.x(), y_interval.y())] = ast2;
 
     // 2) Mesh point cloud -> skeleton
     y_interval = QVector2D(40, 50);
@@ -57,7 +57,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast3.positions = QVector2D(1, 2);
     ast3.render_type = QVector4D(0, 1, 1, 0);
     ast3.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())] = ast3;
+    m_ast_states[std::make_pair(y_interval.x(), y_interval.y())] = ast3;
 
     // 3) curved skeleto <-> simplified skeleton
     y_interval = QVector2D(50, 60);
@@ -70,7 +70,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast4.positions = QVector2D(2, 4);
     ast4.render_type = QVector4D(0, 0, 1, 0);
     ast4.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())] = ast4;
+    m_ast_states[std::make_pair(y_interval.x(), y_interval.y())] = ast4;
 
 
     // 3) Skeleton -> no skeleton
@@ -84,7 +84,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast5.positions = QVector2D(4, 4);
     ast5.render_type = QVector4D(0, 0, 0, 1);
     ast5.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())] = ast5;
+    m_ast_states[std::make_pair(y_interval.x(), y_interval.y())] = ast5;
 
     // 4) Skeleton -> no skeleton
     y_interval = QVector2D(80, 100);
@@ -97,7 +97,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast6.positions = QVector2D(4, 4);
     ast6.render_type = QVector4D(0, 0, 0, 1);
     ast6.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())] = ast6;
+    m_ast_states[std::make_pair(y_interval.x(), y_interval.y())] = ast6;
 
 
     // ################## X axis: Neurites Abstraction
@@ -112,7 +112,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu1.positions = QVector2D(1, 1);       // alpha limit, div, pos1, pos2
     neu1.render_type = QVector4D(1, 0, 0, 0); // mesh triangles only
     neu1.extra_info = QVector4D(0, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_x_axis_states[std::make_pair(x_interval.x(), x_interval.y())] = neu1;
+    m_neu_states[std::make_pair(x_interval.x(), x_interval.y())] = neu1;
 
     // 2) Mesh triangles -> point cloud -> skeleton
     x_interval = QVector2D(20, 40);
@@ -125,7 +125,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu2.positions = QVector2D(1, 2);       // alpha limit, div, pos1, pos2
     neu2.render_type = QVector4D(1, 1, 1, 0);
     neu2.extra_info = QVector4D(0, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_x_axis_states[std::make_pair(x_interval.x(), x_interval.y())] = neu2;
+    m_neu_states[std::make_pair(x_interval.x(), x_interval.y())] = neu2;
 
     // 3) skeleton -> simplified skeleton
     x_interval = QVector2D(40, 60);
@@ -138,7 +138,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu3.positions = QVector2D(2, 4);       // alpha limit, div, pos1, pos2
     neu3.render_type = QVector4D(0, 0, 1, 0);
     neu3.extra_info = QVector4D(0, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_x_axis_states[std::make_pair(x_interval.x(), x_interval.y())] = neu3;
+    m_neu_states[std::make_pair(x_interval.x(), x_interval.y())] = neu3;
 
 
     // 4) Skeleton -> Point
@@ -152,7 +152,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu4.positions = QVector2D(4, 3);       // alpha limit, div, pos1, pos2
     neu4.render_type = QVector4D(0, 0, 0, 1);
     neu4.extra_info = QVector4D(0, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_x_axis_states[std::make_pair(x_interval.x(), x_interval.y())] = neu4;
+    m_neu_states[std::make_pair(x_interval.x(), x_interval.y())] = neu4;
 
     // 5) Skeleton -> Point
     x_interval = QVector2D(80, 100);
@@ -165,7 +165,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu5.positions = QVector2D(4, 3);       // alpha limit, div, pos1, pos2
     neu5.render_type = QVector4D(0, 0, 0, 1);
     neu5.extra_info = QVector4D(0, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_x_axis_states[std::make_pair(x_interval.x(), x_interval.y())] = neu5;
+    m_neu_states[std::make_pair(x_interval.x(), x_interval.y())] = neu5;
 
 
     // 2D space definition
@@ -181,7 +181,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast7.positions = QVector2D(5, 6); // 3D -> layout 2 for astrocyte
     ast7.render_type = QVector4D(0, 0, 0, 1); // graph
     ast7.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())] = ast7;
+    m_ast_states[std::make_pair(y_interval.x(), y_interval.y())] = ast7;
 
     // 6) Neurite Node 3D -> Neurite Node 2D (layouted) with astrocyte
     x_interval = QVector2D(98, 100);
@@ -196,148 +196,152 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu6.positions = QVector2D(5, 6); // 3D -> layout 2 for astrocyte
     neu6.render_type = QVector4D(0, 0, 0, 1); // graph
     neu6.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_x_axis_states[std::make_pair(x_interval.x(), x_interval.y())] = neu6;
+    m_neu_states[std::make_pair(x_interval.x(), x_interval.y())] = neu6;
 
 
     // ################## Creating the 2d space shapes
     int ID = 1;
-    struct properties y_states, x_states;
+    struct properties ast_properties, neu_properties;
 
     //* 1
     x_interval = x_intervals[0];
     y_interval =  y_intervals[0];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    x_states = m_x_axis_states[std::make_pair(x_interval.x(), x_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    neu_properties = m_neu_states[std::make_pair(x_interval.x(), x_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
 
     // 2
     y_interval =  y_intervals[1];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     // 3
     y_interval =  y_intervals[2];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     // 4
     y_interval =  y_intervals[3];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     y_interval =  y_intervals[4];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
 
     //* 5
     x_interval = x_intervals[1];
     y_interval =  y_intervals[0];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    x_states = m_x_axis_states[std::make_pair(x_interval.x(), x_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    neu_properties = m_neu_states[std::make_pair(x_interval.x(), x_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     // 6
     y_interval =  y_intervals[1];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     // 7
     y_interval =  y_intervals[2];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     // 8
     y_interval =  y_intervals[3];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     y_interval =  y_intervals[4];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
 
     //* 9
     x_interval = x_intervals[2];
     y_interval =  y_intervals[0];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    x_states = m_x_axis_states[std::make_pair(x_interval.x(), x_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    neu_properties = m_neu_states[std::make_pair(x_interval.x(), x_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     // 10
     y_interval =  y_intervals[1];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     // 11
     y_interval =  y_intervals[2];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     y_interval =  y_intervals[3];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     y_interval =  y_intervals[4];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
 
     //* 9
     x_interval = x_intervals[3];
     y_interval =  y_intervals[0];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    x_states = m_x_axis_states[std::make_pair(x_interval.x(), x_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    neu_properties = m_neu_states[std::make_pair(x_interval.x(), x_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     // 10
     y_interval =  y_intervals[1];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     // 11
     y_interval =  y_intervals[2];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     y_interval =  y_intervals[3];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
 
     // 2D space
     x_interval = x_intervals[4];
     y_interval =  y_intervals[5];
     initRect(x_interval, y_interval, ID++);
-    y_states = m_y_axis_states[std::make_pair(y_interval.x(), y_interval.y())];
-    x_states = m_x_axis_states[std::make_pair(x_interval.x(), x_interval.y())];
-    m_IntervalXY.push_back({y_states, x_states});
+    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
+    neu_properties = m_neu_states[std::make_pair(x_interval.x(), x_interval.y())];
+    m_IntervalXY.push_back({ast_properties, neu_properties});
+
+
+    // interpolate between 3D astrocyte and no astrocyte
+    initLine(QVector2D(60, 60), QVector2D(100, 60), ID++);
 
     // interpolate between graph 3D and 2D
     initLine(QVector2D(60, 60), QVector2D(80, 80), ID++);
+
     // interpolate between 3D neurite skeleton to 3D points
     initLine(QVector2D(60, 60), QVector2D(60, 100), ID++);
-    // interpolate between 3D astrocyte and no astrocyte
-    initLine(QVector2D(60, 60), QVector2D(100, 60), ID++);
+
     // interpolate between neurites skeleton 3D and 2D
     initLine(QVector2D(60, 100), QVector2D(80, 100), ID++);
     // interpolate between astrocyte and nodes 3D to 2D
