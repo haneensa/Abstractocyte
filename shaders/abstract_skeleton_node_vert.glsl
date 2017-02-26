@@ -107,8 +107,8 @@ void main(void)
         position_intp = translate(x_axis, 80, 100, 0, 1);
 
         // todo: fix the 3d - 2d transitioning (multiply layouts with rotation matrix)
-        new_position = mix(v_vertex , v_vertex, position_intp);
-//        new_position = mix(v_layout1 , v_layout2, position_intp);
+       // new_position = mix(v_vertex , v_vertex, position_intp);
+        new_position = mix(v_layout1 , v_layout2, position_intp);
 
         gl_PointSize = 1;
     } else {

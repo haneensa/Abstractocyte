@@ -185,6 +185,32 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         // the 2D view is always locked from rotating
         // and the reset is alway rotatable
 
+        // do wait function, if the user stayed in this view more than t seconds then do this
+        // 1) stop previous layouting algorithm if running
+        if (m_FDL_running) {
+            timer->stop();
+            m_graphManager->stopForceDirectedLayout(0);
+            m_graphManager->stopForceDirectedLayout(1);
+            m_graphManager->stopForceDirectedLayout(2);
+            m_graphManager->stopForceDirectedLayout(3);
+        }
+
+        // 2) reset graph nodes coordinates
+        updateMVPAttrib();      // update uniforms
+        m_graphManager->update2Dflag(true, m_uniforms);
+        m_opengl_mngr->update2Dflag(true);
+
+        // 3) start layouting
+
+        timer->start(0);
+        // pass rotation matrix
+        m_FDL_running = true;   // run force layout
+        m_graphManager->startForceDirectedLayout(0);
+        m_graphManager->startForceDirectedLayout(1);
+        m_graphManager->startForceDirectedLayout(2);
+        m_graphManager->startForceDirectedLayout(3);
+
+
     } else {
         m_translation = QVector3D( m_translation.x() + deltaX/(float)width(), m_translation.y() +  -1.0 * (deltaY/(float)height()), 0.0);
     }

@@ -25,7 +25,7 @@ void GraphManager::update2Dflag(bool is2D, struct GlobalUniforms uniforms)
 {
     m_2D = is2D;
 
-    if (!m_2D) {
+    if (!m_2D) { // if 3D but graph is never 3D
         // reset the cooridnates of the graphs
         QMatrix4x4 identitiy;
         m_graph[0]->resetCoordinates(identitiy); // for now later I will have two separate variables one for 2D one for 3D
@@ -122,7 +122,6 @@ void GraphManager::ExtractGraphFromMesh()
             }
         }
     }
-
 
      m_graph[0] = new Graph( Graph_t::NODE_NODE, m_opengl_mngr ); // neurite-neurite
      m_graph[0]->parseNODE_NODE(neurites_nodes, edges_info);
