@@ -13,5 +13,4 @@ struct GlobalUniforms {
     QMatrix4x4 rMatrix;
 };
 
-
 #endif // GLSLUNIFORM_STRUCTS_H

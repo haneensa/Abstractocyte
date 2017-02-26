@@ -6,7 +6,10 @@ layout (lines) in;
 layout (line_strip, max_vertices = 2) out;
 
 in int          V_ID[];
+in float        V_alpha[];
+
 out vec4        color_val;
+out float       alpha;
 
 uniform int     y_axis;
 uniform int     x_axis;
@@ -48,7 +51,12 @@ layout (std430, binding=3) buffer space2d_data
 
 void main() {
     //  Ideally I would interpolate betweeen the edges transparency to show it smothly?
+//    if (x_axis < 98) {
+//        return;
+//    }
 
+    color_val = vec4(1.0, 0, 1, 1);
+    alpha = V_alpha[0];
     gl_Position = gl_in[0].gl_Position;
     gl_PointSize = gl_in[0].gl_PointSize;
     EmitVertex();

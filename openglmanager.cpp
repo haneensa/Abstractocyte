@@ -517,8 +517,15 @@ bool OpenGLManager::initNeuritesGraphShaders()
         return false;
 
 
+     m_program_neurites_nodes = glCreateProgram();
+    bool res = initShader(m_program_neurites_nodes,  ":/shaders/nodes_vert.glsl",
+                      ":/shaders/abstract_skeleton_node_geom.glsl",
+                      ":/shaders/points_3d_frag.glsl");
+    if (res == false)
+        return false;
+
     m_program_neurites_index = glCreateProgram();
-    bool res = initShader(m_program_neurites_index,  ":/shaders/nodes_vert.glsl",
+    res = initShader(m_program_neurites_index,  ":/shaders/nodes_vert.glsl",
                                        ":/shaders/lines_geom.glsl",
                                        ":/shaders/points_passthrough_frag.glsl");
     if (res == false)
@@ -533,6 +540,7 @@ bool OpenGLManager::initNeuritesGraphShaders()
     m_NeuritesNodesVBO.create();
     m_NeuritesNodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
     m_NeuritesNodesVBO.bind();
+    glUseProgram(m_program_neurites_nodes);
 
     m_NeuritesNodesVBO.allocate( m_neurites_nodes.data(),
                             m_neurites_nodes.size() * sizeof(GLuint) );
@@ -573,15 +581,18 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
     m_NeuritesGraphVAO.bind();
     m_NeuritesNodesVBO.bind();
 
-
     m_uniforms = grid_uniforms;
+
+    glUseProgram(m_program_neurites_nodes);
+    updateAbstractUniformsLocation(m_program_neurites_nodes);
+
+    glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
 
     m_NeuritesIndexVBO.bind();
 
     glUseProgram(m_program_neurites_index);
     updateAbstractUniformsLocation(m_program_neurites_index);
 
-    glLineWidth(50.0f);
     glDrawElements(GL_LINES,  m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
 
     m_NeuritesIndexVBO.release();
@@ -602,19 +613,20 @@ void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
 
     // initialize uniforms
     GLuint mMatrix = glGetUniformLocation(program, "mMatrix");
+    GLuint m_noRartionMatrix = glGetUniformLocation(program, "m_noRartionMatrix");
     GLuint vMatrix = glGetUniformLocation(program, "vMatrix");
     GLint is2D = glGetUniformLocation(program, "is2D");
     int is2D_value;
 
     if (m_2D) { // force directed layout started, them use model without rotation
-        glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
         is2D_value = 1;
     } else {
-        glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
         is2D_value = 0;
     }
-
     glUniform1iv(is2D, 1, &is2D_value);
+
+    glUniformMatrix4fv(m_noRartionMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
+    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
 
     glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
 
@@ -634,15 +646,15 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     m_uniforms = grid_uniforms;
 
     // 1) Mesh Triangles
-    drawMeshTriangles(grid_uniforms);
-    // 2) Mesh Points
-    drawMeshPoints(grid_uniforms);
-    // 3) Skeleton Points
-    drawSkeletonPoints(grid_uniforms);
-    // 3) Abstract Skeleton Graph (Nodes and Edges)
-    drawSkeletonsGraph(grid_uniforms);
+//    drawMeshTriangles(grid_uniforms);
+//    // 2) Mesh Points
+//    drawMeshPoints(grid_uniforms);
+//    // 3) Skeleton Points
+//    drawSkeletonPoints(grid_uniforms);
+//    // 3) Abstract Skeleton Graph (Nodes and Edges)
+//    drawSkeletonsGraph(grid_uniforms);
     // 4) Neurites Graph (Nodes and Edges)
-//    drawNeuritesGraph(grid_uniforms);
+    drawNeuritesGraph(grid_uniforms);
 }
 
 void OpenGLManager::updateUniformsLocation(GLuint program)

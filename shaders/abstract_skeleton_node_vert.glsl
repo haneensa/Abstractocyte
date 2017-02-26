@@ -11,10 +11,13 @@ out float V_alpha;
 
 // World transformation
 uniform mat4 mMatrix;
+uniform mat4 m_noRartionMatrix;
+
 // View Transformation
 uniform mat4 vMatrix;
 // Projection transformation
 uniform mat4 pMatrix;
+
 uniform int  y_axis;
 uniform int  x_axis;
 uniform int is2D;
@@ -76,11 +79,12 @@ void main(void)
     int ID = int(vertex.w);
     V_ID = ID;
     mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
+    mat4 m_noRotvpMatrix = pMatrix * vMatrix * m_noRartionMatrix;
 
     vec4 v_vertex =  mvpMatrix * vec4(vertex.xyz, 1); // original position
-    vec4 v_layout1 =  mvpMatrix * vec4(layout1, 0, 1); // original position
-    vec4 v_layout2 =  mvpMatrix * vec4(layout2, 0, 1); // original position
-    vec4 v_layout3 =  mvpMatrix * vec4(layout3, 0, 1); // original position
+    vec4 v_layout1 =  m_noRotvpMatrix * vec4(layout1, 0, 1); // original position
+    vec4 v_layout2 =  m_noRotvpMatrix * vec4(layout2, 0, 1); // original position
+    vec4 v_layout3 =  m_noRotvpMatrix * vec4(layout3, 0, 1); // original position
 
     int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
 
@@ -101,15 +105,18 @@ void main(void)
     vec4 new_position;
 
     if (type == 0) {
-        // astrocyte, along the y axis it will disappear,
-        // along the x axis it will be interpolated between layout 1 and layout 2
         V_alpha =  translate(y_axis, 80, 100,  1, 0);
         position_intp = translate(x_axis, 80, 100, 0, 1);
+            if (x_axis > 80) {
+            // astrocyte, along the y axis it will disappear,
+            // along the x axis it will be interpolated between layout 1 and layout 2
 
-        // todo: fix the 3d - 2d transitioning (multiply layouts with rotation matrix)
-       // new_position = mix(v_vertex , v_vertex, position_intp);
-        new_position = mix(v_layout1 , v_layout2, position_intp);
-
+            // todo: fix the 3d - 2d transitioning (multiply layouts with rotation matrix)
+           // new_position = mix(v_vertex , v_vertex, position_intp);
+            new_position = mix(v_layout1 , v_layout2, position_intp);
+        } else {
+            new_position = mix(v_vertex , v_vertex, position_intp);
+        }
         gl_PointSize = 1;
     } else {
         // if we are in the 2D space, then we have two interpolation for the neurites
@@ -118,17 +125,18 @@ void main(void)
         // then we interpolate along the x axis using these two values
 
         V_alpha = 1.0;
-        gl_PointSize =  translate(x_axis, 80, 100, 1, 20);
+        gl_PointSize =  translate(x_axis, 95, 100, 1, 20);
 
         // for skeleton get the value between v_layout3 and v_layout1 using mix with y_axis
         // then get another position for node in layout 1 and layout 2
         // then use these two new values to get the final one along the x axis
 
         position_intp = translate(y_axis, 80, 100, 0, 1);
+
         vec4 skeleton_pos = mix(v_layout1 , v_layout3, position_intp);
 
-        vec4 node_layout1 = mvpMatrix * vec4(SSBO_data[ID].layout1, 0, 1);
-        vec4 node_layout2 = mvpMatrix * vec4(SSBO_data[ID].layout2, 0, 1);
+        vec4 node_layout1 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout1, 0, 1);
+        vec4 node_layout2 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout2, 0, 1);
 
         vec4 node_pos  = mix(node_layout1 , node_layout2, position_intp);
 
