@@ -60,6 +60,10 @@ void main() {
     gl_Position = gl_in[0].gl_Position;
     gl_PointSize = gl_in[0].gl_PointSize;
     alpha = V_alpha[0];
+    if (alpha < 0.01){
+        return;
+    }
+
     EmitVertex();
     EndPrimitive();
 }

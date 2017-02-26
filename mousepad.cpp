@@ -230,7 +230,7 @@ void MousePad::initializeGL()
 {
     qDebug() << "MousePad::initializeGL()";
     initializeOpenGLFunctions();
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.0f,0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     qDebug() << "MousePad::initData()";
@@ -262,13 +262,13 @@ void MousePad::initializeGL()
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.0f,0.0f, 0.0f, 1.0f);
 }
 
 void MousePad::paintGL()
 {
     glViewport( 0, 0, m_w, m_h);
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.0f,0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_vao_circle.bind();
@@ -407,7 +407,7 @@ void MousePad::renderSelection(void)
     qDebug() << "Draw Selection!";
   //  glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDisable(GL_DITHER);
     m_vao_2DSpace.bind();
@@ -434,7 +434,7 @@ void MousePad::renderSelection(void)
     m_vao_selection.release();
 
     glEnable(GL_DITHER);
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.0f,0.0f, 0.0f, 1.0f);
 }
 
 void MousePad::processSelection(float x, float y)

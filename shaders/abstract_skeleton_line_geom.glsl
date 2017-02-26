@@ -67,6 +67,10 @@ void main() {
 
     for(int i = 0; i < 2; i++) {
         alpha = V_alpha[i];
+        if (alpha < 0.01){
+            return;
+        }
+
         int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
 
         properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
