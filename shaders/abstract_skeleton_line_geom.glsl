@@ -22,6 +22,7 @@ layout (line_strip, max_vertices = 2) out;
 
 in int          V_ID[];
 in float        V_alpha[];
+in int          V_render[];
 
 out vec4        color_val;
 out float       alpha;
@@ -77,7 +78,7 @@ void main() {
 
         vec4 render_type = space_properties.render_type; // additional info
 
-        if ( render_type.w == 0  ) {
+        if ( V_render[i] == 0  ) {
             return;
         }
 

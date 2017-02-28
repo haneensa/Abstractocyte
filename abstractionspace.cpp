@@ -12,6 +12,9 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
       m_glFunctionsSet(false),
       m_intervalID(0)
 {
+    int max_neurite_nsize = 20;
+    int simplified_skeleton_nsize = 1;
+
     QVector2D x_interval, y_interval;
     struct properties ast1, ast2, ast3, ast4, ast5, ast6;
     struct properties neu1, neu2, neu3, neu4, neu5;
@@ -147,7 +150,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu4.pos_alpha  = QVector2D(0, 1);
     neu4.trans_alpha = QVector2D(1, 1);
     neu4.color_alpha = QVector2D(1, 1);
-    neu4.point_size = QVector2D(7, 35);
+    neu4.point_size = QVector2D(1, max_neurite_nsize);
     neu4.interval = QVector2D(x_interval.x(), x_interval.y());       // alpha limit, div, pos1, pos2
     neu4.positions = QVector2D(1, 6);       // alpha limit, div, pos1, pos2
     neu4.render_type = QVector4D(0, 0, 0, 1);
@@ -160,7 +163,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu5.pos_alpha  = QVector2D(0, 1);
     neu5.trans_alpha = QVector2D(1, 1);
     neu5.color_alpha = QVector2D(1, 1);
-    neu5.point_size = QVector2D(7, 30);
+    neu5.point_size = QVector2D(1, max_neurite_nsize);
     neu5.interval = QVector2D(x_interval.x(), x_interval.y());       // alpha limit, div, pos1, pos2
     neu5.positions = QVector2D(1, 6);       // alpha limit, div, pos1, pos2
     neu5.render_type = QVector4D(0, 0, 0, 1);
@@ -318,7 +321,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu6.pos_alpha  = QVector2D(0, 1);
     neu6.trans_alpha = QVector2D(1, 1);
     neu6.color_alpha = QVector2D(1, 1);
-    neu6.point_size = QVector2D(7, 30);
+    neu6.point_size = QVector2D(1, max_neurite_nsize);
     neu6.interval = QVector2D(x_interval.x(), x_interval.y());       // alpha limit, div, pos1, pos2
     neu6.positions = QVector2D(1, 6);       // alpha limit, div, pos1, pos2
     neu6.render_type = QVector4D(0, 0, 0, 1);
@@ -366,7 +369,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu6.pos_alpha = QVector2D(0, 1); // 3D to 2D lyout
     neu6.trans_alpha = QVector2D(1, 1); // nothing disappears
     neu6.color_alpha = QVector2D(1, 1); // same color
-    neu6.point_size = QVector2D(1, 6); // same point size
+    neu6.point_size = QVector2D(1, 1); // same point size
     // vertically instead of horizantally (Need indication)
     // flag: if 0, then verticall, else horizantally (generalization)
     neu6.interval = QVector2D(y_interval.x(), y_interval.y()); // 3D -> layout 2 for astrocyte
@@ -400,7 +403,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     // vertically instead of horizantally (Need indication)
     // flag: if 0, then verticall, else horizantally (generalization)
     neu6.interval = QVector2D(x_interval.x(), x_interval.y()); // 3D -> layout 2 for astrocyte
-    neu6.positions = QVector2D(1, 3); // 3D -> layout 2 for astrocyte
+    neu6.positions = QVector2D(1, 4); // 3D -> layout 2 for astrocyte
     neu6.render_type = QVector4D(0, 0, 0, 1); // graph
     neu6.extra_info = QVector4D(0, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
 
@@ -424,7 +427,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu6.pos_alpha = QVector2D(0, 1); // 3D to 2D lyout
     neu6.trans_alpha = QVector2D(1, 1); // nothing disappears
     neu6.color_alpha = QVector2D(1, 1); // same color
-    neu6.point_size = QVector2D(10, 10); // same point size
+    neu6.point_size = QVector2D(max_neurite_nsize, max_neurite_nsize); // same point size
     // vertically instead of horizantally (Need indication)
     // flag: if 0, then verticall, else horizantally (generalization)
     neu6.interval = QVector2D(x_interval.x(), x_interval.y()); // 3D -> layout 2 for astrocyte

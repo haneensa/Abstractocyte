@@ -6,9 +6,9 @@ layout (location = 1) in vec2 layout1;
 layout (location = 2) in vec2 layout2;
 layout (location = 3) in vec2 layout3;
 
-out int V_ID;
-out float V_alpha;
-
+out int     V_ID;
+out float   V_alpha;
+out int     V_render;
 // World transformation
 uniform mat4 mMatrix;
 uniform mat4 m_noRartionMatrix;
@@ -101,7 +101,10 @@ void main(void)
     vec2 positions = space_properties.positions; // which positions to interpolate between them
     vec4 render_type = space_properties.render_type; // additional info
     vec4 extra_info = space_properties.extra_info;   // x: axis type (0: x_axis, 1: y_axis)
-
+    if (extra_info.y == 1 && render_type.w == 1)
+        V_render = 1;
+    else
+        V_render = 0;
 
    // if we are in the 2D space, then we have two interpolation for the neurites
    // for the nodes and skeletons along the y axis (node layout 1 and node layout 2)
@@ -129,5 +132,6 @@ void main(void)
         gl_Position = mix(v_layout1,  v_layout2 ,  position_intp_x);
 
    }
+
 }
 

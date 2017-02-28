@@ -8,6 +8,7 @@ layout (location = 3) in vec2 layout3;
 
 out int V_ID;
 out float V_alpha;
+out int     V_render;
 
 // World transformation
 uniform mat4 mMatrix;
@@ -86,6 +87,10 @@ void main(void)
     vec4 v_layout2 =  m_noRotvpMatrix * vec4(layout2, 0, 1); // original position
     vec4 v_layout3 =  m_noRotvpMatrix * vec4(layout3, 0, 1); // original position
 
+
+    vec4 node_layout1 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout1, 0, 1);
+    vec4 node_layout2 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout2, 0, 1);
+
     int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
@@ -98,6 +103,12 @@ void main(void)
     vec2 positions = space_properties.positions; // which positions to interpolate between them
     vec4 render_type = space_properties.render_type; // additional info
     vec4 extra_info = space_properties.extra_info;   // x: axis type (0: x_axis, 1: y_axis)
+
+    if (extra_info.y == 0 && render_type.w == 1)
+        V_render = 1;
+    else
+        V_render = 0;
+
 
     int slider = (extra_info.x == 1) ? y_axis : x_axis;  // need to make this general and not tied to object type
 
@@ -113,19 +124,6 @@ void main(void)
 
     vec4 pos1, pos2;
 
-    // if we are in the 2D space, then we have two interpolation for the neurites
-    // for the nodes and skeletons along the y axis (node layout 1 and node layout 2)
-    // for the neurites skeleton as well along the y axis (layout 1 and layout 3)
-    // then we interpolate along the x axis using these two values
-
-    // for skeleton get the value between v_layout3 and v_layout1 using mix with y_axis
-    // then get another position for node in layout 1 and layout 2
-    // then use these two new values to get the final one along the x axis
-    float position_intp_1 = translate(y_axis, 80, 100, 0, 1);
-    vec4 skeleton_pos = mix(v_layout1 , v_layout3, position_intp_1);
-    vec4 node_layout1 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout1, 0, 1);
-    vec4 node_layout2 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout2, 0, 1);
-    vec4 node_pos  = mix(node_layout2, node_layout1 ,  position_intp_1);
 
     float position_intp = translate(slider, leftMin, leftMax,  pos_alpha.x, pos_alpha.y);
     switch(pos1_flag)
@@ -134,8 +132,8 @@ void main(void)
     case 2: pos1 = v_layout1; break;
     case 3: pos1 = v_layout2; break;
     case 4: pos1 = v_layout3; break;
-    case 5: pos1 = skeleton_pos; break;
-    case 6: pos1 = node_pos; break;
+    case 5: pos1 = node_layout1; break;
+    case 6: pos1 = node_layout2; break;
     }
 
     switch(pos2_flag)
@@ -144,10 +142,10 @@ void main(void)
     case 2: pos2 = v_layout1; break;
     case 3: pos2 = v_layout2; break;
     case 4: pos2 = v_layout3; break;
-    case 5: pos2 = skeleton_pos; break;
-    case 6: pos2 = node_pos; break;
+    case 5: pos2 = node_layout1; break;
+    case 6: pos2 = node_layout2; break;
     }
 
 
-    gl_Position = pos2 * position_intp + ( 1.0 - position_intp) * pos1;
+    gl_Position = mix(pos1,  pos2 ,  position_intp)  ;
 }

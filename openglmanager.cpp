@@ -297,8 +297,8 @@ bool OpenGLManager::initAbstractSkeletonShaders()
         return false;
 
     qDebug() << "nodes shader";
-    m_program_skeletons_nodes = glCreateProgram();
-    bool res = initShader(m_program_skeletons_nodes,
+    m_program_skeletons_2D_nodes = glCreateProgram();
+    bool res = initShader(m_program_skeletons_2D_nodes,
                           ":/shaders/abstract_skeleton_node_2D_vert.glsl",
                           ":/shaders/abstract_skeleton_node_geom.glsl",
                           ":/shaders/points_3d_frag.glsl");
@@ -306,9 +306,28 @@ bool OpenGLManager::initAbstractSkeletonShaders()
         return res;
 
     qDebug() << "index shader";
-    m_program_skeletons_index = glCreateProgram();
-    res = initShader(m_program_skeletons_index,
+    m_program_skeletons_2D_index = glCreateProgram();
+    res = initShader(m_program_skeletons_2D_index,
                      ":/shaders/abstract_skeleton_node_2D_vert.glsl",
+                     ":/shaders/abstract_skeleton_line_geom.glsl",
+                     ":/shaders/points_passthrough_frag.glsl");
+
+    if (res == false)
+        return res;
+
+
+    m_program_skeletons_23D_nodes = glCreateProgram();
+    res = initShader(m_program_skeletons_23D_nodes,
+                          ":/shaders/abstract_skeleton_node_transition_vert.glsl",
+                          ":/shaders/abstract_skeleton_node_geom.glsl",
+                          ":/shaders/points_3d_frag.glsl");
+    if (res == false)
+        return res;
+
+    qDebug() << "index shader";
+    m_program_skeletons_23D_index = glCreateProgram();
+    res = initShader(m_program_skeletons_23D_index,
+                     ":/shaders/abstract_skeleton_node_transition_vert.glsl",
                      ":/shaders/abstract_skeleton_line_geom.glsl",
                      ":/shaders/points_passthrough_frag.glsl");
 
@@ -320,7 +339,10 @@ bool OpenGLManager::initAbstractSkeletonShaders()
 
     m_SkeletonsNodesVBO.bind();
 
-    glUseProgram(m_program_skeletons_nodes);
+    glUseProgram(m_program_skeletons_2D_nodes);
+    initSkeletonsVertexAttribPointer();
+
+    glUseProgram(m_program_skeletons_23D_nodes);
     initSkeletonsVertexAttribPointer();
 
     GL_Error();
@@ -328,7 +350,8 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     m_SkeletonsNodesVBO.release();
 
     m_SkeletonsIndexVBO.bind();
-    glUseProgram(m_program_skeletons_index);
+    glUseProgram(m_program_skeletons_2D_index);
+    glUseProgram(m_program_skeletons_23D_index);
 
     m_SkeletonsIndexVBO.release();
     m_SkeletonsGraphVAO.release();
@@ -350,23 +373,25 @@ void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms)
 
     m_SkeletonsNodesVBO.allocate( m_abstract_skel_nodes.data(),
                                   m_abstract_skel_nodes.size() * sizeof(struct AbstractSkelNode) );
-    glUseProgram(m_program_skeletons_nodes);
-    updateAbstractUniformsLocation(m_program_skeletons_nodes);
 
+    glUseProgram(m_program_skeletons_2D_nodes);
+    updateAbstractUniformsLocation(m_program_skeletons_2D_nodes);
+    glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
+
+    glUseProgram(m_program_skeletons_23D_nodes);
+    updateAbstractUniformsLocation(m_program_skeletons_23D_nodes);
     glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
 
     m_SkeletonsIndexVBO.bind();
 
-    glUseProgram(m_program_skeletons_index);
-
-    updateAbstractUniformsLocation(m_program_skeletons_index);
-
-    glLineWidth(50.0f);
-    float linewidth[2];
-    glGetFloatv(GL_LINE_WIDTH_RANGE, linewidth);
-    qDebug() << "min line width: " << linewidth[0] << " max: " << linewidth[1];
-
+    glUseProgram(m_program_skeletons_2D_index);
+    updateAbstractUniformsLocation(m_program_skeletons_2D_index);
     glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
+
+    glUseProgram(m_program_skeletons_23D_index);
+    updateAbstractUniformsLocation(m_program_skeletons_23D_index);
+    glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
+
     m_SkeletonsIndexVBO.release();
 
 
@@ -417,7 +442,7 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
 void OpenGLManager::drawMeshTriangles(struct GlobalUniforms grid_uniforms)
 {
-   qDebug() << "OpenGLManager::drawMeshTriangles()";
+//   qDebug() << "OpenGLManager::drawMeshTriangles()";
 
    m_vao_mesh.bind();
    glUseProgram(m_program_mesh);
@@ -461,7 +486,7 @@ bool OpenGLManager::initMeshPointsShaders()
 
 void OpenGLManager::drawMeshPoints(struct GlobalUniforms grid_uniforms)
 {
-    qDebug() << "OpenGLManager::drawMeshPoints()";
+   // qDebug() << "OpenGLManager::drawMeshPoints()";
 
 
     // I need this because transitioning from mesh to skeleton is not smooth
@@ -521,7 +546,7 @@ bool OpenGLManager::initSkeletonShaders()
 
 void OpenGLManager::drawSkeletonPoints(struct GlobalUniforms grid_uniforms)
 {
-    qDebug() << "OpenGLManager::drawSkeletonPoints";
+   // qDebug() << "OpenGLManager::drawSkeletonPoints";
     // I need this because vertex <-> skeleton mapping is not complete
     m_vao_skeleton.bind();
     glUseProgram(m_program_skeleton);

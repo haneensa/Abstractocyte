@@ -8,7 +8,7 @@ out vec4        color_val;
 
 in int          V_ID[];
 in float        V_alpha[];
-
+in int          V_render[];
 
 struct SSBO_datum {
     vec4 color;
@@ -50,9 +50,8 @@ void main() {
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
-    vec4 render_type = space_properties.render_type; // additional info
 
-    if ( render_type.w == 0  ) {
+    if ( V_render[0] == 0  ) {
         return;
     }
 
@@ -60,7 +59,7 @@ void main() {
     gl_Position = gl_in[0].gl_Position;
     gl_PointSize = gl_in[0].gl_PointSize;
     alpha = V_alpha[0];
-    if (alpha < 0.01){
+    if (alpha < 0.05){
         return;
     }
 

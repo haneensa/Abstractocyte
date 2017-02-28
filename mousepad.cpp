@@ -368,12 +368,12 @@ void MousePad::getSlotsX(int value)
     m_x = value;
     // minimum = 0, maximum = 99
     emit setSignalX(value);
-    m_vbo_circle.bind();
-    circle.x = (float)value/100.0;
-    GLfloat points[] = { circle.x,  circle.y };
-    m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
-    m_vbo_circle.release();
-    m_updatedPointer = true;
+//    m_vbo_circle.bind();
+//    circle.x = (float)value/100.0;
+//    GLfloat points[] = { circle.x,  circle.y };
+//    m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
+//    m_vbo_circle.release();
+  //  m_updatedPointer = true;
     update();
 
 }
@@ -386,12 +386,12 @@ void MousePad::getSlotsY(int value)
     m_y = value;
     // minimum = 0, maximum = 99
     emit setSignalY(value);
-    m_vbo_circle.bind();
-    circle.y = (float)(value)/100.0;
-    GLfloat points[] = { circle.x,  circle.y };
-    m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
-    m_vbo_circle.release();
-    m_updatedPointer = true;
+  //  m_vbo_circle.bind();
+  //  circle.y = (float)(value)/100.0;
+//    GLfloat points[] = { circle.x,  circle.y };
+//    m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
+//    m_vbo_circle.release();
+  //  m_updatedPointer = true;
     update();
 }
 
@@ -405,9 +405,7 @@ void MousePad::renderSelection(void)
 {
     aboutToCompose();
     qDebug() << "Draw Selection!";
-  //  glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
-
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDisable(GL_DITHER);
     m_vao_2DSpace.bind();
@@ -434,7 +432,7 @@ void MousePad::renderSelection(void)
     m_vao_selection.release();
 
     glEnable(GL_DITHER);
-    glClearColor(0.0f,0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f,0.0f, 0.0f, 0.0f);
 }
 
 void MousePad::processSelection(float x, float y)
@@ -454,9 +452,9 @@ void MousePad::processSelection(float x, float y)
     glReadPixels(x,  y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &res);
     int pickedID = res[0] + res[1] * 256 + res[2] * 256 * 256;
 
-    //qDebug() <<  res[0] <<  " " << res[1] <<  " " << res[2];
+    qDebug() <<  res[0] <<  " " << res[1] <<  " " << res[2] << " " << res[3];
 
-    if (pickedID <= 0) {
+    if (pickedID == 255 || pickedID == 0) {
         qDebug() << "Background, Picked ID: " << pickedID;
     } else { 
         GLint viewport[4];
