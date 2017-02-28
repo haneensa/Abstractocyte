@@ -87,7 +87,7 @@ void main(void)
     vec4 v_layout2 =  m_noRotvpMatrix * vec4(layout2, 0, 1); // original position
     vec4 v_layout3 =  m_noRotvpMatrix * vec4(layout3, 0, 1); // original position
 
-
+    vec4 node_center = m_noRotvpMatrix * vec4(SSBO_data[ID].center.xy, 0, 1);
     vec4 node_layout1 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout1, 0, 1);
     vec4 node_layout2 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout2, 0, 1);
 
@@ -132,8 +132,7 @@ void main(void)
     case 2: pos1 = v_layout1; break;
     case 3: pos1 = v_layout2; break;
     case 4: pos1 = v_layout3; break;
-    case 5: pos1 = node_layout1; break;
-    case 6: pos1 = node_layout2; break;
+    case 5: pos1 = node_center; break;
     }
 
     switch(pos2_flag)
@@ -142,8 +141,7 @@ void main(void)
     case 2: pos2 = v_layout1; break;
     case 3: pos2 = v_layout2; break;
     case 4: pos2 = v_layout3; break;
-    case 5: pos2 = node_layout1; break;
-    case 6: pos2 = node_layout2; break;
+    case 5: pos2 = node_center; break;
     }
 
 

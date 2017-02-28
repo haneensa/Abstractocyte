@@ -119,7 +119,7 @@ void main(void)
         V_alpha = 1;
         float position_intp_y = translate(y_axis, extra_info.z, extra_info.w, 0, 1);
         vec4 skeleton_pos = mix(v_layout1 , v_layout3, position_intp_y);
-        vec4 node_pos  = mix(node_layout2, node_layout1 ,  position_intp_y);
+        vec4 node_pos  = mix(node_layout1, node_layout2 ,  position_intp_y);
 
         // if type == neurite -> mix (skeleton, node, x )
         float position_intp_x = translate(x_axis, interval.x, interval.y, 0, 1);

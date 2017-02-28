@@ -705,7 +705,7 @@ void OpenGLManager::updateUniformsLocation(GLuint program)
     if (m_glFunctionsSet == false)
         return;
 
-    qDebug() << "OpenGLManager::updateUniformsLocation";
+   // qDebug() << "OpenGLManager::updateUniformsLocation";
     // initialize uniforms
     GLuint mMatrix = glGetUniformLocation(program, "mMatrix");
     glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
