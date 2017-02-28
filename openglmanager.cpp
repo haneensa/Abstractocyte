@@ -184,6 +184,46 @@ void OpenGLManager::fillVBOsData()
     m_vbo_IndexMesh.release();
     m_vbo_skeleton.release();
 
+    // allocate skeleton nodes
+    m_SkeletonsNodesVBO.create();
+    m_SkeletonsNodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
+    m_SkeletonsNodesVBO.bind();
+
+    m_SkeletonsNodesVBO.allocate( m_abstract_skel_nodes.data(),
+                                  m_abstract_skel_nodes.size() * sizeof(struct AbstractSkelNode) );
+    GL_Error();
+    m_SkeletonsNodesVBO.release();
+
+    // allocate skeleton edges
+    m_SkeletonsIndexVBO.create();
+    m_SkeletonsIndexVBO.bind();
+
+    m_SkeletonsIndexVBO.allocate( m_abstract_skel_edges.data(),
+                                  m_abstract_skel_edges.size() * sizeof(GLuint) );
+    m_SkeletonsIndexVBO.release();
+    GL_Error();
+
+    // allocate neurites nodes
+    m_NeuritesNodesVBO.create();
+    m_NeuritesNodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
+    m_NeuritesNodesVBO.bind();
+
+    m_NeuritesNodesVBO.allocate( m_neurites_nodes.data(),
+                            m_neurites_nodes.size() * sizeof(GLuint) );
+    m_NeuritesNodesVBO.release();
+
+
+    // allocate neurites edges
+    m_NeuritesIndexVBO.create();
+    m_NeuritesIndexVBO.bind();
+
+    m_NeuritesIndexVBO.allocate( m_neurites_edges.data(),
+                                 m_neurites_edges.size() * sizeof(GLuint) );
+
+    m_NeuritesIndexVBO.release();
+    GL_Error();
+
+
     qDebug() << "m_abstract_skel_nodes.size(): " << m_abstract_skel_nodes.size();
     qDebug() << "m_abstract_skel_edges.size(): " << m_abstract_skel_edges.size();
     qDebug() << "m_neurites_edges.size(): " << m_neurites_edges.size();
@@ -256,18 +296,19 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     if (m_glFunctionsSet == false)
         return false;
 
+    qDebug() << "nodes shader";
     m_program_skeletons_nodes = glCreateProgram();
     bool res = initShader(m_program_skeletons_nodes,
-                          ":/shaders/abstract_skeleton_node_vert.glsl",
+                          ":/shaders/abstract_skeleton_node_2D_vert.glsl",
                           ":/shaders/abstract_skeleton_node_geom.glsl",
                           ":/shaders/points_3d_frag.glsl");
     if (res == false)
         return res;
 
-
+    qDebug() << "index shader";
     m_program_skeletons_index = glCreateProgram();
     res = initShader(m_program_skeletons_index,
-                     ":/shaders/abstract_skeleton_node_vert.glsl",
+                     ":/shaders/abstract_skeleton_node_2D_vert.glsl",
                      ":/shaders/abstract_skeleton_line_geom.glsl",
                      ":/shaders/points_passthrough_frag.glsl");
 
@@ -276,30 +317,18 @@ bool OpenGLManager::initAbstractSkeletonShaders()
 
     m_SkeletonsGraphVAO.create();
     m_SkeletonsGraphVAO.bind();
-    GL_Error();
-    m_SkeletonsNodesVBO.create();
-    m_SkeletonsNodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
+
     m_SkeletonsNodesVBO.bind();
+
     glUseProgram(m_program_skeletons_nodes);
-
-    m_SkeletonsNodesVBO.allocate( m_abstract_skel_nodes.data(),
-                                  m_abstract_skel_nodes.size() * sizeof(struct AbstractSkelNode) );
-    GL_Error();
-
     initSkeletonsVertexAttribPointer();
 
     GL_Error();
 
     m_SkeletonsNodesVBO.release();
 
-    m_SkeletonsIndexVBO.create();
     m_SkeletonsIndexVBO.bind();
-
-    m_SkeletonsIndexVBO.allocate( m_abstract_skel_edges.data(),
-                                  m_abstract_skel_edges.size() * sizeof(GLuint) );
-
     glUseProgram(m_program_skeletons_index);
-
 
     m_SkeletonsIndexVBO.release();
     m_SkeletonsGraphVAO.release();
@@ -319,12 +348,10 @@ void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms)
     m_SkeletonsGraphVAO.bind();
     m_SkeletonsNodesVBO.bind();
 
+    m_SkeletonsNodesVBO.allocate( m_abstract_skel_nodes.data(),
+                                  m_abstract_skel_nodes.size() * sizeof(struct AbstractSkelNode) );
     glUseProgram(m_program_skeletons_nodes);
     updateAbstractUniformsLocation(m_program_skeletons_nodes);
-
-    m_SkeletonsNodesVBO.allocate( m_abstract_skel_nodes.data(),
-                                  m_abstract_skel_nodes.size() *
-                                  sizeof(struct AbstractSkelNode) );
 
     glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
 
@@ -537,13 +564,9 @@ bool OpenGLManager::initNeuritesGraphShaders()
     m_NeuritesGraphVAO.create();
     m_NeuritesGraphVAO.bind();
 
-    m_NeuritesNodesVBO.create();
-    m_NeuritesNodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
     m_NeuritesNodesVBO.bind();
     glUseProgram(m_program_neurites_nodes);
 
-    m_NeuritesNodesVBO.allocate( m_neurites_nodes.data(),
-                            m_neurites_nodes.size() * sizeof(GLuint) );
 
     GL_Error();
 
@@ -555,14 +578,9 @@ bool OpenGLManager::initNeuritesGraphShaders()
 
     m_NeuritesNodesVBO.release();
 
-    m_NeuritesIndexVBO.create();
     m_NeuritesIndexVBO.bind();
 
-    m_NeuritesIndexVBO.allocate( m_neurites_edges.data(),
-                                 m_neurites_edges.size() * sizeof(GLuint) );
-
     glUseProgram(m_program_neurites_index);
-
 
     m_NeuritesIndexVBO.release();
     m_NeuritesGraphVAO.release();
@@ -654,7 +672,7 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     // 3) Abstract Skeleton Graph (Nodes and Edges)
     drawSkeletonsGraph(grid_uniforms);
     // 4) Neurites Graph (Nodes and Edges)
-    drawNeuritesGraph(grid_uniforms);
+//    drawNeuritesGraph(grid_uniforms);
 }
 
 void OpenGLManager::updateUniformsLocation(GLuint program)

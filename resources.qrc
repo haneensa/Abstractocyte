@@ -21,11 +21,12 @@
         <file>shaders/space_pointer_frag.glsl</file>
         <file>shaders/space_pointer_geom.glsl</file>
         <file>shaders/space_pointer_vert.glsl</file>
-        <file>shaders/abstract_skeleton_node_vert.glsl</file>
         <file>shaders/abstract_skeleton_line_geom.glsl</file>
         <file>shaders/nodes_vert.glsl</file>
         <file>shaders/abstract_skeleton_node_geom.glsl</file>
         <file>shaders/points_3d_frag.glsl</file>
         <file>shaders/points_passthrough_frag.glsl</file>
+        <file>shaders/abstract_skeleton_node_2D_vert.glsl</file>
+        <file>shaders/abstract_skeleton_node_transition_vert.glsl</file>
     </qresource>
 </RCC>

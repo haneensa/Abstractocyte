@@ -296,13 +296,36 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     m_IntervalXY.push_back({ast_properties, neu_properties});
 
     // 2D space
-    x_interval = x_intervals[4];
-    y_interval =  y_intervals[5];
-    initRect(x_interval, y_interval, ID++);
-    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
-    neu_properties = m_neu_states[std::make_pair(x_interval.x(), x_interval.y())];
-    m_IntervalXY.push_back({ast_properties, neu_properties});
+    struct properties ast7, neu6 /* non repeatable properties -> no need map */;
 
+    // 4)   (x axis) Skeleton -> no skeleton
+    //      (y axis) layout 1  -> layout 2
+    y_interval = QVector2D(80, 100);
+    ast7.pos_alpha = QVector2D(0, 1);
+    ast7.trans_alpha = QVector2D(1, 0);
+    ast7.color_alpha = QVector2D(1, 1); // skeleto <-> no skeleton
+    ast7.point_size = QVector2D(1, 1);
+    ast7.interval = QVector2D(y_interval.x(), y_interval.y());
+    ast7.positions = QVector2D(1, 1);
+    ast7.render_type = QVector4D(0, 0, 0, 1);
+    ast7.extra_info = QVector4D(0, 1, 80, 100);   // x: axis type (0: x_axis, 1: y_axis)
+                                               // y: both x and y axis
+                                               // z: left interval, w: right interval for y axis
+
+    // 4)   (x axis) Skeleton -> point layouted
+    //      (y axis) Layout <-> Layout
+    x_interval = QVector2D(80, 100);
+    neu6.pos_alpha  = QVector2D(0, 1);
+    neu6.trans_alpha = QVector2D(1, 1);
+    neu6.color_alpha = QVector2D(1, 1);
+    neu6.point_size = QVector2D(7, 30);
+    neu6.interval = QVector2D(x_interval.x(), x_interval.y());       // alpha limit, div, pos1, pos2
+    neu6.positions = QVector2D(1, 6);       // alpha limit, div, pos1, pos2
+    neu6.render_type = QVector4D(0, 0, 0, 1);
+    neu6.extra_info = QVector4D(0, 1, 80, 100);   // x: axis type (0: x_axis, 1: y_axis)
+
+    initRect(x_interval, y_interval, ID++);
+    m_IntervalXY.push_back({ast7, neu6});
 
     // interpolate between 3D Simplified astrocyte and no astrocyte
     // Neurites 3D simplified Skeleton
@@ -326,7 +349,6 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
 
 
     // 2D space definition
-    struct properties ast7, neu6;
     // 5) Skeleton Simplified 3D -> Skeleton Simplified 2D (layouted)
     y_interval = QVector2D(60, 80);
     ast7.pos_alpha = QVector2D(0, 1); // 3D to 2D lyout
@@ -337,7 +359,6 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast7.positions = QVector2D(1, 2); // 3D -> layout 2 for astrocyte
     ast7.render_type = QVector4D(0, 0, 0, 1); // graph
     ast7.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_ast_states[std::make_pair(y_interval.x(), y_interval.y())] = ast7;
 
 
     // 6) Neurite Node 3D -> Neurite Node 2D (layouted) with astrocyte
@@ -352,18 +373,67 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu6.positions = QVector2D(1, 2); // 3D -> layout 2 for astrocyte
     neu6.render_type = QVector4D(0, 0, 0, 1); // graph
     neu6.extra_info = QVector4D(0, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_neu_states[std::make_pair(x_interval.x(), x_interval.y())] = neu6;
 
-    ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
-    neu_properties = m_neu_states[std::make_pair(x_interval.x(), x_interval.y())];
     // interpolate between graph 3D and 2D
-    m_IntervalXY.push_back({ast_properties, neu_properties});
+    m_IntervalXY.push_back({ast7, neu6});
     initLine(QVector2D(60, 60), QVector2D(80, 80), ID++);
 
 
     // interpolate between neurites skeleton 3D and 2D
+    // 5) No skeleton!!
+    y_interval = QVector2D(95, 100);
+    ast7.pos_alpha = QVector2D(1, 1); // 3D to 2D lyout
+    ast7.trans_alpha = QVector2D(1, 1); // nothing disappears
+    ast7.color_alpha = QVector2D(1, 1); // same color
+    ast7.point_size = QVector2D(1, 1); // same point size
+    ast7.interval = QVector2D(y_interval.x(), y_interval.y()); // 3D -> layout 2 for astrocyte
+    ast7.positions = QVector2D(1, 2); // 3D -> layout 2 for astrocyte
+    ast7.render_type = QVector4D(0, 0, 0, 0); // graph
+    ast7.extra_info = QVector4D(0, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
+
+    // 6) Neurite Node 3D -> Neurite Node 2D (layouted) with astrocyte
+    x_interval = QVector2D(60, 80);
+    neu6.pos_alpha = QVector2D(0, 1); // 3D to 2D lyout
+    neu6.trans_alpha = QVector2D(0, 1); // nothing disappears
+    neu6.color_alpha = QVector2D(1, 1); // same color
+    neu6.point_size = QVector2D(1, 1); // same point size
+    // vertically instead of horizantally (Need indication)
+    // flag: if 0, then verticall, else horizantally (generalization)
+    neu6.interval = QVector2D(x_interval.x(), x_interval.y()); // 3D -> layout 2 for astrocyte
+    neu6.positions = QVector2D(1, 3); // 3D -> layout 2 for astrocyte
+    neu6.render_type = QVector4D(0, 0, 0, 1); // graph
+    neu6.extra_info = QVector4D(0, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
+
+    // interpolate between graph 3D and 2D
+    m_IntervalXY.push_back({ast7, neu6});
     initLine(QVector2D(60, 100), QVector2D(80, 100), ID++);
     // interpolate between astrocyte and nodes 3D to 2D
+
+    y_interval = QVector2D(60, 80);
+    ast7.pos_alpha = QVector2D(0, 1); // 3D to 2D lyout
+    ast7.trans_alpha = QVector2D(1, 1); // nothing disappears
+    ast7.color_alpha = QVector2D(1, 1); // same color
+    ast7.point_size = QVector2D(1, 1); // same point size
+    ast7.interval = QVector2D(y_interval.x(), y_interval.y()); // 3D -> layout 2 for astrocyte
+    ast7.positions = QVector2D(1, 3); // 3D -> layout 2 for astrocyte
+    ast7.render_type = QVector4D(0, 0, 0, 1); // graph
+    ast7.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
+
+    // 6) Neurite Node 3D -> Neurite Node 2D (layouted) with astrocyte
+    x_interval = QVector2D(60, 80);
+    neu6.pos_alpha = QVector2D(0, 1); // 3D to 2D lyout
+    neu6.trans_alpha = QVector2D(1, 1); // nothing disappears
+    neu6.color_alpha = QVector2D(1, 1); // same color
+    neu6.point_size = QVector2D(10, 10); // same point size
+    // vertically instead of horizantally (Need indication)
+    // flag: if 0, then verticall, else horizantally (generalization)
+    neu6.interval = QVector2D(x_interval.x(), x_interval.y()); // 3D -> layout 2 for astrocyte
+    neu6.positions = QVector2D(6, 6); // 3D -> layout 2 for astrocyte
+    neu6.render_type = QVector4D(0, 0, 0, 1); // graph
+    neu6.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
+
+    // interpolate between graph 3D and 2D
+    m_IntervalXY.push_back({ast7, neu6});
     initLine(QVector2D(100, 60), QVector2D(100, 80), ID++);
 }
 

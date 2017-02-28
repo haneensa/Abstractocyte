@@ -189,7 +189,7 @@ Edge* Graph::addEdge(int eID, int hvgxID, int nID1, int nID2)
     }
 
     if (id_tuple1 == id_tuple2) {
-        qDebug() << "Duplicates " << nID1 << " " << nID2;
+     //   qDebug() << "Duplicates " << nID1 << " " << nID2;
         m_dupEdges++;
         return NULL;
     }
@@ -198,7 +198,7 @@ Edge* Graph::addEdge(int eID, int hvgxID, int nID1, int nID2)
     Node *n2 = getNode(id_tuple2);
 
     if (n1 == NULL || n2 == NULL) {
-        qDebug() << "cant insert " << nID1 << " and " << nID2;
+   //     qDebug() << "cant insert " << nID1 << " and " << nID2;
         return NULL;
     }
 
@@ -218,7 +218,7 @@ Node* Graph::getNode(std::pair<int, int> id_tuple)
         return m_nodes[id_tuple];
     }
 
-    qDebug() << id_tuple << " doesnt exist.";
+    //qDebug() << id_tuple << " doesnt exist.";
     return NULL;
 }
 
@@ -228,7 +228,7 @@ Edge* Graph::getEdge(int eID)
         return m_edges[eID];
     }
 
-    qDebug() << eID << " doesnt exist.";
+    //qDebug() << eID << " doesnt exist.";
     return NULL;
 }
 
