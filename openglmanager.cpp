@@ -766,7 +766,7 @@ void OpenGLManager::update_skeleton_layout1(QVector2D layout1, int node_index, i
     }
 
     if (node_index  > m_abstract_skel_nodes.size()) {
-        qDebug() << "out of range " << m_abstract_skel_nodes.size();
+        qDebug() << node_index << " out of range " << m_abstract_skel_nodes.size();
         return;
     }
 
@@ -790,7 +790,7 @@ void OpenGLManager::update_skeleton_layout2(QVector2D layout2, int node_index, i
     }
 
     if (node_index  > m_abstract_skel_nodes.size()) {
-        qDebug() << "out of range " << m_abstract_skel_nodes.size();
+        qDebug() <<node_index << " out of range " << m_abstract_skel_nodes.size();
         return;
     }
 
@@ -813,7 +813,7 @@ void OpenGLManager::update_skeleton_layout3(QVector2D layout3,int node_index, in
     }
 
     if (node_index  > m_abstract_skel_nodes.size()) {
-        qDebug() << "out of range " << m_abstract_skel_nodes.size();
+        qDebug() << node_index << " out of range "<< m_abstract_skel_nodes.size();
         return;
     }
 

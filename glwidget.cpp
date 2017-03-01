@@ -225,7 +225,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
             m_FDL_running = false;
         }
 
-         m_rotation_timer->start(500);
+         m_rotation_timer->start(1000);
 
     }
 

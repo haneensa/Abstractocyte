@@ -147,12 +147,12 @@ protected:
         }
     };
 
-    Graph_t                                         m_gType;
+    Graph_t                         m_gType;
 
-    DataContainer                                   *m_data_containter;
-    OpenGLManager                                   *m_opengl_mngr;
+    DataContainer                   *m_data_containter;
+    OpenGLManager                   *m_opengl_mngr;
 
-    std::map<std::pair<int, int>, Node*>            m_nodes;    // IDs are unique to identify nodes
+    std::map<std::pair<int, int>, Node*>     m_nodes;    // IDs are unique to identify nodes
                                                 // if more than a skeleton
                                                 // IDs for skeleton are offsets, that is later
                                                 // stored in the skeleton itself
