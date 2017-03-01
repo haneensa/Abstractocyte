@@ -12,11 +12,11 @@ DataContainer::DataContainer()
 {
     m_indices_size = 0;
     m_skeleton_points_size = 0;
-    m_limit = 43;
+    m_limit = 10000;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
-    importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+   // importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
    importXML("://scripts/m3_neurites.xml");    // neurites time:  28802 ms
 }
 
@@ -153,6 +153,22 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
                 qDebug() << "center: " << x << " " << y << " " << z;
                 obj->setCenter(QVector4D(x/5.0, y/5.0, z/5.0, 0));
                 // set ssbo with this center
+            }  else if (xml.name() == "ast_point") {
+                // index to astrocyte vertex from the skeleton
+                // or the vertex itself
+                xml.readNext();
+                QString coords = xml.text().toString();
+                QStringList stringlist = coords.split(" ");
+                if (stringlist.size() < 3) {
+                    continue;
+                }
+
+                float x = stringlist.at(0).toDouble();
+                float y = stringlist.at(1).toDouble();
+                float z = stringlist.at(2).toDouble();
+                qDebug() << "center: " << x << " " << y << " " << z;
+                obj->setAstPoint(QVector4D(x/5.0, y/5.0, z/5.0, 0));
+                // set ssbo with this center
             }
         } // if start element
         xml.readNext();
@@ -206,6 +222,7 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                     // place holder
                     v.skeleton_vertex = mesh_vertex;
                 } else {
+                    // I could use index to be able to connect vertices logically
                     float x2 = stringlist.at(3).toDouble()/5.0;
                     float y2 = stringlist.at(4).toDouble()/5.0;
                     float z2 = stringlist.at(5).toDouble()/5.0;

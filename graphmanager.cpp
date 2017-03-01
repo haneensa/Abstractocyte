@@ -85,7 +85,7 @@ void GraphManager::ExtractGraphFromMesh()
         Object *objectP = (*iter).second;
         int hvgxID = objectP->getHVGXID();
         Object_t type = objectP->getObjectType();
-        if (type != Object_t::ASTROCYTE || type != Object_t::SYNAPSE || type != Object_t::MITO) {
+        if (type != Object_t::ASTROCYTE && type != Object_t::SYNAPSE && type != Object_t::MITO) {
             // neurite
             QVector4D center = objectP->getCenter();
             Node* newNode = new Node(hvgxID, -1,  center.x(), center.y(), center.z());

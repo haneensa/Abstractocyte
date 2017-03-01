@@ -134,7 +134,9 @@ void OpenGLManager::fillVBOsData()
         vbo_skeleton_offset += vbo_skeleton_count;
 
         // allocate neurites nodes place holders
-        if (object_p->getObjectType() != Object_t::ASTROCYTE  || object_p->getObjectType() != Object_t::MITO  || object_p->getObjectType()  != Object_t::SYNAPSE) {
+        if (object_p->getObjectType() != Object_t::ASTROCYTE
+                && object_p->getObjectType() != Object_t::MITO
+                && object_p->getObjectType()  != Object_t::SYNAPSE) {
             object_p->setNodeIdx(m_neurites_nodes.size());
             m_neurites_nodes.push_back(ID);
         }

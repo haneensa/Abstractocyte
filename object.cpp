@@ -109,6 +109,11 @@ void Object::setCenter(QVector4D center)
     m_center = center;
 }
 
+void Object::setAstPoint(QVector4D ast_point)
+{
+    m_ast_point = ast_point;
+}
+
 struct ssbo_mesh Object::getSSBOData()
 {
     struct ssbo_mesh ssbo_data;

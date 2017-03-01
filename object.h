@@ -32,6 +32,7 @@ public:
     std::string getName()               {  return m_name; }
     QVector4D getColor();
     QVector4D getCenter()               { return m_center; }
+    QVector4D getAstPoint()               { return m_ast_point; }
     int getVolume()                     { return m_volume; }
     int getHVGXID()                     { return m_ID; }
     struct ssbo_mesh getSSBOData();
@@ -39,6 +40,7 @@ public:
     // properties setters
     void setColor(QVector4D color)      {  m_color = color; }
     void setCenter(QVector4D center);
+    void setAstPoint(QVector4D ast_point);
     void setVolume(int volume)          { m_volume = volume; }
 
     // skeleton management
@@ -65,6 +67,8 @@ private:
     int                                     m_function; // -1:not applicable, 0:ex, 1:in, 3:unknown
     int                                     m_parentID; // -1 if none
     QVector4D                               m_center;
+    // closest point from astrocyte skeleton to this object so we can project the object on skeleton and be part of it
+    QVector4D                               m_ast_point;
     QVector4D                               m_color;
 
     Skeleton                                *m_skeleton;
