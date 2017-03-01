@@ -170,6 +170,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 void GLWidget::lockRotation2D()
 {
     m_rotation_timer->stop();
+    m_FDL_running = true;   // run force layout
+
 
     // start a timer, and reset it whenever we are here
     // once we exceed threshold start force layouted
@@ -180,14 +182,6 @@ void GLWidget::lockRotation2D()
     m_graphManager->update2Dflag(true, m_uniforms);
     m_opengl_mngr->update2Dflag(true);
 
-    // 3) start layouting
-
-    // pass rotation matrix
-    m_FDL_running = true;   // run force layout
-    m_graphManager->startForceDirectedLayout(0);
-    m_graphManager->startForceDirectedLayout(1);
-    m_graphManager->startForceDirectedLayout(2);
-    m_graphManager->startForceDirectedLayout(3);
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
@@ -225,7 +219,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
             m_FDL_running = false;
         }
 
-         m_rotation_timer->start(1000);
+         m_rotation_timer->start(500);
 
     }
 

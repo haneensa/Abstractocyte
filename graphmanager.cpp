@@ -25,21 +25,15 @@ void GraphManager::update2Dflag(bool is2D, struct GlobalUniforms uniforms)
 {
     m_2D = is2D;
 
-    if (!m_2D) { // if 3D but graph is never 3D
-        // reset the cooridnates of the graphs
-        QMatrix4x4 identitiy;
-        m_graph[0]->resetCoordinates(identitiy); // for now later I will have two separate variables one for 2D one for 3D
-        m_graph[1]->resetCoordinates(identitiy); // for now later I will have two separate variables one for 2D one for 3D
-        m_graph[2]->resetCoordinates(identitiy); // for now later I will have two separate variables one for 2D one for 3D
-        m_graph[3]->resetCoordinates(identitiy); // for now later I will have two separate variables one for 2D one for 3D
+    if (m_2D) { // if 3D but graph is never 3D
 
-    } else {
         // reset graph
-        m_graph[0]->resetCoordinates(uniforms.rMatrix);
-        m_graph[1]->resetCoordinates(uniforms.rMatrix);
-        m_graph[2]->resetCoordinates(uniforms.rMatrix);
-        m_graph[3]->resetCoordinates(uniforms.rMatrix);
-
+        for (int i = 0; i < max_graphs; i++) {
+            m_FDL_running = true;
+            m_graph[i]->updateUniforms(uniforms);
+            m_layout_threads[i] = std::thread(&Graph::resetCoordinates, m_graph[i]);
+        }
+        // pass rotation matrix
     }
 }
 // I have 4 graphs:
@@ -167,12 +161,6 @@ void GraphManager::stopForceDirectedLayout(int graphIdx)
 
 void GraphManager::startForceDirectedLayout(int graphIdx)
 {
-    // update the 2D node position at the start and whenever the m_mvp change, -> when m_value == 1.0 and m_mvp changed
-    stopForceDirectedLayout(graphIdx);
-
-    m_FDL_running = true;
-    m_layout_threads[graphIdx] = std::thread(&Graph::runforceDirectedLayout, m_graph[graphIdx]);
-
 }
 
 void GraphManager::updateGraphParam1(double value)

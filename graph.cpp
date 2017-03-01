@@ -257,23 +257,31 @@ void Graph::drawGrid(struct GlobalUniforms grid_uniforms)
 
 /************************ Force Directed Layout ****************************/
 // when we switch to 2D we use the other vertex with the no rotation matrix
-void Graph::resetCoordinates(QMatrix4x4 rotationMatrix)
+void Graph::resetCoordinates()
 {
     if (m_opengl_mngr == NULL)
         return;
 
+    m_FDL_terminate = false;
+
     qDebug() << "2D";
     hashGrid->clear();
     for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
+        if (m_FDL_terminate) goto quit;
+
         Node *node = (*iter).second;
 
-        node->resetLayout(rotationMatrix);
+        node->resetLayout(m_uniforms.rMatrix);
         update_node_data(node);
 
         // add to the spatial hash
         hashGrid->insert((*iter).second);
     }
 
+    runforceDirectedLayout();
+
+quit:
+qDebug() << "Exist resetCoordinates" ;
 }
 
 void Graph::update_node_data(Node* node)

@@ -108,7 +108,7 @@ public:
     void repulseNodes(Node *node1, Node *node2, float k);
     QVector2D attractionForce(float x1, float y1, float x2, float y2, float k);
     QVector2D repulsiveForce(float x1, float y1, float x2, float y2, float k);
-    void resetCoordinates(QMatrix4x4 rotationMatrix);
+    void resetCoordinates();
 
     void update_node_data(Node* node);
 
@@ -118,7 +118,7 @@ public:
     void updateNode(Node *node);
     void drawGrid(struct GlobalUniforms grid_uniforms);
     void initGridBuffers();
-    void updateGridUniforms(struct GlobalUniforms grid_uniforms);
+    void updateUniforms(struct GlobalUniforms uniforms) {m_uniforms = uniforms;}
 
     void updateGraphParam1(double value);
     void updateGraphParam2(double value);
@@ -148,6 +148,8 @@ protected:
     };
 
     Graph_t                         m_gType;
+
+    struct GlobalUniforms               m_uniforms;
 
     DataContainer                   *m_data_containter;
     OpenGLManager                   *m_opengl_mngr;
