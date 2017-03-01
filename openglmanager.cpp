@@ -569,7 +569,7 @@ bool OpenGLManager::initNeuritesGraphShaders()
         return false;
 
 
-     m_program_neurites_nodes = glCreateProgram();
+    m_program_neurites_nodes = glCreateProgram();
     bool res = initShader(m_program_neurites_nodes,  ":/shaders/nodes_vert.glsl",
                       ":/shaders/abstract_skeleton_node_geom.glsl",
                       ":/shaders/points_3d_frag.glsl");
@@ -578,7 +578,7 @@ bool OpenGLManager::initNeuritesGraphShaders()
 
     m_program_neurites_index = glCreateProgram();
     res = initShader(m_program_neurites_index,  ":/shaders/nodes_vert.glsl",
-                                       ":/shaders/lines_geom.glsl",
+                                       ":/shaders/abstract_skeleton_line_geom.glsl",
                                        ":/shaders/points_passthrough_frag.glsl");
     if (res == false)
         return res;
@@ -628,7 +628,7 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
     glUseProgram(m_program_neurites_nodes);
     updateAbstractUniformsLocation(m_program_neurites_nodes);
 
-//    glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
+    glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
 
     m_NeuritesIndexVBO.bind();
 
@@ -696,7 +696,6 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     drawMeshPoints(grid_uniforms);
     drawMeshTriangles(grid_uniforms);
 
-
     // 3) Skeleton Points
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -705,7 +704,7 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     // 3) Abstract Skeleton Graph (Nodes and Edges)
     drawSkeletonsGraph(grid_uniforms);
     // 4) Neurites Graph (Nodes and Edges)
-//    drawNeuritesGraph(grid_uniforms);
+    drawNeuritesGraph(grid_uniforms);
 }
 
 void OpenGLManager::updateUniformsLocation(GLuint program)

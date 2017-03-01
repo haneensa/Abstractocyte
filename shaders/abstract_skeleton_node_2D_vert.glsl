@@ -93,9 +93,6 @@ void main(void)
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
-    vec2 pos_alpha = space_properties.pos_alpha; // position interpolation (pos1, pos2)
-    vec2 trans_alpha = space_properties.trans_alpha; // alpha
-    vec2 color_alpha = space_properties.color_alpha; // color_intp
     vec2 point_size = space_properties.point_size; // point_size
     vec2 interval = space_properties.interval; // interval this state is between
     vec2 positions = space_properties.positions; // which positions to interpolate between them

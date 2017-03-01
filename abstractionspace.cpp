@@ -82,25 +82,12 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast5.pos_alpha = QVector2D(0, 1);
     ast5.trans_alpha = QVector2D(1, 0);
     ast5.color_alpha = QVector2D(1, 1); // skeleto <-> no skeleton
-    ast5.point_size = QVector2D(1, 1);
+    ast5.point_size = QVector2D(6, 6);
     ast5.interval = QVector2D(y_interval.x(), y_interval.y());
-    ast5.positions = QVector2D(1, 1);
-    ast5.render_type = QVector4D(0, 0, 0, 1);
+    ast5.positions = QVector2D(4, 4);
+    ast5.render_type = QVector4D(0, 0, 1, 0);
     ast5.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
     m_ast_states[std::make_pair(y_interval.x(), y_interval.y())] = ast5;
-
-    // 4) Skeleton -> no skeleton
-    y_interval = QVector2D(80, 100);
-    y_intervals.push_back(y_interval); // 5
-    ast6.pos_alpha = QVector2D(0, 1);
-    ast6.trans_alpha = QVector2D(1, 0);
-    ast6.color_alpha = QVector2D(1, 1); // skeleto <-> no skeleton
-    ast6.point_size = QVector2D(1, 1);
-    ast6.interval = QVector2D(y_interval.x(), y_interval.y());
-    ast6.positions = QVector2D(1, 1);
-    ast6.render_type = QVector4D(0, 0, 0, 1);
-    ast6.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_ast_states[std::make_pair(y_interval.x(), y_interval.y())] = ast6;
 
 
     // ################## X axis: Neurites Abstraction
@@ -150,10 +137,10 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu4.pos_alpha  = QVector2D(0, 1);
     neu4.trans_alpha = QVector2D(1, 1);
     neu4.color_alpha = QVector2D(1, 1);
-    neu4.point_size = QVector2D(1, max_neurite_nsize);
+    neu4.point_size = QVector2D(7, max_neurite_nsize);
     neu4.interval = QVector2D(x_interval.x(), x_interval.y());       // alpha limit, div, pos1, pos2
-    neu4.positions = QVector2D(1, 5);       // alpha limit, div, pos1, pos2
-    neu4.render_type = QVector4D(0, 0, 0, 1);
+    neu4.positions = QVector2D(4, 3);       // alpha limit, div, pos1, pos2
+    neu4.render_type = QVector4D(0, 0, 1, 0);
     neu4.extra_info = QVector4D(0, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
     m_neu_states[std::make_pair(x_interval.x(), x_interval.y())] = neu4;
 
@@ -332,7 +319,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
 
     // interpolate between 3D Simplified astrocyte and no astrocyte
     // Neurites 3D simplified Skeleton
-    x_interval = x_intervals[4];
+    x_interval = x_intervals[3];
     y_interval =  y_intervals[4];
     ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
     neu_properties = m_neu_states[std::make_pair(x_interval.x(), x_interval.y())];
@@ -342,7 +329,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
 
     // interpolate between 3D neurite skeleton to 3D points
     // astrocyte same simplified skeleton 3d
-    x_interval = x_intervals[4];
+    x_interval = x_intervals[3];
     y_interval =  y_intervals[4];
     ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
     neu_properties = m_neu_states[std::make_pair(x_interval.x(), x_interval.y())];

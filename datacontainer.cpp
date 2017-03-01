@@ -16,7 +16,7 @@ DataContainer::DataContainer()
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
-   importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
    importXML("://scripts/m3_neurites.xml");    // neurites time:  28802 ms
 }
 
@@ -57,6 +57,9 @@ bool DataContainer::importXML(QString path)
                 }
                 Object *obj = NULL;
 
+                // make a thread that would read this ?
+                // the astrocyte wast most of the time
+                // so if we can optimize reading one object would be better
                 parseObject(xml, obj); // fills the object with obj info
             } else if (xml.name() == "conn") {
                 parseConnGraph(xml);
@@ -128,7 +131,7 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
         // go to the next child of object node
         if (xml.tokenType() == QXmlStreamReader::StartElement) {
             if (xml.name() == "mesh") {
-                parseMesh(xml, obj);
+                parseMesh(xml, obj); // takes the most time
             } else if (xml.name() == "skeleton") {
                 parseSkeleton(xml, obj);
             } else if (xml.name() == "volume") {

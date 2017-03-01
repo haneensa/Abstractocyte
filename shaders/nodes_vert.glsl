@@ -7,8 +7,9 @@
 // in: per vertex data
 layout (location = 0) in int ID;
 
-out int V_ID;
-out float V_alpha;
+out float   V_alpha;
+out int     V_ID;
+out int      V_render;
 
 // World transformation
 uniform mat4 mMatrix;
@@ -17,7 +18,6 @@ uniform mat4 m_noRartionMatrix;
 uniform mat4 vMatrix;
 // Projection transformation
 uniform mat4 pMatrix;
-uniform int is2D;
 uniform int  y_axis;
 uniform int  x_axis;
 
@@ -56,8 +56,6 @@ layout (std430, binding=3) buffer space2d_data
     ast_neu_properties space2d;
 };
 
-
-
 float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
 {
     // if value < leftMin -> value = leftMin
@@ -77,21 +75,44 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 
 void main(void)
 {
+
+    V_ID = ID;
     // two positions to interpolate between:
     // 3D with rotation
     // projected 2D without rotation
-    mat4 m_noRotvpMatrix = pMatrix * vMatrix * mMatrix;
+    mat4 m_noRotvpMatrix = pMatrix * vMatrix * m_noRartionMatrix;
 
     // todo: interpolate between different layouts based on state
     vec4 node_layout1 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout1, 0, 1);
     vec4 node_layout2 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout2, 0, 1);
-    float position_intp = translate(y_axis, 80, 100, 0, 1);
 
-    V_alpha =  translate(y_axis, 80, 100,  0, 1);
-    V_alpha = 1;
-    vec4 node_pos  = mix(node_layout2, node_layout1 ,  position_intp);
+    int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
+    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
-    gl_Position =  node_pos; // original position
-    gl_PointSize = 20;
-    V_ID = ID;
+    vec2 interval = space_properties.interval; // interval this state is between
+    vec4 render_type = space_properties.render_type; // additional info
+    vec4 extra_info = space_properties.extra_info;   // x: axis type (0: x_axis, 1: y_axis)
+    if (extra_info.y == 1 && render_type.w == 1)
+        V_render = 1;
+    else
+        V_render = 0;
+
+
+    float alphax =  translate(x_axis, interval.x, interval.y,  0, 1);
+    float alphay =  translate(y_axis, extra_info.z, extra_info.w,  0, 1);
+    V_alpha = min(alphax, alphay);
+
+    gl_PointSize = 1;
+
+    float position_intp_y = translate(y_axis, extra_info.z, extra_info.w, 0, 1);
+   // vec4 skeleton_pos = mix(v_layout1 , v_layout3, position_intp_y);
+    vec4 node_pos  = mix(node_layout1, node_layout2 ,  position_intp_y);
+
+    // if type == neurite -> mix (skeleton, node, x )
+   // float position_intp_x = translate(x_axis, interval.x, interval.y, 0, 1);
+    // gl_Position = node_pos * position_intp_x + ( 1.0 - position_intp_x) * skeleton_pos;
+    //todo: mix the point on the skeleton with the two new layouted positions for smooth interpolation
+    // along the x axis
+    gl_Position = node_pos;
+
 }
