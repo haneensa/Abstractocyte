@@ -29,6 +29,7 @@ public slots:
     void getGraphParam5(double value);
     void getGraphParam6(double value);
     void getGraphParam7(double value);
+    void lockRotation2D();
 
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);
@@ -81,7 +82,8 @@ protected:
     // force directed layout
     bool                                m_FDL_running;
 
-    QTimer                              *timer;
+    QTimer                              *m_refresh_timer;
+    QTimer                              *m_rotation_timer;
 
 };
 

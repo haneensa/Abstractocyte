@@ -115,7 +115,12 @@ void main(void)
    // then get another position for node in layout 1 and layout 2
    // then use these two new values to get the final one along the x axis
    if (type == 1){ // enruties
-        gl_PointSize =  translate(x_axis, extra_info.z,  extra_info.w, point_size.x, point_size.y);
+
+        if (x_axis == extra_info.w)
+           gl_PointSize =  point_size.y;
+        else
+            gl_PointSize =  1;
+
         V_alpha = 1;
         float position_intp_y = translate(y_axis, extra_info.z, extra_info.w, 0, 1);
         vec4 skeleton_pos = mix(v_layout1 , v_layout3, position_intp_y);

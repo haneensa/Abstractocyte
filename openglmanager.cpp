@@ -689,10 +689,18 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     write_ssbo_data();
 
     // 1) Mesh Triangles
-    drawMeshTriangles(grid_uniforms);
     // 2) Mesh Points
+
+    glDisable (GL_BLEND);
+    glBlendFunc (GL_ONE, GL_ONE);
     drawMeshPoints(grid_uniforms);
+    drawMeshTriangles(grid_uniforms);
+
+
     // 3) Skeleton Points
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     drawSkeletonPoints(grid_uniforms);
     // 3) Abstract Skeleton Graph (Nodes and Edges)
     drawSkeletonsGraph(grid_uniforms);

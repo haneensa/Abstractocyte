@@ -36,8 +36,12 @@ GLWidget::GLWidget(QWidget *parent)
     //reset translation
     m_translation = QVector3D(0.0, 0.0, 0.0);
 
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    m_refresh_timer = new QTimer(this);
+    connect(m_refresh_timer, SIGNAL(timeout()), this, SLOT(update()));
+
+    m_rotation_timer = new QTimer(this);
+    connect(m_rotation_timer, SIGNAL(timeout()), this, SLOT(lockRotation2D()));
+
 
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -163,12 +167,35 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     event->accept();
 }
 
+void GLWidget::lockRotation2D()
+{
+    m_rotation_timer->stop();
+
+    // start a timer, and reset it whenever we are here
+    // once we exceed threshold start force layouted
+    // if we are below x < 50 and y < 50
+
+    // 2) reset graph nodes coordinates
+    updateMVPAttrib();      // update uniforms
+    m_graphManager->update2Dflag(true, m_uniforms);
+    m_opengl_mngr->update2Dflag(true);
+
+    // 3) start layouting
+
+    // pass rotation matrix
+    m_FDL_running = true;   // run force layout
+    m_graphManager->startForceDirectedLayout(0);
+    m_graphManager->startForceDirectedLayout(1);
+    m_graphManager->startForceDirectedLayout(2);
+    m_graphManager->startForceDirectedLayout(3);
+}
+
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     int deltaX = event->x() - m_lastPos.x();
     int deltaY = event->y() - m_lastPos.y();
 
-    if (m_isRotatable) {        
+    if (m_isRotatable && (m_xaxis < 60 && m_yaxis < 60)) {
         // Mouse release position - mouse press position
         QVector2D diff = QVector2D(deltaX, deltaY);
         // Rotation axis is perpendicular to the mouse position difference
@@ -188,28 +215,18 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         // do wait function, if the user stayed in this view more than t seconds then do this
         // 1) stop previous layouting algorithm if running
         if (m_FDL_running) {
-            timer->stop();
+            m_refresh_timer->stop();
             m_graphManager->stopForceDirectedLayout(0);
             m_graphManager->stopForceDirectedLayout(1);
             m_graphManager->stopForceDirectedLayout(2);
             m_graphManager->stopForceDirectedLayout(3);
+            m_FDL_running = false;
         }
 
-        // 2) reset graph nodes coordinates
-        updateMVPAttrib();      // update uniforms
-        m_graphManager->update2Dflag(true, m_uniforms);
-        m_opengl_mngr->update2Dflag(true);
-
-        // 3) start layouting
-
-        timer->start(0);
-        // pass rotation matrix
-        m_FDL_running = true;   // run force layout
-        m_graphManager->startForceDirectedLayout(0);
-        m_graphManager->startForceDirectedLayout(1);
-        m_graphManager->startForceDirectedLayout(2);
-        m_graphManager->startForceDirectedLayout(3);
-
+        if (m_xaxis < 50 || m_yaxis < 50)
+            m_rotation_timer->start(500);
+        else
+            m_rotation_timer->start(200);
 
     } else {
         m_translation = QVector3D( m_translation.x() + deltaX/(float)width(), m_translation.y() +  -1.0 * (deltaY/(float)height()), 0.0);
@@ -282,7 +299,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             } else if (m_FDL_running)
                 qDebug() << "force layout is already running.";
             else {
-                timer->start(0);
+                m_refresh_timer->start(0);
                 // pass rotation matrix
                 m_FDL_running = true;   // run force layout
                 m_graphManager->startForceDirectedLayout(0);
@@ -293,7 +310,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             }
         break;
         case(Qt::Key_X):
-            timer->stop();
+            m_refresh_timer->stop();
             m_graphManager->stopForceDirectedLayout(0);
             m_graphManager->stopForceDirectedLayout(1);
             m_graphManager->stopForceDirectedLayout(2);
