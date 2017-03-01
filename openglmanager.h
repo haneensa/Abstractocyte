@@ -62,9 +62,9 @@ public:
     void update_ssbo_data_layout1(QVector2D layout1, int hvgxID); // access them using IDs
     void update_ssbo_data_layout2(QVector2D layout2, int hvgxID); // access them using IDs
 
-    void update_skeleton_layout1(QVector2D layout1, int node_index, int hvgxID);
-    void update_skeleton_layout2(QVector2D layout2, int node_index, int hvgxID);
-    void update_skeleton_layout3(QVector2D layout3, int node_index, int hvgxID);
+    void update_skeleton_layout1(QVector2D layout1,  long node_index, int hvgxID);
+    void update_skeleton_layout2(QVector2D layout2,  long node_index, int hvgxID);
+    void update_skeleton_layout3(QVector2D layout3,  long node_index, int hvgxID);
 
 
 

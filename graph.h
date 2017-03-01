@@ -83,7 +83,7 @@ public:
     bool parseNODE_NODE(std::vector<Node*> neurites_nodes, std::vector<QVector2D> neurites_edges);
     bool parseSKELETON(std::vector<Node*> neurites_skeletons_nodes, std::vector<QVector4D> neurites_skeletons_edges);
 
-    Node* addNode(std::pair<int, int> id_tuple, float x, float y, float z);
+    Node* addNode(std::pair<int, int> id_tuple, float x, float y, float z, Node_t node_type);
     Edge* addEdge(int eID, int hvgxID, int nID1, int nID2);
 
     Node* getNode(std::pair<int, int> id_tuple);

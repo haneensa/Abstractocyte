@@ -114,7 +114,7 @@ bool Graph::parseNODE_NODE(std::vector<Node*> neurites_nodes, std::vector<QVecto
         Node *node = neurites_nodes[i];
         QVector3D position = node->get3DPosition();
         std::pair<int, int> id_tuple =  std::make_pair(node->getID(), -1);
-        this->addNode(id_tuple, position.x(), position.y(), position.z());
+        this->addNode(id_tuple, position.x(), position.y(), position.z(), Node_t::NONE);
     }
 
     for (int i = 0; i < neurites_edges.size(); i++) {
@@ -149,7 +149,8 @@ bool Graph::parseSKELETON(std::vector<Node*> neurites_skeletons_nodes,
         Node *node = neurites_skeletons_nodes[i];
         QVector3D position = node->get3DPosition();
         std::pair<int, int> id_tuple =  std::make_pair(node->getID(),  node->getIdxID());
-        this->addNode(id_tuple, position.x(), position.y(), position.z());
+        // I can access the objects using their IDs then get the type
+        this->addNode(id_tuple, position.x(), position.y(), position.z(), Node_t::NONE /* need to assin for each node their type */);
     }
 
     for (int i = 0; i < neurites_skeletons_edges.size(); i++) {
@@ -164,11 +165,11 @@ bool Graph::parseSKELETON(std::vector<Node*> neurites_skeletons_nodes,
 }
 
 
-Node* Graph::addNode(std::pair<int, int> id_tuple, float x, float y, float z)
+Node* Graph::addNode(std::pair<int, int> id_tuple, float x, float y, float z, Node_t node_type)
 {
     size_t idxID = id_tuple.second;
     int nID = id_tuple.first;
-    Node* newNode = new Node(nID, idxID, x, y, z);
+    Node* newNode = new Node(nID, idxID, x, y, z, node_type);
     m_nodes[id_tuple] = newNode; // these IDs should be unique per graph!q
     m_nodesCounter++;
     return newNode;

@@ -93,7 +93,7 @@ void GraphManager::ExtractGraphFromMesh()
         // add nodes
         int skeleton_offset = objectP->getSkeletonOffset();
         for ( int i = 0; i < nodes3D.size(); i++) {
-            int nIndx = i + skeleton_offset;
+            unsigned long nIndx = i + skeleton_offset;
             Node* newNode = new Node(hvgxID, nIndx,  nodes3D[i].x(), nodes3D[i].y(), nodes3D[i].z());
             if (type == Object_t::ASTROCYTE) {
                 astrocyte_skeleton_nodes.push_back(newNode);

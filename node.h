@@ -6,17 +6,17 @@
 #include <QMatrix4x4>
 #include "edge.h"
 
-enum class Node_t { AXON, DENDRITE, BOUTON, SPINE, MITO, SYNAPSE, ASTROCYTE, GLYCOGEN };
+enum class Node_t { AXON, DENDRITE, BOUTON, SPINE, MITO, SYNAPSE, ASTROCYTE, GLYCOGEN, NONE};
 
 class Edge;
 
 class Node
 {
 public:
-    Node(int nID, int idxID, float x, float y, float z, Node_t node_type = Node_t::ASTROCYTE);
+    Node(int nID, long idxID, float x, float y, float z, Node_t node_type = Node_t::NONE);
     ~Node();
     int getID()                 { return m_nID; }
-    int getIdxID()              { return m_idxID; }
+    long getIdxID()    { return m_idxID; }
 
     Node_t getNodeType()        { return m_node_t; }
     QVector3D get3DPosition()   { return m_nodeXYZ; }
@@ -39,7 +39,7 @@ public:
 
 private:
     int                     m_nID;      // hvgx ID
-    int                     m_idxID;    // index in buffer
+    long                     m_idxID;    // index in buffer
 
     // could belong to a skeleton or just one neurite node
     bool                    m_is_skeleton;

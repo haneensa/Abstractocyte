@@ -149,6 +149,7 @@ void OpenGLManager::fillVBOsData()
         Skeleton *skeleton = object_p->getSkeleton(); // not null as long as the object exist
         std::vector<QVector3D> nodes3D = skeleton->getGraphNodes();
         std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
+        qDebug() << "set offset: " << m_abstract_skel_nodes.size();
         object_p->setSkeletonOffset(m_abstract_skel_nodes.size());
         // each skeleton node has local index within its list of nodes
         // and an offset within list of abstract skel nodes
@@ -750,7 +751,7 @@ void OpenGLManager::update_ssbo_data_layout2(QVector2D layout2, int hvgxID)
 }
 
 // Graph_t::ALL_SKELETONS, dont discriminate between types
-void OpenGLManager::update_skeleton_layout1(QVector2D layout1, int node_index, int hvgxID)
+void OpenGLManager::update_skeleton_layout1(QVector2D layout1,  long node_index, int hvgxID)
 {
     // get the object -> get its skeleton -> update the layout
     std::map<int, Object*> objects_map = m_obj_mnger->getObjectsMap();
@@ -773,7 +774,7 @@ void OpenGLManager::update_skeleton_layout1(QVector2D layout1, int node_index, i
     m_abstract_skel_nodes[node_index].layout1 = layout1;
 }
 
-void OpenGLManager::update_skeleton_layout2(QVector2D layout2, int node_index, int hvgxID)
+void OpenGLManager::update_skeleton_layout2(QVector2D layout2,  long node_index, int hvgxID)
 {
     // get the object -> get its skeleton -> update the layout
     // get the object -> get its skeleton -> update the layout
@@ -789,7 +790,7 @@ void OpenGLManager::update_skeleton_layout2(QVector2D layout2, int node_index, i
         return;
     }
 
-    if (node_index  > m_abstract_skel_nodes.size()) {
+    if (node_index  > m_abstract_skel_nodes.size()) {// since no astrpcyte I should never get here
         qDebug() <<node_index << " out of range " << m_abstract_skel_nodes.size();
         return;
     }
@@ -797,7 +798,7 @@ void OpenGLManager::update_skeleton_layout2(QVector2D layout2, int node_index, i
     m_abstract_skel_nodes[node_index].layout2 = layout2;
 }
 
-void OpenGLManager::update_skeleton_layout3(QVector2D layout3,int node_index, int hvgxID)
+void OpenGLManager::update_skeleton_layout3(QVector2D layout3,  long node_index, int hvgxID)
 {
     // get the object -> get its skeleton -> update the layout
     // get the object -> get its skeleton -> update the layout

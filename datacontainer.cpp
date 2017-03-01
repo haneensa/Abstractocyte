@@ -12,7 +12,7 @@ DataContainer::DataContainer()
 {
     m_indices_size = 0;
     m_skeleton_points_size = 0;
-    m_limit = 1000;
+    m_limit = 10;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
