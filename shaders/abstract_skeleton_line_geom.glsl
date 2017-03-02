@@ -63,10 +63,16 @@ layout (std430, binding=3) buffer space2d_data
 
 
 void main() {
-    int ID = V_ID[0];
-    color_val = SSBO_data[ID].color;
-
     for(int i = 0; i < 2; i++) {
+        int ID = V_ID[i];
+
+        int isFiltered = int(SSBO_data[ID].info.w);
+        if (isFiltered == 1)
+            return;
+
+        color_val = SSBO_data[ID].color;
+
+
         alpha = V_alpha[i];
         if (alpha < 0.01){
             return;

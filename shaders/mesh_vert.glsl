@@ -74,6 +74,7 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 
 void main(void)
 { 
+
     mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
     vec4 mesh_vertex =  pvmMatrix * vec4(mesh_vx.xyz , 1.0);
     vec4 Vskeleton_vx = pvmMatrix * vec4(skeleton_vx.xyz, 1.0);

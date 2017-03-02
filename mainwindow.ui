@@ -47,8 +47,8 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>224</width>
-     <height>328</height>
+     <width>300</width>
+     <height>567</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -76,8 +76,8 @@
     <property name="cursor">
      <cursorShape>ArrowCursor</cursorShape>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
+    <layout class="QGridLayout" name="gridLayout_7">
+     <item row="0" column="0">
       <widget class="QGroupBox" name="groupBox">
        <property name="minimumSize">
         <size>
@@ -87,8 +87,20 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>1000</width>
-         <height>1000</height>
+         <width>300</width>
+         <height>300</height>
+        </size>
+       </property>
+       <property name="sizeIncrement">
+        <size>
+         <width>1</width>
+         <height>1</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>1</width>
+         <height>1</height>
         </size>
        </property>
        <property name="layoutDirection">
@@ -101,7 +113,7 @@
         <string>GroupBox</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0" rowspan="2">
+        <item row="0" column="0">
          <widget class="QSlider" name="verticalSlider">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -127,8 +139,20 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>800</width>
-            <height>800</height>
+            <width>300</width>
+            <height>300</height>
+           </size>
+          </property>
+          <property name="sizeIncrement">
+           <size>
+            <width>1</width>
+            <height>1</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>1</width>
+            <height>0</height>
            </size>
           </property>
          </widget>
@@ -146,7 +170,7 @@
        <zorder>verticalSlider</zorder>
       </widget>
      </item>
-     <item>
+     <item row="1" column="0">
       <widget class="QFrame" name="frame_2">
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
@@ -154,7 +178,7 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <layout class="QGridLayout" name="gridLayout">
+       <layout class="QGridLayout" name="gridLayout_6">
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
@@ -164,138 +188,116 @@
            <attribute name="title">
             <string>Tab 1</string>
            </attribute>
-           <widget class="QWidget" name="layoutWidget">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>161</width>
-              <height>191</height>
-             </rect>
-            </property>
-            <layout class="QFormLayout" name="formLayout">
-             <item row="0" column="0">
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>Repulsion Constant</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox">
-               <property name="minimum">
-                <double>0.010000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_2">
-               <property name="text">
-                <string>Attraction Constant</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_3">
-               <property name="text">
-                <string>AABB dim</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_9">
-               <property name="text">
-                <string>Max Distance</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label_10">
-               <property name="text">
-                <string>Slow Factor</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_8">
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_10">
-               <property name="minimum">
-                <double>0.010000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.100000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_12">
-               <property name="text">
-                <string>Max Vertex Movement</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="0">
-              <widget class="QLabel" name="label_11">
-               <property name="text">
-                <string>Max Force</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QFrame" name="frame">
-            <property name="geometry">
-             <rect>
-              <x>90</x>
-              <y>0</y>
-              <width>120</width>
-              <height>80</height>
-             </rect>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-           </widget>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="0" column="0">
+             <layout class="QFormLayout" name="formLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Repulsion Constant</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox">
+                <property name="minimum">
+                 <double>0.010000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Attraction Constant</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>AABB dim</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Max Distance</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_10">
+                <property name="text">
+                 <string>Slow Factor</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_8">
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_10">
+                <property name="minimum">
+                 <double>0.010000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_12">
+                <property name="text">
+                 <string>Max Vertex Movement</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="0">
+               <widget class="QLabel" name="label_11">
+                <property name="text">
+                 <string>Max Force</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </widget>
           <widget class="QWidget" name="tab_2">
            <attribute name="title">
@@ -332,6 +334,59 @@
           <property name="title">
            <string>Filter View</string>
           </property>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_5">
+             <property name="text">
+              <string>Filter By Type:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QComboBox" name="comboBox_2">
+             <item>
+              <property name="text">
+               <string>NONE</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>ASTROCYTE</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>AXON</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>DENDRITE</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>BOUTON</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>SPINE</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>MITO</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>SYNAPSES</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>
@@ -376,6 +431,7 @@
     <slot>getGraphParam5(double)</slot>
     <slot>getGraphParam6(double)</slot>
     <slot>getGraphParam7(double)</slot>
+    <slot>getFilteredType(QString)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -404,8 +460,8 @@
    <slot>getSlotsX(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>144</x>
-     <y>230</y>
+     <x>179</x>
+     <y>341</y>
     </hint>
     <hint type="destinationlabel">
      <x>108</x>
@@ -424,8 +480,8 @@
      <y>121</y>
     </hint>
     <hint type="destinationlabel">
-     <x>99</x>
-     <y>241</y>
+     <x>134</x>
+     <y>341</y>
     </hint>
    </hints>
   </connection>
@@ -436,8 +492,8 @@
    <slot>getAbstractionData(AbstractionSpace*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>236</x>
-     <y>178</y>
+     <x>547</x>
+     <y>209</y>
     </hint>
     <hint type="destinationlabel">
      <x>129</x>
@@ -456,8 +512,8 @@
      <y>150</y>
     </hint>
     <hint type="destinationlabel">
-     <x>239</x>
-     <y>93</y>
+     <x>550</x>
+     <y>124</y>
     </hint>
    </hints>
   </connection>
@@ -472,8 +528,8 @@
      <y>154</y>
     </hint>
     <hint type="destinationlabel">
-     <x>232</x>
-     <y>205</y>
+     <x>543</x>
+     <y>236</y>
     </hint>
    </hints>
   </connection>
@@ -488,8 +544,8 @@
      <y>96</y>
     </hint>
     <hint type="destinationlabel">
-     <x>242</x>
-     <y>139</y>
+     <x>553</x>
+     <y>170</y>
     </hint>
    </hints>
   </connection>
@@ -516,12 +572,12 @@
    <slot>getGraphParam1(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>182</x>
-     <y>301</y>
+     <x>266</x>
+     <y>419</y>
     </hint>
     <hint type="destinationlabel">
-     <x>258</x>
-     <y>302</y>
+     <x>569</x>
+     <y>333</y>
     </hint>
    </hints>
   </connection>
@@ -532,12 +588,12 @@
    <slot>getGraphParam2(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>182</x>
-     <y>327</y>
+     <x>266</x>
+     <y>445</y>
     </hint>
     <hint type="destinationlabel">
-     <x>273</x>
-     <y>327</y>
+     <x>584</x>
+     <y>358</y>
     </hint>
    </hints>
   </connection>
@@ -548,12 +604,12 @@
    <slot>getGraphParam3(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>189</x>
-     <y>353</y>
+     <x>266</x>
+     <y>471</y>
     </hint>
     <hint type="destinationlabel">
-     <x>268</x>
-     <y>346</y>
+     <x>579</x>
+     <y>377</y>
     </hint>
    </hints>
   </connection>
@@ -564,12 +620,12 @@
    <slot>getGraphParam4(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>189</x>
-     <y>379</y>
+     <x>266</x>
+     <y>497</y>
     </hint>
     <hint type="destinationlabel">
-     <x>288</x>
-     <y>378</y>
+     <x>599</x>
+     <y>409</y>
     </hint>
    </hints>
   </connection>
@@ -580,12 +636,12 @@
    <slot>getGraphParam5(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>187</x>
-     <y>400</y>
+     <x>266</x>
+     <y>523</y>
     </hint>
     <hint type="destinationlabel">
-     <x>271</x>
-     <y>403</y>
+     <x>582</x>
+     <y>434</y>
     </hint>
    </hints>
   </connection>
@@ -596,12 +652,12 @@
    <slot>getGraphParam6(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>181</x>
-     <y>433</y>
+     <x>266</x>
+     <y>549</y>
     </hint>
     <hint type="destinationlabel">
-     <x>265</x>
-     <y>434</y>
+     <x>576</x>
+     <y>465</y>
     </hint>
    </hints>
   </connection>
@@ -612,12 +668,28 @@
    <slot>getGraphParam7(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>182</x>
-     <y>457</y>
+     <x>266</x>
+     <y>575</y>
     </hint>
     <hint type="destinationlabel">
-     <x>255</x>
-     <y>455</y>
+     <x>566</x>
+     <y>486</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_2</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getFilteredType(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>241</x>
+     <y>651</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>379</x>
+     <y>647</y>
     </hint>
    </hints>
   </connection>

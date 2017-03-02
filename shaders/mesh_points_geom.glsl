@@ -53,6 +53,10 @@ layout (std430, binding=3) buffer space2d_data
 
 void main() {
     int ID = V_ID[0]; // ID here is the index of this object in ssbo array
+    int isFiltered = int(SSBO_data[ID].info.w);
+    if (isFiltered == 1)
+        return;
+
     int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
 
     color_val = V_color_val[0];

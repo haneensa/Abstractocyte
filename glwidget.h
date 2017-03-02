@@ -31,6 +31,9 @@ public slots:
     void getGraphParam7(double value);
     void lockRotation2D();
 
+    void getFilteredType(QString value);
+
+
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);
 

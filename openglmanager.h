@@ -68,6 +68,7 @@ public:
 
 
     Object_t getObjectTypeByID(int hvgxID);
+    void FilterByType(Object_t type);
 
 protected:
     DataContainer                       *m_dataContainer; // get the data to render from here

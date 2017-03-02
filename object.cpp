@@ -120,6 +120,7 @@ struct ssbo_mesh Object::getSSBOData()
     ssbo_data.color = m_color;
     ssbo_data.center = m_center;
     ssbo_data.info.setX(m_volume);
+    ssbo_data.info.setW(0); // filtered? 0: no, 1: yes
     ssbo_data.layout1 = m_center.toVector2D();
     ssbo_data.layout2 = m_center.toVector2D();
 

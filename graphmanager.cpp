@@ -49,6 +49,9 @@ void GraphManager::update2Dflag(bool is2D, struct GlobalUniforms uniforms)
 // 4) object nodes and their connectivity information
     // object nodes
     // connectivity info from them
+
+// how to remove filtered objects from graph?????
+
 void GraphManager::ExtractGraphFromMesh()
 {
      // render skeletons then interpolate to nodes by accessing the nodes positions from ssbo

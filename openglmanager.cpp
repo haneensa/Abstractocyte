@@ -98,7 +98,7 @@ void OpenGLManager::fillVBOsData()
     m_ssbo_data.resize(1000);
 
     m_vbo_skeleton.create();
-    m_vbo_skeleton.setUsagePattern( QOpenGLBuffer::StaticDraw);
+    m_vbo_skeleton.setUsagePattern( QOpenGLBuffer::StaticDraw );
     m_vbo_skeleton.bind();
     m_vbo_skeleton.allocate(NULL, m_dataContainer->getSkeletonPointsSize()  * sizeof(SkeletonPoint));
     int vbo_IndexMesh_offset = 0;
@@ -827,4 +827,18 @@ Object_t OpenGLManager::getObjectTypeByID(int hvgxID)
         return Object_t::UNKNOWN;
 
     return m_dataContainer->getObjectTypeByID(hvgxID);
+}
+
+
+void OpenGLManager::FilterByType(Object_t type)
+{
+    // this should be fast, I should somehow group by IDs for types, and when we filter by type I just get all IDs with this type and set them to 1 which means filtered
+    std::vector<int> objects_list = m_dataContainer->getObjectsIDsByType(type);
+    qDebug() << "Filtering " << objects_list.size() << " objects";
+
+    for (int i = 0; i < objects_list.size(); i++) {
+        int hvgxID = objects_list[i];
+        qDebug() << "Filtering ID " << hvgxID;
+        m_ssbo_data[hvgxID].info.setW(1);
+    }
 }

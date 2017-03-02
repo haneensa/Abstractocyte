@@ -73,6 +73,10 @@ void main() {
 
   for(int i = 0; i < 3; i++) {
     int ID = V_ID[i];
+    int isFiltered = int(SSBO_data[ID].info.w);
+    if (isFiltered == 1)
+        return;
+
     int type = int(SSBO_data[ID].center.w);
     color_val = V_color_val[i];
 

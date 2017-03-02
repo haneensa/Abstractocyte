@@ -330,4 +330,26 @@ void GLWidget::getGraphParam7(double value)
     m_graphManager->updateGraphParam7(value);
 }
 
+void GLWidget::getFilteredType(QString value)
+{
+    qDebug() << "Filter: " << value;
+    if (m_opengl_mngr == NULL)
+        return;
 
+    Object_t object_type = Object_t::UNKNOWN;
+    if (value == "AXON")
+        object_type = Object_t::AXON;
+    else if (value == "DENDRITE")
+        object_type = Object_t::DENDRITE;
+    else if (value == "BOUTON")
+        object_type = Object_t::BOUTON;
+    else if (value == "SPINE")
+        object_type = Object_t::SPINE;
+    else if (value == "MITO")
+        object_type = Object_t::MITO;
+    else if (value == "SYNAPSE")
+        object_type = Object_t::SYNAPSE;
+
+    m_opengl_mngr->FilterByType(object_type);
+    update();
+}

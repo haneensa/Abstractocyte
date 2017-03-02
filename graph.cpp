@@ -347,6 +347,9 @@ void Graph::update_node_data(Node* node)
     }
 }
 
+// how to remove filtered objects from graph?????
+// for each node check if it is filtered
+// if yes ignore it and proceed
 void Graph::runforceDirectedLayout()
 {
     qDebug() << "run force directed layout";

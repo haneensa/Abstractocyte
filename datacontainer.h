@@ -34,21 +34,25 @@ public:
 
     Object_t getObjectTypeByID(int hvgxID);
 
+    std::vector<int> getObjectsIDsByType(Object_t type);
 
 protected:
     // store all vertices of the mesh.
     // unique vertices, faces to index them.
-    Mesh                                *m_mesh;
+    Mesh                                    *m_mesh;
 
-    int                                 m_skeleton_points_size;
-    int                                 m_indices_size;
-    int                                 m_vertex_offset;
-    int                                 m_limit;
+    int                                     m_skeleton_points_size;
+    int                                     m_indices_size;
+    int                                     m_vertex_offset;
+    int                                     m_limit;
 
-    std::map<int, Object*>              m_objects;
+    std::map<int, Object*>                  m_objects;
+
+    // for each type, make a list of their IDs
+    std::map< Object_t, std::vector<int> >  m_objectsIDsByType;
 
     // graph related data
-    std::vector<QVector2D>              neurites_neurite_edge;
+    std::vector<QVector2D>                  neurites_neurite_edge;
 };
 
 #endif // OBJECTMANAGER_H

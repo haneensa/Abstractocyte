@@ -51,6 +51,10 @@ layout (std430, binding=3) buffer space2d_data
 
 void main() {
     int ID = V_ID[0];
+    int isFiltered = int(SSBO_data[ID].info.w);
+    if (isFiltered == 1)
+        return;
+
     int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
