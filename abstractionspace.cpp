@@ -144,21 +144,6 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu4.extra_info = QVector4D(0, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
     m_neu_states[std::make_pair(x_interval.x(), x_interval.y())] = neu4;
 
-    // 5) Skeleton -> Point
-    x_interval = QVector2D(80, 100);
-    x_intervals.push_back(x_interval);  // 4
-    neu5.pos_alpha  = QVector2D(0, 1);
-    neu5.trans_alpha = QVector2D(1, 1);
-    neu5.color_alpha = QVector2D(1, 1);
-    neu5.point_size = QVector2D(1, max_neurite_nsize);
-    neu5.interval = QVector2D(x_interval.x(), x_interval.y());       // alpha limit, div, pos1, pos2
-    neu5.positions = QVector2D(1, 5);       // alpha limit, div, pos1, pos2
-    neu5.render_type = QVector4D(0, 0, 0, 1);
-    neu5.extra_info = QVector4D(0, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
-    m_neu_states[std::make_pair(x_interval.x(), x_interval.y())] = neu5;
-
-
-
 
     // ################## Creating the 2d space shapes
     int ID = 1;

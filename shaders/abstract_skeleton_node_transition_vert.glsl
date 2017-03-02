@@ -87,7 +87,7 @@ void main(void)
     vec4 v_layout2 =  m_noRotvpMatrix * vec4(layout2, 0, 1); // original position
     vec4 v_layout3 =  m_noRotvpMatrix * vec4(layout3, 0, 1); // original position
 
-    vec4 node_center = m_noRotvpMatrix * vec4(SSBO_data[ID].center.xy, 0, 1);
+    vec4 node_center = mvpMatrix * vec4(SSBO_data[ID].center.xyz, 1);
     vec4 node_layout2 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout2, 0, 1);
 
     int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
@@ -144,7 +144,6 @@ void main(void)
     case 5: pos2 = node_center; break;
     case 6: pos2 = node_layout2; break;
     }
-
 
     gl_Position = mix(pos1,  pos2 ,  position_intp)  ;
 }
