@@ -349,6 +349,8 @@ void GLWidget::getFilteredType(QString value)
         object_type = Object_t::MITO;
     else if (value == "SYNAPSE")
         object_type = Object_t::SYNAPSE;
+    else if (value == "ASTROCYTE")
+        object_type = Object_t::ASTROCYTE;
 
     m_opengl_mngr->FilterByType(object_type);
     update();

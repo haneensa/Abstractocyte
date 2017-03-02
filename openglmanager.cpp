@@ -839,6 +839,10 @@ void OpenGLManager::FilterByType(Object_t type)
     for (int i = 0; i < objects_list.size(); i++) {
         int hvgxID = objects_list[i];
         qDebug() << "Filtering ID " << hvgxID;
-        m_ssbo_data[hvgxID].info.setW(1);
+        if (m_ssbo_data[hvgxID].info.w() == 1)
+            m_ssbo_data[hvgxID].info.setW(0);
+        else
+            m_ssbo_data[hvgxID].info.setW(1);
+
     }
 }

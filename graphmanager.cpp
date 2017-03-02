@@ -50,7 +50,6 @@ void GraphManager::update2Dflag(bool is2D, struct GlobalUniforms uniforms)
     // object nodes
     // connectivity info from them
 
-// how to remove filtered objects from graph?????
 
 void GraphManager::ExtractGraphFromMesh()
 {
