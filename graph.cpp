@@ -112,9 +112,15 @@ bool Graph::parseNODE_NODE(std::vector<Node*> neurites_nodes, std::vector<QVecto
 {
     for (int i = 0; i < neurites_nodes.size(); i++) {
         Node *node = neurites_nodes[i];
+        int hvgxID = node->getID();
         QVector3D position = node->get3DPosition();
         std::pair<int, int> id_tuple =  std::make_pair(node->getID(), -1);
-        this->addNode(id_tuple, position.x(), position.y(), position.z(), Node_t::NONE);
+        Object_t object_type = m_opengl_mngr->getObjectTypeByID(hvgxID);
+        Node_t node_type =  Node_t::NONE;
+        if (object_type == Object_t::ASTROCYTE)
+            node_type = Node_t::ASTROCYTE;
+
+        this->addNode(id_tuple, position.x(), position.y(), position.z(), node_type);
     }
 
     for (int i = 0; i < neurites_edges.size(); i++) {
@@ -147,10 +153,16 @@ bool Graph::parseSKELETON(std::vector<Node*> neurites_skeletons_nodes,
     // iterate over the objets
     for (int i = 0; i < neurites_skeletons_nodes.size(); i++) {
         Node *node = neurites_skeletons_nodes[i];
+        int hvgxID = node->getID();
         QVector3D position = node->get3DPosition();
-        std::pair<int, int> id_tuple =  std::make_pair(node->getID(),  node->getIdxID());
+        std::pair<int, int> id_tuple =  std::make_pair(hvgxID,  node->getIdxID());
         // I can access the objects using their IDs then get the type
-        this->addNode(id_tuple, position.x(), position.y(), position.z(), Node_t::NONE /* need to assin for each node their type */);
+        Object_t object_type = m_opengl_mngr->getObjectTypeByID(hvgxID);
+        Node_t node_type =  Node_t::NONE;
+        if (object_type == Object_t::ASTROCYTE)
+            node_type = Node_t::ASTROCYTE;
+
+        this->addNode(id_tuple, position.x(), position.y(), position.z(), node_type /* need to assin for each node their type */);
     }
 
     for (int i = 0; i < neurites_skeletons_edges.size(); i++) {
@@ -267,6 +279,8 @@ void Graph::resetCoordinates()
 
     qDebug() << "2D";
     hashGrid->clear();
+    // this take so much time that by the time we reach it still do this?
+    // create many threads within one thread?
     for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
         if (m_FDL_terminate) goto quit;
 

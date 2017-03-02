@@ -67,9 +67,10 @@ public:
     void update_skeleton_layout3(QVector2D layout3,  long node_index, int hvgxID);
 
 
+    Object_t getObjectTypeByID(int hvgxID);
 
 protected:
-    DataContainer                       *m_obj_mnger; // get the data to render from here
+    DataContainer                       *m_dataContainer; // get the data to render from here
 
     bool                                m_glFunctionsSet;
     bool                                m_2D;

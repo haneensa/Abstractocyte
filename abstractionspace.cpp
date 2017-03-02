@@ -12,7 +12,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
       m_glFunctionsSet(false),
       m_intervalID(0)
 {
-    int max_neurite_nsize = 20;
+    int max_neurite_nsize = 15;
     int simplified_skeleton_nsize = 1;
 
     QVector2D x_interval, y_interval;
@@ -418,7 +418,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     // vertically instead of horizantally (Need indication)
     // flag: if 0, then verticall, else horizantally (generalization)
     neu6.interval = QVector2D(x_interval.x(), x_interval.y()); // 3D -> layout 2 for astrocyte
-    neu6.positions = QVector2D(5, 5); // 3D -> layout 2 for astrocyte
+    neu6.positions = QVector2D(5, 6); // 3D -> layout 2 for astrocyte
     neu6.render_type = QVector4D(0, 0, 0, 1); // graph
     neu6.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
 

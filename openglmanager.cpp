@@ -11,7 +11,7 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger)
       m_2D(false),
       m_bindIdx(2) // ssbo biding point
 {
-    m_obj_mnger = obj_mnger;
+    m_dataContainer = obj_mnger;
     m_glFunctionsSet = false;
 }
 
@@ -100,16 +100,16 @@ void OpenGLManager::fillVBOsData()
     m_vbo_skeleton.create();
     m_vbo_skeleton.setUsagePattern( QOpenGLBuffer::StaticDraw);
     m_vbo_skeleton.bind();
-    m_vbo_skeleton.allocate(NULL, m_obj_mnger->getSkeletonPointsSize()  * sizeof(SkeletonPoint));
+    m_vbo_skeleton.allocate(NULL, m_dataContainer->getSkeletonPointsSize()  * sizeof(SkeletonPoint));
     int vbo_IndexMesh_offset = 0;
 
     // initialize index buffers
     m_vbo_IndexMesh.create();
     m_vbo_IndexMesh.bind();
-    m_vbo_IndexMesh.allocate( NULL, m_obj_mnger->getMeshIndicesSize() * sizeof(GLuint) );
+    m_vbo_IndexMesh.allocate( NULL, m_dataContainer->getMeshIndicesSize() * sizeof(GLuint) );
     int vbo_skeleton_offset = 0;
 
-    std::map<int, Object*> objects_map = m_obj_mnger->getObjectsMap();
+    std::map<int, Object*> objects_map = m_dataContainer->getObjectsMap();
     for ( auto iter = objects_map.begin(); iter != objects_map.end(); iter++) {
         Object *object_p = (*iter).second;
         int ID = object_p->getHVGXID();
@@ -172,7 +172,7 @@ void OpenGLManager::fillVBOsData()
    }
 
     // allocate neurites nodes edges
-    std::vector<QVector2D> edges_info = m_obj_mnger->getNeuritesEdges();
+    std::vector<QVector2D> edges_info = m_dataContainer->getNeuritesEdges();
     for (int i = 0; i < edges_info.size(); ++i) {
         int nID1 = edges_info[i].x();
         int nID2 = edges_info[i].y();
@@ -429,7 +429,7 @@ bool OpenGLManager::initMeshTrianglesShaders()
         qDebug() << "Could not bind vertex buffer to the context.";
     }
 
-    Mesh* mesh = m_obj_mnger->getMeshPointer();
+    Mesh* mesh = m_dataContainer->getMeshPointer();
     mesh->allocateVerticesVBO(m_vbo_mesh);
 
     // initialize index buffers
@@ -454,7 +454,7 @@ void OpenGLManager::drawMeshTriangles(struct GlobalUniforms grid_uniforms)
    updateUniformsLocation(m_program_mesh);
 
    m_vbo_IndexMesh.bind();
-   glDrawElements(GL_TRIANGLES,  m_obj_mnger->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
+   glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
    m_vbo_IndexMesh.release();
    m_vao_mesh.release();
 }
@@ -500,7 +500,7 @@ void OpenGLManager::drawMeshPoints(struct GlobalUniforms grid_uniforms)
     updateUniformsLocation(m_program_mesh_points);
 
     m_vbo_IndexMesh.bind();
-    glDrawElements(GL_POINTS,  m_obj_mnger->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
+    glDrawElements(GL_POINTS,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
     m_vbo_IndexMesh.release();
 
     m_vao_mesh_points.release();
@@ -557,7 +557,7 @@ void OpenGLManager::drawSkeletonPoints(struct GlobalUniforms grid_uniforms)
     m_uniforms = grid_uniforms;
     updateUniformsLocation(m_program_skeleton);
 
-    glDrawArrays(GL_POINTS, 0,  m_obj_mnger->getSkeletonPointsSize()  );
+    glDrawArrays(GL_POINTS, 0,  m_dataContainer->getSkeletonPointsSize()  );
     m_vao_skeleton.release();
 
 }
@@ -754,7 +754,7 @@ void OpenGLManager::update_ssbo_data_layout2(QVector2D layout2, int hvgxID)
 void OpenGLManager::update_skeleton_layout1(QVector2D layout1,  long node_index, int hvgxID)
 {
     // get the object -> get its skeleton -> update the layout
-    std::map<int, Object*> objects_map = m_obj_mnger->getObjectsMap();
+    std::map<int, Object*> objects_map = m_dataContainer->getObjectsMap();
 
     if (objects_map.find(hvgxID) == objects_map.end()) {
         return;
@@ -778,7 +778,7 @@ void OpenGLManager::update_skeleton_layout2(QVector2D layout2,  long node_index,
 {
     // get the object -> get its skeleton -> update the layout
     // get the object -> get its skeleton -> update the layout
-    std::map<int, Object*> objects_map = m_obj_mnger->getObjectsMap();
+    std::map<int, Object*> objects_map = m_dataContainer->getObjectsMap();
     if (objects_map.find(hvgxID) == objects_map.end()) {
         qDebug() << "Object not found";
         return;
@@ -802,7 +802,7 @@ void OpenGLManager::update_skeleton_layout3(QVector2D layout3,  long node_index,
 {
     // get the object -> get its skeleton -> update the layout
     // get the object -> get its skeleton -> update the layout
-    std::map<int, Object*> objects_map = m_obj_mnger->getObjectsMap();
+    std::map<int, Object*> objects_map = m_dataContainer->getObjectsMap();
     if (objects_map.find(hvgxID) == objects_map.end()) {
         return;
     }
@@ -819,4 +819,12 @@ void OpenGLManager::update_skeleton_layout3(QVector2D layout3,  long node_index,
     }
 
     m_abstract_skel_nodes[node_index].layout3 = layout3;
+}
+
+Object_t OpenGLManager::getObjectTypeByID(int hvgxID)
+{
+    if (m_dataContainer == NULL)
+        return Object_t::UNKNOWN;
+
+    return m_dataContainer->getObjectTypeByID(hvgxID);
 }

@@ -32,6 +32,8 @@ public:
     int getMeshIndicesSize();
     Mesh* getMeshPointer();
 
+    Object_t getObjectTypeByID(int hvgxID);
+
 
 protected:
     // store all vertices of the mesh.
