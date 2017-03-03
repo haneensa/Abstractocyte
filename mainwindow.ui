@@ -48,7 +48,7 @@
    <property name="minimumSize">
     <size>
      <width>300</width>
-     <height>567</height>
+     <height>574</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -335,14 +335,14 @@
            <string>Filter View</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
-           <item row="2" column="0">
+           <item row="0" column="0">
             <widget class="QLabel" name="label_5">
              <property name="text">
               <string>Filter By Type:</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
+           <item row="0" column="1">
             <widget class="QComboBox" name="comboBox_2">
              <item>
               <property name="text">
@@ -385,6 +385,16 @@
               </property>
              </item>
             </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Filter By ID:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="lineEdit"/>
            </item>
           </layout>
          </widget>
@@ -432,6 +442,7 @@
     <slot>getGraphParam6(double)</slot>
     <slot>getGraphParam7(double)</slot>
     <slot>getFilteredType(QString)</slot>
+    <slot>getFilteredID(QString)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -460,8 +471,8 @@
    <slot>getSlotsX(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>179</x>
-     <y>341</y>
+     <x>214</x>
+     <y>336</y>
     </hint>
     <hint type="destinationlabel">
      <x>108</x>
@@ -480,8 +491,8 @@
      <y>121</y>
     </hint>
     <hint type="destinationlabel">
-     <x>134</x>
-     <y>341</y>
+     <x>169</x>
+     <y>336</y>
     </hint>
    </hints>
   </connection>
@@ -573,7 +584,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>266</x>
-     <y>419</y>
+     <y>414</y>
     </hint>
     <hint type="destinationlabel">
      <x>569</x>
@@ -589,7 +600,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>266</x>
-     <y>445</y>
+     <y>440</y>
     </hint>
     <hint type="destinationlabel">
      <x>584</x>
@@ -605,7 +616,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>266</x>
-     <y>471</y>
+     <y>466</y>
     </hint>
     <hint type="destinationlabel">
      <x>579</x>
@@ -621,7 +632,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>266</x>
-     <y>497</y>
+     <y>492</y>
     </hint>
     <hint type="destinationlabel">
      <x>599</x>
@@ -637,7 +648,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>266</x>
-     <y>523</y>
+     <y>518</y>
     </hint>
     <hint type="destinationlabel">
      <x>582</x>
@@ -653,7 +664,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>266</x>
-     <y>549</y>
+     <y>544</y>
     </hint>
     <hint type="destinationlabel">
      <x>576</x>
@@ -669,7 +680,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>266</x>
-     <y>575</y>
+     <y>570</y>
     </hint>
     <hint type="destinationlabel">
      <x>566</x>
@@ -684,12 +695,28 @@
    <slot>getFilteredType(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>241</x>
-     <y>651</y>
+     <x>270</x>
+     <y>634</y>
     </hint>
     <hint type="destinationlabel">
      <x>379</x>
      <y>647</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEdit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getFilteredID(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>253</x>
+     <y>647</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>337</x>
+     <y>657</y>
     </hint>
    </hints>
   </connection>

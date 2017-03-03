@@ -32,6 +32,7 @@ public slots:
     void lockRotation2D();
 
     void getFilteredType(QString value);
+    void getFilteredID(QString value);
 
 
 signals:

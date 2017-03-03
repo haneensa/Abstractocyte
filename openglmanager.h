@@ -69,6 +69,7 @@ public:
 
     Object_t getObjectTypeByID(int hvgxID);
     void FilterByType(Object_t type);
+    void FilterByID( QList<QString> tokens_Ids );
 
 protected:
     DataContainer                       *m_dataContainer; // get the data to render from here

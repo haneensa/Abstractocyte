@@ -355,3 +355,15 @@ void GLWidget::getFilteredType(QString value)
     m_opengl_mngr->FilterByType(object_type);
     update();
 }
+
+void GLWidget::getFilteredID(QString value)
+{
+    qDebug() << "Filter: " << value;
+    if (m_opengl_mngr == NULL)
+        return;
+    // check if there are more than one ID
+    QList<QString> tokens = value.split(',');
+    qDebug() << tokens;
+    m_opengl_mngr->FilterByID(tokens);
+    update();
+}

@@ -846,3 +846,17 @@ void OpenGLManager::FilterByType(Object_t type)
 
     }
 }
+
+void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
+{
+    for (int i = 0; i < m_ssbo_data.size(); ++i) {
+        m_ssbo_data[i].info.setW(1);
+    }
+
+    for (int i = 0; i < tokens_Ids.size(); ++i) {
+        int hvgxID = tokens_Ids[i].toInt();
+        if (hvgxID > m_ssbo_data.size())
+            continue;
+        m_ssbo_data[hvgxID].info.setW(0);
+    }
+}

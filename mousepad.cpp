@@ -403,6 +403,7 @@ void MousePad::getAbstractionData(AbstractionSpace *space_instance)
 
 void MousePad::renderSelection(void)
 {
+    // why I didnt use glRenderMode(GL_SELECT)?
     aboutToCompose();
     qDebug() << "Draw Selection!";
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
