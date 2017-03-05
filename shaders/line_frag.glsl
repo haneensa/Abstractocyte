@@ -13,11 +13,11 @@ void main() {
     vec2 projection = v_start + clamp(t, 0, 1) * v_line;
     vec2 delta = gl_FragCoord.xy - projection;
     float d2 = dot(delta, delta);
-    float k = clamp(5 - d2,  0.0, 1.0);
+    float k = clamp(9 - d2,  0.0, 1.0);
     float endWeight = step(abs(t * 2 - 1), 1);
 
     outcol = color_val;
-    outcol.a = mix(k, 1, endWeight);
-    if (outcol.a  < 0.1)
+    outcol.a = alpha; //mix(k, 1, endWeight);
+    if (outcol.a  < 0.01)
         discard;
 }

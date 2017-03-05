@@ -18,7 +18,8 @@
 */
 
 layout (lines) in;
-layout(triangle_strip, max_vertices = 6) out;
+//layout(triangle_strip, max_vertices = 6) out;
+layout(line_strip, max_vertices = 2) out;
 
 in int          V_ID[];
 in float        V_alpha[];
@@ -123,15 +124,15 @@ void main() {
     vec2 startInNDC = start.wy / start.w;
     vec2 endInNDC = end.xy / end.w ;
     vec2 lineInNDC = endInNDC - startInNDC;
-    vec2 startInScreen = (0.5 * startInNDC + vec2(0.5)) * vpSize  + vec2(0, 0);
-    vec2 endInScreen = (0.5 * endInNDC + vec2(0.5)) * vpSize + vec2(0, 0);
+    vec2 startInScreen = (0.5 * startInNDC + vec2(0.5)) * vpSize  + v_viewport[0].xy;
+    vec2 endInScreen = (0.5 * endInNDC + vec2(0.5)) * vpSize + v_viewport[0].xy;
     vec2 lineInScreen = lineInNDC * vpSize; // ndc to screen (direction vector)
     vec2 axisInScreen = normalize(lineInScreen);
     vec2 sideInScreen = vec2(-axisInScreen.y, axisInScreen.x);
     vec2 axisInNDC = axisInScreen / vpSize;
     vec2 sideInNDC = sideInScreen / vpSize;
-    vec4 axis = vec4(axisInNDC, 0.0, 0.0) * 5 /*line width*/;
-    vec4 side = vec4(sideInNDC, 0.0, 0.0) * 5;
+    vec4 axis = vec4(axisInNDC, 0.0, 0.0) * 9 /*line width*/;
+    vec4 side = vec4(sideInNDC, 0.0, 0.0) * 9 /*line width*/;
 
     vec4 a = (start + (side - axis) * start.w);
     vec4 b = (end + (side + axis)*  end.w);
@@ -145,11 +146,12 @@ void main() {
 
 
 
-    gl_Position = a; EmitVertex();
-    gl_Position = d; EmitVertex();
-    gl_Position = b;  EmitVertex();
-    gl_Position = c; EmitVertex();
-
+//    gl_Position = a; EmitVertex();
+//    gl_Position = d; EmitVertex();
+//    gl_Position = b;  EmitVertex();
+//    gl_Position = c; EmitVertex();
+    gl_Position = start; EmitVertex();
+    gl_Position = end; EmitVertex();
     EndPrimitive();
 }
 
