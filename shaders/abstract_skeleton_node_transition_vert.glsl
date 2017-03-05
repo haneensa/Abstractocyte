@@ -6,8 +6,8 @@ layout (location = 1) in vec2 layout1;
 layout (location = 2) in vec2 layout2;
 layout (location = 3) in vec2 layout3;
 
-out int V_ID;
-out float V_alpha;
+out int     V_ID;
+out float   V_alpha;
 out int     V_render;
 
 // World transformation
@@ -21,8 +21,9 @@ uniform mat4 pMatrix;
 
 uniform int  y_axis;
 uniform int  x_axis;
-uniform int is2D;
+uniform vec4 viewport;
 
+out vec4 v_viewport;
 struct SSBO_datum {
     vec4 color;
     vec4 center;
@@ -77,6 +78,7 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 // here I should lock the rotation matrix
 void main(void)
 {
+    v_viewport = viewport;
     int ID = int(vertex.w);
     V_ID = ID;
     mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;

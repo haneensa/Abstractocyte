@@ -83,9 +83,12 @@ void GLWidget::updateMVPAttrib()
     m_rotationMatrix.translate(-1.0 * m_cameraPosition);
     m_mMatrix *= m_rotationMatrix;
 
+    const qreal retinaScale = devicePixelRatio();
+    QVector4D viewport = QVector4D(0, 0, width()  * retinaScale, height() * retinaScale);
+
     // graph model matrix without rotation, apply rotation to nodes directly
     m_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
-                        m_model_noRotation.data(), m_rotationMatrix};
+                        m_model_noRotation.data(), m_rotationMatrix, viewport};
 }
 
 void GLWidget::initializeGL()
@@ -131,12 +134,7 @@ void GLWidget::paintGL()
     updateMVPAttrib();
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
-    struct GlobalUniforms grid_uniforms = { m_yaxis, m_xaxis, m_mMatrix.data(),
-                                            m_vMatrix.data(), m_projection.data(),
-                                            m_model_noRotation.data(), m_rotationMatrix};
-
-    m_opengl_mngr->drawAll(grid_uniforms);
+    m_opengl_mngr->drawAll(m_uniforms);
 
 }
 
@@ -146,6 +144,9 @@ void GLWidget::resizeGL(int w, int h)
     const qreal retinaScale = devicePixelRatio();
     h = (h == 0) ? 1 : h;
     glViewport(0, 0, w * retinaScale, h * retinaScale);
+
+    qDebug() <<  w * retinaScale << " " << h * retinaScale;
+    m_uniforms.viewport = QVector4D(0, 0, w * retinaScale, h * retinaScale);
 
     m_projection.setToIdentity();
     m_projection.ortho(GLfloat(-w) / GLfloat(h),  GLfloat(w) / GLfloat(h), -1.0,  1.0f, -5.0, 5.0 );

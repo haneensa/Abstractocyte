@@ -1,3 +1,35 @@
+/*
+Just to make it easier.. this code is copied from HVR_AbstractGraphManager
+
+
+//Render the selection frame
+
+glBindFramebufferEXT(GL_FRAMEBUFFER, m_selectionFramebuffer);
+//clear
+glClear(GL_COLOR_BUFFER_BIT);
+//disable dithering -- important
+glDisable(GL_DITHER);
+//render graph
+m_abstract_graph->drawAbstract(HVR_GRAPH_DRAW_SELECTION_MODE, HVR_ABSTRACT_GRAPH_DRAW_CLUSTERED_EDGES_OPTION);
+//enable dithering again
+glEnable(GL_DITHER);
+//process click
+_processSelection();
+
+glBindFramebufferEXT(GL_FRAMEBUFFER, 0);
+
+
+in process selection:
+
+GLint viewport[4];
+GLubyte pixel[3];
+glGetIntegerv(GL_VIEWPORT, viewport);
+glReadPixels(m_mouse_x, viewport[3] - m_mouse_y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, (void *)pixel);
+
+int id = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
+
+ */
+
 #include "openglmanager.h"
 
 OpenGLManager::OpenGLManager(DataContainer *obj_mnger)
@@ -313,7 +345,7 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     res = initShader(m_program_skeletons_2D_index,
                      ":/shaders/abstract_skeleton_node_2D_vert.glsl",
                      ":/shaders/abstract_skeleton_line_geom.glsl",
-                     ":/shaders/points_passthrough_frag.glsl");
+                     ":/shaders/line_frag.glsl");
 
     if (res == false)
         return res;
@@ -332,7 +364,7 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     res = initShader(m_program_skeletons_23D_index,
                      ":/shaders/abstract_skeleton_node_transition_vert.glsl",
                      ":/shaders/abstract_skeleton_line_geom.glsl",
-                     ":/shaders/points_passthrough_frag.glsl");
+                     ":/shaders/line_frag.glsl");
 
     if (res == false)
         return res;
@@ -389,10 +421,12 @@ void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms)
 
     glUseProgram(m_program_skeletons_2D_index);
     updateAbstractUniformsLocation(m_program_skeletons_2D_index);
+    glLineWidth(20);
     glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
 
     glUseProgram(m_program_skeletons_23D_index);
     updateAbstractUniformsLocation(m_program_skeletons_23D_index);
+    glLineWidth(20);
     glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
 
     m_SkeletonsIndexVBO.release();
@@ -582,7 +616,7 @@ bool OpenGLManager::initNeuritesGraphShaders()
     m_program_neurites_index = glCreateProgram();
     res = initShader(m_program_neurites_index,  ":/shaders/nodes_vert.glsl",
                                        ":/shaders/abstract_skeleton_line_geom.glsl",
-                                       ":/shaders/points_passthrough_frag.glsl");
+                                       ":/shaders/line_frag.glsl");
     if (res == false)
         return res;
 
@@ -637,6 +671,7 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
 
     glUseProgram(m_program_neurites_index);
     updateAbstractUniformsLocation(m_program_neurites_index);
+    glLineWidth(20);
 
     glDrawElements(GL_LINES,  m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
 
@@ -650,6 +685,32 @@ void OpenGLManager::update2Dflag(bool is2D)
 {
     m_2D = is2D;
 }
+
+
+void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
+{
+    m_uniforms = grid_uniforms;
+    write_ssbo_data();
+
+    // 1) Mesh Triangles
+    // 2) Mesh Points
+
+    glDisable (GL_BLEND);
+    glBlendFunc (GL_ONE, GL_ONE);
+    drawMeshPoints(grid_uniforms);
+    drawMeshTriangles(grid_uniforms);
+
+    // 3) Skeleton Points
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    drawSkeletonPoints(grid_uniforms);
+    // 3) Abstract Skeleton Graph (Nodes and Edges)
+    drawSkeletonsGraph(grid_uniforms);
+    // 4) Neurites Graph (Nodes and Edges)
+    drawNeuritesGraph(grid_uniforms);
+}
+
 
 void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
 {
@@ -684,30 +745,15 @@ void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
     GLint x_axis = glGetUniformLocation(program, "x_axis");
     glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
 
-}
+    GLint viewport = glGetUniformLocation(program, "viewport");
+    qDebug() << "viewport " << viewport;
+    float viewport_values[4];
+    viewport_values[0] = m_uniforms.viewport.x();
+    viewport_values[1] = m_uniforms.viewport.y();
+    viewport_values[2] = m_uniforms.viewport.z();
+    viewport_values[3] = m_uniforms.viewport.w();
 
-void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
-{
-    m_uniforms = grid_uniforms;
-    write_ssbo_data();
-
-    // 1) Mesh Triangles
-    // 2) Mesh Points
-
-    glDisable (GL_BLEND);
-    glBlendFunc (GL_ONE, GL_ONE);
-    drawMeshPoints(grid_uniforms);
-    drawMeshTriangles(grid_uniforms);
-
-    // 3) Skeleton Points
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    drawSkeletonPoints(grid_uniforms);
-    // 3) Abstract Skeleton Graph (Nodes and Edges)
-    drawSkeletonsGraph(grid_uniforms);
-    // 4) Neurites Graph (Nodes and Edges)
-    drawNeuritesGraph(grid_uniforms);
+    glUniform4fv(viewport, 1,  viewport_values);
 }
 
 void OpenGLManager::updateUniformsLocation(GLuint program)
@@ -731,6 +777,7 @@ void OpenGLManager::updateUniformsLocation(GLuint program)
 
     GLint x_axis = glGetUniformLocation(program, "x_axis");
     glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
+
 }
 
 

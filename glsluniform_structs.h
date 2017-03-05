@@ -11,6 +11,7 @@ struct GlobalUniforms {
     float* pMatrix;
     float* modelNoRotMatrix;
     QMatrix4x4 rMatrix;
+    QVector4D viewport;
 };
 
 #endif // GLSLUNIFORM_STRUCTS_H

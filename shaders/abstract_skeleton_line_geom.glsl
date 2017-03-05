@@ -18,14 +18,20 @@
 */
 
 layout (lines) in;
-layout (line_strip, max_vertices = 2) out;
+layout(triangle_strip, max_vertices = 6) out;
 
 in int          V_ID[];
 in float        V_alpha[];
 in int          V_render[];
-
+in vec4         v_viewport[];
 out vec4        color_val;
 out float       alpha;
+
+uniform vec4 viewport;
+
+out vec2 v_start;
+out vec2 v_line;
+out float v_l2;
 
 struct SSBO_datum {
     vec4 color;
@@ -89,11 +95,70 @@ void main() {
         }
 
         gl_PointSize =  gl_in[i].gl_PointSize;
-        gl_Position = gl_in[i].gl_Position;
-        EmitVertex();
-
     }
 
-    EndPrimitive();
+    vec4 start = gl_in[0].gl_Position;
+    vec4 end = gl_in[1].gl_Position;
 
+    float t0 = start.z + start.w;
+    float t1 = end.z + end.w;
+    if(t0 < 0.0)
+    {
+        if(t1 < 0.0)
+        {
+            return;
+        }
+       start = mix(start, end, (0 - t0) / (t1 - t0));
+    }
+    if(t1 < 0.0)
+    {
+       end = mix(start, end, (0 - t0) / (t1 - t0));
+    }
+
+
+    // get viewport
+    vec2 vpSize = v_viewport[0].zw/*viewport.yz*/;
+
+    // Compute line axis and side vector in screen space
+    vec2 startInNDC = start.wy / start.w;
+    vec2 endInNDC = end.xy / end.w ;
+    vec2 lineInNDC = endInNDC - startInNDC;
+    vec2 startInScreen = (0.5 * startInNDC + vec2(0.5)) * vpSize  + vec2(0, 0);
+    vec2 endInScreen = (0.5 * endInNDC + vec2(0.5)) * vpSize + vec2(0, 0);
+    vec2 lineInScreen = lineInNDC * vpSize; // ndc to screen (direction vector)
+    vec2 axisInScreen = normalize(lineInScreen);
+    vec2 sideInScreen = vec2(-axisInScreen.y, axisInScreen.x);
+    vec2 axisInNDC = axisInScreen / vpSize;
+    vec2 sideInNDC = sideInScreen / vpSize;
+    vec4 axis = vec4(axisInNDC, 0.0, 0.0) * 5 /*line width*/;
+    vec4 side = vec4(sideInNDC, 0.0, 0.0) * 5;
+
+    vec4 a = (start + (side - axis) * start.w);
+    vec4 b = (end + (side + axis)*  end.w);
+    vec4 c = (end - (side - axis)*  end.w);
+    vec4 d = (start - (side + axis)* start.w);
+
+
+    v_start = startInScreen;
+    v_line = endInScreen - startInScreen;
+    v_l2 = dot(v_line, v_line);
+
+
+
+    gl_Position = a; EmitVertex();
+    gl_Position = d; EmitVertex();
+    gl_Position = b;  EmitVertex();
+    gl_Position = c; EmitVertex();
+
+    EndPrimitive();
 }
+
+//  a - - - - - - - - - - - - - - - - b
+//  |      |                   |      |
+//  |      |                   |      |
+//  |      |                   |      |
+//  | - - -start - - - - - - end- - - |
+//  |      |                   |      |
+//  |      |                   |      |
+//  |      |                   |      |
+//  d - - - - - - - - - - - - - - - - c

@@ -20,6 +20,7 @@ uniform mat4 vMatrix;
 uniform mat4 pMatrix;
 uniform int  y_axis;
 uniform int  x_axis;
+uniform vec4 viewport;
 
 struct SSBO_datum {
     vec4 color;

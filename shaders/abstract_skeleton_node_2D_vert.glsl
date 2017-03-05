@@ -20,7 +20,8 @@ uniform mat4 pMatrix;
 
 uniform int  y_axis;
 uniform int  x_axis;
-uniform int is2D;
+uniform vec4 viewport;
+out vec4 v_viewport;
 
 struct SSBO_datum {
     vec4 color;
@@ -76,6 +77,7 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 // here I should lock the rotation matrix
 void main(void)
 {
+    v_viewport = viewport;
     int ID = int(vertex.w);
     V_ID = ID;
     mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
