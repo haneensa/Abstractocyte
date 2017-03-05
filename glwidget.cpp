@@ -179,6 +179,7 @@ void GLWidget::lockRotation2D()
     // if we are below x < 50 and y < 50
 
     // 2) reset graph nodes coordinates
+    m_refresh_timer->start(0);
     updateMVPAttrib();      // update uniforms
     m_graphManager->update2Dflag(true, m_uniforms);
     m_opengl_mngr->update2Dflag(true);
