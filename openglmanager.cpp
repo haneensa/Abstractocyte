@@ -345,7 +345,7 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     res = initShader(m_program_skeletons_2D_index,
                      ":/shaders/abstract_skeleton_node_2D_vert.glsl",
                      ":/shaders/abstract_skeleton_line_geom.glsl",
-                     ":/shaders/line_frag.glsl");
+                     ":/shaders/points_3d_frag.glsl");
 
     if (res == false)
         return res;
@@ -364,7 +364,7 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     res = initShader(m_program_skeletons_23D_index,
                      ":/shaders/abstract_skeleton_node_transition_vert.glsl",
                      ":/shaders/abstract_skeleton_line_geom.glsl",
-                     ":/shaders/line_frag.glsl");
+                     ":/shaders/points_3d_frag.glsl");
 
     if (res == false)
         return res;
@@ -616,7 +616,9 @@ bool OpenGLManager::initNeuritesGraphShaders()
     m_program_neurites_index = glCreateProgram();
     res = initShader(m_program_neurites_index,  ":/shaders/nodes_vert.glsl",
                                        ":/shaders/abstract_skeleton_line_geom.glsl",
-                                       ":/shaders/line_frag.glsl");
+                                       ":/shaders/points_3d_frag.glsl");
+//    ":/shaders/line_frag.glsl");
+
     if (res == false)
         return res;
 

@@ -18,8 +18,7 @@
 */
 
 layout (lines) in;
-//layout(triangle_strip, max_vertices = 6) out;
-layout(line_strip, max_vertices = 2) out;
+layout(points, max_vertices = 100) out;
 
 in int          V_ID[];
 in float        V_alpha[];
@@ -27,12 +26,6 @@ in int          V_render[];
 in vec4         v_viewport[];
 out vec4        color_val;
 out float       alpha;
-
-uniform vec4 viewport;
-
-out vec2 v_start;
-out vec2 v_line;
-out float v_l2;
 
 struct SSBO_datum {
     vec4 color;
@@ -70,97 +63,43 @@ layout (std430, binding=3) buffer space2d_data
 
 
 void main() {
-    for(int i = 0; i < 2; i++) {
-        int ID = V_ID[i];
+    int ID = V_ID[0];
 
-        int isFiltered = int(SSBO_data[ID].info.w);
-        if (isFiltered == 1)
-            return;
+    int isFiltered = int(SSBO_data[ID].info.w);
+    if (isFiltered == 1)
+        return;
 
-        color_val = SSBO_data[ID].color;
+    color_val = SSBO_data[ID].color;
 
 
-        alpha = V_alpha[i];
-        if (alpha < 0.01){
-            return;
-        }
-
-        int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
-
-        properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
-
-        vec4 render_type = space_properties.render_type; // additional info
-
-        if ( V_render[i] == 0  ) {
-            return;
-        }
-
-        gl_PointSize =  gl_in[i].gl_PointSize;
+    alpha = V_alpha[0];
+    if (alpha < 0.01){
+        return;
     }
+
+    int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
+
+    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
+
+    vec4 render_type = space_properties.render_type; // additional info
+
+    if ( V_render[0] == 0  ) {
+        return;
+    }
+
+    gl_PointSize =  4;
+
 
     vec4 start = gl_in[0].gl_Position;
     vec4 end = gl_in[1].gl_Position;
 
-    float t0 = start.z + start.w;
-    float t1 = end.z + end.w;
-    if(t0 < 0.0)
-    {
-        if(t1 < 0.0)
-        {
-            return;
-        }
-       start = mix(start, end, (0 - t0) / (t1 - t0));
+    for (int i = 0; i < 100; i++ ) {
+         float u = float(i) / float(100);
+         float x = (end.x - start.x) * u + start.x;
+         float y = (start.y - end.y) / (start.x - end.x) * (x - start.x) + start.y;
+         gl_Position = vec4(x, y, 0, 1.0);
+         EmitVertex();
+         EndPrimitive();
+
     }
-    if(t1 < 0.0)
-    {
-       end = mix(start, end, (0 - t0) / (t1 - t0));
-    }
-
-
-    // get viewport
-    vec2 vpSize = v_viewport[0].zw/*viewport.yz*/;
-
-    // Compute line axis and side vector in screen space
-    vec2 startInNDC = start.wy / start.w;
-    vec2 endInNDC = end.xy / end.w ;
-    vec2 lineInNDC = endInNDC - startInNDC;
-    vec2 startInScreen = (0.5 * startInNDC + vec2(0.5)) * vpSize  + v_viewport[0].xy;
-    vec2 endInScreen = (0.5 * endInNDC + vec2(0.5)) * vpSize + v_viewport[0].xy;
-    vec2 lineInScreen = lineInNDC * vpSize; // ndc to screen (direction vector)
-    vec2 axisInScreen = normalize(lineInScreen);
-    vec2 sideInScreen = vec2(-axisInScreen.y, axisInScreen.x);
-    vec2 axisInNDC = axisInScreen / vpSize;
-    vec2 sideInNDC = sideInScreen / vpSize;
-    vec4 axis = vec4(axisInNDC, 0.0, 0.0) * 9 /*line width*/;
-    vec4 side = vec4(sideInNDC, 0.0, 0.0) * 9 /*line width*/;
-
-    vec4 a = (start + (side - axis) * start.w);
-    vec4 b = (end + (side + axis)*  end.w);
-    vec4 c = (end - (side - axis)*  end.w);
-    vec4 d = (start - (side + axis)* start.w);
-
-
-    v_start = startInScreen;
-    v_line = endInScreen - startInScreen;
-    v_l2 = dot(v_line, v_line);
-
-
-
-//    gl_Position = a; EmitVertex();
-//    gl_Position = d; EmitVertex();
-//    gl_Position = b;  EmitVertex();
-//    gl_Position = c; EmitVertex();
-    gl_Position = start; EmitVertex();
-    gl_Position = end; EmitVertex();
-    EndPrimitive();
 }
-
-//  a - - - - - - - - - - - - - - - - b
-//  |      |                   |      |
-//  |      |                   |      |
-//  |      |                   |      |
-//  | - - -start - - - - - - end- - - |
-//  |      |                   |      |
-//  |      |                   |      |
-//  |      |                   |      |
-//  d - - - - - - - - - - - - - - - - c
