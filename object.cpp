@@ -130,12 +130,19 @@ struct ssbo_mesh Object::getSSBOData()
 // skeleton management
 void Object::addSkeletonNode(QVector3D coords)
 {
-    m_skeleton->addNode(coords);
+    // also ID to be used for the vertex (parent or child)
+    // how would I know this node belongs to a child
+    // and which child it would be?
+
+    // for children, I have the list of IDs of points that belong to the child
+    // then get the skeleton of its parent
+    // and mark these with child IDs
+    m_skeleton->addNode(coords, m_ID);
 }
 
 void Object::addSkeletonPoint(QVector3D coords)
 {
-    m_skeleton->addPoint(coords);
+    m_skeleton->addPoint(coords, m_ID);
 }
 
 int Object::writeSkeletontoVBO(QOpenGLBuffer vbo, int offset)

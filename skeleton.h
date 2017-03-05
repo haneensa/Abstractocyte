@@ -29,8 +29,8 @@ class Skeleton
 public:
     Skeleton(int ID);
     ~Skeleton();
-    void addNode(QVector3D coords);
-    void addPoint(QVector3D coords);
+    void addNode(QVector3D coords, int ID);
+    void addPoint(QVector3D coords, int ID);
     void*  getSkeletonPoints();
     int getSkeletonPointsSize();
     void addBranch(SkeletonBranch *branch);

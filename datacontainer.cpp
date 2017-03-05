@@ -120,6 +120,17 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
     int hvgxID = nameList[nameList.size() - 1].toInt();
     obj = new Object(name.toUtf8().constData(), hvgxID);
 
+    // if axon or dendrite then set parent ID
+    // Parent -> Child
+    // if axon then all boutons afterwards are its children
+    // else if dendrite all consecutive spines are its children
+    if (obj->getObjectType() == Object_t::AXON || obj->getObjectType() ==  Object_t::DENDRITE) { // assuming: all spines/boutons has parents
+        m_curParent = obj;
+    } else if (obj->getObjectType() == Object_t::BOUTON ||obj->getObjectType() == Object_t::SPINE) {
+        obj->setParentID(m_curParent);
+        m_objects[m_curParent->getHVGXID()]->addChild(obj);
+    }
+
     QVector4D color = obj->getColor();
     // set ssbo with this ID to this color
 
@@ -177,16 +188,7 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
         if (hvgxID == 120)
             return;
 
-        // if axon or dendrite then set parent ID
-        // Parent -> Child
-        // if axon then all boutons afterwards are its children
-        // else if dendrite all consecutive spines are its children
-        if (obj->getObjectType() == Object_t::AXON || obj->getObjectType() ==  Object_t::DENDRITE) { // assuming: all spines/boutons has parents
-            m_curParent = obj;
-        } else if (obj->getObjectType() == Object_t::BOUTON ||obj->getObjectType() == Object_t::SPINE) {
-            obj->setParentID(m_curParent);
-            m_objects[m_curParent->getHVGXID()]->addChild(obj);
-        }
+
 
          m_objects[hvgxID] =  obj;
          std::vector<int> IdsTemp = m_objectsIDsByType[obj->getObjectType()];

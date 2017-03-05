@@ -1,3 +1,5 @@
+// todo: add mitochondira node to neurites skeletons
+
 #ifndef OBJECT_H
 #define OBJECT_H
 
