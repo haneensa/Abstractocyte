@@ -44,6 +44,11 @@ struct ssbo_mesh {
     QVector4D info;    // volume, type (axon, bouton, spine, dendrite, ..), neurite/astr, filtered
     QVector2D layout1; // layouted position (only neurties)
     QVector2D layout2; // layouted position (with astrocyte)
+    // parent ID,
+    // check parent, if filtered out then dispaly the independent skeleton,
+    // else dont
+
+    // except I need to map the same hidden skeleton within its parent to a node
 };
 
 

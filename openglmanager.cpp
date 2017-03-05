@@ -179,6 +179,11 @@ void OpenGLManager::fillVBOsData()
         // get skeleton of the object
         // if no skeleton, this will be skipped, thus no graph for this object
         Skeleton *skeleton = object_p->getSkeleton(); // not null as long as the object exist
+        // if (spine/bouton) then get their skeleton from their parents
+        // inside of then the indices
+        // get the actual nodes from their parents
+        // only show them if parent is filtered
+
         std::vector<QVector3D> nodes3D = skeleton->getGraphNodes();
         std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
         qDebug() << "set offset: " << m_abstract_skel_nodes.size();

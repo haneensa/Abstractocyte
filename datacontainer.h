@@ -41,6 +41,7 @@ protected:
     // unique vertices, faces to index them.
     Mesh                                    *m_mesh;
 
+    Object                                  *m_curParent;
     int                                     m_skeleton_points_size;
     int                                     m_indices_size;
     int                                     m_vertex_offset;

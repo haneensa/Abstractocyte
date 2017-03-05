@@ -15,7 +15,7 @@ DataContainer::DataContainer()
     m_limit = 100000;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
-  importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+ // importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
    importXML("://m3_neurites.xml");    // neurites time:  28802 ms
 }
 
@@ -176,6 +176,18 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
     if (obj != NULL) {
         if (hvgxID == 120)
             return;
+
+        // if axon or dendrite then set parent ID
+        // Parent -> Child
+        // if axon then all boutons afterwards are its children
+        // else if dendrite all consecutive spines are its children
+        if (obj->getObjectType() == Object_t::AXON || obj->getObjectType() ==  Object_t::DENDRITE) { // assuming: all spines/boutons has parents
+            m_curParent = obj;
+        } else if (obj->getObjectType() == Object_t::BOUTON ||obj->getObjectType() == Object_t::SPINE) {
+            obj->setParentID(m_curParent);
+            m_objects[m_curParent->getHVGXID()]->addChild(obj);
+        }
+
          m_objects[hvgxID] =  obj;
          std::vector<int> IdsTemp = m_objectsIDsByType[obj->getObjectType()];
          IdsTemp.push_back(obj->getHVGXID());

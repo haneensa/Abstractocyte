@@ -42,7 +42,8 @@ public:
     void setCenter(QVector4D center);
     void setAstPoint(QVector4D ast_point);
     void setVolume(int volume)          { m_volume = volume; }
-
+    void setParentID(Object *parent)    { qDebug() << "Adding " << parent->getHVGXID() << " as parent to " <<  m_ID; m_parent == parent; }
+    void addChild(Object *child)        { qDebug() << "Adding " << child->getHVGXID() << " as the " << m_children.size() << "th child to " <<  m_ID; m_children.push_back(child); }
     // skeleton management
     void addSkeletonNode(QVector3D coords);
     void addSkeletonPoint(QVector3D coords);
@@ -64,8 +65,11 @@ private:
     // object properties
     Object_t                                m_object_t;     /* object type */
     int                                     m_volume;
-    int                                     m_function; // -1:not applicable, 0:ex, 1:in, 3:unknown
-    int                                     m_parentID; // -1 if none
+    int                                     m_function;     // -1:not applicable, 0:ex, 1:in, 3:unknown
+
+    Object                                  *m_parent;    // NULL if none
+    std::vector<Object*>                    m_children;   // axon-> bouton, den->spine
+
     QVector4D                               m_center;
     // closest point from astrocyte skeleton to this object so we can project the object on skeleton and be part of it
     QVector4D                               m_ast_point;

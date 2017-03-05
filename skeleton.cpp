@@ -19,7 +19,7 @@ void Skeleton::addNode(QVector3D coords)
 void Skeleton::addPoint(QVector3D coords)
 {
     QVector4D point = coords.toVector4D();
-    point.setW(m_ID);
+    point.setW(m_ID); // check if this belongs to a child then add child ID here
     QVector4D knot1, knot2;
     m_points.push_back({point, knot1, knot2}); // nodes IDs are from 0 to max, so the index can be used as ID index
 }
