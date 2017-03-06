@@ -31,7 +31,7 @@ public:
     ~Skeleton();
     void addNode(QVector3D coords);
     void addPoint(QVector3D coords);
-    void addBranch(SkeletonBranch *branch);
+    void addBranch(SkeletonBranch *branch, Skeleton *parentSkeleton);
 
     void markPoint(int pIndex, int IDMark);
 

@@ -44,7 +44,7 @@ int Skeleton::getSkeletonPointsSize()
     return m_points.size();
 }
 
-void Skeleton::addBranch(SkeletonBranch *branch)
+void Skeleton::addBranch(SkeletonBranch *branch, Skeleton *parentSkeleton)
 {
     // get the point and set its knots to this branch knots
     m_branches.push_back(branch);
@@ -55,6 +55,13 @@ void Skeleton::addBranch(SkeletonBranch *branch)
     std::vector<int> pointsIndices = branch->getPointsIndxs();
     for (int i = 0; i < pointsIndices.size(); i++) {
         int index = pointsIndices[i];
+        if (m_points.size() <= index) {
+            qDebug() << "index out of range addBranch points";
+            return;
+        }
+
+        // should I store points here???
+
         struct SkeletonPoint v = m_points[index];
         QVector3D n1 = m_nodes[knots.x()];
         QVector3D n2 = m_nodes[knots.y()];
