@@ -1,3 +1,6 @@
+// skeletons to take care of : 134, 510
+// 419, 56
+// 422, 59
 #include <chrono>
 #include "datacontainer.h"
 
@@ -12,7 +15,7 @@ DataContainer::DataContainer()
 {
     m_indices_size = 0;
     m_skeleton_points_size = 0;
-    m_limit = 100000;
+    m_limit = 10;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
  // importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
@@ -188,8 +191,6 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
         if (hvgxID == 120)
             return;
 
-
-
          m_objects[hvgxID] =  obj;
          std::vector<int> IdsTemp = m_objectsIDsByType[obj->getObjectType()];
          IdsTemp.push_back(obj->getHVGXID());
@@ -315,7 +316,7 @@ void DataContainer::parseSkeleton(QXmlStreamReader &xml, Object *obj)
             } else if (xml.name() == "points") {
                 qDebug() << xml.name();
                 parseSkeletonPoints(xml, obj);
-            } else if (xml.name() == "branches") {
+            } else if (xml.name() == "branches") { // children has only branches which uses their parents points
               // process branches
                 parseBranch(xml, obj);
             }
@@ -426,7 +427,7 @@ void DataContainer::parseBranch(QXmlStreamReader &xml, Object *obj)
             if (xml.name() == "b") {
                 branch = new SkeletonBranch();
                 int ID = xml.attributes().value("name").toInt();
-            } else if (xml.name() == "knots") {
+            } else if (xml.name() == "knots") { // for children knots uses parents points not nodes
                 if (branch == NULL) {
                     qDebug() << "branch null";
                     continue;
@@ -442,7 +443,7 @@ void DataContainer::parseBranch(QXmlStreamReader &xml, Object *obj)
                 int knot1 = stringlist.at(0).toInt();
                 int knot2 = stringlist.at(1).toInt();
                 branch->addKnots(knot1, knot2);
-            } else if (xml.name() == "points_ids") {
+            } else if (xml.name() == "points_ids") { // uses parent points, I need to mark these points with the child ID that uses them
                 if (branch == NULL || obj == NULL) {
                     qDebug() << "branch null or obj is NULL";
                     continue;

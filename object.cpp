@@ -25,6 +25,7 @@ Object::Object(std::string name, int ID)
 
     m_skeleton = new Skeleton(m_ID);
 
+    m_parent = NULL;
     qDebug() << "create " << m_name.data() << " hvgxID: " << m_ID;
 }
 
@@ -163,3 +164,16 @@ void Object::addSkeletonBranch(SkeletonBranch *branch)
 {
     m_skeleton->addBranch(branch);
 }
+
+void Object::setParentID(Object *parent)
+{
+    qDebug() << "Adding " << parent->getHVGXID() << " as parent to " <<  m_ID;
+    m_parent = parent;
+}
+
+void Object::addChild(Object *child)
+{
+    qDebug() << "Adding " << child->getHVGXID() << " as the " << m_children.size() << "th child to " <<  m_ID;
+    m_children.push_back(child);
+}
+

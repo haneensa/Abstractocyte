@@ -753,7 +753,6 @@ void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
     glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
 
     GLint viewport = glGetUniformLocation(program, "viewport");
-    qDebug() << "viewport " << viewport;
     float viewport_values[4];
     viewport_values[0] = m_uniforms.viewport.x();
     viewport_values[1] = m_uniforms.viewport.y();
@@ -911,6 +910,34 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
         int hvgxID = tokens_Ids[i].toInt();
         if (hvgxID > m_ssbo_data.size())
             continue;
+
+        std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
+        if (objectMap.find(hvgxID) == objectMap.end() || objectMap[hvgxID] == NULL) {
+            return;
+        }
+
+        Object *obj = objectMap[hvgxID];
+        // if it has a children then get them
+        // else if has parent get them
+        Object *parent = obj->getParent();
+        if (parent == NULL) {
+            qDebug() << obj->getName().data() << " has no parnt";
+        } else {
+            if (parent->getHVGXID() < m_ssbo_data.size())
+                m_ssbo_data[parent->getHVGXID()].info.setW(0);
+        }
+
+        std::vector<Object*> children = obj->getChildren();
+        if (children.size() == 0) {
+            qDebug() << obj->getName().data() << " has no child";
+        } else {
+            for (int i = 0; i < children.size(); i++) {
+                if (children[i]->getHVGXID() > m_ssbo_data.size())
+                    continue;
+                qDebug() << "Showing " << children[i]->getName().data();
+                m_ssbo_data[children[i]->getHVGXID()].info.setW(0);
+            }
+        }
         m_ssbo_data[hvgxID].info.setW(0);
     }
 }

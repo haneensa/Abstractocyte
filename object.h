@@ -1,5 +1,7 @@
 // todo: add mitochondira node to neurites skeletons
-
+// neurites dont have points cooridnates
+// they use parents nodes coordinates so they only have index in the skeleton
+//
 #ifndef OBJECT_H
 #define OBJECT_H
 
@@ -38,14 +40,16 @@ public:
     int getVolume()                     { return m_volume; }
     int getHVGXID()                     { return m_ID; }
     struct ssbo_mesh getSSBOData();
+    Object* getParent()                 { return m_parent; }
+    std::vector<Object*> getChildren()  { return m_children; }
 
     // properties setters
     void setColor(QVector4D color)      {  m_color = color; }
     void setCenter(QVector4D center);
     void setAstPoint(QVector4D ast_point);
     void setVolume(int volume)          { m_volume = volume; }
-    void setParentID(Object *parent)    { qDebug() << "Adding " << parent->getHVGXID() << " as parent to " <<  m_ID; m_parent == parent; }
-    void addChild(Object *child)        { qDebug() << "Adding " << child->getHVGXID() << " as the " << m_children.size() << "th child to " <<  m_ID; m_children.push_back(child); }
+    void setParentID(Object *parent);
+    void addChild(Object *child);
     // skeleton management
     void addSkeletonNode(QVector3D coords);
     void addSkeletonPoint(QVector3D coords);

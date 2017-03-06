@@ -11,12 +11,12 @@ Skeleton::~Skeleton()
     qDebug() << "~Skeleton";
 }
 
-void Skeleton::addNode(QVector3D coords)
+void Skeleton::addNode(QVector3D coords, int ID)
 {
     m_nodes.push_back(coords); // nodes IDs are from 0 to max, so the index can be used as ID index
 }
 
-void Skeleton::addPoint(QVector3D coords)
+void Skeleton::addPoint(QVector3D coords, int ID)
 {
     QVector4D point = coords.toVector4D();
     point.setW(m_ID); // check if this belongs to a child then add child ID here
