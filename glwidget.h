@@ -51,6 +51,8 @@ protected:
     void loadMesh();
 
 
+    void stopForecDirectedLayout();
+
     AbstractionSpace                    *m_2dspace;
     bool                                m_2D;
 

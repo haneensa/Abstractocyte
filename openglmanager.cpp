@@ -184,7 +184,10 @@ void OpenGLManager::fillVBOsData()
         // get the actual nodes from their parents
         // only show them if parent is filtered
 
-        std::vector<QVector3D> nodes3D = skeleton->getGraphNodes();
+        // I do want the substructures graph to be present and use them only if their parents was filtered
+
+        // add all and in the view check if the parent not filtered then dont show it
+        std::vector<QVector3D> nodes3D = skeleton->getGraphNodes(); // if child these would be 0
         std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
         qDebug() << "set offset: " << m_abstract_skel_nodes.size();
         object_p->setSkeletonOffset(m_abstract_skel_nodes.size());
@@ -892,18 +895,41 @@ void OpenGLManager::FilterByType(Object_t type)
     for (int i = 0; i < objects_list.size(); i++) {
         int hvgxID = objects_list[i];
         qDebug() << "Filtering ID " << hvgxID;
-        if (m_ssbo_data[hvgxID].info.w() == 1)
-            m_ssbo_data[hvgxID].info.setW(0);
-        else
-            m_ssbo_data[hvgxID].info.setW(1);
-
+        if (m_ssbo_data[hvgxID].info.w() == 1) {
+            FilterObject(hvgxID, false);
+        } else {
+            FilterObject(hvgxID, true);
+        }
     }
+}
+
+void OpenGLManager::FilterObject(int ID, bool isfilterd)
+{
+    std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
+    if ( ID > m_ssbo_data.size() ||
+         objectMap.find(ID) == objectMap.end() ||
+         objectMap[ID] == NULL )
+    {
+        // no need to filter something that doesnt exist
+        return;
+    }
+
+    Object *obj = objectMap[ID];
+    obj->updateFilteredFlag(isfilterd);
+
+
+    if (isfilterd) {
+        m_ssbo_data[ID].info.setW(1);
+    } else {
+        m_ssbo_data[ID].info.setW(0);
+    }
+
 }
 
 void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
-        m_ssbo_data[i].info.setW(1);
+        FilterObject(i, true);
     }
 
     for (int i = 0; i < tokens_Ids.size(); ++i) {
@@ -917,14 +943,15 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
         }
 
         Object *obj = objectMap[hvgxID];
+
         // if it has a children then get them
         // else if has parent get them
         Object *parent = obj->getParent();
         if (parent == NULL) {
             qDebug() << obj->getName().data() << " has no parnt";
         } else {
-            if (parent->getHVGXID() < m_ssbo_data.size())
-                m_ssbo_data[parent->getHVGXID()].info.setW(0);
+            FilterObject(parent->getHVGXID(), false);
+
         }
 
         std::vector<Object*> children = obj->getChildren();
@@ -932,12 +959,11 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
             qDebug() << obj->getName().data() << " has no child";
         } else {
             for (int i = 0; i < children.size(); i++) {
-                if (children[i]->getHVGXID() > m_ssbo_data.size())
-                    continue;
                 qDebug() << "Showing " << children[i]->getName().data();
-                m_ssbo_data[children[i]->getHVGXID()].info.setW(0);
+                FilterObject(children[i]->getHVGXID(), false);
             }
         }
-        m_ssbo_data[hvgxID].info.setW(0);
+        FilterObject(hvgxID, false);
+
     }
 }

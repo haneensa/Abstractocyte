@@ -213,12 +213,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         // do wait function, if the user stayed in this view more than t seconds then do this
         // 1) stop previous layouting algorithm if running
         if (m_FDL_running) {
-            m_refresh_timer->stop();
-            m_graphManager->stopForceDirectedLayout(0);
-            m_graphManager->stopForceDirectedLayout(1);
-            m_graphManager->stopForceDirectedLayout(2);
-            m_graphManager->stopForceDirectedLayout(3);
-            m_FDL_running = false;
+            stopForecDirectedLayout();
         }
 
          m_rotation_timer->start(500);
@@ -265,13 +260,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
                 m_isRotatable = !m_isRotatable;
         break;
         case(Qt::Key_X): // stop layouting algorithm
-            m_refresh_timer->stop();
-            m_graphManager->stopForceDirectedLayout(0);
-            m_graphManager->stopForceDirectedLayout(1);
-            m_graphManager->stopForceDirectedLayout(2);
-            m_graphManager->stopForceDirectedLayout(3);
-
-            m_FDL_running = false;
+            stopForecDirectedLayout();
         break;
     }
 }
@@ -338,6 +327,8 @@ void GLWidget::getFilteredType(QString value)
     if (m_opengl_mngr == NULL)
         return;
 
+    stopForecDirectedLayout();
+
     Object_t object_type = Object_t::UNKNOWN;
     if (value == "AXON")
         object_type = Object_t::AXON;
@@ -355,6 +346,11 @@ void GLWidget::getFilteredType(QString value)
         object_type = Object_t::ASTROCYTE;
 
     m_opengl_mngr->FilterByType(object_type);
+
+    // start force layout
+    m_rotation_timer->start(0);
+
+
     update();
 }
 
@@ -366,6 +362,23 @@ void GLWidget::getFilteredID(QString value)
     // check if there are more than one ID
     QList<QString> tokens = value.split(',');
     qDebug() << tokens;
+
+    stopForecDirectedLayout();
+
     m_opengl_mngr->FilterByID(tokens);
+
+    // start force layout
+    m_rotation_timer->start(0);
+
     update();
 }
+
+ void GLWidget::stopForecDirectedLayout()
+ {
+     // stop force layout
+     m_refresh_timer->stop();
+     for (int i = 0; i < 4; ++i)
+         m_graphManager->stopForceDirectedLayout(i);
+
+     m_FDL_running = false;
+ }

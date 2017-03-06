@@ -61,6 +61,10 @@ public:
     void setNodeIdx(int node_index)    { m_nodeIndx = node_index ; }
     int  getNodeIdx()                  { return m_nodeIndx; }
 
+    void markChildSubSkeleton(SkeletonBranch *branch, int ID);
+
+    void updateFilteredFlag(bool isFiltered)   { m_isFiltered = isFiltered; }
+    bool isFiltered()                          { return m_isFiltered; }
 
 private:
     std::string                             m_name;
@@ -85,6 +89,8 @@ private:
 
     // indices to access the global mesh vertices defined in mesh
     std::vector<GLuint>                     m_meshIndices;
+
+    bool                                    m_isFiltered;   // 1 yes, 0 no
 
 };
 

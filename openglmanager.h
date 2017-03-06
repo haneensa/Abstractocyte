@@ -67,9 +67,11 @@ public:
     void update_skeleton_layout3(QVector2D layout3,  long node_index, int hvgxID);
 
 
+    std::map<int, Object*>  getObjectsMap() { return m_dataContainer->getObjectsMap(); }
     Object_t getObjectTypeByID(int hvgxID);
     void FilterByType(Object_t type);
     void FilterByID( QList<QString> tokens_Ids );
+    void FilterObject(int ID, bool isfilterd);
 
 protected:
     DataContainer                       *m_dataContainer; // get the data to render from here
@@ -125,6 +127,6 @@ protected:
 
     GLuint                              m_program_neurites_nodes;
     GLuint                              m_program_neurites_index;
-};
+ };
 
 #endif // OPENGLMANAGER_H

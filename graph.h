@@ -149,11 +149,11 @@ protected:
 
     Graph_t                         m_gType;
 
-    struct GlobalUniforms               m_uniforms;
+    struct GlobalUniforms           m_uniforms;
 
-    DataContainer                   *m_data_containter;
     OpenGLManager                   *m_opengl_mngr;
 
+    // I need a way to filter out nodes based on if they are shown or not
     std::map<std::pair<int, int>, Node*>     m_nodes;    // IDs are unique to identify nodes
                                                 // if more than a skeleton
                                                 // IDs for skeleton are offsets, that is later
@@ -196,7 +196,7 @@ protected:
     float                           m_Tglobal;      // Tinit * n (temperature sum)
     int                             m_rounds;       // max number of rounds
 
-
+    std::map<int, int>              m_FilteredHVGX;
 };
 
 #endif // GRAPH_H

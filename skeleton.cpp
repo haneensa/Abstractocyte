@@ -11,17 +11,27 @@ Skeleton::~Skeleton()
     qDebug() << "~Skeleton";
 }
 
-void Skeleton::addNode(QVector3D coords, int ID)
+void Skeleton::addNode(QVector3D coords)
 {
     m_nodes.push_back(coords); // nodes IDs are from 0 to max, so the index can be used as ID index
 }
 
-void Skeleton::addPoint(QVector3D coords, int ID)
+void Skeleton::addPoint(QVector3D coords)
 {
     QVector4D point = coords.toVector4D();
     point.setW(m_ID); // check if this belongs to a child then add child ID here
     QVector4D knot1, knot2;
     m_points.push_back({point, knot1, knot2}); // nodes IDs are from 0 to max, so the index can be used as ID index
+}
+
+void Skeleton::markPoint(int pIndex, int IDMark)
+{
+    if (m_points.size() < pIndex) {
+        qDebug() << pIndex << " out of range at mark point";
+        return;
+    }
+
+    m_points[pIndex].vertex.setW(IDMark);
 }
 
 void*  Skeleton::getSkeletonPoints()

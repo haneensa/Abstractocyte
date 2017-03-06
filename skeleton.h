@@ -29,11 +29,14 @@ class Skeleton
 public:
     Skeleton(int ID);
     ~Skeleton();
-    void addNode(QVector3D coords, int ID);
-    void addPoint(QVector3D coords, int ID);
+    void addNode(QVector3D coords);
+    void addPoint(QVector3D coords);
+    void addBranch(SkeletonBranch *branch);
+
+    void markPoint(int pIndex, int IDMark);
+
     void*  getSkeletonPoints();
     int getSkeletonPointsSize();
-    void addBranch(SkeletonBranch *branch);
 
      // for simplified graph, we need the branches
     // knots IDs and their edges

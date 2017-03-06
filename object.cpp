@@ -26,6 +26,7 @@ Object::Object(std::string name, int ID)
     m_skeleton = new Skeleton(m_ID);
 
     m_parent = NULL;
+    m_isFiltered = false;
     qDebug() << "create " << m_name.data() << " hvgxID: " << m_ID;
 }
 
@@ -131,19 +132,20 @@ struct ssbo_mesh Object::getSSBOData()
 // skeleton management
 void Object::addSkeletonNode(QVector3D coords)
 {
+
+
     // also ID to be used for the vertex (parent or child)
     // how would I know this node belongs to a child
     // and which child it would be?
-
     // for children, I have the list of IDs of points that belong to the child
     // then get the skeleton of its parent
     // and mark these with child IDs
-    m_skeleton->addNode(coords, m_ID);
+    m_skeleton->addNode(coords);
 }
 
 void Object::addSkeletonPoint(QVector3D coords)
 {
-    m_skeleton->addPoint(coords, m_ID);
+    m_skeleton->addPoint(coords);
 }
 
 int Object::writeSkeletontoVBO(QOpenGLBuffer vbo, int offset)
@@ -162,7 +164,30 @@ int Object::writeSkeletontoVBO(QOpenGLBuffer vbo, int offset)
 }
 void Object::addSkeletonBranch(SkeletonBranch *branch)
 {
+//    if ( m_parent != NULL &&
+//         (m_object_t == Object_t::SPINE || m_object_t == Object_t::BOUTON)) {
+//        // I have the parent
+//        // access the parent
+//        // mark the points and nodes in this branch at the parent
+//        // with this child ID
+//        m_parent->markChildSubSkeleton(branch, m_ID);
+//    }
+
     m_skeleton->addBranch(branch);
+}
+
+void Object::markChildSubSkeleton(SkeletonBranch *childBranch, int childID)
+{
+    if (childBranch == NULL)
+        return;
+
+    // no need to mark the nodes since they are already part of the points
+    // QVector2D nodes = branch->getKnots();
+    std::vector<int> childPoints = childBranch->getPointsIndxs();
+    for (int pIndex = 0; pIndex < childPoints.size(); ++pIndex) {
+        m_skeleton->markPoint(pIndex, childID);
+    }
+
 }
 
 void Object::setParentID(Object *parent)

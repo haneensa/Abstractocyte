@@ -15,11 +15,11 @@ DataContainer::DataContainer()
 {
     m_indices_size = 0;
     m_skeleton_points_size = 0;
-    m_limit = 10;
+    m_limit = 10000;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
- // importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
-   importXML("://m3_neurites.xml");    // neurites time:  28802 ms
+  // importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    importXML("://m3_neurites.xml");    // neurites time:  28802 ms
 }
 
 DataContainer::~DataContainer()
@@ -418,6 +418,11 @@ void DataContainer::parseBranch(QXmlStreamReader &xml, Object *obj)
 
     qDebug() << xml.name();
     xml.readNext();
+
+    if (obj == NULL) {
+        qDebug() << "Problem Obj is Null parseBranch.";
+        return;
+    }
 
     SkeletonBranch *branch = NULL;
     // this object structure is not done

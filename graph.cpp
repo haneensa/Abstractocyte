@@ -270,21 +270,41 @@ void Graph::drawGrid(struct GlobalUniforms grid_uniforms)
 
 /************************ Force Directed Layout ****************************/
 // when we switch to 2D we use the other vertex with the no rotation matrix
+// each time we filter we need to reset this to exclude filtered nodes
 void Graph::resetCoordinates()
 {
     if (m_opengl_mngr == NULL)
         return;
 
     m_FDL_terminate = false;
+    std::map<int, Object*>  objectMap = m_opengl_mngr->getObjectsMap();
 
     qDebug() << "2D";
     hashGrid->clear();
+    m_FilteredHVGX.clear();
     // this take so much time that by the time we reach it still do this?
     // create many threads within one thread?
     for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
         if (m_FDL_terminate) goto quit;
 
         Node *node = (*iter).second;
+
+        // if node filtered then ignore it
+        //if node is filtered then continue
+        // here I can get the list of filtered objects
+        int hvgxID = node->getID() ;
+        if ( objectMap.find(hvgxID) == objectMap.end() ||
+             objectMap[hvgxID] == NULL )
+        {
+            qDebug() << hvgxID << " Node not in map, why? quite layouting";
+            goto quit;
+        }
+
+        if (objectMap[hvgxID]->isFiltered()) {
+            m_FilteredHVGX[hvgxID] = 1;
+            continue;
+        }
+
 
         node->resetLayout(m_uniforms.rMatrix);
         update_node_data(node);
@@ -351,9 +371,14 @@ void Graph::update_node_data(Node* node)
 // for each node check if it is filtered
 // if yes ignore it and proceed, but this would wast time
 // I need to remove it from graph!!S
+
+// dont filter in the connectivity graph??
+
 void Graph::runforceDirectedLayout()
 {
     qDebug() << "run force directed layout";
+    std::map<int, Object*>  objectMap = m_opengl_mngr->getObjectsMap();
+
     m_FDL_terminate = false;
     float area = 1.0;
     float k = std::sqrt( area / m_nodesCounter );
@@ -369,19 +394,28 @@ void Graph::runforceDirectedLayout()
             if (m_FDL_terminate) goto quit;
 
             Node *node1 = (*iter).second;
+            // if node is filtered then continue
+            // not all nodes belong to an object
+            // there is the connectivity node
+            int hvgxID1 = node1->getID() ;
+            if (!(m_FilteredHVGX.find(hvgxID1) == m_FilteredHVGX.end()) )
+            {
+
+                continue;
+            }
+
             nearNodes.clear();
             hashGrid->queryAABB(node1, m_AABBdim, nearNodes);
             for ( auto iter2 = nearNodes.begin(); iter2 != nearNodes.end(); iter2++ ) {
                 if (m_FDL_terminate) goto quit;
 
-               // Node *node2 = (*iter2).second;
                 Node *node2 = (*iter2);
+                int hvgxID2 = node2->getID() ;
+                if ( !(m_FilteredHVGX.find(hvgxID2) == m_FilteredHVGX.end()) )
+                {
+                    continue;
+                }
 
-                // be careful with this condition, because a skeleton has the same ID for all its nodes
-                //if ( node1->getID() == node2->getID() ) {
-                //    continue;
-                //}
-                // this one,
                 repulseNodes(node1, node2, m_Cr * k);
             }
         }
@@ -400,6 +434,13 @@ void Graph::runforceDirectedLayout()
             if (m_FDL_terminate) goto quit;
 
             Node *node = (*iter).second;
+
+            //if node is filtered then continue
+            int hvgxID = node->getID() ;
+            if ( !(m_FilteredHVGX.find(hvgxID) == m_FilteredHVGX.end()) )
+            {
+                continue;
+            }
 
             // get amount of force on node
             QVector2D force = m_SLOW_FACTOR * node->getForceSum();
@@ -455,6 +496,12 @@ void Graph::attractConnectedNodes(Edge *edge, float k)
 {
     Node *node1 = edge->getNode1();
     Node *node2 = edge->getNode2();
+    if ( !(m_FilteredHVGX.find(node1->getID()) == m_FilteredHVGX.end()) || !(m_FilteredHVGX.find(node2->getID()) == m_FilteredHVGX.end()) )
+    {
+        return;
+    }
+
+    qDebug() << "Attraction";
 
     QVector3D n1 = node1->getLayoutedPosition();
     QVector3D n2 = node2->getLayoutedPosition();
