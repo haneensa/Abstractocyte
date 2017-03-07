@@ -63,10 +63,11 @@ void main(void)
     mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
     vec4 skeleton_vertex =  pvmMatrix * vec4(posAttr.xyz, 1.0);
 
-    int ID = int(posAttr.w);
-    V_ID = ID;
+    int ID = int(posAttr.w);  
 
     int type = int(SSBO_data[ID].center.w);     // 0: astrocyte, 1: neurite
+
+    V_ID = ID;
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 

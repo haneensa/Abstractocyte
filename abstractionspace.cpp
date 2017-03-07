@@ -512,7 +512,6 @@ void AbstractionSpace::initLine(QVector2D end1, QVector2D end2, int ID)
     float dy = end2.y() - end1.y();
     QVector2D normal = QVector2D(-dy, dx);
     normal.normalize();
-    qDebug() << "****normal: " << normal;
 
     QVector2D p1, p2, p3, p4; // positions for one tirangle
     int thickness = 2;
