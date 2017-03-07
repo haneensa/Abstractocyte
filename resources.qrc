@@ -30,5 +30,6 @@
         <file>shaders/abstract_skeleton_node_transition_vert.glsl</file>
         <file>shaders/line_frag.glsl</file>
         <file>shaders/common.glslh</file>
+        <file>data/mouse3_metadata_objname_center.hvgx</file>
     </qresource>
 </RCC>

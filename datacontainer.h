@@ -24,6 +24,8 @@ public:
     void parseConnGraph(QXmlStreamReader &xml);
     void parseSkeletonPoints(QXmlStreamReader &xml, Object *obj);
 
+    void loadMetaDataHVGX(QString path);
+
     // graph related function
     std::map<int, Object*>  getObjectsMap();
     std::vector<QVector2D> getNeuritesEdges();

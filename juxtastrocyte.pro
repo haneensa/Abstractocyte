@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     skeletonbranch.cpp \
     mesh.cpp \
     openglmanager.cpp \
-    datacontainer.cpp
+    datacontainer.cpp \
+    glycogen.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -51,7 +52,8 @@ HEADERS  += mainwindow.h \
     ssbo_structs.h \
     glsluniform_structs.h \
     openglmanager.h \
-    datacontainer.h
+    datacontainer.h \
+    glycogen.h
 
 FORMS    += mainwindow.ui
 

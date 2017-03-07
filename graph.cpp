@@ -645,10 +645,9 @@ QVector2D Graph::GEM_computeImpulse(Node *node)
              continue;
          }
 
-         // delta = v.pos - u.pos
-         // if (delta != 0)
-             // p = p + delta * E * E/(delta_length^2)
-         repulseNodes(node, node2, m_Cr);
+         QVector2D delta; /*= v.pos - u.pos*/
+         if (delta != QVector2D(0, 0))
+            impulse = impulse + delta * /*E * E/*/(delta.lengthSquared());
      }
 
     // attractive forces
@@ -659,9 +658,8 @@ QVector2D Graph::GEM_computeImpulse(Node *node)
     for ( auto iter = edges.begin(); iter != edges.end(); iter++ ) {
         Edge *edge = (*iter).second;
         // for nodes u connected to v
-        // delta = v.pos - u.pos
-        // p = p - delta * (delta_length^2)/(E*E * GEM_function_growing(node))
-        attractConnectedNodes(edge, m_Ca);
+        QVector2D delta ;/*= v.pos - u.pos*/
+        impulse = impulse - delta * (delta.lengthSquared())/(/*E*E*/  GEM_function_growing(node));
     }
 
     return impulse;

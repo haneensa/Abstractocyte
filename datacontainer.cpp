@@ -15,9 +15,10 @@ DataContainer::DataContainer()
 {
     m_indices_size = 0;
     m_skeleton_points_size = 0;
-    m_limit = 100;
+    m_limit = 1;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
+    loadMetaDataHVGX(":/data/mouse3_metadata_objname_center.hvgx");
   // importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
    importXML("://m3_neurites.xml");    // neurites time:  28802 ms
 }
@@ -28,6 +29,28 @@ DataContainer::~DataContainer()
     for (std::size_t i = 0; i != m_objects.size(); i++) {
         delete m_objects[i];
     }
+}
+
+void DataContainer::loadMetaDataHVGX(QString path)
+{
+    qDebug() << "Func: loadMetaDataHVGX";
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        qDebug() << "Could not open the file for reading";
+        return;
+    }
+
+    QTextStream in(&file);
+    QList<QByteArray> wordList;
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        wordList = line.split(',');
+        if (wordList[0] == "gc")
+            qDebug() << line;
+
+    }
+
+    file.close();
 }
 
 // need away to optimize this!!!!!
@@ -279,6 +302,9 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 /* vertex 3 */
                 obj->addTriangleIndex(f3_index - 1);
                 m_indices_size += 3;
+
+                // parse normals
+
             } else if (xml.name() == "markers") {
                 qDebug() << xml.name();
                 xml.readNext();
