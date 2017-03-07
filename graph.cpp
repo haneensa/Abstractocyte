@@ -652,14 +652,15 @@ QVector2D Graph::GEM_computeImpulse(Node *node)
      }
 
     // attractive forces
-    // for nodes u connected to v
-    // delta = v.pos - u.pos
-    // p = p - delta * (delta_length^2)/(E*E * function_growing(v))
+
      // forcs due to edge attraction
      // get all nodes connected to this node
     std::map<int, Edge*> edges = node->getAdjEdges();
     for ( auto iter = edges.begin(); iter != edges.end(); iter++ ) {
         Edge *edge = (*iter).second;
+        // for nodes u connected to v
+        // delta = v.pos - u.pos
+        // p = p - delta * (delta_length^2)/(E*E * GEM_function_growing(node))
         attractConnectedNodes(edge, m_Ca);
     }
 
@@ -669,7 +670,7 @@ QVector2D Graph::GEM_computeImpulse(Node *node)
 double Graph::GEM_function_growing(Node *node)
 {
     double result;
-    // (deg(v) + deg(v)/2) * nrm
+    result =  ((double)node->getDeg()  + (double) node->getDeg() /2.0) * m_nrm;
     return result;
 }
 
@@ -678,16 +679,15 @@ void Graph::GEM_update_node(Node *node, QVector2D impulse)
 
     if( impulse != QVector2D(0, 0) ){
         impulse = node->getLocalTemp() * impulse.normalized() * m_nrm; // scale p by temperature
-         //v.pos = v.pos + p // move v to new position
+        node->addToLayoutedPosition(impulse); // move v to new position
          //  c = c + p // update sum of points
 
         if (node->getImpulse() != QVector2D(0, 0) ) {
            // cehck previous p
            double B = GEM_get_angle(impulse, node->getImpulse());
            if (std::sin(B)  >= std::sin(PI/2 + m_a_r) ) {
-              // v.d = v.d + s_r  sign(sin B); // rotation
                double sign = (std::sin(B) > 0) ? 1 : -1;
-               node->updateSkew( node->getSkew() + m_s_r  * sign);
+               node->updateSkew( node->getSkew() + m_s_r  * sign); // rotation
             }
 
            if ( std::abs( std::cos(B) ) > std::cos(m_a_o) )

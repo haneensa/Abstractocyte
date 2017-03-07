@@ -46,6 +46,7 @@ public:
     void updateSkew(double newSkew)    { skew_gauge = newSkew; }
     double getSkew()                { return skew_gauge; }
 
+    int getDeg()                    { return m_adjEdges.size(); }
 private:
     int                     m_nID;      // hvgx ID
     long                     m_idxID;    // index in buffer

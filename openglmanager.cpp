@@ -705,7 +705,7 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     // 1) Mesh Triangles
     // 2) Mesh Points
 
-//    drawMeshPoints(grid_uniforms);
+    drawMeshPoints(grid_uniforms);
     drawMeshTriangles(grid_uniforms);
 
     // 3) Skeleton Points
