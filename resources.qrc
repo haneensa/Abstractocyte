@@ -31,5 +31,8 @@
         <file>shaders/line_frag.glsl</file>
         <file>shaders/common.glslh</file>
         <file>data/mouse3_metadata_objname_center.hvgx</file>
+        <file>shaders/glycogen_frag.glsl</file>
+        <file>shaders/glycogen_geom.glsl</file>
+        <file>shaders/glycogen_vert.glsl</file>
     </qresource>
 </RCC>

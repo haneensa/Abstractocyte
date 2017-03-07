@@ -80,7 +80,7 @@ bool OpenGLManager::initOpenGLFunctions()
     initMeshPointsShaders();
     initAbstractSkeletonShaders();
     initNeuritesGraphShaders();
-
+    initGlycogenPointsShaders();
     return true;
 }
 
@@ -715,6 +715,7 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     drawNeuritesGraph(grid_uniforms);
     drawMeshTriangles(grid_uniforms);
 
+    drawGlycogenPoints(grid_uniforms);
 }
 
 
@@ -760,6 +761,88 @@ void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
 
     glUniform4fv(viewport, 1,  viewport_values);
 }
+
+bool OpenGLManager::initGlycogenPointsShaders()
+{
+    qDebug() << "OpenGLManager::initGlycogenPointsShaders()";
+
+    if (m_glFunctionsSet == false)
+        return false;
+
+    m_program_glycogen = glCreateProgram();
+    bool res = initShader(m_program_glycogen,  ":/shaders/glycogen_vert.glsl",
+                      ":/shaders/glycogen_geom.glsl",
+                      ":/shaders/points_3d_frag.glsl");
+    if (res == false)
+        return false;
+
+    GL_Error();
+
+    // initialize buffers
+    m_vao_glycogen.create();
+    m_vao_glycogen.bind();
+
+    m_vbo_glycogen.create();
+    m_vbo_glycogen.setUsagePattern( QOpenGLBuffer::DynamicDraw );
+    m_vbo_glycogen.bind();
+
+    // fill glycogen points
+    std::map<int, Glycogen*> glycogenMap = m_dataContainer->getGlycogenMap();
+    struct glycogen_datum {
+        int ID;
+        QVector4D center_diam;
+    };
+
+    std::vector<struct glycogen_datum> glycogen_data;
+    for (auto iter = glycogenMap.begin(); iter != glycogenMap.end(); iter++ ) {
+        Glycogen*gc = (*iter).second;
+        QVector4D center_diam = gc->getCenter();
+        center_diam.setW(gc->getDiameter());
+        struct glycogen_datum gc_datum = {gc->getID(), center_diam};
+        glycogen_data.push_back(gc_datum);
+
+
+    }
+    m_vbo_glycogen.allocate( glycogen_data.data(),
+                                  glycogen_data.size() * sizeof(struct glycogen_datum) );
+    GL_Error();
+
+    glUseProgram(m_program_glycogen);
+
+
+    // init pointers
+    int offset = 0;
+    glEnableVertexAttribArray(0);
+    glVertexAttribIPointer(0, 1, GL_INT, 0, (void*)offset);
+
+    offset +=  sizeof(int);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
+                          sizeof(glycogen_datum), (GLvoid*)offset);
+
+
+
+    GL_Error();
+
+    // initialize uniforms
+
+    m_vbo_glycogen.release();
+    m_vao_glycogen.bind();
+}
+
+void OpenGLManager::drawGlycogenPoints(struct GlobalUniforms grid_uniforms)
+{
+    // I need this because transitioning from mesh to skeleton is not smooth
+    m_vao_glycogen.bind();
+    glUseProgram(m_program_glycogen);
+    m_uniforms = grid_uniforms;
+
+    updateUniformsLocation(m_program_glycogen);
+    glDrawArrays(GL_POINTS, 0,  m_dataContainer->getGlycogenSize() );
+
+    m_vao_glycogen.release();
+}
+
 
 void OpenGLManager::updateUniformsLocation(GLuint program)
 {

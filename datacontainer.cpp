@@ -3,7 +3,6 @@
 // 422, 59
 #include <chrono>
 #include "datacontainer.h"
-#include "glycogen.h"
 
 // todo: each object has to have all elements (mesh, skeleton, ..)
 // if it doesnt then take care of this case (missing data)
@@ -19,10 +18,10 @@ DataContainer::DataContainer()
     m_limit = 10000;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
-    importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
-   importXML("://m3_neurites.xml");    // neurites time:  28802 ms
+     importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+   //importXML("://m3_neurites.xml");    // neurites time:  28802 ms
 
-   // loadMetaDataHVGX(":/data/mouse3_metadata_objname_center.hvgx");
+     loadMetaDataHVGX(":/data/mouse3_metadata_objname_center.hvgx");
 
 }
 
@@ -52,7 +51,19 @@ void DataContainer::loadMetaDataHVGX(QString path)
         wordList = line.split(',');
 
         if (wordList[0] == "gc") {
-            qDebug() << line;
+            if (wordList.size() < 7) {
+                qDebug() << "wordList.size() < 7";
+                return;
+            }
+            int ID = wordList[1].toInt();
+            float x = wordList[2].toFloat();
+            float y = wordList[3].toFloat();
+            float z = wordList[4].toFloat();
+            float diameter = wordList[5].toFloat();
+            std::string name = wordList[6];
+
+            Glycogen *gc = new Glycogen(ID, name, QVector3D(x, y, z), diameter);
+            m_glycogenMap[ID] = gc;
         } else if (wordList[0] == "sg") {
             continue;
         } else if (wordList[0] == "sy") {

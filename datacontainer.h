@@ -8,6 +8,7 @@
 
 #include "object.h"
 #include "mesh.h"
+#include "glycogen.h"
 
 class DataContainer
 {
@@ -25,6 +26,9 @@ public:
     void parseSkeletonPoints(QXmlStreamReader &xml, Object *obj);
 
     void loadMetaDataHVGX(QString path);
+
+    int getGlycogenSize()              { return m_glycogenMap.size(); }
+    std::map<int, Glycogen*> getGlycogenMap() { return m_glycogenMap; }
 
     // graph related function
     std::map<int, Object*>  getObjectsMap();
@@ -56,6 +60,8 @@ protected:
 
     // graph related data
     std::vector<QVector2D>                  neurites_neurite_edge;
+
+    std::map<int, Glycogen*>                 m_glycogenMap;
 };
 
 #endif // OBJECTMANAGER_H

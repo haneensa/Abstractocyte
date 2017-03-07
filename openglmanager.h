@@ -56,6 +56,11 @@ public:
     void drawNeuritesGraph(struct GlobalUniforms grid_uniforms);
 
 
+    // *********** 6) Mesh Points     ***********
+    bool initGlycogenPointsShaders();
+    void drawGlycogenPoints(struct GlobalUniforms grid_uniforms);
+
+
 
     // ssbo management
     // function to update ssbo data (layout 1, layout 2)
@@ -124,6 +129,11 @@ protected:
     QOpenGLBuffer                       m_NeuritesIndexVBO;
     QOpenGLBuffer                       m_NeuritesNodesVBO;
 
+
+    // *********** 6) Glycogen Nodes     ***********
+    QOpenGLVertexArrayObject            m_vao_glycogen;
+    QOpenGLBuffer                       m_vbo_glycogen;
+    GLuint                              m_program_glycogen;
 
     GLuint                              m_program_neurites_nodes;
     GLuint                              m_program_neurites_index;
