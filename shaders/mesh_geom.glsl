@@ -61,8 +61,10 @@ void main() {
     if (isFiltered == 1)
         return;
 
+
     int type = int(SSBO_data[ID].center.w);
     color_val = V_color_val[i];
+
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
@@ -73,6 +75,7 @@ void main() {
     }
 
     alpha =  V_alpha[i];
+
 
     color_intp =  V_color_intp[i];
 

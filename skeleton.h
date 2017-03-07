@@ -37,7 +37,8 @@ public:
 
     void*  getSkeletonPoints();
     int getSkeletonPointsSize();
-
+    std::vector<struct SkeletonPoint> getSkeletonPointsVec();
+    void updatePointAtIndex(int index, struct SkeletonPoint v);
      // for simplified graph, we need the branches
     // knots IDs and their edges
     std::vector<QVector3D> getGraphNodes();
