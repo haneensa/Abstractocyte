@@ -3,6 +3,7 @@
 // 422, 59
 #include <chrono>
 #include "datacontainer.h"
+#include "glycogen.h"
 
 // todo: each object has to have all elements (mesh, skeleton, ..)
 // if it doesnt then take care of this case (missing data)
@@ -15,12 +16,14 @@ DataContainer::DataContainer()
 {
     m_indices_size = 0;
     m_skeleton_points_size = 0;
-    m_limit = 1;
+    m_limit = 10000;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
-    loadMetaDataHVGX(":/data/mouse3_metadata_objname_center.hvgx");
-  // importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
    importXML("://m3_neurites.xml");    // neurites time:  28802 ms
+
+   // loadMetaDataHVGX(":/data/mouse3_metadata_objname_center.hvgx");
+
 }
 
 DataContainer::~DataContainer()
@@ -31,6 +34,8 @@ DataContainer::~DataContainer()
     }
 }
 
+// load this after loading obj file
+// get center from here, and volume, and connectivity?
 void DataContainer::loadMetaDataHVGX(QString path)
 {
     qDebug() << "Func: loadMetaDataHVGX";
@@ -45,8 +50,25 @@ void DataContainer::loadMetaDataHVGX(QString path)
     while (!file.atEnd()) {
         QByteArray line = file.readLine();
         wordList = line.split(',');
-        if (wordList[0] == "gc")
+
+        if (wordList[0] == "gc") {
             qDebug() << line;
+        } else if (wordList[0] == "sg") {
+            continue;
+        } else if (wordList[0] == "sy") {
+            continue;
+        } else if (wordList[0] == "mt") {
+            continue;
+        } else if (wordList[0] == "bo") {
+            continue;
+        } else if (wordList[0] == "sp") {
+            continue;
+        } else if (wordList[0] == "dn") {
+            continue;
+        } else if (wordList[0] == "ax") {
+            continue;
+        }
+
 
     }
 
