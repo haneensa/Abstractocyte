@@ -123,7 +123,6 @@ struct ssbo_mesh Object::getSSBOData()
     ssbo_data.center = m_center;
     ssbo_data.info.setX(m_volume);
     int type = (int) m_object_t;
-    qDebug() << m_name.data() << " "  << type;
     ssbo_data.info.setY(type); // object type
     if (m_parent != NULL)
         ssbo_data.info.setZ(m_parent->getHVGXID());

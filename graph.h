@@ -93,8 +93,8 @@ public:
     std::map<std::pair<int, int>, Node*> getNodes() { return m_nodes; }
     std::map<int, Edge*> getEdges() { return m_edges; }
 
-    int getNodesCount(){ return m_nodesCounter; }
-    int getEdgesCount() { return m_edgesCounter; }
+    int getNodesCount(){ return m_nodes.size(); }
+    int getEdgesCount() { return m_edges.size(); }
     int getDupEdgesCount() { return m_dupEdges; }
 
     std::map<std::pair<int, int>, Node*>::iterator getNodesBegin()  { return m_nodes.begin(); }
@@ -161,8 +161,6 @@ protected:
 
     std::map<int, Edge*>            m_edges;    // IDs refer to m_nodes IDs
 
-    int m_nodesCounter;
-    int m_edgesCounter;
     int m_dupEdges;
 
 

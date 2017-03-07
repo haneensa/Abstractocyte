@@ -2,8 +2,6 @@
 
 Graph::Graph(Graph_t graphType, OpenGLManager *opengl_mnger)
     : m_FDL_terminate(true),
-      m_nodesCounter(0),
-      m_edgesCounter(0),
       m_dupEdges(0)
 
 
@@ -36,11 +34,11 @@ void Graph::initGemParameters()
     m_Tmax = 256;
     m_a_r = PI/6;          // PI/6
     m_a_o = PI/2;          // PI/2
-    m_s_r = 1/(2*m_nodesCounter);          // 1/2n
+    m_s_r = 1/(2*m_nodes.size());          // 1/2n
     m_s_o = 1/3;          // 1/3
-    m_Tinit = std::sqrt(m_nodesCounter);        // initial temperature for a vertex
-    m_Tglobal;      // Tinit * n (temperature sum)
-    m_rounds;       // max number of rounds
+    m_Tinit = std::sqrt(m_nodes.size());        // initial temperature for a vertex
+    m_Tglobal = m_Tinit * m_nodes.size();      // temperature sum
+    m_rounds = 40 * m_nodes.size();       // max number of rounds
 
 }
 
@@ -183,7 +181,6 @@ Node* Graph::addNode(std::pair<int, int> id_tuple, float x, float y, float z, No
     int nID = id_tuple.first;
     Node* newNode = new Node(nID, idxID, x, y, z, node_type);
     m_nodes[id_tuple] = newNode; // these IDs should be unique per graph!q
-    m_nodesCounter++;
     return newNode;
 }
 
@@ -215,7 +212,7 @@ Edge* Graph::addEdge(int eID, int hvgxID, int nID1, int nID2)
         return NULL;
     }
 
-    int idxID = m_edgesCounter++;
+    int idxID = m_edges.size();
     Edge* newEdge = new Edge(eID, idxID, n1, n2);
     n1->addEdge(newEdge);
     n2->addEdge(newEdge);
@@ -381,7 +378,7 @@ void Graph::runforceDirectedLayout()
 
     m_FDL_terminate = false;
     float area = 1.0;
-    float k = std::sqrt( area / m_nodesCounter );
+    float k = std::sqrt( area / m_nodes.size() );
     std::vector<Node*> nearNodes;
     // reset layouted coordinates to original values
     for ( int i = 0; i < m_ITERATIONS; i++ ) {
@@ -596,12 +593,14 @@ void Graph::runGEM()
     qDebug() << "Run GEM Layouting Algorithm";
     int rounds = 0;
 
-    while(m_Tglobal/m_nodesCounter < m_Tmin && rounds < m_rounds) {
-        for (int i = 0; i < m_nodesCounter; i++) {
-            if (m_Tglobal/m_nodesCounter < m_Tmin)
+    int n = m_nodes.size();
+
+    while(m_Tglobal/n < m_Tmin && rounds < m_rounds) {
+        for (int i = 0; i < n; i++) {
+            if (m_Tglobal/n < m_Tmin)
                 break;
 
-            // get a vertex v
+            // get a vertex v, random node?
             // Tglobal = Tglobal - v.t
             // p = compute_impulse(v)
             // update(v, p) // update position and temperature
