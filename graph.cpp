@@ -1,4 +1,5 @@
 #include "graph.h"
+#include <cmath>
 
 Graph::Graph(Graph_t graphType, OpenGLManager *opengl_mnger)
     : m_FDL_terminate(true),
@@ -25,7 +26,7 @@ Graph::Graph(Graph_t graphType, OpenGLManager *opengl_mnger)
     hashGrid = new SpatialHash(gridCol, gridMin, gridMax);
 }
 
-void Graph::initGemParameters()
+void Graph::GEM_initParameters()
 {
     m_nrm = 0.0015;  // normalization factor
     m_gravity = 1/16;  // gravitational constant
@@ -304,6 +305,8 @@ void Graph::resetCoordinates()
 
 
         node->resetLayout(m_uniforms.rMatrix);
+        node->setLocalTemp(m_Tinit);
+
         update_node_data(node);
 
         // add to the spatial hash
@@ -588,7 +591,7 @@ QVector2D Graph::repulsiveForce(float x1, float y1, float x2, float y2, float k)
     return force;
 }
 
-void Graph::runGEM()
+void Graph::GEM_run()
 {
     qDebug() << "Run GEM Layouting Algorithm";
     int rounds = 0;
@@ -596,81 +599,113 @@ void Graph::runGEM()
     int n = m_nodes.size();
 
     while(m_Tglobal/n < m_Tmin && rounds < m_rounds) {
-        for (int i = 0; i < n; i++) {
+        for ( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++ ) {
             if (m_Tglobal/n < m_Tmin)
                 break;
 
             // get a vertex v, random node?
-            // Tglobal = Tglobal - v.t
-            // p = compute_impulse(v)
-            // update(v, p) // update position and temperature
-            // Tglobal = Tglobal + v.t
+            Node *node = (*iter).second;
 
+            m_Tglobal = m_Tglobal - node->getLocalTemp();
+            QVector2D impluse = GEM_computeImpulse( node );
+            GEM_update_node(node, impluse); // update position and temperature
+            m_Tglobal = m_Tglobal - node->getLocalTemp();
         }
 
         rounds++;
     }
 }
 
-double Graph::computeImpulse(/*vertex*/)
+QVector2D Graph::GEM_computeImpulse(Node *node)
 {
+    QVector2D impulse;
     // attract to original projected location
-    // p = (v.opos - v.pos) * g * function_growing(v)
+    QVector2D opos, pos;
+    impulse =  (opos -  pos) * m_gravity * GEM_function_growing(node);
 
     // random disturbance
-    // b = small random vector (length of < 0.07)
-    // p = p + b
+
+     QVector2D disturbance; // = small random vector (length of < 0.07)
+     disturbance.setX(std::rand()/RAND_MAX);
+     disturbance.setX(std::rand()/RAND_MAX);
+     qDebug() <<   disturbance;
+     impulse = impulse + disturbance;
 
     // repulsive forces
     // for all neighboring nodes u within a distance d
-        // delta = v.pos - u.pos
-        // if (delta != 0)
-            // p = p + delta * E * E/(delta_length^2)
+
+     // forces on nodes due to node-node repulsion
+     std::vector<Node*> nearNodes;
+     hashGrid->queryAABB(node, m_AABBdim, nearNodes);
+     for ( auto iter2 = nearNodes.begin(); iter2 != nearNodes.end(); iter2++ ) {
+         Node *node2 = (*iter2);
+         int hvgxID2 = node2->getID() ;
+         if ( !(m_FilteredHVGX.find(hvgxID2) == m_FilteredHVGX.end()) )
+         {
+             continue;
+         }
+
+         // delta = v.pos - u.pos
+         // if (delta != 0)
+             // p = p + delta * E * E/(delta_length^2)
+         repulseNodes(node, node2, m_Cr);
+     }
 
     // attractive forces
-        // for nodes u connected to v
-            // delta = v.pos - u.pos
-            // p = p - delta * (delta_length^2)/(E*E * function_growing(v))
+    // for nodes u connected to v
+    // delta = v.pos - u.pos
+    // p = p - delta * (delta_length^2)/(E*E * function_growing(v))
+     // forcs due to edge attraction
+     // get all nodes connected to this node
+    std::map<int, Edge*> edges = node->getAdjEdges();
+    for ( auto iter = edges.begin(); iter != edges.end(); iter++ ) {
+        Edge *edge = (*iter).second;
+        attractConnectedNodes(edge, m_Ca);
+    }
 
-    // return p
-    return 0.1;
+    return impulse;
 }
 
-double Graph::function_growing(/*vertex*/)
+double Graph::GEM_function_growing(Node *node)
 {
     double result;
     // (deg(v) + deg(v)/2) * nrm
     return result;
 }
 
-void Graph::update_node(/*vertex and impulse*/)
+void Graph::GEM_update_node(Node *node, QVector2D impulse)
 {
-    /*
-     * if p != 0
-     *      p = v.t * normalize(p) * nrm // scale p by temperature
-     *      v.pos = v.pos + p // move v to new position
-     *      c = c + p // update sum of points
-     *
-     * if v.p != 0:
-     *      // cehck previous p
-     *      B = get_angle(p, v.p)
-     *      if (sin(B) >= sim(PI/2 + ar)
-     *          v.d = v.d + s_r  sign(sin B) // rotation
-     *
-     *      if abs( cos(B) ) > cos(a_o)
-     *          v.t = v.t * s_o * cos(B) // oscillation
-     *
-     *      v.t = v.t * ( 1 - abs(v.d) )
-     *      v.t = min(v.t, Tmax)    // cap to mximum
-     *
-     *      v.p = p // save impulse
-     */
+
+    if( impulse != QVector2D(0, 0) ){
+        impulse = node->getLocalTemp() * impulse.normalized() * m_nrm; // scale p by temperature
+         //v.pos = v.pos + p // move v to new position
+         //  c = c + p // update sum of points
+
+        if (node->getImpulse() != QVector2D(0, 0) ) {
+           // cehck previous p
+           double B = GEM_get_angle(impulse, node->getImpulse());
+           if (std::sin(B)  >= std::sin(PI/2 + m_a_r) ) {
+              // v.d = v.d + s_r  sign(sin B); // rotation
+               double sign = (std::sin(B) > 0) ? 1 : -1;
+               node->updateSkew( node->getSkew() + m_s_r  * sign);
+            }
+
+           if ( std::abs( std::cos(B) ) > std::cos(m_a_o) )
+             node->setLocalTemp( node->getLocalTemp() * m_s_o * std::cos(B));
+
+           double newLocalTemp = node->getLocalTemp() * ( 1 - std::abs(node->getSkew()) );
+           newLocalTemp = std::min(newLocalTemp, (double)m_Tmax);
+           node->setLocalTemp( newLocalTemp );  // cap to mximum
+
+           node->updateImpulse(impulse); // save impulse
+        }
+    }
 }
 
-double Graph::get_angle()
+double Graph::GEM_get_angle(QVector2D u, QVector2D v)
 {
     double angle;
-    // angle = arc_cosine(dot(u, v) / length(v) * length(u) )
+    angle = std::acos(u.dotProduct(v, u) / v.length() * u.length());
     return angle;
 }
 

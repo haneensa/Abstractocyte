@@ -130,12 +130,12 @@ public:
 
 
     // GEM
-    void initGemParameters();
-    void runGEM();
-    double computeImpulse(/*vertex*/);
-    double function_growing(/*vertex*/);
-    void update_node(/*vertex and impulse*/);
-    double get_angle(/*vertex 1, vertex 2*/);
+    void GEM_initParameters();
+    void GEM_run();
+    QVector2D GEM_computeImpulse(Node *node);
+    double GEM_function_growing(Node *node);
+    void GEM_update_node(Node *node, QVector2D impulse);
+    double GEM_get_angle(QVector2D u, QVector2D v);
 
 protected:
     struct pair_hash {
@@ -182,7 +182,7 @@ protected:
 
     // GEM constants
     float                           m_nrm;  // normalization factor
-    float                           m_gravity;  // gravitational constant
+    double                          m_gravity;  // gravitational constant
     float                           m_edge_size;    // desired edge size
     int                             m_Tmin;         // min temperature
     int                             m_Tmax;

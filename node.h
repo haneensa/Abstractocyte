@@ -21,7 +21,7 @@ public:
     Node_t getNodeType()        { return m_node_t; }
     QVector3D get3DPosition()   { return m_nodeXYZ; }
     void addEdge(Edge *e);
-
+    std::map<int, Edge*> getAdjEdges()   { return m_adjEdges; }
 
     // force based layout related functions
     QVector2D getLayoutedPosition();
@@ -36,6 +36,15 @@ public:
     // hashmap
     void setHashMap(std::pair<int, int> cell);
     std::pair<int, int>  getHashMapCell();
+
+
+    // GEM
+    double getLocalTemp()           { return m_localTemp; }
+    void setLocalTemp(double tinit) { m_localTemp = tinit; }
+    QVector2D getImpulse()          { return impulse; }
+    void updateImpulse(QVector2D newImpulse)    { impulse = newImpulse; }
+    void updateSkew(double newSkew)    { skew_gauge = newSkew; }
+    double getSkew()                { return skew_gauge; }
 
 private:
     int                     m_nID;      // hvgx ID
@@ -56,7 +65,7 @@ private:
 
     // GEM Algorithm
     QVector2D               impulse;  // impulse vector
-    double                  t;  // local temperature
+    double                  m_localTemp;  // local temperature
     double                  skew_gauge;
 
     // force directed layout

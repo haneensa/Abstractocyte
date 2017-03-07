@@ -705,7 +705,7 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     // 1) Mesh Triangles
     // 2) Mesh Points
 
-    drawMeshPoints(grid_uniforms);
+//    drawMeshPoints(grid_uniforms);
     drawMeshTriangles(grid_uniforms);
 
     // 3) Skeleton Points
@@ -937,27 +937,27 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
             return;
         }
 
-        Object *obj = objectMap[hvgxID];
+//        Object *obj = objectMap[hvgxID];
 
-        // if it has a children then get them
-        // else if has parent get them
-        Object *parent = obj->getParent();
-        if (parent == NULL) {
-            qDebug() << obj->getName().data() << " has no parnt";
-        } else {
-            FilterObject(parent->getHVGXID(), false);
+//        // if it has a children then get them
+//        // else if has parent get them
+//        Object *parent = obj->getParent();
+//        if (parent == NULL) {
+//            qDebug() << obj->getName().data() << " has no parnt";
+//        } else {
+//            FilterObject(parent->getHVGXID(), false);
 
-        }
+//        }
 
-        std::vector<Object*> children = obj->getChildren();
-        if (children.size() == 0) {
-            qDebug() << obj->getName().data() << " has no child";
-        } else {
-            for (int i = 0; i < children.size(); i++) {
-                qDebug() << "Showing " << children[i]->getName().data();
-                FilterObject(children[i]->getHVGXID(), false);
-            }
-        }
+//        std::vector<Object*> children = obj->getChildren();
+//        if (children.size() == 0) {
+//            qDebug() << obj->getName().data() << " has no child";
+//        } else {
+//            for (int i = 0; i < children.size(); i++) {
+//                qDebug() << "Showing " << children[i]->getName().data();
+//                FilterObject(children[i]->getHVGXID(), false);
+//            }
+//        }
         FilterObject(hvgxID, false);
 
     }

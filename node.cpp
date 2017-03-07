@@ -10,6 +10,11 @@ Node::Node(int nID, long idxID, float x, float y, float z, Node_t node_type)
     // force directed layout
     m_forceSum = QVector2D(0.0, 0.0);
     m_layouted = QVector2D(x, y);
+
+    // GEM
+    impulse = QVector2D(0, 0);
+    skew_gauge = 0;
+    m_localTemp = 0 /*Tinit*/;
 }
 
 Node::~Node()

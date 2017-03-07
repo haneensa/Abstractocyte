@@ -194,6 +194,7 @@ void Object::markChildSubSkeleton(SkeletonBranch *childBranch, int childID)
     // no need to mark the nodes since they are already part of the points
     std::vector<int> childPoints = childBranch->getPointsIndxs();
     for (int i = 0; i < childPoints.size(); ++i) {
+        qDebug() << childPoints[i]<<  " " <<  childID <<  " " <<  m_ID;
         m_skeleton->markPoint(childPoints[i], childID);
 
     }
