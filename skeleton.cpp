@@ -44,6 +44,7 @@ int Skeleton::getSkeletonPointsSize()
     return m_points.size();
 }
 
+
 void Skeleton::addBranch(SkeletonBranch *branch, Skeleton *parentSkeleton)
 {
     // get the point and set its knots to this branch knots

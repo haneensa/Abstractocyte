@@ -19,23 +19,6 @@ uniform vec3 diffuseLightDirection;
 float cosTheta = clamp( dot( normal_out, diffuseLightDirection ), 0, 1 );
 float intensity = dot(diffuseLightDirection, normal_out);
 
-float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
-{
-    // if value < leftMin -> value = leftMin
-    value = max(value, leftMin);
-    // if value > leftMax -> value = leftMax
-    value = min(value, leftMax);
-    // Figure out how 'wide' each range is
-    float leftSpan = leftMax - leftMin;
-    float rightSpan = rightMax - rightMin;
-
-    // Convert the left range into a 0-1 range (float)
-    float valueScaled = float(value - leftMin) / float(leftSpan);
-
-    // Convert the 0-1 range into a value in the right range.
-    return rightMin + (valueScaled * rightSpan);
-}
-
 void main() {
     vec4 color = color_val;
     vec4 toon_color = vec4(color.r, color.g, color.b, 1.0);

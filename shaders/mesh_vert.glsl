@@ -1,5 +1,8 @@
 #version 430
 
+// todo later: find a way to include header
+#extension GL_ARB_shading_language_include : require
+
 layout(location = 0) in vec4    mesh_vx;
 layout(location = 1) in vec4    skeleton_vx;
 
@@ -54,23 +57,7 @@ layout (std430, binding=3) buffer space2d_data
     ast_neu_properties space2d;
 };
 
-float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
-{
-    // if value < leftMin -> value = leftMin
-    value = max(value, leftMin);
-    // if value > leftMax -> value = leftMax
-    value = min(value, leftMax);
-    // Figure out how 'wide' each range is
-    float leftSpan = leftMax - leftMin;
-    float rightSpan = rightMax - rightMin;
-
-    // Convert the left range into a 0-1 range (float)
-    float valueScaled = float(value - leftMin) / float(leftSpan);
-
-    // Convert the 0-1 range into a value in the right range.
-    return rightMin + (valueScaled * rightSpan);
-}
-
+float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax);
 
 void main(void)
 { 
@@ -137,4 +124,21 @@ void main(void)
    vec4 new_position = mix(pos1 , pos2, position_intp);
 
    gl_Position = new_position;
+}
+
+float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
+{
+    // if value < leftMin -> value = leftMin
+    value = max(value, leftMin);
+    // if value > leftMax -> value = leftMax
+    value = min(value, leftMax);
+    // Figure out how 'wide' each range is
+    float leftSpan = leftMax - leftMin;
+    float rightSpan = rightMax - rightMin;
+
+    // Convert the left range into a 0-1 range (float)
+    float valueScaled = float(value - leftMin) / float(leftSpan);
+
+    // Convert the 0-1 range into a value in the right range.
+    return rightMin + (valueScaled * rightSpan);
 }

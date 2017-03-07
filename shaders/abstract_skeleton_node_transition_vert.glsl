@@ -58,27 +58,14 @@ layout (std430, binding=3) buffer space2d_data
     ast_neu_properties space2d;
 };
 
-float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
-{
-    // if value < leftMin -> value = leftMin
-    value = max(value, leftMin);
-    // if value > leftMax -> value = leftMax
-    value = min(value, leftMax);
-    // Figure out how 'wide' each range is
-    float leftSpan = leftMax - leftMin;
-    float rightSpan = rightMax - rightMin;
-
-    // Convert the left range into a 0-1 range (float)
-    float valueScaled = float(value - leftMin) / float(leftSpan);
-
-    // Convert the 0-1 range into a value in the right range.
-    return rightMin + (valueScaled * rightSpan);
-}
+float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax);
 
 // here I should lock the rotation matrix
 void main(void)
 {
     v_viewport = viewport;
+    // if has parent and parent not filtered, then use it
+    // else use child if not filtered as well
     int ID = int(vertex.w);
     V_ID = ID;
     mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
@@ -148,4 +135,21 @@ void main(void)
     }
 
     gl_Position = mix(pos1,  pos2 ,  position_intp)  ;
+}
+
+float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
+{
+    // if value < leftMin -> value = leftMin
+    value = max(value, leftMin);
+    // if value > leftMax -> value = leftMax
+    value = min(value, leftMax);
+    // Figure out how 'wide' each range is
+    float leftSpan = leftMax - leftMin;
+    float rightSpan = rightMax - rightMin;
+
+    // Convert the left range into a 0-1 range (float)
+    float valueScaled = float(value - leftMin) / float(leftSpan);
+
+    // Convert the 0-1 range into a value in the right range.
+    return rightMin + (valueScaled * rightSpan);
 }

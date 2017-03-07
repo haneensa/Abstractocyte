@@ -29,5 +29,6 @@
         <file>shaders/abstract_skeleton_node_2D_vert.glsl</file>
         <file>shaders/abstract_skeleton_node_transition_vert.glsl</file>
         <file>shaders/line_frag.glsl</file>
+        <file>shaders/common.glslh</file>
     </qresource>
 </RCC>

@@ -54,46 +54,9 @@ layout (std430, binding=3) buffer space2d_data
     ast_neu_properties space2d;
 };
 
-float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
-{
-    // if value < leftMin -> value = leftMin
-    value = max(value, leftMin);
-    // if value > leftMax -> value = leftMax
-    value = min(value, leftMax);
-    // Figure out how 'wide' each range is
-    float leftSpan = leftMax - leftMin;
-    float rightSpan = rightMax - rightMin;
+float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax);
 
-    // Convert the left range into a 0-1 range (float)
-    float valueScaled = float(value - leftMin) / float(leftSpan);
-
-    // Convert the 0-1 range into a value in the right range.
-    return rightMin + (valueScaled * rightSpan);
-}
-
-vec4 project_point_to_lint(vec4 A, vec4 B, vec4 p)
-{
-    vec4 q; // closest point to p on the line segment from A to B
-
-    vec4 AB = (B-A); // vector from A to B
-    float AB_squared = dot(AB, AB); // squared distance from A to B
-    if (AB_squared == 0.0) {
-        // A and B are the same point
-        q = A;
-    } else {
-        vec4 Ap = (p-A); // vector from A to p
-        float t = dot(Ap, AB) / AB_squared; // A + t (B - A)
-        if ( t < 0.0) // before A on the line, return A
-            q = A;
-        else if (t > 1.0) // after B on the line, return B
-            q = B;
-        else // projection lines inbetween A and B on the line
-            q = A + t * AB;
-    }
-
-    return q;
-}
-
+vec4 project_point_to_lint(vec4 A, vec4 B, vec4 p);
 
 void main(void)
 {
@@ -162,3 +125,44 @@ void main(void)
    gl_Position = new_position;
 
 }
+
+float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
+{
+    // if value < leftMin -> value = leftMin
+    value = max(value, leftMin);
+    // if value > leftMax -> value = leftMax
+    value = min(value, leftMax);
+    // Figure out how 'wide' each range is
+    float leftSpan = leftMax - leftMin;
+    float rightSpan = rightMax - rightMin;
+
+    // Convert the left range into a 0-1 range (float)
+    float valueScaled = float(value - leftMin) / float(leftSpan);
+
+    // Convert the 0-1 range into a value in the right range.
+    return rightMin + (valueScaled * rightSpan);
+}
+
+vec4 project_point_to_lint(vec4 A, vec4 B, vec4 p)
+{
+    vec4 q; // closest point to p on the line segment from A to B
+
+    vec4 AB = (B-A); // vector from A to B
+    float AB_squared = dot(AB, AB); // squared distance from A to B
+    if (AB_squared == 0.0) {
+        // A and B are the same point
+        q = A;
+    } else {
+        vec4 Ap = (p-A); // vector from A to p
+        float t = dot(Ap, AB) / AB_squared; // A + t (B - A)
+        if ( t < 0.0) // before A on the line, return A
+            q = A;
+        else if (t > 1.0) // after B on the line, return B
+            q = B;
+        else // projection lines inbetween A and B on the line
+            q = A + t * AB;
+    }
+
+    return q;
+}
+

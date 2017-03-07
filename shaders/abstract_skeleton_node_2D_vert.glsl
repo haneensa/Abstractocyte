@@ -1,5 +1,6 @@
 #version 430
 
+
 // in: per vertex data
 layout (location = 0) in vec4 vertex;
 layout (location = 1) in vec2 layout1;
@@ -57,22 +58,7 @@ layout (std430, binding=3) buffer space2d_data
     ast_neu_properties space2d;
 };
 
-float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
-{
-    // if value < leftMin -> value = leftMin
-    value = max(value, leftMin);
-    // if value > leftMax -> value = leftMax
-    value = min(value, leftMax);
-    // Figure out how 'wide' each range is
-    float leftSpan = leftMax - leftMin;
-    float rightSpan = rightMax - rightMin;
-
-    // Convert the left range into a 0-1 range (float)
-    float valueScaled = float(value - leftMin) / float(leftSpan);
-
-    // Convert the 0-1 range into a value in the right range.
-    return rightMin + (valueScaled * rightSpan);
-}
+float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax);
 
 // here I should lock the rotation matrix
 void main(void)
@@ -137,5 +123,22 @@ void main(void)
 
    }
 
+}
+
+float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
+{
+    // if value < leftMin -> value = leftMin
+    value = max(value, leftMin);
+    // if value > leftMax -> value = leftMax
+    value = min(value, leftMax);
+    // Figure out how 'wide' each range is
+    float leftSpan = leftMax - leftMin;
+    float rightSpan = rightMax - rightMin;
+
+    // Convert the left range into a 0-1 range (float)
+    float valueScaled = float(value - leftMin) / float(leftSpan);
+
+    // Convert the 0-1 range into a value in the right range.
+    return rightMin + (valueScaled * rightSpan);
 }
 

@@ -122,6 +122,13 @@ struct ssbo_mesh Object::getSSBOData()
     ssbo_data.color = m_color;
     ssbo_data.center = m_center;
     ssbo_data.info.setX(m_volume);
+    int type = (int) m_object_t;
+    ssbo_data.info.setY(type); // object type
+    if (m_parent != NULL)
+        ssbo_data.info.setZ(m_parent->getHVGXID());
+    else
+        ssbo_data.info.setZ(-1);
+
     ssbo_data.info.setW(0); // filtered? 0: no, 1: yes
     ssbo_data.layout1 = m_center.toVector2D();
     ssbo_data.layout2 = m_center.toVector2D();
@@ -185,10 +192,10 @@ void Object::markChildSubSkeleton(SkeletonBranch *childBranch, int childID)
         return;
 
     // no need to mark the nodes since they are already part of the points
-    // QVector2D nodes = branch->getKnots();
     std::vector<int> childPoints = childBranch->getPointsIndxs();
-    for (int pIndex = 0; pIndex < childPoints.size(); ++pIndex) {
-        m_skeleton->markPoint(pIndex, childID);
+    for (int i = 0; i < childPoints.size(); ++i) {
+        m_skeleton->markPoint(childPoints[i], childID);
+
     }
 
 }

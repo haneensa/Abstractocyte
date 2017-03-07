@@ -41,7 +41,7 @@ struct ssbo_2DState {
 struct ssbo_mesh {
     QVector4D color;
     QVector4D center;  // center.w = neurite/astrocyte
-    QVector4D info;    // volume, type (axon, bouton, spine, dendrite, ..), neurite/astr, filtered
+    QVector4D info;    // x: volume, y: type (axon, bouton, spine, dendrite, ..), z: parent ID, w: filtered
     QVector2D layout1; // layouted position (only neurties)
     QVector2D layout2; // layouted position (with astrocyte)
     // parent ID,

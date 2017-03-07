@@ -45,6 +45,7 @@ public:
 
     void setIndexOffset(int offset) { m_idx_offset = offset; }
     int getIndexOffset()            { return m_idx_offset; }
+
 protected:
     int                             m_ID;
 
