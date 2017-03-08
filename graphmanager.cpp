@@ -27,6 +27,7 @@ void GraphManager::update2Dflag(bool is2D, struct GlobalUniforms uniforms)
 
     if (m_2D) { // if 3D but graph is never 3D
 
+        m_opengl_mngr->multiplyWithRotation(uniforms.rMatrix);
         // reset graph
         for (int i = 0; i < max_graphs; i++) {
             m_FDL_running = true;

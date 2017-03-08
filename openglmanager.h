@@ -71,6 +71,7 @@ public:
     void update_skeleton_layout2(QVector2D layout2,  long node_index, int hvgxID);
     void update_skeleton_layout3(QVector2D layout3,  long node_index, int hvgxID);
 
+    void multiplyWithRotation(QMatrix4x4 rotationMatrix);
 
     std::map<int, Object*>  getObjectsMap() { return m_dataContainer->getObjectsMap(); }
     Object_t getObjectTypeByID(int hvgxID);

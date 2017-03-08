@@ -625,7 +625,6 @@ bool OpenGLManager::initNeuritesGraphShaders()
     res = initShader(m_program_neurites_index,  ":/shaders/nodes_vert.glsl",
                                        ":/shaders/abstract_skeleton_line_geom.glsl",
                                        ":/shaders/points_3d_frag.glsl");
-//    ":/shaders/line_frag.glsl");
 
     if (res == false)
         return res;
@@ -958,6 +957,17 @@ void OpenGLManager::update_skeleton_layout3(QVector2D layout3,  long node_index,
     }
 
     m_abstract_skel_nodes[node_index].layout3 = layout3;
+}
+
+void OpenGLManager::multiplyWithRotation(QMatrix4x4 rotationMatrix)
+{
+    for (int i = 0; i < m_abstract_skel_nodes.size(); ++i) {
+        QVector3D rotVertex = rotationMatrix * m_abstract_skel_nodes[i].vertex.toVector3D();
+        m_abstract_skel_nodes[i].layout1 = rotVertex.toVector2D();
+        m_abstract_skel_nodes[i].layout2 = rotVertex.toVector2D();
+        m_abstract_skel_nodes[i].layout3 = rotVertex.toVector2D();
+
+    }
 }
 
 Object_t OpenGLManager::getObjectTypeByID(int hvgxID)
