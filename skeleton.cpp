@@ -24,7 +24,8 @@ void Skeleton::addPoint(QVector3D coords)
     QVector4D point = coords.toVector4D();
     point.setW(m_ID); // check if this belongs to a child then add child ID here
     QVector4D knot1, knot2;
-    m_points[m_points.size()] = {point, knot1, knot2}; // nodes IDs are from 0 to max, so the index can be used as ID index
+    SkeletonPoint v =  {point, knot1, knot2};
+    m_points[m_points.size()] = std::make_pair(m_points.size(), v); // nodes IDs are from 0 to max, so the index can be used as ID index
     points_vec.push_back({point, knot1, knot2});
 }
 
@@ -35,7 +36,12 @@ void Skeleton::markPoint(int pIndex, int IDMark)
         return;
     }
 
-    m_points[pIndex].vertex.setW(IDMark);
+    // use the index ID to get the index in vector
+    std::pair< int, struct SkeletonPoint > datum = m_points[pIndex];
+    // update the SkeletonPoint
+    datum.second.vertex.setW(IDMark);
+    m_points[pIndex] = datum;
+    points_vec[datum.first] = datum.second;
 }
 
 
@@ -43,8 +49,6 @@ void*  Skeleton::getSkeletonPoints()
 {
     // no need for order for points
 
-//    std::transform(m_points.begin(), m_points.end(), std::back_inserter(points_vec),
-//                    second(m_points) );
     return points_vec.data();
 }
 
@@ -54,62 +58,77 @@ int  Skeleton::getSkeletonPointsSize()
     return m_points.size();
 }
 
-std::map<int, struct SkeletonPoint> Skeleton::getSkeletonPointsVec()
+std::map<int, std::pair< int, struct SkeletonPoint> >  Skeleton::getPointsMap()
 {
     return m_points;
 }
-
- void Skeleton::updatePointAtIndex(int index, struct SkeletonPoint v)
- {
-     m_points[index] = v;
- }
-
 
  // for each branch we add if spine or bouton then construct nodes and points
 void Skeleton::addBranch(SkeletonBranch *branch, Skeleton *parentSkeleton)
 {
     // get the point and set its knots to this branch knots
-    m_branches.push_back(branch);
     // get this branch points set
     // reiterate over the m_points, and for each index in this branch get the point set its knots
     QVector2D knots = branch->getKnots();
-    std::vector<QVector3D> nodes = m_nodes;
-    std::map<int, struct SkeletonPoint> points  = m_points;
 
     std::vector<int> pointsIndices = branch->getPointsIndxs();
     for (int i = 0; i < pointsIndices.size(); i++) {
         int index = pointsIndices[i];
 
-        // if child, then map this point index to a point here
+        if (parentSkeleton != NULL) {  //if child, then map this point index to a point here
 
-        // if spine or bouton use parent skeleton points and nodes
-        if (parentSkeleton != NULL) {
-            // use parent instead
-             nodes = parentSkeleton->getGraphNodes();
-             points = parentSkeleton->getSkeletonPointsVec();
-             // this is the child skeleton
-             // then and m_nodes
-             // m_points
-             // I need away to map nodes indices to the one in m_nodes
+           //  if spine or bouton use parent skeleton points and nodes
+           // use parent instead
+            std::map<int, std::pair< int, struct SkeletonPoint> >  parentPoints = parentSkeleton->getPointsMap();
+            if (parentPoints.find(index) == parentPoints.end())
+            {
+                qDebug() << "Point not fount at index " << index;
+                return;
+            }
+
+            std::pair< int, struct SkeletonPoint > datum = parentPoints[index];
+
+            std::vector<QVector3D> parentNodes = parentSkeleton->getGraphNodes();
+
+            if (parentPoints.size() < knots.x() || parentPoints.size() < knots.y() ) {
+                qDebug() << "Node index is incorrect" << parentPoints.size() << " " << knots;
+                return;
+            }
+
+            std::pair< int, struct SkeletonPoint > sk_n1 = parentPoints[knots.x()];
+            std::pair< int, struct SkeletonPoint > sk_n2 = parentPoints[knots.y()];
+
+            QVector3D n1 = sk_n1.second.vertex.toVector3D();
+            QVector3D n2 = sk_n2.second.vertex.toVector3D();
+
+            datum.second.knot1 = QVector4D(n1.x(), n1.y(), n1.z(), 1.0);
+            datum.second.knot2 = QVector4D(n2.x(), n2.y(), n2.z(), 1.0);
+
+            branch->addKnots(m_nodes.size(), m_nodes.size() + 1);
+
+            m_nodes.push_back(n1);
+            m_nodes.push_back(n2);
+            m_branches.push_back(branch);
+
+        } else {
+            if (m_points.size() <= index || m_nodes.size() < knots.x() || m_nodes.size() < knots.y()) {
+                qDebug() << "index out of range addBranch points";
+                return;
+            }
+
+            // should I store points here???
+            std::pair< int, struct SkeletonPoint > datum = m_points[index];
+            QVector3D n1 = m_nodes[knots.x()];
+            QVector3D n2 = m_nodes[knots.y()];
+            datum.second.knot1 = QVector4D(n1.x(), n1.y(), n1.z(), 1.0);
+            datum.second.knot2 = QVector4D(n2.x(), n2.y(), n2.z(), 1.0);
+
+            m_points[index] = datum;
+            points_vec[datum.first] = datum.second;
+
+            m_branches.push_back(branch);
+
         }
-
-        if (points.size() <= index || nodes.size() < knots.x() || nodes.size() < knots.y()) {
-            qDebug() << "index out of range addBranch points";
-            return;
-        }
-
-        // should I store points here???
-
-        struct SkeletonPoint v = points[index];
-        QVector3D n1 = nodes[knots.x()];
-        QVector3D n2 = nodes[knots.y()];
-        v.knot1 = QVector4D(n1.x(), n1.y(), n1.z(), 1.0);
-        v.knot2 = QVector4D(n2.x(), n2.y(), n2.z(), 1.0);
-
-        if (parentSkeleton != NULL)
-            parentSkeleton->updatePointAtIndex(index, v);
-        else
-            updatePointAtIndex(index, v);
     }
 }
 

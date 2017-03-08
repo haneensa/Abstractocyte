@@ -706,7 +706,7 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     // 2) Mesh Points
 
 //    drawMeshPoints(grid_uniforms);
-    drawGlycogenPoints(grid_uniforms);
+//    drawGlycogenPoints(grid_uniforms);
 
     glDisable (GL_BLEND);
       glBlendFunc (GL_ONE, GL_ONE);

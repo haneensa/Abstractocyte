@@ -179,7 +179,7 @@ void Object::addSkeletonBranch(SkeletonBranch *branch)
         // with this child ID
         m_parent->markChildSubSkeleton(branch, m_ID);
         Skeleton *parentSkeleton = m_parent->getSkeleton();
-        m_skeleton->addBranch(branch, NULL);
+        m_skeleton->addBranch(branch, parentSkeleton);
     } else {
         m_skeleton->addBranch(branch, NULL);
     }

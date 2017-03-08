@@ -48,8 +48,9 @@ public:
 
     void*  getSkeletonPoints();
     int getSkeletonPointsSize();
-    std::map<int, struct SkeletonPoint> getSkeletonPointsVec();
-    void updatePointAtIndex(int index, struct SkeletonPoint v);
+
+    std::map<int, std::pair< int, struct SkeletonPoint> >  getPointsMap();
+
      // for simplified graph, we need the branches
     // knots IDs and their edges
     std::vector<QVector3D> getGraphNodes();
@@ -70,7 +71,7 @@ protected:
     // segments has IDs but they are not useful to track anything, so I can use any order
 
     std::vector<QVector3D>                  m_nodes; // vector or map?
-    std::map<int, struct SkeletonPoint>     m_points; // use pointers?
+    std::map<int, std::pair< int, struct SkeletonPoint> >     m_points; // ID -> <index in vector , data>
     std::vector<struct SkeletonPoint>       points_vec;
     std::vector<SkeletonBranch *>           m_branches;
 };

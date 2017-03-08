@@ -7,6 +7,7 @@ SkeletonBranch::SkeletonBranch()
 
 void SkeletonBranch::addKnots(int knot1, int knot2)
 {
+    // in case of a child they refrence these from their parent IDs
     m_nodes[0] = knot1;
     m_nodes[1] = knot2;
 }
