@@ -65,7 +65,7 @@ layout (std430, binding=3) buffer space2d_data
 void main() {
     int ID = V_ID[0] ;
 
-    if (int(SSBO_data[V_ID[0]].info.w) == 1 || int(SSBO_data[V_ID[1]].info.w) == 1 )
+    if ( int(SSBO_data[V_ID[0]].info.w) == 1 || int(SSBO_data[V_ID[1]].info.w) == 1 )
         return;
 
     color_val = SSBO_data[ID].color;
