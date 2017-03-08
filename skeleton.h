@@ -4,6 +4,17 @@
 #include "skeletonbranch.h"
 #include <QVector3D>
 
+
+template< typename tPair >
+struct second_t {
+    typename tPair::second_type operator()( const tPair& p ) const { return p.second; }
+};
+
+
+template< typename tMap>
+second_t< typename tMap::value_type > second( const tMap& m) { return second_t< typename tMap::value_type>( ); }
+
+
 // skeleton vertex
 // todo: use union instead to represent fields?
 struct SkeletonPoint {
@@ -37,7 +48,7 @@ public:
 
     void*  getSkeletonPoints();
     int getSkeletonPointsSize();
-    std::vector<struct SkeletonPoint> getSkeletonPointsVec();
+    std::map<int, struct SkeletonPoint> getSkeletonPointsVec();
     void updatePointAtIndex(int index, struct SkeletonPoint v);
      // for simplified graph, we need the branches
     // knots IDs and their edges
@@ -48,9 +59,9 @@ public:
     int getIndexOffset()            { return m_idx_offset; }
 
 protected:
-    int                             m_ID;
+    int                                     m_ID;
 
-    int                             m_idx_offset;
+    int                                     m_idx_offset;
 
     // a skeleton consists of: nodes, points, and segments
     // local IDs!!
@@ -58,9 +69,10 @@ protected:
     // points has their own IDs [0, Max] for each object and they are distincts per segment
     // segments has IDs but they are not useful to track anything, so I can use any order
 
-    std::vector<QVector3D>              m_nodes; // vector or map?
-    std::vector<struct SkeletonPoint>  m_points;
-    std::vector<SkeletonBranch *>       m_branches;
+    std::vector<QVector3D>                  m_nodes; // vector or map?
+    std::map<int, struct SkeletonPoint>     m_points; // use pointers?
+    std::vector<struct SkeletonPoint>       points_vec;
+    std::vector<SkeletonBranch *>           m_branches;
 };
 
 #endif // SKELETON_H

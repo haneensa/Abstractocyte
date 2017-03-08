@@ -706,16 +706,20 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     // 2) Mesh Points
 
 //    drawMeshPoints(grid_uniforms);
+    drawGlycogenPoints(grid_uniforms);
 
-    // 3) Skeleton Points
+    glDisable (GL_BLEND);
+      glBlendFunc (GL_ONE, GL_ONE);
     drawSkeletonPoints(grid_uniforms);
+    glEnable (GL_BLEND);
+      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // 3) Abstract Skeleton Graph (Nodes and Edges)
     drawSkeletonsGraph(grid_uniforms);
     // 4) Neurites Graph (Nodes and Edges)
     drawNeuritesGraph(grid_uniforms);
     drawMeshTriangles(grid_uniforms);
+    // 3) Skeleton Points
 
-    drawGlycogenPoints(grid_uniforms);
 }
 
 

@@ -80,18 +80,18 @@ void Skeleton::addBranch(SkeletonBranch *branch, Skeleton *parentSkeleton)
     for (int i = 0; i < pointsIndices.size(); i++) {
         int index = pointsIndices[i];
 
-        // if child, then map this point index to a point here
+//        // if child, then map this point index to a point here
 
-        // if spine or bouton use parent skeleton points and nodes
-        if (parentSkeleton != NULL) {
-            // use parent instead
-             nodes = parentSkeleton->getGraphNodes();
-             points = parentSkeleton->getSkeletonPointsVec();
-             // this is the child skeleton
-             // then and m_nodes
-             // m_points
-             // I need away to map nodes indices to the one in m_nodes
-        }
+//        // if spine or bouton use parent skeleton points and nodes
+//        if (parentSkeleton != NULL) {
+//            // use parent instead
+//             nodes = parentSkeleton->getGraphNodes();
+//             points = parentSkeleton->getSkeletonPointsVec();
+//             // this is the child skeleton
+//             // then and m_nodes
+//             // m_points
+//             // I need away to map nodes indices to the one in m_nodes
+//        }
 
         if (points.size() <= index || nodes.size() < knots.x() || nodes.size() < knots.y()) {
             qDebug() << "index out of range addBranch points";
