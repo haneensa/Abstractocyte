@@ -37,10 +37,6 @@ public:
 
     void drawMeshTriangles(struct GlobalUniforms grid_uniforms);
 
-    // *********** 2) Mesh Points     ***********
-    bool initMeshPointsShaders();
-    void drawMeshPoints(struct GlobalUniforms grid_uniforms);
-
     // *********** 3) Skeleton Points    ***********
     bool initSkeletonShaders();
     void drawSkeletonPoints(struct GlobalUniforms grid_uniforms);
@@ -98,10 +94,6 @@ protected:
     QOpenGLBuffer                       m_vbo_mesh;
     QOpenGLBuffer                       m_vbo_IndexMesh;
     GLuint                              m_program_mesh;
-
-    // *********** 2) Mesh Points     ***********
-    QOpenGLVertexArrayObject            m_vao_mesh_points;
-    GLuint                              m_program_mesh_points;
 
     // *********** 3) Skeleton Points    ***********
     QOpenGLVertexArrayObject            m_vao_skeleton;

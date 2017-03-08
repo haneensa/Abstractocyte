@@ -54,7 +54,6 @@ OpenGLManager::~OpenGLManager()
 
     glDeleteProgram(m_program_skeleton);
     glDeleteProgram(m_program_mesh);
-    glDeleteProgram(m_program_mesh_points);
 
     m_vao_mesh.destroy();
     m_vbo_mesh.destroy();
@@ -77,7 +76,6 @@ bool OpenGLManager::initOpenGLFunctions()
     // *********** 3) Skeleton Points    ***********
     initSkeletonShaders();
     initMeshTrianglesShaders();
-    initMeshPointsShaders();
     initAbstractSkeletonShaders();
     initNeuritesGraphShaders();
     initGlycogenPointsShaders();
@@ -501,55 +499,6 @@ void OpenGLManager::drawMeshTriangles(struct GlobalUniforms grid_uniforms)
    m_vao_mesh.release();
 }
 
-bool OpenGLManager::initMeshPointsShaders()
-{
-    qDebug() << "OpenGLManager::initMeshPointsShaders()";
-    m_program_mesh_points = glCreateProgram();
-    bool res = initShader(m_program_mesh_points, ":/shaders/mesh_vert.glsl",
-                                                 ":/shaders/mesh_points_geom.glsl",
-                                                 ":/shaders/points_3d_frag.glsl");
-    if (res == false)
-        return res;
-
-    // create vbos and vaos
-    m_vao_mesh_points.create();
-    m_vao_mesh_points.bind();
-
-    glUseProgram(m_program_mesh_points);
-
-    QVector3D lightDir = QVector3D(-2.5f, -2.5f, -0.9f);
-    GLuint lightDir_loc = glGetUniformLocation(m_program_mesh_points, "diffuseLightDirection");
-    glUniform3fv(lightDir_loc, 1, &lightDir[0]);
-
-    m_vbo_mesh.bind();
-
-    initMeshVertexAttrib();
-
-    m_vbo_mesh.release();
-    m_vao_mesh_points.release();
-}
-
-void OpenGLManager::drawMeshPoints(struct GlobalUniforms grid_uniforms)
-{
-   // qDebug() << "OpenGLManager::drawMeshPoints()";
-
-
-    // I need this because transitioning from mesh to skeleton is not smooth
-    m_vao_mesh_points.bind();
-    glUseProgram(m_program_mesh_points);
-    m_uniforms = grid_uniforms;
-
-    updateUniformsLocation(m_program_mesh_points);
-
-    m_vbo_IndexMesh.bind();
-    glDrawElements(GL_POINTS,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
-    m_vbo_IndexMesh.release();
-
-    m_vao_mesh_points.release();
-
-}
-
-
 bool OpenGLManager::initSkeletonShaders()
 {
     qDebug() << "OpenGLManager::initSkeletonShaders()";
@@ -704,7 +653,6 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     // 1) Mesh Triangles
     // 2) Mesh Points
 
-//    drawMeshPoints(grid_uniforms);
     drawGlycogenPoints(grid_uniforms);
 
     glDisable (GL_BLEND);

@@ -6,7 +6,6 @@
         <file>shaders/lines_geom.glsl</file>
         <file>shaders/mesh_frag.glsl</file>
         <file>shaders/mesh_geom.glsl</file>
-        <file>shaders/mesh_points_geom.glsl</file>
         <file>shaders/mesh_vert.glsl</file>
         <file>shaders/selection_frag.glsl</file>
         <file>shaders/selection_geom.glsl</file>
