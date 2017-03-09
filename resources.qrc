@@ -1,8 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>shaders/grid_frag.glsl</file>
-        <file>shaders/grid_geom.glsl</file>
-        <file>shaders/grid_vert.glsl</file>
         <file>shaders/lines_geom.glsl</file>
         <file>shaders/mesh_frag.glsl</file>
         <file>shaders/mesh_geom.glsl</file>

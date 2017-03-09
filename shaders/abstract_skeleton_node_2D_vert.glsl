@@ -90,7 +90,7 @@ void main(void)
     vec2 positions = space_properties.positions; // which positions to interpolate between them
     vec4 render_type = space_properties.render_type; // additional info
     vec4 extra_info = space_properties.extra_info;   // x: axis type (0: x_axis, 1: y_axis)
-    if (extra_info.y == 1 && render_type.w == 1)
+    if (render_type.w == 1)
         V_render = 1;
     else
         V_render = 0;
@@ -104,7 +104,6 @@ void main(void)
    // then get another position for node in layout 1 and layout 2
    // then use these two new values to get the final one along the x axis
    if (type == 1){ // enruties
-
         if (x_axis == extra_info.w)
            gl_PointSize =  point_size.y;
         else

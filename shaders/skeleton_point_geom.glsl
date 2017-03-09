@@ -9,6 +9,11 @@ out float   color_intp;
 out vec4    color_val;
 out float   alpha;
 
+
+uniform int     y_axis;
+uniform int     x_axis;
+
+
 layout (points) in;
 layout (points, max_vertices = 1) out;
 
@@ -57,12 +62,12 @@ void main() {
 
     int type = int(SSBO_data[ID].center.w);
     color_val = SSBO_data[ID].color;
+    gl_PointSize =  gl_in[0].gl_PointSize;
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
     vec4 render_type = space_properties.render_type; // additional info
-
-    if (render_type.z == 0) {
+    if (render_type.y == 0) {
         return;
     }
 
@@ -73,7 +78,6 @@ void main() {
     }
 
     color_intp = V_color_intp[0];
-    gl_PointSize =  gl_in[0].gl_PointSize;
     gl_Position = gl_in[0].gl_Position;
 
     EmitVertex();

@@ -1,6 +1,6 @@
 #version 430
 
-layout(location = 0) in vec4    posAttr;
+layout(location = 0) in vec4    vertex;
 layout(location = 1) in vec4    knot1;
 layout(location = 2) in vec4    knot2;
 
@@ -61,9 +61,9 @@ vec4 project_point_to_lint(vec4 A, vec4 B, vec4 p);
 void main(void)
 {
     mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
-    vec4 skeleton_vertex =  pvmMatrix * vec4(posAttr.xyz, 1.0);
+    vec4 skeleton_vertex =  pvmMatrix * vec4(vertex.xyz, 1.0);
 
-    int ID = int(posAttr.w);  
+    int ID = int(vertex.w);
 
     int type = int(SSBO_data[ID].center.w);     // 0: astrocyte, 1: neurite
 
@@ -77,7 +77,6 @@ void main(void)
     vec2 point_size = space_properties.point_size; // point_size
     vec2 interval = space_properties.interval; // additional info
     vec2 positions = space_properties.positions; // additional info
-    vec4 render_type = space_properties.render_type; // additional info
     vec4 extra_info = space_properties.extra_info;   // x: axis type (0: x_axis, 1: y_axis)
 
     int slider = (extra_info.x == 1) ? y_axis : x_axis;  // need to make this general and not tied to object type

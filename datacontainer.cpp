@@ -16,10 +16,10 @@ DataContainer::DataContainer()
     m_tempCounter = 0;
     m_indices_size = 0;
     m_skeleton_points_size = 0;
-    m_limit = 10000;
+    m_limit = 10;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
-    importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+   importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     importXML("://m3_neurites.xml");    // neurites time:  28802 ms
     // has glycogen data
     loadMetaDataHVGX(":/data/mouse3_metadata_objname_center.hvgx");

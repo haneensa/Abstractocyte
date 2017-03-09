@@ -7,7 +7,7 @@
 // here we get the indices that connect these points
 // slowly lower the resolution until we go to 2D skeleton
 
-enum class Edge_t { ASTRO_SKELETON, NEURITE_SKELETON, NEURITE_NEURITE };
+enum class Edge_t { ASTRO_SKELETON, NEURITE_SKELETON, SYNAPSE, PARENT_CHILD };
 
 class Node;
 class Edge

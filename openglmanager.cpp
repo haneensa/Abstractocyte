@@ -520,15 +520,15 @@ bool OpenGLManager::initSkeletonShaders()
     GL_Error();
 
     int offset = 0;
-    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(0); // original position of the skeleton point
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  0);
 
     offset += sizeof(QVector4D);
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(1); // simplified skeleton end 1
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  (GLvoid*)offset);
 
     offset += sizeof(QVector4D);
-    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(2);   // simplified skeleton end 2
     glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  (GLvoid*)offset);
 
     GL_Error();
