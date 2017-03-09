@@ -57,20 +57,6 @@ void main() {
 
     int type = int(SSBO_data[ID].center.w);
     color_val = SSBO_data[ID].color;
-    if (type == 1) {
-        // check if spine or bouton
-        // if this is a child and parent is not filtered
-        int neurite_type = int(SSBO_data[ID].info.y);
-        if (neurite_type == 2 || neurite_type == 3) // spine, bouton
-        {
-            int ParentID = int(SSBO_data[ID].info.z);
-            int isParentFiltered = int(SSBO_data[ParentID].info.w);
-            if (isParentFiltered == 0) // color this special color that would show this is a mix of parent and child
-                color_val = color_val + vec4(0.3, 0.3, 0.3, 0);
-        }
-
-    }
-
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 

@@ -69,6 +69,10 @@ void main(void)
     mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
     mat4 m_noRotvpMatrix = pMatrix * vMatrix * m_noRartionMatrix;
 
+    // if we switch to 2D I can store the vertex multiplied by only rotation matrix here
+    // then use the ssbo to transfer the data there
+    // then I can have that information available all th time
+
     vec4 v_vertex =  mvpMatrix * vec4(vertex.xyz, 1); // original position
     vec4 v_layout1 =  m_noRotvpMatrix * vec4(layout1, 0, 1); // original position
     vec4 v_layout2 =  m_noRotvpMatrix * vec4(layout2, 0, 1); // original position

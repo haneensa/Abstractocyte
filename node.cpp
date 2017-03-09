@@ -37,20 +37,20 @@ void Node::addEdge(Edge *e)
     }
 }
 
-// force based layout related functions
-QVector2D Node::getLayoutedPosition()
-{
-    return m_layouted;
-}
-
-
 void Node::addToLayoutedPosition(QVector2D newPos)
 {
     m_layouted += QVector2D(newPos.x(), newPos.y());
 }
 
+QVector2D Node::getProjectedVertex()
+{
+     QVector3D vec = m_rotationMatrix * m_nodeXYZ;
+     return vec.toVector2D();
+}
+
 void Node::resetLayout(QMatrix4x4 rotationMatrix)
 {
+    m_rotationMatrix = rotationMatrix;
     QVector3D vec = rotationMatrix * m_nodeXYZ;
     m_layouted = vec.toVector2D();
     resetForce();

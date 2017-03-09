@@ -77,10 +77,12 @@ void main() {
     }
 
     int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
-
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
     vec4 render_type = space_properties.render_type; // additional info
+
+
+
 
     if ( V_render[0] == 0  ) {
         return;

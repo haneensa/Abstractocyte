@@ -68,6 +68,8 @@ void main(void)
     // else use child if not filtered as well
     int ID = int(vertex.w);
     V_ID = ID;
+    int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
+
     mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
     mat4 m_noRotvpMatrix = pMatrix * vMatrix * m_noRartionMatrix;
 
@@ -79,7 +81,6 @@ void main(void)
     vec4 node_center = mvpMatrix * vec4(SSBO_data[ID].center.xyz, 1);
     vec4 node_layout2 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout2, 0, 1);
 
-    int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
@@ -97,6 +98,14 @@ void main(void)
     else
         V_render = 0;
 
+    if ( type == 1 && (int(SSBO_data[ID].info.y) == 2 || int(SSBO_data[ID].info.y) == 3) ) {
+        // check if spine or bouton
+        // if this is a child and parent is not filtered
+            int ParentID = int(SSBO_data[ID].info.z);
+            int isParentFiltered = int(SSBO_data[ParentID].info.w);
+            if (isParentFiltered == 0) // color this special color that would show this is a mix of parent and child
+                 V_render = 0;
+    }
 
     int slider = (extra_info.x == 1) ? y_axis : x_axis;  // need to make this general and not tied to object type
 

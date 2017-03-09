@@ -15,21 +15,22 @@ class Node
 public:
     Node(int nID, long idxID, float x, float y, float z, Node_t node_type = Node_t::NONE);
     ~Node();
-    int getID()                 { return m_nID; }
-    long getIdxID()    { return m_idxID; }
+    int getID()                         { return m_nID; }
+    long getIdxID()                     { return m_idxID; }
 
-    Node_t getNodeType()        { return m_node_t; }
-    QVector3D get3DPosition()   { return m_nodeXYZ; }
+    Node_t getNodeType()                { return m_node_t; }
+    QVector3D get3DPosition()           { return m_nodeXYZ; }
     void addEdge(Edge *e);
-    std::map<int, Edge*> getAdjEdges()   { return m_adjEdges; }
+    std::map<int, Edge*> getAdjEdges()  { return m_adjEdges; }
 
+    QVector2D getProjectedVertex();
     // force based layout related functions
-    QVector2D getLayoutedPosition();
+    QVector2D getLayoutedPosition()     { return m_layouted; }
     void addToLayoutedPosition(QVector2D newPos);
     void resetLayout(QMatrix4x4 rotationMatrix);
 
     void addToForceSum(QVector2D newForce);
-    QVector2D getForceSum()     { return m_forceSum; }
+    QVector2D getForceSum()             { return m_forceSum; }
 
     void resetForce();
 
@@ -72,6 +73,8 @@ private:
     // force directed layout
     QVector2D               m_forceSum; // force to be applied on 2D position
     QVector2D               m_layouted; // 2D position after applying force
+
+    QMatrix4x4              m_rotationMatrix;
 };
 
 #endif // NODE_H

@@ -620,10 +620,6 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
 
     m_uniforms = grid_uniforms;
 
-    glUseProgram(m_program_neurites_nodes);
-    updateAbstractUniformsLocation(m_program_neurites_nodes);
-
-    glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
 
     m_NeuritesIndexVBO.bind();
 
@@ -634,6 +630,13 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
     glDrawElements(GL_LINES,  m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
 
     m_NeuritesIndexVBO.release();
+
+    glUseProgram(m_program_neurites_nodes);
+    updateAbstractUniformsLocation(m_program_neurites_nodes);
+
+    glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
+
+
 
     m_NeuritesNodesVBO.release();
     m_NeuritesGraphVAO.release();

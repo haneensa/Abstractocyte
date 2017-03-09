@@ -66,6 +66,8 @@ public:
     void updateFilteredFlag(bool isFiltered)   { m_isFiltered = isFiltered; }
     bool isFiltered()                          { return m_isFiltered; }
 
+
+    void updateAstSynapseFlag(bool flag)                 { return; }
 private:
     std::string                             m_name;
     int                                     m_ID; // hvgx
