@@ -44,7 +44,7 @@ struct properties {
     vec2 point_size;
     vec2 interval;
     vec2 positions;
-    vec4 render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
+    vec4 render_type; // mesh triangles, points skeleton, graph (points, edges), 2D
     vec4 extra_info;  // x: axis type, y, z, w: empty slots
 };
 

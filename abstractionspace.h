@@ -40,6 +40,8 @@ public:
     std::vector<struct abstractionPoint> get2DSpaceVertices() { return m_vertices; }
     std::vector<GLuint> get2DSpaceIndices() { return m_indices; }
 
+    struct ast_neu_properties getSpaceProper()  { return m_IntervalXY[m_intervalID]; }
+
 private:
     struct pair_hash {
         template <class T1, class T2>

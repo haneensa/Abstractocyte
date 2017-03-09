@@ -10,6 +10,7 @@
 #ifndef OPENGLMANAGER_H
 #define OPENGLMANAGER_H
 
+#include "abstractionspace.h"
 #include "mainopengl.h"
 #include "datacontainer.h"
 #include "glsluniform_structs.h"
@@ -17,7 +18,7 @@
 class OpenGLManager : public MainOpenGL
 {
 public:
-    OpenGLManager(DataContainer * obj_mnger);
+    OpenGLManager(DataContainer * obj_mnger, AbstractionSpace  *absSpace);
     ~OpenGLManager();
     void fillVBOsData();
     bool initOpenGLFunctions();
@@ -77,6 +78,7 @@ public:
 
 protected:
     DataContainer                       *m_dataContainer; // get the data to render from here
+    AbstractionSpace                    *m_2dspace;
 
     bool                                m_glFunctionsSet;
     bool                                m_2D;

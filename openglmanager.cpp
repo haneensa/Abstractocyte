@@ -32,7 +32,7 @@ int id = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
 
 #include "openglmanager.h"
 
-OpenGLManager::OpenGLManager(DataContainer *obj_mnger)
+OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpace)
     : m_vbo_skeleton( QOpenGLBuffer::VertexBuffer ),
       m_vbo_mesh( QOpenGLBuffer::VertexBuffer ),
       m_vbo_IndexMesh(QOpenGLBuffer::IndexBuffer),
@@ -44,6 +44,7 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger)
       m_bindIdx(2) // ssbo biding point
 {
     m_dataContainer = obj_mnger;
+    m_2dspace = absSpace;
     m_glFunctionsSet = false;
 }
 
@@ -652,17 +653,24 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
 {
     m_uniforms = grid_uniforms;
     write_ssbo_data();
+    struct ast_neu_properties space_properties = m_2dspace->getSpaceProper();
 
-    // 1) Mesh Triangles
-    // 2) Mesh Points
 
     drawGlycogenPoints(grid_uniforms);
 
-    glDisable (GL_BLEND);
-      glBlendFunc (GL_ONE, GL_ONE);
-    drawSkeletonPoints(grid_uniforms);
-    glEnable (GL_BLEND);
-      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    if ( space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x() == 0) {
+        drawSkeletonPoints(grid_uniforms);
+    } else {
+        glDisable (GL_BLEND);
+          glBlendFunc (GL_ONE, GL_ONE);
+        drawSkeletonPoints(grid_uniforms);
+
+        glEnable (GL_BLEND);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    }
+
     // 3) Abstract Skeleton Graph (Nodes and Edges)
     drawSkeletonsGraph(grid_uniforms);
     // 4) Neurites Graph (Nodes and Edges)

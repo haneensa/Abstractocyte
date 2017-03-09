@@ -21,7 +21,7 @@ GLWidget::GLWidget(QWidget *parent)
 
     // objects manager with all objects data
     m_data_containter = new DataContainer();
-    m_opengl_mngr = new OpenGLManager(m_data_containter);
+    m_opengl_mngr = new OpenGLManager(m_data_containter, m_2dspace);
 
     // graph manager with 4 graphs and 2D space layouted data
     m_graphManager = new GraphManager( m_data_containter, m_opengl_mngr );
