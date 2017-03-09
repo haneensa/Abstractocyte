@@ -22,6 +22,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     std::vector<QVector2D> y_intervals;
     std::vector<QVector2D> x_intervals;
 
+    // todo: change the render type: x: mesh, y: skeleton points, z: graph transitional, w: graph 2D
     // ##################  Y axis
     // 1) Mesh Triangles, Phong Shading -> Toon Shading
     y_interval = QVector2D(0, 20);
