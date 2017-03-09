@@ -251,20 +251,6 @@ void Graph::updateNode(Node *node)
     return;
 }
 
-void Graph::initGridBuffers()
-{
-    qDebug() << "initGridBuffers";
-    hashGrid->initOpenGLFunctions();
-    if (hashGrid->init_Shaders_Buffers() == false) {
-        qDebug() << "error!";
-        return;
-    }
-}
-
-void Graph::drawGrid(struct GlobalUniforms grid_uniforms)
-{
-    hashGrid->drawGrid(grid_uniforms);
-}
 
 /************************ Force Directed Layout ****************************/
 // when we switch to 2D we use the other vertex with the no rotation matrix

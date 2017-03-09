@@ -142,8 +142,6 @@ public:
 
     // spatial hashing
     void updateNode(Node *node);
-    void drawGrid(struct GlobalUniforms grid_uniforms);
-    void initGridBuffers();
     void updateUniforms(struct GlobalUniforms uniforms) {m_uniforms = uniforms;}
 
     void updateGraphParam1(double value);
