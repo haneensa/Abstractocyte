@@ -22,9 +22,9 @@ public:
     void parseSkeleton(QXmlStreamReader &xml, Object *obj);
     void parseSkeletonNodes(QXmlStreamReader &xml, Object *obj);
     void parseBranch(QXmlStreamReader &xml, Object *obj);
-    void parseConnGraph(QXmlStreamReader &xml);
     void parseSkeletonPoints(QXmlStreamReader &xml, Object *obj);
 
+    void loadConnectivityGraph(QString path);
     void loadMetaDataHVGX(QString path);
 
     int getGlycogenSize()              { return m_glycogenMap.size(); }
