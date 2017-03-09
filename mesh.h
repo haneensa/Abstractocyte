@@ -6,7 +6,7 @@
 // mesh vertex
 struct VertexData {
     QVector4D   mesh_vertex;        // w: ID
-    QVector4D   skeleton_vertex;    // w: markers
+    QVector4D   skeleton_vertex;    // w: markers distance to astrocyte (since this is per vertex, compute the distance from each vertex to astrocyte)
 };
 
 class Mesh

@@ -72,6 +72,7 @@ void main(void)
 
     int type = int(SSBO_data[ID].center.w);
 
+    // if skeleton_vx.w is below a threshold then color it
     if (bleeding == 1)
         V_color_val = vec4(1.0, 0.0, 0.0, 1.0);
     else

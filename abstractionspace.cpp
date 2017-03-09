@@ -282,7 +282,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast7.point_size = QVector2D(1, 1);
     ast7.interval = QVector2D(y_interval.x(), y_interval.y());
     ast7.positions = QVector2D(1, 1);
-    ast7.render_type = QVector4D(0, 0, 1, 1);
+    ast7.render_type = QVector4D(0, 0,  0, 1);
     ast7.extra_info = QVector4D(0, 0, 80, 100);   // x: axis type (0: x_axis, 1: y_axis)
                                                // y: both x and y axis
                                                // z: left interval, w: right interval for y axis
@@ -296,7 +296,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu6.point_size = QVector2D(1, max_neurite_nsize);
     neu6.interval = QVector2D(x_interval.x(), x_interval.y());       // alpha limit, div, pos1, pos2
     neu6.positions = QVector2D(1, 6);       // alpha limit, div, pos1, pos2
-    neu6.render_type = QVector4D(0, 0, 1, 1);
+    neu6.render_type = QVector4D(0, 0, 0, 1);
     neu6.extra_info = QVector4D(0, 0, 80, 100);   // x: axis type (0: x_axis, 1: y_axis)
 
     initRect(x_interval, y_interval, ID++);
