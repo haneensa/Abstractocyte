@@ -13,16 +13,16 @@
  */
 DataContainer::DataContainer()
 {
+    m_tempCounter = 0;
     m_indices_size = 0;
     m_skeleton_points_size = 0;
     m_limit = 100;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
-    importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     importXML("://m3_neurites.xml");    // neurites time:  28802 ms
-
     // has glycogen data
-    loadMetaDataHVGX(":/data/mouse3_metadata_objname_center.hvgx");
+  loadMetaDataHVGX(":/data/mouse3_metadata_objname_center.hvgx");
 
 }
 
@@ -66,6 +66,7 @@ void DataContainer::loadMetaDataHVGX(QString path)
             Glycogen *gc = new Glycogen(ID, name, QVector3D(x, y, z), diameter);
             m_glycogenMap[ID] = gc;
         } else if (wordList[0] == "sg") {
+            // update the nodes center here?
             continue;
         } else if (wordList[0] == "sy") {
             continue;
@@ -128,7 +129,7 @@ bool DataContainer::importXML(QString path)
 
     auto t2 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> ms = t2 - t1;
-    qDebug() << "time: " << ms.count() << "ms";
+    qDebug() << "time: " << ms.count() << "ms, m_tempCounter: " << m_tempCounter;
 }
 
 void DataContainer::parseConnGraph(QXmlStreamReader &xml)
@@ -298,6 +299,10 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 if (stringlist.size() < 5) {
                     // place holder
                     v.skeleton_vertex = mesh_vertex;
+                } else if ( obj->getObjectType() == Object_t::MITO || obj->getObjectType() == Object_t::SYNAPSE ) {
+                    QVector4D center = obj->getCenter();
+                    center.setW(0);
+                    v.skeleton_vertex = center;
                 } else {
                     // I could use index to be able to connect vertices logically
                     float x2 = stringlist.at(3).toDouble()/5.0;
@@ -343,7 +348,15 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 qDebug() << xml.name();
                 xml.readNext();
                 QStringList markersList = xml.text().toString().split(" ");
-                m_mesh->MarkBleedingVertices(markersList, m_vertex_offset);
+                bool isAstSynapse = m_mesh->MarkBleedingVertices(markersList, m_vertex_offset);
+                if (isAstSynapse == false) {
+                    // this object is not touching anyone
+                    obj->updateAstSynapseFlag(false);
+                    m_tempCounter++;
+                    qDebug() << "****** not touching astrocyte " << m_tempCounter;
+                } else {
+                    obj->updateAstSynapseFlag(true);
+                }
             }
         } // if start element
         xml.readNext();
@@ -365,6 +378,8 @@ void DataContainer::parseSkeleton(QXmlStreamReader &xml, Object *obj)
     qDebug() << xml.name();
 
     xml.readNext();
+    if ( obj->getObjectType() == Object_t::MITO || obj->getObjectType() == Object_t::SYNAPSE )
+        return;
 
     // this object structure is not done
     while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "skeleton")) {

@@ -43,6 +43,7 @@ public:
     std::vector<int> getObjectsIDsByType(Object_t type);
 
 protected:
+    int m_tempCounter;
     // store all vertices of the mesh.
     // unique vertices, faces to index them.
     Mesh                                    *m_mesh;
