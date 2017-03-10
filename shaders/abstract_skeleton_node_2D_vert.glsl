@@ -69,6 +69,10 @@ void main(void)
     mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
     mat4 m_noRotvpMatrix = pMatrix * vMatrix * m_noRartionMatrix;
 
+    // if we switch to 2D I can store the vertex multiplied by only rotation matrix here
+    // then use the ssbo to transfer the data there
+    // then I can have that information available all th time
+
     vec4 v_vertex =  mvpMatrix * vec4(vertex.xyz, 1); // original position
     vec4 v_layout1 =  m_noRotvpMatrix * vec4(layout1, 0, 1); // original position
     vec4 v_layout2 =  m_noRotvpMatrix * vec4(layout2, 0, 1); // original position
@@ -86,7 +90,7 @@ void main(void)
     vec2 positions = space_properties.positions; // which positions to interpolate between them
     vec4 render_type = space_properties.render_type; // additional info
     vec4 extra_info = space_properties.extra_info;   // x: axis type (0: x_axis, 1: y_axis)
-    if (extra_info.y == 1 && render_type.w == 1)
+    if (render_type.w == 1)
         V_render = 1;
     else
         V_render = 0;
@@ -100,7 +104,6 @@ void main(void)
    // then get another position for node in layout 1 and layout 2
    // then use these two new values to get the final one along the x axis
    if (type == 1){ // enruties
-
         if (x_axis == extra_info.w)
            gl_PointSize =  point_size.y;
         else

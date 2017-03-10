@@ -24,19 +24,6 @@ bool Mesh::isValidFaces(int f1, int f2, int f3)
     return true;
 }
 
-void Mesh::MarkBleedingVertices(QStringList markersList, int vertex_offset)
-{
-    for (int i = 0; i < markersList.size(); ++i) {
-        int rv_index = markersList.at(i).toInt() + vertex_offset;
-        if (rv_index >= verticesList.size() || rv_index < 1) {
-            qDebug() << "error! skiped rv " << rv_index << " vertices list size: " << verticesList.size();
-            continue;
-        }
-        verticesList[rv_index-1].skeleton_vertex.setW(1);
-    }
-}
-
-
 void Mesh::allocateVerticesVBO(QOpenGLBuffer vbo_mesh)
 {
     vbo_mesh.allocate(verticesList.data(), verticesList.size() * sizeof(VertexData));

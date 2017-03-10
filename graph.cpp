@@ -251,20 +251,6 @@ void Graph::updateNode(Node *node)
     return;
 }
 
-void Graph::initGridBuffers()
-{
-    qDebug() << "initGridBuffers";
-    hashGrid->initOpenGLFunctions();
-    if (hashGrid->init_Shaders_Buffers() == false) {
-        qDebug() << "error!";
-        return;
-    }
-}
-
-void Graph::drawGrid(struct GlobalUniforms grid_uniforms)
-{
-    hashGrid->drawGrid(grid_uniforms);
-}
 
 /************************ Force Directed Layout ****************************/
 // when we switch to 2D we use the other vertex with the no rotation matrix
@@ -280,6 +266,8 @@ void Graph::resetCoordinates()
     qDebug() << "2D";
     hashGrid->clear();
     m_FilteredHVGX.clear();
+
+
     // this take so much time that by the time we reach it still do this?
     // create many threads within one thread?
     for( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++) {
@@ -418,6 +406,8 @@ void Graph::runforceDirectedLayout()
 
                 repulseNodes(node1, node2, m_Cr * k);
             }
+
+           attractToOriginalPosition(node1, 0.5); // the less the more
         }
 
         // forcs due to edge attraction
@@ -491,6 +481,18 @@ quit:
 qDebug() << "Exist Thread" ;
 
 }
+
+
+void Graph::attractToOriginalPosition(Node *node, float k)
+{
+    QVector2D layoutedXY = node->getLayoutedPosition();
+    QVector2D projectdXY = node->getProjectedVertex();
+    QVector2D vforce  = attractionForce(layoutedXY.x(), layoutedXY.y(), projectdXY.x(), projectdXY.y(), k);
+
+    // Attract: node ----------> original position
+    node->addToForceSum(vforce);
+}
+
 
 void Graph::attractConnectedNodes(Edge *edge, float k)
 {
@@ -583,8 +585,6 @@ QVector2D Graph::repulsiveForce(float x1, float y1, float x2, float y2, float k)
 
     if (distance <= m_AABBdim) {
         repulsion =    (k * k) / distance;
-       // repulsion =    (k * k) * (distance - m_MAX_DISTANCE);
-
         force =  dxy.normalized() * repulsion;
     }
 

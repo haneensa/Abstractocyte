@@ -15,6 +15,32 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+struct force_layout_param {
+    float Cr /*1.5*/;           // repulsion constant
+    float Ca /*0.5*/;           // attraction constant
+    float AABBdim /*0.15*/;      // the area to include nodes for repulsion
+    float max_distance /*0.1*/; // max edge distance for attraction force
+    int iterations /*10000*/;
+    float max_vertex_movement /*0.01*/;  // max movment for vertex after applying the force
+    float slow_factor /*0.01*/;          // force slowing factor
+    float max_force /*1.0*/;            // max force to appy
+};
+
+struct GEM_param {
+    float   nrm;            // normalization factor
+    double  gravity;        // gravitational constant
+    float   edge_size;      // desired edge size
+    int     Tmin;           // min temperature
+    int     Tmax;
+    float   a_r;            // PI/6
+    float   a_o;            // PI/2
+    float   s_r;            // 1/2n
+    float   s_o;            // 1/3
+    float   Tinit;          // initial temperature for a vertex
+    float   Tglobal;        // Tinit * n (temperature sum)
+    int     rounds;         // max number of rounds
+
+};
 
 #define PI 3.14159265358979f
 
@@ -109,15 +135,13 @@ public:
     QVector2D attractionForce(float x1, float y1, float x2, float y2, float k);
     QVector2D repulsiveForce(float x1, float y1, float x2, float y2, float k);
     void resetCoordinates();
-
+    void attractToOriginalPosition(Node *node, float k);
     void update_node_data(Node* node);
 
     void terminateFDL()  { m_FDL_terminate = true; }
 
     // spatial hashing
     void updateNode(Node *node);
-    void drawGrid(struct GlobalUniforms grid_uniforms);
-    void initGridBuffers();
     void updateUniforms(struct GlobalUniforms uniforms) {m_uniforms = uniforms;}
 
     void updateGraphParam1(double value);

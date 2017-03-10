@@ -32,7 +32,7 @@ int id = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
 
 #include "openglmanager.h"
 
-OpenGLManager::OpenGLManager(DataContainer *obj_mnger)
+OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpace)
     : m_vbo_skeleton( QOpenGLBuffer::VertexBuffer ),
       m_vbo_mesh( QOpenGLBuffer::VertexBuffer ),
       m_vbo_IndexMesh(QOpenGLBuffer::IndexBuffer),
@@ -44,6 +44,7 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger)
       m_bindIdx(2) // ssbo biding point
 {
     m_dataContainer = obj_mnger;
+    m_2dspace = absSpace;
     m_glFunctionsSet = false;
 }
 
@@ -54,7 +55,6 @@ OpenGLManager::~OpenGLManager()
 
     glDeleteProgram(m_program_skeleton);
     glDeleteProgram(m_program_mesh);
-    glDeleteProgram(m_program_mesh_points);
 
     m_vao_mesh.destroy();
     m_vbo_mesh.destroy();
@@ -77,7 +77,6 @@ bool OpenGLManager::initOpenGLFunctions()
     // *********** 3) Skeleton Points    ***********
     initSkeletonShaders();
     initMeshTrianglesShaders();
-    initMeshPointsShaders();
     initAbstractSkeletonShaders();
     initNeuritesGraphShaders();
     initGlycogenPointsShaders();
@@ -501,55 +500,6 @@ void OpenGLManager::drawMeshTriangles(struct GlobalUniforms grid_uniforms)
    m_vao_mesh.release();
 }
 
-bool OpenGLManager::initMeshPointsShaders()
-{
-    qDebug() << "OpenGLManager::initMeshPointsShaders()";
-    m_program_mesh_points = glCreateProgram();
-    bool res = initShader(m_program_mesh_points, ":/shaders/mesh_vert.glsl",
-                                                 ":/shaders/mesh_points_geom.glsl",
-                                                 ":/shaders/points_3d_frag.glsl");
-    if (res == false)
-        return res;
-
-    // create vbos and vaos
-    m_vao_mesh_points.create();
-    m_vao_mesh_points.bind();
-
-    glUseProgram(m_program_mesh_points);
-
-    QVector3D lightDir = QVector3D(-2.5f, -2.5f, -0.9f);
-    GLuint lightDir_loc = glGetUniformLocation(m_program_mesh_points, "diffuseLightDirection");
-    glUniform3fv(lightDir_loc, 1, &lightDir[0]);
-
-    m_vbo_mesh.bind();
-
-    initMeshVertexAttrib();
-
-    m_vbo_mesh.release();
-    m_vao_mesh_points.release();
-}
-
-void OpenGLManager::drawMeshPoints(struct GlobalUniforms grid_uniforms)
-{
-   // qDebug() << "OpenGLManager::drawMeshPoints()";
-
-
-    // I need this because transitioning from mesh to skeleton is not smooth
-    m_vao_mesh_points.bind();
-    glUseProgram(m_program_mesh_points);
-    m_uniforms = grid_uniforms;
-
-    updateUniformsLocation(m_program_mesh_points);
-
-    m_vbo_IndexMesh.bind();
-    glDrawElements(GL_POINTS,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
-    m_vbo_IndexMesh.release();
-
-    m_vao_mesh_points.release();
-
-}
-
-
 bool OpenGLManager::initSkeletonShaders()
 {
     qDebug() << "OpenGLManager::initSkeletonShaders()";
@@ -571,15 +521,15 @@ bool OpenGLManager::initSkeletonShaders()
     GL_Error();
 
     int offset = 0;
-    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(0); // original position of the skeleton point
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  0);
 
     offset += sizeof(QVector4D);
-    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(1); // simplified skeleton end 1
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  (GLvoid*)offset);
 
     offset += sizeof(QVector4D);
-    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(2);   // simplified skeleton end 2
     glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  (GLvoid*)offset);
 
     GL_Error();
@@ -625,7 +575,6 @@ bool OpenGLManager::initNeuritesGraphShaders()
     res = initShader(m_program_neurites_index,  ":/shaders/nodes_vert.glsl",
                                        ":/shaders/abstract_skeleton_line_geom.glsl",
                                        ":/shaders/points_3d_frag.glsl");
-//    ":/shaders/line_frag.glsl");
 
     if (res == false)
         return res;
@@ -672,10 +621,6 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
 
     m_uniforms = grid_uniforms;
 
-    glUseProgram(m_program_neurites_nodes);
-    updateAbstractUniformsLocation(m_program_neurites_nodes);
-
-    glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
 
     m_NeuritesIndexVBO.bind();
 
@@ -686,6 +631,13 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
     glDrawElements(GL_LINES,  m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
 
     m_NeuritesIndexVBO.release();
+
+    glUseProgram(m_program_neurites_nodes);
+    updateAbstractUniformsLocation(m_program_neurites_nodes);
+
+    glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
+
+
 
     m_NeuritesNodesVBO.release();
     m_NeuritesGraphVAO.release();
@@ -701,24 +653,31 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
 {
     m_uniforms = grid_uniforms;
     write_ssbo_data();
+    struct ast_neu_properties space_properties = m_2dspace->getSpaceProper();
 
-    // 1) Mesh Triangles
-    // 2) Mesh Points
 
-//    drawMeshPoints(grid_uniforms);
     drawGlycogenPoints(grid_uniforms);
 
-    glDisable (GL_BLEND);
-      glBlendFunc (GL_ONE, GL_ONE);
-    drawSkeletonPoints(grid_uniforms);
-    glEnable (GL_BLEND);
-      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // 3) Abstract Skeleton Graph (Nodes and Edges)
-    drawSkeletonsGraph(grid_uniforms);
-    // 4) Neurites Graph (Nodes and Edges)
-    drawNeuritesGraph(grid_uniforms);
-    drawMeshTriangles(grid_uniforms);
-    // 3) Skeleton Points
+
+//    if ( space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x() == 0) {
+//        drawSkeletonsGraph(grid_uniforms);
+//        drawNeuritesGraph(grid_uniforms);
+//        drawMeshTriangles(grid_uniforms);
+//        drawSkeletonPoints(grid_uniforms);
+//    } else {
+        glDisable (GL_BLEND);
+          glBlendFunc (GL_ONE, GL_ONE);
+        drawSkeletonPoints(grid_uniforms);
+
+        glEnable (GL_BLEND);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        drawSkeletonsGraph(grid_uniforms);
+        drawNeuritesGraph(grid_uniforms);
+        drawMeshTriangles(grid_uniforms);
+//    }
+
+
 
 }
 
@@ -958,6 +917,17 @@ void OpenGLManager::update_skeleton_layout3(QVector2D layout3,  long node_index,
     }
 
     m_abstract_skel_nodes[node_index].layout3 = layout3;
+}
+
+void OpenGLManager::multiplyWithRotation(QMatrix4x4 rotationMatrix)
+{
+    for (int i = 0; i < m_abstract_skel_nodes.size(); ++i) {
+        QVector3D rotVertex = rotationMatrix * m_abstract_skel_nodes[i].vertex.toVector3D();
+        m_abstract_skel_nodes[i].layout1 = rotVertex.toVector2D();
+        m_abstract_skel_nodes[i].layout2 = rotVertex.toVector2D();
+        m_abstract_skel_nodes[i].layout3 = rotVertex.toVector2D();
+
+    }
 }
 
 Object_t OpenGLManager::getObjectTypeByID(int hvgxID)

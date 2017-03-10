@@ -23,9 +23,9 @@ public:
     void parseSkeleton(QXmlStreamReader &xml, Object *obj);
     void parseSkeletonNodes(QXmlStreamReader &xml, Object *obj);
     void parseBranch(QXmlStreamReader &xml, Object *obj);
-    void parseConnGraph(QXmlStreamReader &xml);
     void parseSkeletonPoints(QXmlStreamReader &xml, Object *obj);
 
+    void loadConnectivityGraph(QString path);
     void loadMetaDataHVGX(QString path);
 
     int getGlycogenSize()              { return m_glycogenMap.size(); }
@@ -44,6 +44,7 @@ public:
     std::vector<int> getObjectsIDsByType(Object_t type);
 
 protected:
+    int m_tempCounter;
     // store all vertices of the mesh.
     // unique vertices, faces to index them.
     Mesh                                    *m_mesh;

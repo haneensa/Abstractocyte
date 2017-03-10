@@ -66,6 +66,11 @@ public:
     void updateFilteredFlag(bool isFiltered)   { m_isFiltered = isFiltered; }
     bool isFiltered()                          { return m_isFiltered; }
 
+
+    void updateAstSynapseFlag(bool flag)        { m_isAstroSynapse = flag; }
+
+    void updateClosestAstroVertex(float dist);
+
 private:
     std::string                             m_name;
     int                                     m_ID; // hvgx
@@ -91,6 +96,9 @@ private:
     std::vector<GLuint>                     m_meshIndices;
 
     bool                                    m_isFiltered;   // 1 yes, 0 no
+
+    bool                                    m_isAstroSynapse;
+    float                                   m_closest_astro_vertex;
 
 };
 

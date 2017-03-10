@@ -13,16 +13,19 @@
  */
 DataContainer::DataContainer()
 {
+    m_tempCounter = 0;
     m_indices_size = 0;
     m_skeleton_points_size = 0;
-    m_limit = 100;
+    m_limit = 10000;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
-    importXML("://scripts/m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
-    importXML("://m3_neurites.xml");    // neurites time:  28802 ms
 
+    loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
+
+    importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    importXML("://m3_neurites.xml");    // neurites time:  28802 ms
     // has glycogen data
-    loadMetaDataHVGX(":/data/mouse3_metadata_objname_center.hvgx");
+    loadMetaDataHVGX(":/data/m3mouse3_metadata.hvgx");
 
 	qDebug() << "setting up octrees";
 	m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
@@ -43,6 +46,42 @@ DataContainer::~DataContainer()
 
 //----------------------------------------------------------------------------
 //
+void DataContainer::loadConnectivityGraph(QString path)
+{
+    qDebug() << "Func: loadConnectivityGraph";
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        qDebug() << "Could not open the file for reading";
+        return;
+    }
+
+    QTextStream in(&file);
+    QList<QByteArray> wordList;
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        wordList = line.split(',');
+
+        if (wordList[0] == "Id") {
+            continue;
+        } else {
+            if (wordList.size() < 3) {
+                qDebug() << "wordList.size() < 3";
+                return;
+            }
+            int ID = wordList[0].toInt();
+            int nodeID1 = wordList[1].toInt();
+            int nodeID2 = wordList[2].toInt();
+
+            QVector2D edge_info = QVector2D(nodeID1, nodeID2);
+            neurites_neurite_edge.push_back(edge_info);
+        }
+
+
+    }
+
+    file.close();
+}
+
 // load this after loading obj file
 // get center from here, and volume, and connectivity?
 void DataContainer::loadMetaDataHVGX(QString path)
@@ -82,10 +121,14 @@ void DataContainer::loadMetaDataHVGX(QString path)
 
 
         } else if (wordList[0] == "sg") {
+            // update the nodes center here?
             continue;
         } else if (wordList[0] == "sy") {
+            // add this info to the related objects
             continue;
         } else if (wordList[0] == "mt") {
+            // update mitochoneria parent here if any exists
+            qDebug() << line;
             continue;
         } else if (wordList[0] == "bo") {
             continue;
@@ -138,48 +181,13 @@ bool DataContainer::importXML(QString path)
                 // the astrocyte wast most of the time
                 // so if we can optimize reading one object would be better
                 parseObject(xml, obj); // fills the object with obj info
-            } else if (xml.name() == "conn") {
-                parseConnGraph(xml);
-           }
+            }
         }
     }
 
     auto t2 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> ms = t2 - t1;
-    qDebug() << "time: " << ms.count() << "ms";
-}
-
-//----------------------------------------------------------------------------
-//
-void DataContainer::parseConnGraph(QXmlStreamReader &xml)
-{
-    if (xml.tokenType() != QXmlStreamReader::StartElement && xml.name() != "conn") {
-        qDebug() << "Called XML parseObejct without attribs";
-        return;
-    }
-
-    qDebug()  << "Parsing: " << xml.name();
-    xml.readNext();
-    while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "conn")) {
-        // go to the next child of object node
-        if (xml.tokenType() == QXmlStreamReader::StartElement) {
-            if (xml.name() == "l") {
-                xml.readNext();
-                QString coords = xml.text().toString();
-                QStringList stringlist = coords.split(" ");
-                if (stringlist.size() < 2) {
-                    continue;
-                }
-
-                int nodeID1 = stringlist.at(0).toInt();
-                int nodeID2 = stringlist.at(1).toInt();
-
-                QVector2D edge_info = QVector2D(nodeID1, nodeID2);
-                neurites_neurite_edge.push_back(edge_info);
-            }
-        } // if start element
-        xml.readNext();
-    } // while
+    qDebug() << "time: " << ms.count() << "ms, m_tempCounter: " << m_tempCounter;
 }
 
 //----------------------------------------------------------------------------
@@ -321,16 +329,32 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 // get the point branch knots as well
                 if (stringlist.size() < 5) {
                     // place holder
+                    qDebug() << "Problem!";
                     v.skeleton_vertex = mesh_vertex;
+                } else if ( obj->getObjectType() == Object_t::MITO || obj->getObjectType() == Object_t::SYNAPSE ) {
+                    QVector4D center = obj->getCenter();
+                    center.setW(0);
+                    v.skeleton_vertex = center;
                 } else {
                     // I could use index to be able to connect vertices logically
-                    float x2 = stringlist.at(3).toDouble()/5.0;
-                    float y2 = stringlist.at(4).toDouble()/5.0;
-                    float z2 = stringlist.at(5).toDouble()/5.0;
+                    float x2 = stringlist.at(3).toFloat()/5.0;
+                    float y2 = stringlist.at(4).toFloat()/5.0;
+                    float z2 = stringlist.at(5).toFloat()/5.0;
                     QVector4D skeleton_vertex(x2, y2, z2, 0);
                     v.skeleton_vertex = skeleton_vertex;
                 }
-				m_mesh->addVertex(v, obj->getObjectType());
+
+                float VertexToAstroDist = 100;
+                if (stringlist.size() > 6) {
+                    VertexToAstroDist = stringlist.at(6).toFloat();
+                  //  qDebug() << "### VertexToAstroDist: " << VertexToAstroDist;
+                }
+
+                v.skeleton_vertex.setW(VertexToAstroDist); // distance from neurite to astrocyte
+                // find the minimum distance and store it in the object so we can easily decide if
+                // it touches the astrocyte or not
+                m_mesh->addVertex(v, obj->getObjectType());
+                obj->updateClosestAstroVertex(VertexToAstroDist);
             } else if (xml.name() == "f") {
                 ++faces;
                 xml.readNext();
@@ -363,11 +387,6 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
 
                 // parse normals
 
-            } else if (xml.name() == "markers") {
-                qDebug() << xml.name();
-                xml.readNext();
-                QStringList markersList = xml.text().toString().split(" ");
-                m_mesh->MarkBleedingVertices(markersList, m_vertex_offset);
             }
         } // if start element
         xml.readNext();
@@ -390,6 +409,8 @@ void DataContainer::parseSkeleton(QXmlStreamReader &xml, Object *obj)
     qDebug() << xml.name();
 
     xml.readNext();
+    if ( obj->getObjectType() == Object_t::MITO || obj->getObjectType() == Object_t::SYNAPSE )
+        return;
 
     // this object structure is not done
     while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "skeleton")) {

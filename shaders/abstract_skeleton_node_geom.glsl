@@ -46,26 +46,26 @@ layout (std430, binding=3) buffer space2d_data
 
 void main() {
     int ID = V_ID[0];
-    int isFiltered = int(SSBO_data[ID].info.w);
-    if (isFiltered == 1)
+
+    alpha = V_alpha[0];
+    if (alpha < 0.05){
         return;
-
-    int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
-
-    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
-
+    }
 
     if ( V_render[0] == 0  ) {
         return;
     }
 
-    color_val = SSBO_data[ID].color;
-    gl_Position = gl_in[0].gl_Position;
-    gl_PointSize = gl_in[0].gl_PointSize;
-    alpha = V_alpha[0];
-    if (alpha < 0.05){
+    int isFiltered = int(SSBO_data[ID].info.w);
+    if (isFiltered == 1)
         return;
-    }
+
+    gl_PointSize = gl_in[0].gl_PointSize;
+
+    color_val = SSBO_data[ID].color;
+
+    gl_Position = gl_in[0].gl_Position;
+
 
     EmitVertex();
     EndPrimitive();

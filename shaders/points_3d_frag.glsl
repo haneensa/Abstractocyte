@@ -22,5 +22,10 @@ void main() {
         float spec = max( pow( dot(normal, halfVector), Ns ), 0. );
         vec4 S = light_specular * mat_specular * spec;
         outcol = vec4(color_val.rgb, alpha) * diffuse + S;
-         outcol.a = alpha;
+        outcol.a = alpha;
+
+//        // this
+//        if (color_val.w <= 0.1) {
+//            outcol.r = 1;
+//        }
 }

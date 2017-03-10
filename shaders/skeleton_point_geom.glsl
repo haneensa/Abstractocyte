@@ -9,6 +9,11 @@ out float   color_intp;
 out vec4    color_val;
 out float   alpha;
 
+
+uniform int     y_axis;
+uniform int     x_axis;
+
+
 layout (points) in;
 layout (points, max_vertices = 1) out;
 
@@ -57,26 +62,12 @@ void main() {
 
     int type = int(SSBO_data[ID].center.w);
     color_val = SSBO_data[ID].color;
-    if (type == 1) {
-        // check if spine or bouton
-        // if this is a child and parent is not filtered
-        int neurite_type = int(SSBO_data[ID].info.y);
-        if (neurite_type == 2 || neurite_type == 3) // spine, bouton
-        {
-            int ParentID = int(SSBO_data[ID].info.z);
-            int isParentFiltered = int(SSBO_data[ParentID].info.w);
-            if (isParentFiltered == 0) // color this special color that would show this is a mix of parent and child
-                color_val = color_val + vec4(0.3, 0.3, 0.3, 0);
-        }
-
-    }
-
+    gl_PointSize =  gl_in[0].gl_PointSize;
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 
     vec4 render_type = space_properties.render_type; // additional info
-
-    if (render_type.z == 0) {
+    if (render_type.y == 0) {
         return;
     }
 
@@ -87,7 +78,6 @@ void main() {
     }
 
     color_intp = V_color_intp[0];
-    gl_PointSize =  gl_in[0].gl_PointSize;
     gl_Position = gl_in[0].gl_Position;
 
     EmitVertex();

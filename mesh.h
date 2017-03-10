@@ -8,7 +8,7 @@ enum class Object_t;
 // mesh vertex
 struct VertexData {
     QVector4D   mesh_vertex;        // w: Object ID
-    QVector4D   skeleton_vertex;    // w: markers
+    QVector4D   skeleton_vertex;    // w: markers distance to astrocyte (since this is per vertex, compute the distance from each vertex to astrocyte)
 
 	int			index;
 	bool		isGlycogen;			//because glycogen ids and object ids are seperate
@@ -37,7 +37,6 @@ public:
     Mesh();
 	void addVertex(struct VertexData vdata, Object_t type);
     bool isValidFaces(int f1, int f2, int f3);
-    void MarkBleedingVertices(QStringList markersList, int vertex_offset); // for xml
     int  getVerticesSize()       { return verticesList.size(); }
     void allocateVerticesVBO(QOpenGLBuffer vbo_mesh);
 	std::vector< struct VertexData >* getVerticesList()  { return &verticesList; }

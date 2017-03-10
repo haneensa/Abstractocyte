@@ -1,12 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>shaders/grid_frag.glsl</file>
-        <file>shaders/grid_geom.glsl</file>
-        <file>shaders/grid_vert.glsl</file>
         <file>shaders/lines_geom.glsl</file>
         <file>shaders/mesh_frag.glsl</file>
         <file>shaders/mesh_geom.glsl</file>
-        <file>shaders/mesh_points_geom.glsl</file>
         <file>shaders/mesh_vert.glsl</file>
         <file>shaders/selection_frag.glsl</file>
         <file>shaders/selection_geom.glsl</file>
@@ -34,5 +30,7 @@
         <file>shaders/glycogen_frag.glsl</file>
         <file>shaders/glycogen_geom.glsl</file>
         <file>shaders/glycogen_vert.glsl</file>
+        <file>data/connectivityList.csv</file>
+        <file>data/m3mouse3_metadata.hvgx</file>
     </qresource>
 </RCC>

@@ -65,22 +65,13 @@ layout (std430, binding=3) buffer space2d_data
 void main() {
     int ID = V_ID[0] ;
 
-    if (int(SSBO_data[V_ID[0]].info.w) == 1 || int(SSBO_data[V_ID[1]].info.w) == 1 )
+    if ( int(SSBO_data[V_ID[0]].info.w) == 1 || int(SSBO_data[V_ID[1]].info.w) == 1 )
         return;
-
-    color_val = SSBO_data[ID].color;
-
 
     alpha = V_alpha[0];
     if (alpha < 0.01){
         return;
     }
-
-    int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
-
-    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
-
-    vec4 render_type = space_properties.render_type; // additional info
 
     if ( V_render[0] == 0  ) {
         return;
@@ -88,6 +79,7 @@ void main() {
 
     gl_PointSize =  4;
 
+    color_val = SSBO_data[ID].color;
 
     vec4 start = gl_in[0].gl_Position;
     vec4 end = gl_in[1].gl_Position;

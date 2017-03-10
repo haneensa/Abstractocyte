@@ -10,6 +10,7 @@
 #ifndef OPENGLMANAGER_H
 #define OPENGLMANAGER_H
 
+#include "abstractionspace.h"
 #include "mainopengl.h"
 #include "datacontainer.h"
 #include "glsluniform_structs.h"
@@ -17,7 +18,7 @@
 class OpenGLManager : public MainOpenGL
 {
 public:
-    OpenGLManager(DataContainer * obj_mnger);
+    OpenGLManager(DataContainer * obj_mnger, AbstractionSpace  *absSpace);
     ~OpenGLManager();
     void fillVBOsData();
     bool initOpenGLFunctions();
@@ -36,10 +37,6 @@ public:
     bool initMeshVertexAttrib();
 
     void drawMeshTriangles(struct GlobalUniforms grid_uniforms);
-
-    // *********** 2) Mesh Points     ***********
-    bool initMeshPointsShaders();
-    void drawMeshPoints(struct GlobalUniforms grid_uniforms);
 
     // *********** 3) Skeleton Points    ***********
     bool initSkeletonShaders();
@@ -71,6 +68,7 @@ public:
     void update_skeleton_layout2(QVector2D layout2,  long node_index, int hvgxID);
     void update_skeleton_layout3(QVector2D layout3,  long node_index, int hvgxID);
 
+    void multiplyWithRotation(QMatrix4x4 rotationMatrix);
 
     std::map<int, Object*>  getObjectsMap() { return m_dataContainer->getObjectsMap(); }
     Object_t getObjectTypeByID(int hvgxID);
@@ -80,6 +78,7 @@ public:
 
 protected:
     DataContainer                       *m_dataContainer; // get the data to render from here
+    AbstractionSpace                    *m_2dspace;
 
     bool                                m_glFunctionsSet;
     bool                                m_2D;
@@ -97,10 +96,6 @@ protected:
     QOpenGLBuffer                       m_vbo_mesh;
     QOpenGLBuffer                       m_vbo_IndexMesh;
     GLuint                              m_program_mesh;
-
-    // *********** 2) Mesh Points     ***********
-    QOpenGLVertexArrayObject            m_vao_mesh_points;
-    GLuint                              m_program_mesh_points;
 
     // *********** 3) Skeleton Points    ***********
     QOpenGLVertexArrayObject            m_vao_skeleton;

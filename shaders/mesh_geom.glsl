@@ -74,6 +74,10 @@ void main() {
         return;
     }
 
+    if (SSBO_data[ID].color.w <= 0.00001) {
+        color_val.rgb = vec3(1, 0, 0);
+    }
+
     alpha =  V_alpha[i];
 
 
