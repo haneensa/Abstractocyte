@@ -13,7 +13,7 @@
 #include "mesh.h"
 #include "ssbo_structs.h"
 
-enum class Object_t { AXON, DENDRITE, BOUTON, SPINE, MITO, SYNAPSE, ASTROCYTE, GLYCOGEN, UNKNOWN };
+enum class Object_t { AXON = 2, DENDRITE = 4, BOUTON = 3 , SPINE = 5, MITO = 1, SYNAPSE = 7, ASTROCYTE = 6, GLYCOGEN = 8, UNKNOWN = 0 };
 
 class Skeleton;
 class Object

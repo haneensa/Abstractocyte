@@ -5,9 +5,11 @@ Mesh::Mesh()
 
 }
 
-void Mesh::addVertex(struct VertexData vdata)
+void Mesh::addVertex(struct VertexData vdata, Object_t type)
 {
     verticesList.push_back(vdata);
+	vdata.index = verticesList.size() - 1;
+	m_typeVertexList[static_cast<int>(type)].push_back(&vdata);
 }
 
 bool Mesh::isValidFaces(int f1, int f2, int f3)
