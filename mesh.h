@@ -15,7 +15,6 @@ public:
     Mesh();
     void addVertex(struct VertexData vdata);
     bool isValidFaces(int f1, int f2, int f3);
-    bool MarkBleedingVertices(QStringList markersList, int vertex_offset); // for xml
     int getVerticesSize()       { return verticesList.size(); }
     void allocateVerticesVBO(QOpenGLBuffer vbo_mesh);
 

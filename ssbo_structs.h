@@ -36,7 +36,7 @@ struct ssbo_2DState {
 // data structure for ssbo of objects
 // one element per obejct
 struct ssbo_mesh {
-    QVector4D color; // w: is astro synapse
+    QVector4D color;    // w: is astro synapse
     QVector4D center;  // center.w = neurite/astrocyte
     QVector4D info;    // x: volume, y: type (axon, bouton, spine, dendrite, ..), z: parent ID, w: filtered
     QVector2D layout1; // layouted position (only neurties)

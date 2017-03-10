@@ -69,6 +69,8 @@ public:
 
     void updateAstSynapseFlag(bool flag)        { m_isAstroSynapse = flag; }
 
+    void updateClosestAstroVertex(float dist);
+
 private:
     std::string                             m_name;
     int                                     m_ID; // hvgx
@@ -96,6 +98,7 @@ private:
     bool                                    m_isFiltered;   // 1 yes, 0 no
 
     bool                                    m_isAstroSynapse;
+    float                                   m_closest_astro_vertex;
 
 };
 

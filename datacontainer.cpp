@@ -16,16 +16,17 @@ DataContainer::DataContainer()
     m_tempCounter = 0;
     m_indices_size = 0;
     m_skeleton_points_size = 0;
-    m_limit = 30;
+    m_limit = 10000;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
 
- //   importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     importXML("://m3_neurites.xml");    // neurites time:  28802 ms
     // has glycogen data
-    loadMetaDataHVGX(":/data/mouse3_metadata_objname_center.hvgx");
+    loadMetaDataHVGX(":/data/m3mouse3_metadata.hvgx");
+
 }
 
 DataContainer::~DataContainer()
@@ -107,8 +108,11 @@ void DataContainer::loadMetaDataHVGX(QString path)
             // update the nodes center here?
             continue;
         } else if (wordList[0] == "sy") {
+            // add this info to the related objects
             continue;
         } else if (wordList[0] == "mt") {
+            // update mitochoneria parent here if any exists
+            qDebug() << line;
             continue;
         } else if (wordList[0] == "bo") {
             continue;
@@ -303,6 +307,7 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 // get the point branch knots as well
                 if (stringlist.size() < 5) {
                     // place holder
+                    qDebug() << "Problem!";
                     v.skeleton_vertex = mesh_vertex;
                 } else if ( obj->getObjectType() == Object_t::MITO || obj->getObjectType() == Object_t::SYNAPSE ) {
                     QVector4D center = obj->getCenter();
@@ -310,13 +315,24 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                     v.skeleton_vertex = center;
                 } else {
                     // I could use index to be able to connect vertices logically
-                    float x2 = stringlist.at(3).toDouble()/5.0;
-                    float y2 = stringlist.at(4).toDouble()/5.0;
-                    float z2 = stringlist.at(5).toDouble()/5.0;
+                    float x2 = stringlist.at(3).toFloat()/5.0;
+                    float y2 = stringlist.at(4).toFloat()/5.0;
+                    float z2 = stringlist.at(5).toFloat()/5.0;
                     QVector4D skeleton_vertex(x2, y2, z2, 0);
                     v.skeleton_vertex = skeleton_vertex;
                 }
+
+                float VertexToAstroDist = 100;
+                if (stringlist.size() > 6) {
+                    VertexToAstroDist = stringlist.at(6).toFloat();
+                  //  qDebug() << "### VertexToAstroDist: " << VertexToAstroDist;
+                }
+
+                v.skeleton_vertex.setW(VertexToAstroDist); // distance from neurite to astrocyte
+                // find the minimum distance and store it in the object so we can easily decide if
+                // it touches the astrocyte or not
                 m_mesh->addVertex(v);
+                obj->updateClosestAstroVertex(VertexToAstroDist);
             } else if (xml.name() == "f") {
                 ++faces;
                 xml.readNext();
@@ -349,19 +365,6 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
 
                 // parse normals
 
-            } else if (xml.name() == "markers") {
-                qDebug() << xml.name();
-                xml.readNext();
-                QStringList markersList = xml.text().toString().split(" ");
-                bool isAstSynapse = m_mesh->MarkBleedingVertices(markersList, m_vertex_offset);
-                if (isAstSynapse == false) {
-                    // this object is not touching anyone
-                    obj->updateAstSynapseFlag(false);
-                    m_tempCounter++;
-                    qDebug() << "****** not touching astrocyte " << m_tempCounter;
-                } else {
-                    obj->updateAstSynapseFlag(true);
-                }
             }
         } // if start element
         xml.readNext();

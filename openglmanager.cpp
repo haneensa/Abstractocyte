@@ -659,9 +659,12 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     drawGlycogenPoints(grid_uniforms);
 
 
-    if ( space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x() == 0) {
-        drawSkeletonPoints(grid_uniforms);
-    } else {
+//    if ( space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x() == 0) {
+//        drawSkeletonsGraph(grid_uniforms);
+//        drawNeuritesGraph(grid_uniforms);
+//        drawMeshTriangles(grid_uniforms);
+//        drawSkeletonPoints(grid_uniforms);
+//    } else {
         glDisable (GL_BLEND);
           glBlendFunc (GL_ONE, GL_ONE);
         drawSkeletonPoints(grid_uniforms);
@@ -669,14 +672,12 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
         glEnable (GL_BLEND);
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    }
+        drawSkeletonsGraph(grid_uniforms);
+        drawNeuritesGraph(grid_uniforms);
+        drawMeshTriangles(grid_uniforms);
+//    }
 
-    // 3) Abstract Skeleton Graph (Nodes and Edges)
-    drawSkeletonsGraph(grid_uniforms);
-    // 4) Neurites Graph (Nodes and Edges)
-    drawNeuritesGraph(grid_uniforms);
-    drawMeshTriangles(grid_uniforms);
-    // 3) Skeleton Points
+
 
 }
 

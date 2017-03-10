@@ -65,18 +65,19 @@ void main(void)
     mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
     vec4 mesh_vertex =  pvmMatrix * vec4(mesh_vx.xyz , 1.0);
     vec4 Vskeleton_vx = pvmMatrix * vec4(skeleton_vx.xyz, 1.0);
-    int bleeding =  int(skeleton_vx.w);
     int ID = int(mesh_vx.w);
 
     V_ID = ID;
 
     int type = int(SSBO_data[ID].center.w);
+    V_color_val = SSBO_data[ID].color;
+
 
     // if skeleton_vx.w is below a threshold then color it
-    if (bleeding == 1)
-        V_color_val = vec4(1.0, 0.0, 0.0, 1.0);
-    else
-        V_color_val = SSBO_data[ID].color;
+    if (skeleton_vx.w <= 0.0001 && type == 1 )
+        V_color_val.rgb = vec3(1.0, 0.0, 0.0);
+
+
 
     properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
 

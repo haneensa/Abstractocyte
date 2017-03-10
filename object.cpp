@@ -23,6 +23,7 @@ Object::Object(std::string name, int ID)
     m_volume = 0;
     m_center = QVector4D(0, 0, 0, 0);
 
+    m_closest_astro_vertex =  1000000.0;
     m_skeleton = new Skeleton(m_ID);
 
     m_parent = NULL;
@@ -32,6 +33,12 @@ Object::Object(std::string name, int ID)
 
 Object::~Object()
 {
+}
+
+void Object::updateClosestAstroVertex(float dist)
+{
+    if (dist < m_closest_astro_vertex)
+        m_closest_astro_vertex = dist;
 }
 
 Object_t Object::getObjectType()
@@ -120,6 +127,8 @@ struct ssbo_mesh Object::getSSBOData()
 {
     struct ssbo_mesh ssbo_data;
     ssbo_data.color = m_color;
+    ssbo_data.color.setW(m_closest_astro_vertex);
+
     ssbo_data.center = m_center;
     ssbo_data.info.setX(m_volume);
     int type = (int) m_object_t;
