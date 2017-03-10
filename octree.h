@@ -126,11 +126,11 @@ namespace SpacePartitioning
 		/** nearest neighbor queries. Using minDistance >= 0, we explicitly disallow self-matches.
 		* @return index of nearest neighbor n with Distance::compute(query, n) > minDistance and otherwise -1.
 		**/
-		int32_t findNeighbor(float x, float y, float z, float minDistance = -1) const;
+		int32_t findNeighbor(float x, float y, float z, float minDistance = -1, int self_index = -1) const;
 
 		/** radius neighbor queries where radius determines the maximal radius of reported indices of points in
 		* resultIndices **/
-		void radiusNeighbors( float x, float y, float z, float radius, std::vector<uint32_t>& resultIndices) const;
+		void radiusNeighbors( float x, float y, float z, float radius, std::vector<uint32_t>& resultIndices, int self_index = -1) const;
 		
 	protected:
 		class Octant
@@ -180,9 +180,9 @@ namespace SpacePartitioning
 		Octant* createOctant(float x, float y, float z, float extent, std::vector<uint32_t>* indices, int depth);
 
 		/** @return true, if search finished, otherwise false. **/
-		bool findNeighbor(const Octant* octant,  float x, float y, float z, float minDistance, float maxDistance, int32_t& resultIndex) const;
+		bool findNeighbor(const Octant* octant, float x, float y, float z, float minDistance, float maxDistance, int32_t& resultIndex, int self_index) const;
 
-		void radiusNeighbors( const Octant* octant,  float x, float y, float z, float radius, float sqrRadius, std::vector<uint32_t>& resultIndices) const;
+		void radiusNeighbors( const Octant* octant,  float x, float y, float z, float radius, float sqrRadius, std::vector<uint32_t>& resultIndices, int self_index) const;
 
 		//void radiusNeighbors( Octant* octant,  float x, float y, float z, float radius, float sqrRadius, std::vector<uint32_t>& resultIndices, std::vector<float>& distances) const;
 

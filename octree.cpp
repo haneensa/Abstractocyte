@@ -171,11 +171,11 @@ namespace SpacePartitioning
 
 	//--------------------------------------------------------------------------------
 	//
-	int32_t Octree::findNeighbor(float x, float y, float z, float minDistance) const
+	int32_t Octree::findNeighbor(float x, float y, float z, float minDistance, int self_index) const
 	{
 		float maxDistance = std::numeric_limits<float>::infinity();
 		int32_t resultIndex = -1;
-		findNeighbor(m_root, x, y, z, minDistance, maxDistance, resultIndex);
+		findNeighbor(m_root, x, y, z, minDistance, maxDistance, resultIndex, self_index);
 		
 		int globalIndex = (*m_data)[resultIndex]->index;
 
@@ -184,7 +184,7 @@ namespace SpacePartitioning
 
 	//--------------------------------------------------------------------------------
 	//
-	bool Octree::findNeighbor(const Octant* octant, float x, float y, float z, float minDistance, float maxDistance, int32_t& resultIndex) const
+	bool Octree::findNeighbor(const Octant* octant, float x, float y, float z, float minDistance, float maxDistance, int32_t& resultIndex, int self_index) const
 	{
 		// 1. first descend to leaf and check in leafs points.
 		if (octant->m_isLeaf)
@@ -198,6 +198,8 @@ namespace SpacePartitioning
 			{
 				uint32_t index = (*octant_indices)[i];
 				VertexData* d = (*m_data)[index];
+				if (d->index == self_index)
+					continue;
 
 				float dist = L2Distance::compute(d->x(), d->y(), d->z(), x, y, z);
 				if (dist > sqrMinDistance && dist < sqrMaxDistance)
@@ -211,7 +213,7 @@ namespace SpacePartitioning
 			return inside(x, y, z, maxDistance, octant);
 		}
 
-		// determine Morton code for each point...
+		// determine child index for each point...
 		uint32_t childIndex = 0;
 		if (x > octant->m_center_x) childIndex += 1;
 		if (y > octant->m_center_y) childIndex += 2;
@@ -219,7 +221,7 @@ namespace SpacePartitioning
 
 		if (octant->m_child[childIndex] != 0)
 		{
-			if (findNeighbor(octant->m_child[childIndex], x, y , z, minDistance, maxDistance, resultIndex)) return true;
+			if (findNeighbor(octant->m_child[childIndex], x, y , z, minDistance, maxDistance, resultIndex, self_index)) return true;
 		}
 
 		// 2. if current best point completely inside, just return.
@@ -231,7 +233,7 @@ namespace SpacePartitioning
 			if (c == childIndex) continue;
 			if (octant->m_child[c] == 0) continue;
 			if (!overlaps(x, y, z, maxDistance, sqrMaxDistance, octant->m_child[c])) continue;
-			if (findNeighbor(octant->m_child[c], x,y,z, minDistance, maxDistance, resultIndex))
+			if (findNeighbor(octant->m_child[c], x,y,z, minDistance, maxDistance, resultIndex, self_index))
 				return true;  // early pruning
 		}
 
@@ -316,20 +318,20 @@ namespace SpacePartitioning
 
 	//--------------------------------------------------------------------------------
 	//
-	void Octree::radiusNeighbors(float x, float y, float z, float radius, std::vector<uint32_t>& resultIndices) const
+	void Octree::radiusNeighbors(float x, float y, float z, float radius, std::vector<uint32_t>& resultIndices, int self_index) const
 	{
 		resultIndices.clear();
 		if (m_root == 0) return;
 
 		float sqrRadius = L2Distance::sqr(radius);  // "squared" radius
-		radiusNeighbors(m_root, x, y, z, radius, sqrRadius, resultIndices);
+		radiusNeighbors(m_root, x, y, z, radius, sqrRadius, resultIndices, self_index);
 
 		//TODO: convert local indices to global ones
 	}
 
 	//--------------------------------------------------------------------------------
 	//
-	void Octree::radiusNeighbors(const Octant* octant, float x, float y, float z, float radius, float sqrRadius, std::vector<uint32_t>& resultIndices) const
+	void Octree::radiusNeighbors(const Octant* octant, float x, float y, float z, float radius, float sqrRadius, std::vector<uint32_t>& resultIndices, int self_index) const
 	{
 		const std::vector<uint32_t>* indices = octant->getIndices();
 		// if search ball S(q,r) contains octant, simply add point indexes.
@@ -338,7 +340,11 @@ namespace SpacePartitioning
 			
 			for (uint32_t i = 0; i < indices->size(); ++i)
 			{
+				
 				uint32_t idx = (*indices)[i];
+				const VertexData* p = (*m_data)[idx];
+				if (p->index == self_index)
+					continue;
 				resultIndices.push_back(idx);
 			}
 
@@ -351,6 +357,9 @@ namespace SpacePartitioning
 			{
 				uint32_t idx = (*indices)[i];
 				const VertexData* p = (*m_data)[idx];
+				if (p->index == self_index)
+					continue;
+
 				float dist = L2Distance::compute(x, y, z, p->x(), p->y(), p->z());
 				if (dist < sqrRadius) resultIndices.push_back(idx);
 			}
@@ -363,7 +372,7 @@ namespace SpacePartitioning
 		{
 			if (octant->m_child[c] == 0) continue;
 			if (!overlaps(x,y,z, radius, sqrRadius, octant->m_child[c])) continue;
-			radiusNeighbors(octant->m_child[c], x,y,z, radius, sqrRadius, resultIndices);
+			radiusNeighbors(octant->m_child[c], x,y,z, radius, sqrRadius, resultIndices, self_index);
 		}
 	}
 

@@ -8,12 +8,13 @@ struct VertexData;
 class Glycogen
 {
 public:
-    Glycogen(int ID, std::string name, QVector3D center, float diameter);
+    Glycogen(int ID, std::string name, QVector3D center, float radius);
     int			getID()         { return m_ID; }
     QVector3D	getCenter() { return m_center; }
 	VertexData*  getVertexData() { return &m_center2; }
-	float		getDiameter() { return m_diameter; }
+	float		getRadius() { return m_radius; }
 	int			getClusterID() { return m_clusterID; }
+	float		getVolume();
 	float		x() const;
 	float		y() const;
 	float		z() const;
@@ -26,7 +27,7 @@ protected:
     std::string     m_name;
     QVector3D       m_center;
 	VertexData		m_center2; //hack to be used with octree
-    float           m_diameter;
+	float           m_radius;
 	int				m_clusterID;
 
 };
