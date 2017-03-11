@@ -12,7 +12,7 @@ Node::Node(int nID, long idxID, float x, float y, float z, Node_t node_type)
     m_layouted = QVector2D(x, y);
 
     // GEM
-    impulse = QVector2D(0, 0);
+    impulse = QVector2D(0, 0); // zero impulse vector
     skew_gauge = 0;
     m_localTemp = 0 /*Tinit*/;
 }

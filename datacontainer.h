@@ -1,3 +1,8 @@
+// cluster glycogen
+// color glycoen based on cluster
+// find closest object to center of cluster
+// color that object with glycogen cluster
+
 #ifndef OBJECTMANAGER_H
 #define OBJECTMANAGER_H
 

@@ -13,6 +13,9 @@
 #include "mesh.h"
 #include "ssbo_structs.h"
 
+#define ASTRO_DIST_THRESH   0.0001
+
+
 enum class Object_t { AXON = 2, DENDRITE = 4, BOUTON = 3 , SPINE = 5, MITO = 1, SYNAPSE = 7, ASTROCYTE = 6, GLYCOGEN = 8, UNKNOWN = 0 };
 
 class Skeleton;
@@ -69,7 +72,8 @@ public:
 
     void updateAstSynapseFlag(bool flag)        { m_isAstroSynapse = flag; }
 
-    void updateClosestAstroVertex(float dist);
+    void updateClosestAstroVertex(float dist,  int vertexIdx);
+
 
 private:
     std::string                             m_name;
@@ -98,7 +102,10 @@ private:
     bool                                    m_isFiltered;   // 1 yes, 0 no
 
     bool                                    m_isAstroSynapse;
-    float                                   m_closest_astro_vertex;
+
+    std::pair<int, float>                   m_closest_astro_vertex;
+
+    std::vector<int>                        m_VertexidxCloseToAstro;  // less than ASTRO_DIST_THRESH ----> we can refine this later
 
 };
 

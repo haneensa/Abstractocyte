@@ -24,8 +24,7 @@ void main() {
         outcol = vec4(color_val.rgb, alpha) * diffuse + S;
         outcol.a = alpha;
 
-//        // this
-//        if (color_val.w <= 0.1) {
-//            outcol.r = 1;
+//        if (color_val.w <= 0.000001) {
+//            outcol.rgb = vec3(1, 0, 0);
 //        }
 }

@@ -1,12 +1,13 @@
+// todo: separate astrocyte and neurites in two different buffers
+
 // manage all vbos and ssbos here
 // and drawing calls
 
 // 1) Mesh Triangles
-// 2) Mesh Points
-// 3) Skeleton Points
+// 2) Skeleton Points
 // 3) Abstract Skeleton Graph (Nodes and Edges)
 // 4) Neurites Graph (Nodes and Edges)
-
+// 5) Glycogen
 #ifndef OPENGLMANAGER_H
 #define OPENGLMANAGER_H
 
@@ -70,11 +71,20 @@ public:
 
     void multiplyWithRotation(QMatrix4x4 rotationMatrix);
 
+    // ********** Filtering ************************
+
     std::map<int, Object*>  getObjectsMap() { return m_dataContainer->getObjectsMap(); }
     Object_t getObjectTypeByID(int hvgxID);
     void FilterByType(Object_t type);
     void FilterByID( QList<QString> tokens_Ids );
     void FilterObject(int ID, bool isfilterd);
+
+
+    // ********** Selection ************************
+    void updateCanvasDim(int w, int h, int retianScale);
+    void initSelectionFrameBuffer();
+    void pick();
+
 
 protected:
     DataContainer                       *m_dataContainer; // get the data to render from here
@@ -94,8 +104,11 @@ protected:
 
     QOpenGLVertexArrayObject            m_vao_mesh;
     QOpenGLBuffer                       m_vbo_mesh;
-    QOpenGLBuffer                       m_vbo_IndexMesh;
+    QOpenGLBuffer                       m_Neurite_vbo_IndexMesh;
+    QOpenGLBuffer                       m_Astro_vbo_IndexMesh;
+
     GLuint                              m_program_mesh;
+
 
     // *********** 3) Skeleton Points    ***********
     QOpenGLVertexArrayObject            m_vao_skeleton;
@@ -132,6 +145,16 @@ protected:
 
     GLuint                              m_program_neurites_nodes;
     GLuint                              m_program_neurites_index;
+
+
+    // ********** Selection ************************
+    int                                 m_canvas_w;
+    int                                 m_canvas_h;
+
+    int                                 m_hits;
+    GLuint                              m_selectionFrameBuffer;
+    GLuint                              m_selectionRenderBuffer;
+
  };
 
 #endif // OPENGLMANAGER_H

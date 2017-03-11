@@ -32,7 +32,9 @@ SOURCES += main.cpp\
     mesh.cpp \
     openglmanager.cpp \
     datacontainer.cpp \
-    glycogen.cpp
+    glycogen.cpp \
+    octree.cpp \
+    glycogencluster.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -53,7 +55,10 @@ HEADERS  += mainwindow.h \
     glsluniform_structs.h \
     openglmanager.h \
     datacontainer.h \
-    glycogen.h
+    glycogen.h \
+    octree.h \
+    glycogencluster.h
+
 
 FORMS    += mainwindow.ui
 

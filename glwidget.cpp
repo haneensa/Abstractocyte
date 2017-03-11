@@ -158,6 +158,8 @@ void GLWidget::resizeGL(int w, int h)
     m_vMatrix.setToIdentity();
     m_vMatrix.lookAt(QVector3D(0.5, 0.5, 1.0) /*m_cameraPosition*/, m_cameraPosition /*center*/, cameraUpDirection);
 
+    if (m_opengl_mngr != NULL)
+        m_opengl_mngr->updateCanvasDim(w, h, retinaScale);
     update();
 }
 

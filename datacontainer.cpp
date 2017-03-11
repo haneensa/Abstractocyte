@@ -360,8 +360,9 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 v.skeleton_vertex.setW(VertexToAstroDist); // distance from neurite to astrocyte
                 // find the minimum distance and store it in the object so we can easily decide if
                 // it touches the astrocyte or not
-                m_mesh->addVertex(v, obj->getObjectType());
-                obj->updateClosestAstroVertex(VertexToAstroDist);
+
+                int vertexIdx = m_mesh->addVertex(v, obj->getObjectType());
+                obj->updateClosestAstroVertex(VertexToAstroDist, vertexIdx);
             } else if (xml.name() == "f") {
                 ++faces;
                 xml.readNext();
