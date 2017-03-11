@@ -16,19 +16,26 @@ DataContainer::DataContainer()
     m_tempCounter = 0;
     m_indices_size = 0;
     m_skeleton_points_size = 0;
-    m_limit =10000;
+    m_limit = 10;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
 
-  importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     importXML("://m3_neurites.xml");    // neurites time:  28802 ms
     // has glycogen data
     loadMetaDataHVGX(":/data/m3mouse3_metadata.hvgx");
 
+	qDebug() << "setting up octrees";
+	m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
+	m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
+	m_glycogenOctree.initialize(&m_glycogenList);
+	qDebug() << "octrees ready";
 }
 
+//----------------------------------------------------------------------------
+//
 DataContainer::~DataContainer()
 {
     qDebug() << "~Mesh()";
@@ -37,6 +44,8 @@ DataContainer::~DataContainer()
     }
 }
 
+//----------------------------------------------------------------------------
+//
 void DataContainer::loadConnectivityGraph(QString path)
 {
     qDebug() << "Func: loadConnectivityGraph";
@@ -86,10 +95,12 @@ void DataContainer::loadMetaDataHVGX(QString path)
 
     QTextStream in(&file);
     QList<QByteArray> wordList;
+	int glycogenCount = 0;
     while (!file.atEnd()) {
         QByteArray line = file.readLine();
         wordList = line.split(',');
 
+		
         if (wordList[0] == "gc") {
             if (wordList.size() < 7) {
                 qDebug() << "wordList.size() < 7";
@@ -103,7 +114,12 @@ void DataContainer::loadMetaDataHVGX(QString path)
             std::string name = wordList[6];
 
             Glycogen *gc = new Glycogen(ID, name, QVector3D(x, y, z), diameter);
+			gc->setIndex(glycogenCount);
+			glycogenCount++;
             m_glycogenMap[ID] = gc;
+			m_glycogenList.push_back(gc->getVertexData());
+
+
         } else if (wordList[0] == "sg") {
             // update the nodes center here?
             continue;
@@ -130,7 +146,9 @@ void DataContainer::loadMetaDataHVGX(QString path)
     file.close();
 }
 
-// need away to optimize this!!!!!
+//----------------------------------------------------------------------------
+//
+// need a way to optimize this!!!!!
 bool DataContainer::importXML(QString path)
 {
     qDebug() << "Func: importXML";
@@ -172,6 +190,8 @@ bool DataContainer::importXML(QString path)
     qDebug() << "time: " << ms.count() << "ms, m_tempCounter: " << m_tempCounter;
 }
 
+//----------------------------------------------------------------------------
+//
 // load the object with all its related informations
 void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
 {
@@ -267,7 +287,8 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
 
 }
 
-
+//----------------------------------------------------------------------------
+//
 void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
 {
     // read vertices and their faces into the mesh
@@ -301,6 +322,7 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
 
                 QVector4D mesh_vertex(x1, y1, z1,  obj->getHVGXID());
                 struct VertexData v;
+				v.isGlycogen = false;
                 v.mesh_vertex = mesh_vertex;
 
                 // todo: get the skeleton vertex from the skeleton itself using an index
@@ -331,7 +353,8 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 v.skeleton_vertex.setW(VertexToAstroDist); // distance from neurite to astrocyte
                 // find the minimum distance and store it in the object so we can easily decide if
                 // it touches the astrocyte or not
-                int vertexIdx = m_mesh->addVertex(v);
+
+                int vertexIdx = m_mesh->addVertex(v, obj->getObjectType());
                 obj->updateClosestAstroVertex(VertexToAstroDist, vertexIdx);
             } else if (xml.name() == "f") {
                 ++faces;
@@ -374,6 +397,7 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
     qDebug() << "vertices count: " << vertices << " faces: " << faces;
 }
 
+//----------------------------------------------------------------------------
 //
 void DataContainer::parseSkeleton(QXmlStreamReader &xml, Object *obj)
 {
@@ -408,6 +432,8 @@ void DataContainer::parseSkeleton(QXmlStreamReader &xml, Object *obj)
     } // while
 }
 
+//----------------------------------------------------------------------------
+//
 void DataContainer::parseSkeletonNodes(QXmlStreamReader &xml, Object *obj)
 {
     // read vertices and their faces into the mesh
@@ -448,6 +474,8 @@ void DataContainer::parseSkeletonNodes(QXmlStreamReader &xml, Object *obj)
     qDebug() << "nodes count: " << nodes;
 }
 
+//----------------------------------------------------------------------------
+//
 void DataContainer::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
 {
     // read vertices and their faces into the mesh
@@ -489,6 +517,8 @@ void DataContainer::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
     qDebug() << "nodes count: " << nodes;
 }
 
+//----------------------------------------------------------------------------
+//
 void DataContainer::parseBranch(QXmlStreamReader &xml, Object *obj)
 {
     // b -> one branch
@@ -548,31 +578,43 @@ void DataContainer::parseBranch(QXmlStreamReader &xml, Object *obj)
     } // while
 }
 
+//----------------------------------------------------------------------------
+//
 int DataContainer::getSkeletonPointsSize()
 {
     return m_skeleton_points_size;
 }
 
+//----------------------------------------------------------------------------
+//
 Mesh* DataContainer::getMeshPointer()
 {
     return m_mesh;
 }
 
+//----------------------------------------------------------------------------
+//
 int DataContainer::getMeshIndicesSize()
 {
     return m_indices_size;
 }
 
+//----------------------------------------------------------------------------
+//
 std::map<int, Object*>  DataContainer::getObjectsMap()
 {
     return m_objects;
 }
 
+//----------------------------------------------------------------------------
+//
 std::vector<QVector2D> DataContainer::getNeuritesEdges()
 {
     return neurites_neurite_edge;
 }
 
+//----------------------------------------------------------------------------
+//
 Object_t DataContainer::getObjectTypeByID(int hvgxID)
 {
     Object* obj = m_objects[hvgxID]; // check if the ID is valid
@@ -582,6 +624,8 @@ Object_t DataContainer::getObjectTypeByID(int hvgxID)
     return obj->getObjectType();
 }
 
+//----------------------------------------------------------------------------
+//
 std::vector<int> DataContainer::getObjectsIDsByType(Object_t type)
 {
   return m_objectsIDsByType[type];

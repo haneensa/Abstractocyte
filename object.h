@@ -15,7 +15,8 @@
 
 #define ASTRO_DIST_THRESH   0.0001
 
-enum class Object_t { AXON, DENDRITE, BOUTON, SPINE, MITO, SYNAPSE, ASTROCYTE, GLYCOGEN, UNKNOWN };
+
+enum class Object_t { AXON = 2, DENDRITE = 4, BOUTON = 3 , SPINE = 5, MITO = 1, SYNAPSE = 7, ASTROCYTE = 6, GLYCOGEN = 8, UNKNOWN = 0 };
 
 class Skeleton;
 class Object

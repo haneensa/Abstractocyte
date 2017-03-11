@@ -5,11 +5,13 @@ Mesh::Mesh()
 
 }
 
-int Mesh::addVertex(struct VertexData vdata)
+
+int Mesh::addVertex(struct VertexData vdata, Object_t type)
 {
     int idx = verticesList.size();
     verticesList.push_back(vdata);
-
+	vdata.index = verticesList.size() - 1;
+	m_typeVertexList[static_cast<int>(type)].push_back(&vdata);
     return idx;
 }
 

@@ -871,7 +871,7 @@ bool OpenGLManager::initGlycogenPointsShaders()
     for (auto iter = glycogenMap.begin(); iter != glycogenMap.end(); iter++ ) {
         Glycogen*gc = (*iter).second;
         QVector4D center_diam = gc->getCenter();
-        center_diam.setW(gc->getDiameter());
+        center_diam.setW(gc->getRadius());
         struct glycogen_datum gc_datum = {gc->getID(), center_diam};
         glycogen_data.push_back(gc_datum);
 

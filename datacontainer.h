@@ -14,6 +14,7 @@
 #include "object.h"
 #include "mesh.h"
 #include "glycogen.h"
+#include "octree.h"
 
 class DataContainer
 {
@@ -67,7 +68,13 @@ protected:
     // graph related data
     std::vector<QVector2D>                  neurites_neurite_edge;
 
-    std::map<int, Glycogen*>                 m_glycogenMap;
+    std::map<int, Glycogen*>                m_glycogenMap;
+	std::vector<VertexData*>				m_glycogenList;
+
+	//octrees
+	SpacePartitioning::Octree				m_spineOctree;
+	SpacePartitioning::Octree				m_boutonOctree;
+	SpacePartitioning::Octree				m_glycogenOctree;
 };
 
 #endif // OBJECTMANAGER_H
