@@ -16,7 +16,7 @@ DataContainer::DataContainer()
     m_tempCounter = 0;
     m_indices_size = 0;
     m_skeleton_points_size = 0;
-    m_limit = 10000;
+    m_limit = 10;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
@@ -28,10 +28,17 @@ DataContainer::DataContainer()
     loadMetaDataHVGX(":/data/m3mouse3_metadata.hvgx");
 
 	qDebug() << "setting up octrees";
-	m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
-	m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
+	//m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
+	//m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
 	m_glycogenOctree.initialize(&m_glycogenList);
 	qDebug() << "octrees ready";
+
+	//qDebug() << "testing clustering";
+	//testing clustering
+	//m_dbscan.initialize(&m_glycogenList, &m_glycogenMap, &m_glycogenOctree);
+	//m_dbscan.run();
+	//qDebug() << "done clustering";
+	
 }
 
 //----------------------------------------------------------------------------
