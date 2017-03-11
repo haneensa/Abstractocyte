@@ -1,7 +1,7 @@
 #include "graph.h"
 #include <cmath>
 
-Graph::Graph(Graph_t graphType, OpenGLManager *opengl_mnger)
+Graph::Graph(Graph_t graphType, OpenGLManager *opengl_mnger, int gridCol)
     : m_FDL_terminate(true),
       m_dupEdges(0)
 
@@ -9,6 +9,17 @@ Graph::Graph(Graph_t graphType, OpenGLManager *opengl_mnger)
 {
     m_gType = graphType;
     m_opengl_mngr = opengl_mnger;
+
+    FDL_initParameters();
+
+    // spatial hashing
+    float gridMin = 0.0f;
+    float gridMax = 1.0f;
+    hashGrid = new SpatialHash(gridCol, gridMin, gridMax);
+}
+
+void Graph::FDL_initParameters()
+{
     // force directed layout parameters
     m_Cr = 1.5;
     m_Ca = 0.5;
@@ -18,12 +29,6 @@ Graph::Graph(Graph_t graphType, OpenGLManager *opengl_mnger)
     m_MAX_VERTEX_MOVEMENT = 0.01f;
     m_SLOW_FACTOR = 0.01f;
     m_MAX_FORCE = 1.0f;
-
-    // spatial hashing
-    int gridCol = 5;
-    float gridMin = 0.0f;
-    float gridMax = 1.0f;
-    hashGrid = new SpatialHash(gridCol, gridMin, gridMax);
 }
 
 void Graph::GEM_initParameters()
@@ -31,16 +36,17 @@ void Graph::GEM_initParameters()
     m_nrm = 0.0015;  // normalization factor
     m_gravity = 1/16;  // gravitational constant
     m_edge_size = 128 * m_nrm;    // desired edge size
+    m_edge_sizesquared *= m_edge_sizesquared;
     m_Tmin = 3;         // min temperature
     m_Tmax = 256;
-    m_a_r = PI/6;          // PI/6
-    m_a_o = PI/2;          // PI/2
-    m_s_r = 1/(2*m_nodes.size());          // 1/2n
-    m_s_o = 1/3;          // 1/3
+    m_a_r = PI/6;          // PI/6  (opening angle for rotation detection)
+    m_a_o = PI/2;          // PI/2  (opening angle for oscilation detection)
+    m_s_r = 1/(2*m_nodes.size() + 1);  // sensitivity towards rotation
+    m_s_o = 1/3;          // 1/3    sensitivity towards oscilation
     m_Tinit = std::sqrt(m_nodes.size());        // initial temperature for a vertex
-    m_Tglobal = m_Tinit * m_nodes.size();      // temperature sum
+    m_Tglobal = m_Tinit * m_nodes.size();      // temperature sum, average of te local temp over all vertices
     m_rounds = 40 * m_nodes.size();       // max number of rounds
-
+    m_barycentric = QVector2D(0, 0);
 }
 
 // later refactor this
@@ -96,16 +102,9 @@ Graph::~Graph()
     delete hashGrid;
 }
 
-bool Graph::createGraph(DataContainer *objectManager)
-{
-
-    return true;
-}
-
 // to construct nodes list
 // I need: hvgxID, type, center,
 // init m_neurites_nodes ssbo here
-
 // edges simple just end points
 bool Graph::parseNODE_NODE(std::vector<Node*> neurites_nodes, std::vector<QVector2D> neurites_edges)
 {
@@ -267,6 +266,7 @@ void Graph::resetCoordinates()
     hashGrid->clear();
     m_FilteredHVGX.clear();
 
+    GEM_initParameters();
 
     // this take so much time that by the time we reach it still do this?
     // create many threads within one thread?
@@ -301,7 +301,9 @@ void Graph::resetCoordinates()
         hashGrid->insert((*iter).second);
     }
 
-    runforceDirectedLayout();
+     runforceDirectedLayout();
+   // GEM_run();
+
 
 quit:
 qDebug() << "Exist resetCoordinates" ;
@@ -591,53 +593,85 @@ QVector2D Graph::repulsiveForce(float x1, float y1, float x2, float y2, float k)
     return force;
 }
 
+
+
+// 1) local temperature
+// 2) attracting vertices towards barycenter
+// 3) detection of oscillations and rotations
 void Graph::GEM_run()
 {
+    m_FDL_terminate = false;
+
     qDebug() << "Run GEM Layouting Algorithm";
     int rounds = 0;
 
-    int n = m_nodes.size();
 
-    while(m_Tglobal/n < m_Tmin && rounds < m_rounds) {
+    // two stages: initialization and iteration
+    // initialization:  initial position (no need), impulse, temperature ----> this is constructed when new node is created
+
+    // iteration loop:
+
+    while(m_Tglobal > m_Tmin && rounds < m_rounds) {
+//        if (m_FDL_terminate) goto quit;
+        // updates vertex positions until the global temp is lower than a desired minimal temp or the time has expired
         for ( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++ ) {
-            if (m_Tglobal/n < m_Tmin)
+            if (m_Tglobal < m_Tmin) {
                 break;
+            }
 
-            // get a vertex v, random node?
+//            if (m_FDL_terminate) goto quit;
+
+            // get a vertex v to update
             Node *node = (*iter).second;
+            m_Tglobal = m_Tglobal - node->getLocalTemp();
 
-            m_Tglobal = m_Tglobal - node->getLocalTemp();
-            QVector2D impluse = GEM_computeImpulse( node );
-            GEM_update_node(node, impluse); // update position and temperature
-            m_Tglobal = m_Tglobal - node->getLocalTemp();
+            // compute v's impulse
+            QVector2D impulse = GEM_computeImpulse( node );
+             // update position and temperature
+            GEM_update_node(node, impulse);
+
+            m_Tglobal = m_Tglobal + node->getLocalTemp();
+
         }
 
         rounds++;
     }
+
+
+//quit:
+//qDebug() << "Exist Thread" ;
+
 }
 
 QVector2D Graph::GEM_computeImpulse(Node *node)
 {
     QVector2D impulse;
-    // attract to original projected location
-    QVector2D opos, pos;
-    impulse =  (opos -  pos) * m_gravity * GEM_function_growing(node);
+    std::map<int, Edge*> edges = node->getAdjEdges();
+    QVector2D vNode = node->getLayoutedPosition();
 
-    // random disturbance
+    // 1) attract to original projected location
+    QVector2D layoutedXY = node->getLayoutedPosition();
+    QVector2D projectdXY = node->getProjectedVertex();
+    impulse =  (projectdXY -  layoutedXY) * m_gravity * GEM_function_growing(node);
 
-     QVector2D disturbance; // = small random vector (length of < 0.07)
-     disturbance.setX(std::rand()/RAND_MAX);
-     disturbance.setX(std::rand()/RAND_MAX);
-     qDebug() <<   disturbance;
-     impulse = impulse + disturbance;
+    // 2) random disturbance
+//     QVector2D disturbance; //  small random vector (length of < 0.07)
+//     disturbance.setX((std::rand()));
+//     disturbance.setY((std::rand()));
+//     disturbance /= (RAND_MAX * 10000);
+//     impulse = impulse + disturbance;
+//     qDebug() << "*** " << disturbance.length();
 
-    // repulsive forces
+    // 3) repulsive forces
     // for all neighboring nodes u within a distance d
 
      // forces on nodes due to node-node repulsion
+
+
      std::vector<Node*> nearNodes;
      hashGrid->queryAABB(node, m_AABBdim, nearNodes);
      for ( auto iter2 = nearNodes.begin(); iter2 != nearNodes.end(); iter2++ ) {
+
          Node *node2 = (*iter2);
          int hvgxID2 = node2->getID() ;
          if ( !(m_FilteredHVGX.find(hvgxID2) == m_FilteredHVGX.end()) )
@@ -645,22 +679,32 @@ QVector2D Graph::GEM_computeImpulse(Node *node)
              continue;
          }
 
-         QVector2D delta; /*= v.pos - u.pos*/
+         QVector2D vNode2 = node2->getLayoutedPosition();
+
+         QVector2D delta = vNode - vNode2;
          if (delta != QVector2D(0, 0))
-            impulse = impulse + delta * /*E * E/*/(delta.lengthSquared());
+            impulse = impulse + delta * m_edge_sizesquared / (delta.lengthSquared());
      }
 
-    // attractive forces
+    // 4) attractive forces
 
      // forcs due to edge attraction
      // get all nodes connected to this node
-    std::map<int, Edge*> edges = node->getAdjEdges();
     for ( auto iter = edges.begin(); iter != edges.end(); iter++ ) {
+
         Edge *edge = (*iter).second;
+        Node *node2 = edge->getNode1();;
+        if (node2 == node)
+            node2 = edge->getNode2();
+        attractConnectedNodes(edge, m_Ca );
+
+        QVector2D vNode2 = node2->getLayoutedPosition();
         // for nodes u connected to v
-        QVector2D delta ;/*= v.pos - u.pos*/
-        impulse = impulse - delta * (delta.lengthSquared())/(/*E*E*/  GEM_function_growing(node));
+        QVector2D delta = vNode - vNode2;
+       // impulse = impulse - delta * delta.lengthSquared()/(m_edge_sizesquared *  GEM_function_growing(node));
+
     }
+
 
     return impulse;
 }
@@ -668,7 +712,7 @@ QVector2D Graph::GEM_computeImpulse(Node *node)
 double Graph::GEM_function_growing(Node *node)
 {
     double result;
-    result =  ((double)node->getDeg()  + (double) node->getDeg() /2.0) * m_nrm;
+    result =  ((double)node->getDeg()  + (double) node->getDeg() /2.0);
     return result;
 }
 
@@ -678,26 +722,28 @@ void Graph::GEM_update_node(Node *node, QVector2D impulse)
     if( impulse != QVector2D(0, 0) ){
         impulse = node->getLocalTemp() * impulse.normalized() * m_nrm; // scale p by temperature
         node->addToLayoutedPosition(impulse); // move v to new position
-         //  c = c + p // update sum of points
-
-        if (node->getImpulse() != QVector2D(0, 0) ) {
-           // cehck previous p
-           double B = GEM_get_angle(impulse, node->getImpulse());
-           if (std::sin(B)  >= std::sin(PI/2 + m_a_r) ) {
-               double sign = (std::sin(B) > 0) ? 1 : -1;
-               node->updateSkew( node->getSkew() + m_s_r  * sign); // rotation
-            }
-
-           if ( std::abs( std::cos(B) ) > std::cos(m_a_o) )
-             node->setLocalTemp( node->getLocalTemp() * m_s_o * std::cos(B));
-
-           double newLocalTemp = node->getLocalTemp() * ( 1 - std::abs(node->getSkew()) );
-           newLocalTemp = std::min(newLocalTemp, (double)m_Tmax);
-           node->setLocalTemp( newLocalTemp );  // cap to mximum
-
-           node->updateImpulse(impulse); // save impulse
-        }
+        m_barycentric = m_barycentric + impulse; // update sum of points
     }
+
+   if (impulse != QVector2D(0, 0) ) {
+        // cehck previous p
+        double B = GEM_get_angle(impulse, node->getImpulse());
+        if (std::sin(B)  >= std::sin(PI/2 + m_a_r/2) ) {
+            double sign = (std::sin(B) > 0) ? 1 : -1;
+            node->updateSkew( node->getSkew() + m_s_r  * sign); // rotation
+        }
+
+        if ( std::abs( std::cos(B) ) > std::cos(m_a_o/2) )
+            node->setLocalTemp( node->getLocalTemp() * m_s_o * std::cos(B));
+
+        double newLocalTemp = node->getLocalTemp() * ( 1 - std::abs(node->getSkew()) );
+        newLocalTemp = std::min(newLocalTemp, (double)m_Tmax);
+        node->setLocalTemp( newLocalTemp );  // cap to mximum
+
+        node->updateImpulse(impulse); // save impulse
+        update_node_data(node);
+  }
+
 }
 
 double Graph::GEM_get_angle(QVector2D u, QVector2D v)

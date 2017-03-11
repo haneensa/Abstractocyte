@@ -23,7 +23,8 @@ Object::Object(std::string name, int ID)
     m_volume = 0;
     m_center = QVector4D(0, 0, 0, 0);
 
-    m_closest_astro_vertex =  1000000.0;
+    m_closest_astro_vertex.second =  1000000.0;
+    m_closest_astro_vertex.first = -1;
     m_skeleton = new Skeleton(m_ID);
 
     m_parent = NULL;
@@ -35,10 +36,14 @@ Object::~Object()
 {
 }
 
-void Object::updateClosestAstroVertex(float dist)
+void Object::updateClosestAstroVertex(float dist, int vertexIdx)
 {
-    if (dist < m_closest_astro_vertex)
-        m_closest_astro_vertex = dist;
+    if (dist < m_closest_astro_vertex.second) {
+        m_closest_astro_vertex.second = dist;
+        m_closest_astro_vertex.first = -1; //   I want from astrocyte :(
+    }
+    if (dist < ASTRO_DIST_THRESH)
+        m_VertexidxCloseToAstro.push_back(vertexIdx);
 }
 
 Object_t Object::getObjectType()
@@ -127,7 +132,7 @@ struct ssbo_mesh Object::getSSBOData()
 {
     struct ssbo_mesh ssbo_data;
     ssbo_data.color = m_color;
-    ssbo_data.color.setW(m_closest_astro_vertex);
+    ssbo_data.color.setW(m_closest_astro_vertex.second);
 
     ssbo_data.center = m_center;
     ssbo_data.info.setX(m_volume);

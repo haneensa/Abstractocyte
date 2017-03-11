@@ -102,10 +102,9 @@ class Node;
 class Graph
 {
 public:
-    Graph(Graph_t graphType,  OpenGLManager *opengl_mnger);
+    Graph(Graph_t graphType,  OpenGLManager *opengl_mnger, int gridCol);
     ~Graph();
 
-    bool createGraph(DataContainer *objectManager);
     bool parseNODE_NODE(std::vector<Node*> neurites_nodes, std::vector<QVector2D> neurites_edges);
     bool parseSKELETON(std::vector<Node*> neurites_skeletons_nodes, std::vector<QVector4D> neurites_skeletons_edges);
 
@@ -129,6 +128,7 @@ public:
     std::map<int, Edge*>::iterator getEdgesEnd()    { return m_edges.end(); }
 
     // force directed layout functions
+    void FDL_initParameters();
     void runforceDirectedLayout();
     void attractConnectedNodes(Edge *edge, float k);
     void repulseNodes(Node *node1, Node *node2, float k);
@@ -208,6 +208,7 @@ protected:
     float                           m_nrm;  // normalization factor
     double                          m_gravity;  // gravitational constant
     float                           m_edge_size;    // desired edge size
+    float                           m_edge_sizesquared;
     int                             m_Tmin;         // min temperature
     int                             m_Tmax;
     float                           m_a_r;          // PI/6
@@ -217,7 +218,7 @@ protected:
     float                           m_Tinit;        // initial temperature for a vertex
     float                           m_Tglobal;      // Tinit * n (temperature sum)
     int                             m_rounds;       // max number of rounds
-
+    QVector2D                       m_barycentric;
     std::map<int, int>              m_FilteredHVGX;
 };
 

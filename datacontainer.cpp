@@ -16,13 +16,13 @@ DataContainer::DataContainer()
     m_tempCounter = 0;
     m_indices_size = 0;
     m_skeleton_points_size = 0;
-    m_limit = 10000;
+    m_limit =10000;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
 
-    importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+  importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     importXML("://m3_neurites.xml");    // neurites time:  28802 ms
     // has glycogen data
     loadMetaDataHVGX(":/data/m3mouse3_metadata.hvgx");
@@ -331,8 +331,8 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 v.skeleton_vertex.setW(VertexToAstroDist); // distance from neurite to astrocyte
                 // find the minimum distance and store it in the object so we can easily decide if
                 // it touches the astrocyte or not
-                m_mesh->addVertex(v);
-                obj->updateClosestAstroVertex(VertexToAstroDist);
+                int vertexIdx = m_mesh->addVertex(v);
+                obj->updateClosestAstroVertex(VertexToAstroDist, vertexIdx);
             } else if (xml.name() == "f") {
                 ++faces;
                 xml.readNext();
