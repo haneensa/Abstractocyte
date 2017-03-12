@@ -22,7 +22,17 @@ namespace Clustering
 	//
 	GlycogenCluster::~GlycogenCluster()
 	{
+		for (auto iter = m_glycogenMap.begin(); iter != m_glycogenMap.end(); iter++)
+		{
+			(*iter).second->setClusterID(0);
+		}
+	}
 
+	//--------------------------------------------------------------------------------
+	//
+	void GlycogenCluster::clearIDs()
+	{
+		GlycogenCluster::ID_COUNTER = 0;
 	}
 
 	//--------------------------------------------------------------------------------
@@ -65,5 +75,19 @@ namespace Clustering
 	{
 		auto found = m_glycogenMap.find(id);
 		return found != m_glycogenMap.end();
+	}
+
+	//--------------------------------------------------------------------------------
+	//
+	int  GlycogenCluster::getClusterSize()
+	{
+		return m_glycogenMap.size();
+	}
+
+	//--------------------------------------------------------------------------------
+	//
+	float GlycogenCluster::getTotalVolume()
+	{
+		return m_totalVolume;
 	}
 }

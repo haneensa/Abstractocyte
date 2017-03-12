@@ -35,6 +35,8 @@ SOURCES += main.cpp\
     glycogen.cpp \
     octree.cpp \
     glycogencluster.cpp \
+    glycogenanalysismanager.cpp \
+    dbscan.cpp \
     rendervertexdata.cpp
 
 HEADERS  += mainwindow.h \
@@ -59,6 +61,8 @@ HEADERS  += mainwindow.h \
     glycogen.h \
     octree.h \
     glycogencluster.h \
+    glycogenanalysismanager.h \
+    dbscan.h \
     rendervertexdata.h
 
 

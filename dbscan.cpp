@@ -96,13 +96,13 @@ namespace Clustering
 		//			NeighborPts' = regionQuery(P', eps)
 		//			if sizeof(NeighborPts') >= MinPts
 		//				NeighborPts = NeighborPts joined with NeighborPts'
-	    //		}
+		//		}
 		//		if P' is not yet member of any cluster
 		//			add P' to cluster C
 		//	}
 		//}
 		addNodeToCluster(node, cluster);
-		
+
 		for (auto i = neighbors.begin(); i != neighbors.end(); i++)
 		{
 			uint32_t idx = (*i);
@@ -179,5 +179,18 @@ namespace Clustering
 		return m_nodeClusterMap.find(node->id()) != m_nodeClusterMap.end();
 	}
 
-	std::map<int, GlycogenCluster*> getClusters();
+	//--------------------------------------------------------------------------------
+	//
+	std::map<int, GlycogenCluster*> DBScan::getClusters()
+	{
+
+		return m_clusters;
+	}
+
+	//--------------------------------------------------------------------------------
+	//
+	std::map<int, VertexData*>  DBScan::getNoiseList()
+	{
+		return m_noiseList;
+	}
 }

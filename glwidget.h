@@ -9,6 +9,7 @@
 #include "graphmanager.h"
 #include "abstractionspace.h"
 #include "openglmanager.h"
+#include "glycogenanalysismanager.h"
 
 class GLWidget : public QOpenGLWidget, MainOpenGL
 {
@@ -17,6 +18,8 @@ class GLWidget : public QOpenGLWidget, MainOpenGL
 public:
     GLWidget(QWidget *parent = 0);
     ~GLWidget();
+
+	GlycogenAnalysisManager* getGlycogenAnalysisManager() { return m_glycogenAnalysisManager; }
 
 public slots:
     void getSliderX(int value);
@@ -33,6 +36,7 @@ public slots:
 
     void getFilteredType(QString value);
     void getFilteredID(QString value);
+
 
     void getFilterWithChildren(bool value);
     void getFilterWithParent(bool value);
@@ -65,6 +69,7 @@ protected:
     DataContainer                       *m_data_containter;
     OpenGLManager                       *m_opengl_mngr;
     GraphManager                        *m_graphManager;
+	GlycogenAnalysisManager				*m_glycogenAnalysisManager;
 
     struct GlobalUniforms               m_uniforms;
 
