@@ -16,7 +16,7 @@ namespace Clustering
 		m_nodesList = 0;
 		m_octree = 0;
 		m_minPts = 3;
-		m_eps = 0.001f;
+		m_eps = 0.06f;
 	}
 
 	//--------------------------------------------------------------------------------
@@ -114,10 +114,6 @@ namespace Clustering
 				m_octree->radiusNeighbors(neighborNode->x(), neighborNode->y(), neighborNode->z(), m_eps, results2, neighborNode->index);
 				if (results2.size() >= m_minPts)
 					expandCluster(node, cluster, results2);
-			}
-			else
-			{
-				qDebug() << "already visited";
 			}
 			if (!isInCluster(neighborNode))
 			{

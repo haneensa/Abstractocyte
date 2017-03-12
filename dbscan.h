@@ -24,7 +24,7 @@ namespace Clustering
 		~DBScan();
 
 		
-		void initialize(std::vector<VertexData*>* data, std::map<int, Glycogen*>* glycogenMap, SpacePartitioning::Octree* octree, float eps = 0.001f, int minPts = 3);
+		void initialize(std::vector<VertexData*>* data, std::map<int, Glycogen*>* glycogenMap, SpacePartitioning::Octree* octree, float eps = 0.06f, int minPts = 3);
 		void run();
 		std::map<int, GlycogenCluster*> getClusters();
 		std::map<int, VertexData*>  getNoiseList();

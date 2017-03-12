@@ -420,7 +420,7 @@
          <item>
           <widget class="QDoubleSpinBox" name="epsDoubleSpinBox">
            <property name="decimals">
-            <number>4</number>
+            <number>3</number>
            </property>
            <property name="maximum">
             <double>1.000000000000000</double>
@@ -429,7 +429,7 @@
             <double>0.001000000000000</double>
            </property>
            <property name="value">
-            <double>0.001000000000000</double>
+            <double>0.060000000000000</double>
            </property>
           </widget>
          </item>

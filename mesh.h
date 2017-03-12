@@ -20,11 +20,11 @@ struct VertexData {
     }
     float  y()  const
     {
-        return mesh_vertex.x();
+        return mesh_vertex.y();
     }
     float  z()  const
     {
-        return mesh_vertex.x();
+        return mesh_vertex.z();
     }
     float id() const
     {

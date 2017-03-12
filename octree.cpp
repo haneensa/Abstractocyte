@@ -127,9 +127,12 @@ namespace SpacePartitioning
 
 				// determine child octant for each point...
 				uint32_t octantIndex = 0;
-				if (p->x() > x) octantIndex = 1;
-				if (p->y() > y) octantIndex += 2;
-				if (p->z() > z) octantIndex += 4;
+				if (p->x() > x) 
+					octantIndex += 1;
+				if (p->y() > y) 
+					octantIndex += 2;
+				if (p->z() > z) 
+					octantIndex += 4;
 
 				//push index to the correct child octant
 				child_octant_indices[octantIndex]->push_back(index);
@@ -137,7 +140,7 @@ namespace SpacePartitioning
 
 			// now, we can create the child nodes...
 			float childExtent = 0.5f * extent; //size of child is half of the parent
-			for (uint32_t i = 0; i < 8; ++i)
+			for (uint32_t i = 0; i < 8; i++)
 			{
 				//if no points for the child
 				if (child_octant_indices[i]->size() == 0)

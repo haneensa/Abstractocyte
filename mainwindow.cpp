@@ -76,7 +76,7 @@ void MainWindow::on_clusterButton_clicked()
 		cluster_item->setCheckState(0, Qt::Checked);
 
 		cluster_item->setText(1, QString::number(cluster->getClusterSize()));
-		cluster_item->setText(2, QString::number(cluster->getTotalVolume()));
+		cluster_item->setText(2, QString::number(cluster->getTotalVolume() , 'f', 4));
 
 		
 	}
