@@ -22,13 +22,13 @@ DataContainer::DataContainer()
     max_volume = 1;
     max_astro_coverage = 1;
 
-    m_limit = 1000;
+    m_limit = 10000;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
 
-    //importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     importXML("://m3_neurites.xml");    // neurites time:  28802 ms
     // has glycogen data
     loadMetaDataHVGX(":/data/m3mouse3_metadata.hvgx");
@@ -142,19 +142,19 @@ void DataContainer::loadMetaDataHVGX(QString path)
         } else if (wordList[0] == "mt") {
             // update mitochoneria parent here if any exists
             //"mt,1053,307,DENDRITE,144,mito_d048_01_029\n"
-            int hvgxID = wordList[1].toInt();
-            int parentID = wordList[4].toInt();
-            if (m_objects.find(hvgxID) == m_objects.end()) {
-                continue;
-            }
+//            int hvgxID = wordList[1].toInt();
+//            int parentID = wordList[4].toInt();
+//            if (m_objects.find(hvgxID) == m_objects.end()) {
+//                continue;
+//            }
 
-            m_objects[hvgxID]->setParentID(m_objects[parentID]);
+//            m_objects[hvgxID]->setParentID(m_objects[parentID]);
 
-            if (m_objects.find(parentID) == m_objects.end()) {
-                continue;
-            }
+//            if (m_objects.find(parentID) == m_objects.end()) {
+//                continue;
+//            }
 
-            m_objects[parentID]->addChild(m_objects[hvgxID]);
+//            m_objects[parentID]->addChild(m_objects[hvgxID]);
 
         } else if (wordList[0] == "bo") {
             continue;
