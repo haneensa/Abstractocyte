@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1082</width>
-    <height>780</height>
+    <height>838</height>
    </rect>
   </property>
   <property name="cursor">
@@ -48,7 +48,7 @@
    <property name="minimumSize">
     <size>
      <width>300</width>
-     <height>626</height>
+     <height>695</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -396,6 +396,27 @@
            <item row="1" column="1">
             <widget class="QLineEdit" name="lineEdit"/>
            </item>
+           <item row="2" column="0" colspan="2">
+            <widget class="QCheckBox" name="checkBox">
+             <property name="text">
+              <string>Filter with children</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0" colspan="2">
+            <widget class="QCheckBox" name="checkBox_2">
+             <property name="text">
+              <string>Filter with parent</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0" colspan="2">
+            <widget class="QCheckBox" name="checkBox_3">
+             <property name="text">
+              <string>Filter with synapses</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
@@ -468,6 +489,9 @@
     <slot>getGraphParam7(double)</slot>
     <slot>getFilteredType(QString)</slot>
     <slot>getFilteredID(QString)</slot>
+    <slot>getFilterWithChildren(bool)</slot>
+    <slot>getFilterWithParent(bool)</slot>
+    <slot>getFilterWithSynapses(bool)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -737,7 +761,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>270</x>
-     <y>678</y>
+     <y>667</y>
     </hint>
     <hint type="destinationlabel">
      <x>337</x>
@@ -757,7 +781,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>39</x>
-     <y>723</y>
+     <y>788</y>
     </hint>
    </hints>
   </connection>
@@ -772,8 +796,56 @@
      <y>699</y>
     </hint>
     <hint type="destinationlabel">
-     <x>66</x>
-     <y>729</y>
+     <x>103</x>
+     <y>788</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getFilterWithChildren(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>224</x>
+     <y>681</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>349</x>
+     <y>678</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_2</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getFilterWithParent(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>206</x>
+     <y>706</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>323</x>
+     <y>709</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_3</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getFilterWithSynapses(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>240</x>
+     <y>730</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>342</x>
+     <y>736</y>
     </hint>
    </hints>
   </connection>

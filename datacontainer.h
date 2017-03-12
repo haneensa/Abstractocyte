@@ -3,6 +3,11 @@
 // find closest object to center of cluster
 // color that object with glycogen cluster
 
+// todo: normalize volume baed on the non filtered objects
+// get the largest volume from all present objects
+// and normalize based on that
+// so whwn dendrites is filtered, other volumes can be relatively objserved without astrocyte
+
 #ifndef OBJECTMANAGER_H
 #define OBJECTMANAGER_H
 
@@ -49,8 +54,16 @@ public:
     std::string getObjectName(int hvgxID);
     std::vector<int> getObjectsIDsByType(Object_t type);
 
+    int getMaxAstroCoverage()   { return max_astro_coverage; }
+    int getMaxVolume()          { return max_volume; }
+
 protected:
-    int m_tempCounter;
+    int                                     m_tempCounter; // how many objects with no contacts to ast based on threshold
+     // maximum volume from displayed objects
+    int                                     max_volume;
+    // maximum vertices from neurites covered by astrocyte
+    int                                     max_astro_coverage;
+
     // store all vertices of the mesh.
     // unique vertices, faces to index them.
     Mesh                                    *m_mesh;

@@ -1,5 +1,7 @@
 #version 430
 
+#define astrocyte 6
+
 // in: per vertex data
 layout (location = 0) in vec4 vertex;
 layout (location = 1) in vec2 layout1;
@@ -82,7 +84,7 @@ void main(void)
     vec4 node_layout2 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout2, 0, 1);
 
 
-    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
+    properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
 
     vec2 pos_alpha = space_properties.pos_alpha; // position interpolation (pos1, pos2)
     vec2 trans_alpha = space_properties.trans_alpha; // alpha
@@ -98,7 +100,7 @@ void main(void)
     else
         V_render = 0;
 
-    if ( type == 1 && (int(SSBO_data[ID].info.y) == 2 || int(SSBO_data[ID].info.y) == 3) ) {
+    if ( type != astrocyte && (int(SSBO_data[ID].info.y) == 2 || int(SSBO_data[ID].info.y) == 3) ) {
         // check if spine or bouton
         // if this is a child and parent is not filtered
             int ParentID = int(SSBO_data[ID].info.z);

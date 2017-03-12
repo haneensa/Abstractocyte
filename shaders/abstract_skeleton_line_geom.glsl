@@ -79,7 +79,7 @@ void main() {
         return;
     }
 
-    gl_PointSize =  4;
+    gl_PointSize =  gl_in[0].gl_PointSize;
 
     color_val = SSBO_data[ID].color;
 

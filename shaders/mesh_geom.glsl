@@ -1,5 +1,7 @@
 #version 430
 
+#define astrocyte 6
+
 in  int         V_ID[];
 
 in vec4         V_color_val[];
@@ -69,7 +71,7 @@ void main() {
     color_val = V_color_val[i];
 
 
-    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
+    properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
 
     vec4 render_type = space_properties.render_type; // additional info
 

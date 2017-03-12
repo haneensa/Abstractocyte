@@ -39,8 +39,8 @@ Object::~Object()
 void Object::updateClosestAstroVertex(float dist, int vertexIdx)
 {
     if (dist < m_closest_astro_vertex.second) {
+        m_closest_astro_vertex.first = -1; //   I want from astrocyte skeleton :(
         m_closest_astro_vertex.second = dist;
-        m_closest_astro_vertex.first = -1; //   I want from astrocyte :(
     }
     if (dist < ASTRO_DIST_THRESH)
         m_VertexidxCloseToAstro.push_back(vertexIdx);
@@ -114,12 +114,6 @@ QVector4D Object::getColor()
 
 void Object::setCenter(QVector4D center)
 {
-    if (m_object_t == Object_t::ASTROCYTE ) {
-        center.setW(0); // w: indicates the type of the object (glia, neurite)
-    } else {
-        center.setW(1);
-    }
-
     m_center = center;
 }
 
@@ -135,9 +129,14 @@ struct ssbo_mesh Object::getSSBOData()
     ssbo_data.color.setW(m_closest_astro_vertex.second);
 
     ssbo_data.center = m_center;
-    ssbo_data.info.setX(m_volume);
     int type = (int) m_object_t;
-    ssbo_data.info.setY(type); // object type
+
+    ssbo_data.center.setW(type);
+    ssbo_data.info.setX(m_volume);
+
+    qDebug() << "m_VertexidxCloseToAstro: " << m_VertexidxCloseToAstro.size() ;
+    ssbo_data.info.setY(m_VertexidxCloseToAstro.size()); // how many vertices are covered by astrocyte
+
     if (m_parent != NULL)
         ssbo_data.info.setZ(m_parent->getHVGXID());
     else

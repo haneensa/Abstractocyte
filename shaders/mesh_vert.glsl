@@ -1,5 +1,7 @@
 #version 430
 
+#define astrocyte 6
+
 // todo later: find a way to include header
 #extension GL_ARB_shading_language_include : require
 
@@ -74,12 +76,12 @@ void main(void)
 
 
     // if skeleton_vx.w is below a threshold then color it
-    if (skeleton_vx.w <= 0.0001 && type == 1 )
+    if (skeleton_vx.w <= 0.0001 && type !=  astrocyte )
         V_color_val.rgb = vec3(1.0, 0.0, 0.0);
 
 
 
-    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
+    properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
 
     vec2 pos_alpha = space_properties.pos_alpha; // position interpolation (pos1, pos2)
     vec2 trans_alpha = space_properties.trans_alpha; // alpha

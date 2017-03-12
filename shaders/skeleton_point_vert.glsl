@@ -1,5 +1,7 @@
 #version 430
 
+#define astrocyte 6
+
 layout(location = 0) in vec4    vertex;
 layout(location = 1) in vec4    knot1;
 layout(location = 2) in vec4    knot2;
@@ -69,7 +71,7 @@ void main(void)
 
     V_ID = ID;
 
-    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
+    properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
 
     vec2 pos_alpha = space_properties.pos_alpha; // position interpolation (pos1, pos2)
     vec2 trans_alpha = space_properties.trans_alpha; // alpha
@@ -84,10 +86,10 @@ void main(void)
     float leftMin = interval.x;
     float leftMax = interval.y;
 
-    if (type == 1)
-        V_alpha = 1;
-    else
+    if (type == astrocyte)
         V_alpha =  translate(slider, leftMin, leftMax, trans_alpha.x, trans_alpha.y);
+    else
+        V_alpha = 1;
 
     float position_intp = translate(slider,leftMin, leftMax,  pos_alpha.x, pos_alpha.y);
     V_color_intp = translate(slider, leftMin, leftMax, color_alpha.y, color_alpha.x);

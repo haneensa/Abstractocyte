@@ -82,6 +82,9 @@ public:
     void showAll();
     void FilterObject(int ID, bool isfilterd);
 
+    void updateDisplayChildFlag(bool flag)          { m_display_child = flag; }
+    void updateDisplayParentFlag(bool flag)         { m_display_parent = flag; }
+    void updateDisplaySynapseFlag(bool flag)        { m_display_synapses = flag; }
 
     // ********** Selection ************************
     void updateCanvasDim(int w, int h, int retianScale);
@@ -155,6 +158,11 @@ protected:
     int                                 m_hits;
     GLuint                              m_selectionFrameBuffer;
     GLuint                              m_selectionRenderBuffer;
+
+    bool                                m_display_child;
+    bool                                m_display_parent;
+    bool                                m_display_synapses;
+
 
  };
 

@@ -86,9 +86,11 @@ void GLWidget::updateMVPAttrib()
     const qreal retinaScale = devicePixelRatio();
     QVector4D viewport = QVector4D(0, 0, width()  * retinaScale, height() * retinaScale);
 
+    int max_astro_coverage = m_data_containter->getMaxAstroCoverage();
+    int max_volume = m_data_containter->getMaxVolume();
     // graph model matrix without rotation, apply rotation to nodes directly
     m_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
-                        m_model_noRotation.data(), m_rotationMatrix, viewport};
+                        m_model_noRotation.data(), m_rotationMatrix, viewport, max_volume, max_astro_coverage};
 }
 
 void GLWidget::initializeGL()
@@ -294,7 +296,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             m_opengl_mngr->showAll();
         break;
         case(Qt::Key_H): // enable hover
-
+            // tra
         break;
     }
 }
@@ -415,4 +417,20 @@ void GLWidget::getFilteredID(QString value)
          m_graphManager->stopForceDirectedLayout(i);
 
      m_FDL_running = false;
+ }
+
+ void GLWidget::getFilterWithChildren(bool value)
+ {
+     // update this in openglmanager
+    m_opengl_mngr->updateDisplayChildFlag(value);
+ }
+
+ void GLWidget::getFilterWithParent(bool value)
+ {
+     m_opengl_mngr->updateDisplayParentFlag(value);
+ }
+
+ void GLWidget::getFilterWithSynapses(bool value)
+ {
+     m_opengl_mngr->updateDisplaySynapseFlag(value);
  }

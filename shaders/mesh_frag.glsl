@@ -6,8 +6,6 @@ in float        color_intp;
 in vec4         color_val;
 out vec4        outcol;
 
-uniform int     y_axis;
-uniform int     x_axis;
 
 //-------------------- DIFFUSE LIGHT PROPERTIES --------------------
 uniform vec3 diffuseLightDirection;
@@ -35,7 +33,6 @@ void main() {
 
     // interpolate between two colors
     // todo: based on the mesh type (astro, neurite)
-    // y_axis astrocyte, else if neurite use (x_axis)
     outcol =  phong_color * color_intp +   (1.0 - color_intp) * toon_color ;
     outcol.a = alpha;
 
