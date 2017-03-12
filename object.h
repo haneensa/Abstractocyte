@@ -45,6 +45,7 @@ public:
     struct ssbo_mesh getSSBOData();
     Object* getParent()                 { return m_parent; }
     std::vector<Object*> getChildren()  { return m_children; }
+    int getAstroCoverage()              { return m_VertexidxCloseToAstro.size(); }
 
     // properties setters
     void setColor(QVector4D color)      {  m_color = color; }

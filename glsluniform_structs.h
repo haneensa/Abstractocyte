@@ -4,14 +4,16 @@
 #include <QMatrix4x4>
 
 struct GlobalUniforms {
-    int y_axis;
-    int x_axis;
-    float* mMatrix;
-    float* vMatrix;
-    float* pMatrix;
-    float* modelNoRotMatrix;
-    QMatrix4x4 rMatrix;
-    QVector4D viewport;
+ /* 0 */    int y_axis;
+ /* 1 */    int x_axis;
+ /* 2 */    float* mMatrix;
+ /* 3 */    float* vMatrix;
+ /* 4 */    float* pMatrix;
+ /* 5 */    float* modelNoRotMatrix;
+ /* 6 */    QMatrix4x4 rMatrix;
+ /* 7 */    QVector4D viewport;
+ /* 8 */    int max_volume;  // maximum volume from displayed objects
+ /* 9 */    int max_astro_coverage; // maximum vertices from neurites covered by astrocyte
 };
 
 #endif // GLSLUNIFORM_STRUCTS_H

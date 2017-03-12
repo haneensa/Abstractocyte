@@ -37,6 +37,11 @@ public slots:
     void getFilteredType(QString value);
     void getFilteredID(QString value);
 
+
+    void getFilterWithChildren(bool value);
+    void getFilterWithParent(bool value);
+    void getFilterWithSynapses(bool value);
+
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);
     void setHoveredID(int);

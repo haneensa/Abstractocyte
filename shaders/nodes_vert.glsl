@@ -1,15 +1,18 @@
 #version 430
 
+#define astrocyte 6
+
 // this is for neurites nodes at the most abstract point.
 // so only when the curser is at (100, 100) the node of this will show uo
 // do I need this? only for the edges
 
 // in: per vertex data
+
 layout (location = 0) in int ID;
 
 out float   V_alpha;
 out int     V_ID;
-out int      V_render;
+out int     V_render;
 
 // World transformation
 uniform mat4 mMatrix;
@@ -88,7 +91,7 @@ void main(void)
     vec4 node_layout2 = m_noRotvpMatrix * vec4(SSBO_data[ID].layout2, 0, 1);
 
     int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
-    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
+    properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
 
     vec2 interval = space_properties.interval; // interval this state is between
     vec4 render_type = space_properties.render_type; // additional info
@@ -103,7 +106,7 @@ void main(void)
     float alphay =  translate(y_axis, extra_info.z, extra_info.w,  0, 1);
     V_alpha = min(alphax, alphay);
 
-    gl_PointSize = 10;
+    gl_PointSize = 2;
 
     float position_intp_y = translate(y_axis, extra_info.z, extra_info.w, 0, 1);
    // vec4 skeleton_pos = mix(v_layout1 , v_layout3, position_intp_y);

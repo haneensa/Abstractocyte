@@ -4,6 +4,8 @@
 #include <chrono>
 #include "datacontainer.h"
 
+#define MESH_MAX 5
+
 // todo: each object has to have all elements (mesh, skeleton, ..)
 // if it doesnt then take care of this case (missing data)
 /*
@@ -16,6 +18,10 @@ DataContainer::DataContainer()
     m_tempCounter = 0;
     m_indices_size = 0;
     m_skeleton_points_size = 0;
+
+    max_volume = 1;
+    max_astro_coverage = 1;
+
     m_limit = 10;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
@@ -135,8 +141,21 @@ void DataContainer::loadMetaDataHVGX(QString path)
             continue;
         } else if (wordList[0] == "mt") {
             // update mitochoneria parent here if any exists
-            qDebug() << line;
-            continue;
+            //"mt,1053,307,DENDRITE,144,mito_d048_01_029\n"
+            int hvgxID = wordList[1].toInt();
+            int parentID = wordList[4].toInt();
+            if (m_objects.find(hvgxID) == m_objects.end()) {
+                continue;
+            }
+
+            m_objects[hvgxID]->setParentID(m_objects[parentID]);
+
+            if (m_objects.find(parentID) == m_objects.end()) {
+                continue;
+            }
+
+            m_objects[parentID]->addChild(m_objects[hvgxID]);
+
         } else if (wordList[0] == "bo") {
             continue;
         } else if (wordList[0] == "sp") {
@@ -258,7 +277,7 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
                 float y = stringlist.at(1).toDouble();
                 float z = stringlist.at(2).toDouble();
                 qDebug() << "center: " << x << " " << y << " " << z;
-                obj->setCenter(QVector4D(x/5.0, y/5.0, z/5.0, 0));
+                obj->setCenter(QVector4D(x/MESH_MAX, y/MESH_MAX, z/MESH_MAX, 0));
                 // set ssbo with this center
             }  else if (xml.name() == "ast_point") {
                 // index to astrocyte vertex from the skeleton
@@ -274,7 +293,7 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
                 float y = stringlist.at(1).toDouble();
                 float z = stringlist.at(2).toDouble();
                 qDebug() << "center: " << x << " " << y << " " << z;
-                obj->setAstPoint(QVector4D(x/5.0, y/5.0, z/5.0, 0));
+                obj->setAstPoint(QVector4D(x/MESH_MAX, y/MESH_MAX, z/MESH_MAX, 0));
                 // set ssbo with this center
             }
         } // if start element
@@ -290,6 +309,12 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
          IdsTemp.push_back(obj->getHVGXID());
          m_objectsIDsByType[obj->getObjectType()] = IdsTemp;
 
+         // need to update these info whenever we filter or change the threshold
+         if (max_astro_coverage < obj->getAstroCoverage())
+            max_astro_coverage = obj->getAstroCoverage();
+
+         if (max_volume < obj->getVolume())
+             max_volume = obj->getVolume();
     }
 
 }
@@ -323,9 +348,9 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                     continue;
                 }
 
-                float x1 = stringlist.at(0).toDouble()/5.0;
-                float y1 = stringlist.at(1).toDouble()/5.0;
-                float z1 = stringlist.at(2).toDouble()/5.0;
+                float x1 = stringlist.at(0).toDouble()/MESH_MAX;
+                float y1 = stringlist.at(1).toDouble()/MESH_MAX;
+                float z1 = stringlist.at(2).toDouble()/MESH_MAX;
 
                 QVector4D mesh_vertex(x1, y1, z1,  obj->getHVGXID());
                 struct VertexData v;
@@ -344,9 +369,9 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                     v.skeleton_vertex = center;
                 } else {
                     // I could use index to be able to connect vertices logically
-                    float x2 = stringlist.at(3).toFloat()/5.0;
-                    float y2 = stringlist.at(4).toFloat()/5.0;
-                    float z2 = stringlist.at(5).toFloat()/5.0;
+                    float x2 = stringlist.at(3).toFloat()/MESH_MAX;
+                    float y2 = stringlist.at(4).toFloat()/MESH_MAX;
+                    float z2 = stringlist.at(5).toFloat()/MESH_MAX;
                     QVector4D skeleton_vertex(x2, y2, z2, 0);
                     v.skeleton_vertex = skeleton_vertex;
                 }
@@ -467,9 +492,9 @@ void DataContainer::parseSkeletonNodes(QXmlStreamReader &xml, Object *obj)
                     continue;
                 }
 
-                float x = stringlist.at(0).toDouble()/5.0;
-                float y = stringlist.at(1).toDouble()/5.0;
-                float z = stringlist.at(2).toDouble()/5.0;
+                float x = stringlist.at(0).toDouble()/MESH_MAX;
+                float y = stringlist.at(1).toDouble()/MESH_MAX;
+                float z = stringlist.at(2).toDouble()/MESH_MAX;
                 QVector3D node(x, y, z);
                 obj->addSkeletonNode(node);
             }
@@ -511,9 +536,9 @@ void DataContainer::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
                     continue;
                 }
 
-                float x = stringlist.at(0).toDouble()/5.0;
-                float y = stringlist.at(1).toDouble()/5.0;
-                float z = stringlist.at(2).toDouble()/5.0;
+                float x = stringlist.at(0).toDouble()/MESH_MAX;
+                float y = stringlist.at(1).toDouble()/MESH_MAX;
+                float z = stringlist.at(2).toDouble()/MESH_MAX;
                 QVector3D node(x, y, z);
                 obj->addSkeletonPoint(node);
             }

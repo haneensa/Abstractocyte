@@ -1,14 +1,16 @@
 #version 430
 
-in int      V_ID[];
+#define astrocyte 6
 
-in float    V_alpha[];
-in float    V_color_intp[];
+in int          V_ID[];
 
-out float   color_intp;
-out vec4    color_val;
-out float   alpha;
-out float         G_ID;
+in float        V_alpha[];
+in float        V_color_intp[];
+
+out float       color_intp;
+out vec4        color_val;
+out float       alpha;
+out float       G_ID;
 
 
 uniform int     y_axis;
@@ -66,7 +68,7 @@ void main() {
     color_val = SSBO_data[ID].color;
     gl_PointSize =  gl_in[0].gl_PointSize;
 
-    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
+    properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
 
     vec4 render_type = space_properties.render_type; // additional info
     if (render_type.y == 0) {

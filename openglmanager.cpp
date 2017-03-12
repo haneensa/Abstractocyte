@@ -44,6 +44,11 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
     m_dataContainer = obj_mnger;
     m_2dspace = absSpace;
     m_glFunctionsSet = false;
+
+    m_display_child = false;
+    m_display_parent = false;
+    m_display_synapses = false;
+
 }
 
 OpenGLManager::~OpenGLManager()
@@ -66,6 +71,9 @@ OpenGLManager::~OpenGLManager()
 
     m_vao_glycogen.destroy();
     m_vbo_glycogen.destroy();
+
+
+
 
 }
 
@@ -129,11 +137,12 @@ int OpenGLManager::processSelection(float x, float y)
 
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
+    glEnable(GL_DEPTH_TEST);
 
     GLubyte pixel[3];
 
     qDebug() << x << " " << y;
-    glReadBuffer(GL_BACK);
+    //glReadBuffer(GL_BACK);
     glReadPixels(x, y, 1, 1, GL_RGB,GL_UNSIGNED_BYTE, (void *)pixel);
     int pickedID = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
     qDebug() << pixel[0] << " " << pixel[1] << " " << pixel[2];
@@ -429,7 +438,7 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     bool res = m_GSkeleton.compileShader("2D_nodes",
                                       ":/shaders/abstract_skeleton_node_2D_vert.glsl",
                                       ":/shaders/abstract_skeleton_node_geom.glsl",
-                                      ":/shaders/points_3d_frag.glsl");
+                                      ":/shaders/points_3dConnevtivity_frag.glsl");
     if (res == false)
         return res;
 
@@ -823,7 +832,8 @@ void OpenGLManager::drawSkeletonPoints(struct GlobalUniforms grid_uniforms, bool
     }
 }
 
-
+// ----------------------------------------------------------------------------
+//
 // we initialize the vbos for drawing
 bool OpenGLManager::initNeuritesGraphShaders()
 {
@@ -832,17 +842,8 @@ bool OpenGLManager::initNeuritesGraphShaders()
     if (m_glFunctionsSet == false)
         return false;
 
-    m_GNeurites.createProgram("nodes");
-    bool res = m_GNeurites.compileShader("nodes",
-                                    ":/shaders/nodes_vert.glsl",
-                                    ":/shaders/abstract_skeleton_node_geom.glsl",
-                                    ":/shaders/points_3d_frag.glsl");
-
-    if (res == false)
-        return false;
-
     m_GNeurites.createProgram("index");
-    res = m_GNeurites.compileShader("index",
+    bool res = m_GNeurites.compileShader("index",
                                          ":/shaders/nodes_vert.glsl",
                                          ":/shaders/abstract_skeleton_line_geom.glsl",
                                          ":/shaders/points_3d_frag.glsl");
@@ -856,7 +857,6 @@ bool OpenGLManager::initNeuritesGraphShaders()
     m_NeuritesGraphVAO.bind();
 
     m_NeuritesNodesVBO.bind();
-    m_GNeurites.useProgram("nodes");
 
     GL_Error();
 
@@ -878,6 +878,8 @@ bool OpenGLManager::initNeuritesGraphShaders()
     return true;
 }
 
+// ----------------------------------------------------------------------------
+//
 // only the edges, because the skeleton itself will collabse into a node
 void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
 {
@@ -889,7 +891,6 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
 
     m_uniforms = grid_uniforms;
 
-
     m_NeuritesIndexVBO.bind();
 
     m_GNeurites.useProgram("index");
@@ -899,11 +900,6 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
     glDrawElements(GL_LINES,  m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
 
     m_NeuritesIndexVBO.release();
-
-    m_GNeurites.useProgram("nodes");
-    updateAbstractUniformsLocation( m_GNeurites.getProgram("nodes") );
-
-    glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
 
     m_NeuritesNodesVBO.release();
     m_NeuritesGraphVAO.release();
@@ -979,6 +975,8 @@ bool OpenGLManager::initGlycogenPointsShaders()
     m_vao_glycogen.bind();
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::drawGlycogenPoints(struct GlobalUniforms grid_uniforms)
 {
     // I need this because transitioning from mesh to skeleton is not smooth
@@ -1020,10 +1018,8 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     if ( (space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x() == 0) || space_properties.neu.render_type.y() == 1 )
         drawSkeletonPoints(grid_uniforms, false); // transparency is allowed
 
-
     if ( space_properties.ast.render_type.z() == 1 ||  space_properties.neu.render_type.z() == 1)
         drawSkeletonsGraph(grid_uniforms, false);
-
 
     if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
         drawSkeletonsGraph(grid_uniforms, false);
@@ -1039,6 +1035,7 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     //disable dithering -- important
     glDisable(GL_DITHER);
     glDisable(GL_MULTISAMPLE);
+    glEnable(GL_DEPTH_TEST);
 
     //render graph
     drawMeshTriangles(m_uniforms, true);
@@ -1096,6 +1093,11 @@ void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
     viewport_values[3] = m_uniforms.viewport.w();
 
     glUniform4fv(viewport, 1,  viewport_values);
+
+    GLint max_volume = glGetUniformLocation(program, "max_volume");
+    glUniform1iv(max_volume, 1, &m_uniforms.max_volume);
+
+    glUniform1iv(9, 1, &m_uniforms.max_astro_coverage);
 }
 
 // ----------------------------------------------------------------------------
@@ -1122,6 +1124,11 @@ void OpenGLManager::updateUniformsLocation(GLuint program)
     GLint x_axis = glGetUniformLocation(program, "x_axis");
     glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
 
+
+    GLint max_volume = glGetUniformLocation(program, "max_volume");
+    glUniform1iv(max_volume, 1, &m_uniforms.max_volume);
+
+    glUniform1iv(9, 1, &m_uniforms.max_astro_coverage);
 }
 
 
@@ -1302,32 +1309,39 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
         if (hvgxID > m_ssbo_data.size())
             continue;
 
-//        std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
-//        if (objectMap.find(hvgxID) == objectMap.end() || objectMap[hvgxID] == NULL) {
-//            return;
-//        }
+        std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
+        if (objectMap.find(hvgxID) == objectMap.end() || objectMap[hvgxID] == NULL) {
+            return;
+        }
 
-//        Object *obj = objectMap[hvgxID];
+        Object *obj = objectMap[hvgxID];
 
-//        // if it has a children then get them
-//        // else if has parent get them
-//        Object *parent = obj->getParent();
-//        if (parent == NULL) {
-//            qDebug() << obj->getName().data() << " has no parnt";
-//        } else {
-//            FilterObject(parent->getHVGXID(), false);
+        // if it has a children then get them
+        // else if has parent get them
+        if (m_display_parent) {
+            Object *parent = obj->getParent();
+            if (parent == NULL) {
+                qDebug() << obj->getName().data() << " has no parnt";
+            } else {
+                FilterObject(parent->getHVGXID(), false);
+            }
+        }
 
-//        }
+        if (m_display_child) {
+            std::vector<Object*> children = obj->getChildren();
+            if (children.size() == 0) {
+                qDebug() << obj->getName().data() << " has no child";
+            } else {
+                for (int i = 0; i < children.size(); i++) {
+                    qDebug() << "Showing " << children[i]->getName().data();
+                    FilterObject(children[i]->getHVGXID(), false);
+                }
+            }
+        }
 
-//        std::vector<Object*> children = obj->getChildren();
-//        if (children.size() == 0) {
-//            qDebug() << obj->getName().data() << " has no child";
-//        } else {
-//            for (int i = 0; i < children.size(); i++) {
-//                qDebug() << "Showing " << children[i]->getName().data();
-//                FilterObject(children[i]->getHVGXID(), false);
-//            }
-//        }
+        if (m_display_synapses) {
+            // get all objects that are connected to this directly or indirectly
+        }
 
         FilterObject(hvgxID, false);
 

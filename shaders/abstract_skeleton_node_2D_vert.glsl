@@ -1,5 +1,8 @@
 #version 430
 
+#define astrocyte   6
+#define spine       5
+#define bouton      3
 
 // in: per vertex data
 layout (location = 0) in vec4 vertex;
@@ -18,6 +21,8 @@ uniform mat4 m_noRartionMatrix;
 uniform mat4 vMatrix;
 // Projection transformation
 uniform mat4 pMatrix;
+
+layout(location = 9) uniform int   max_astro_coverage;
 
 uniform int  y_axis;
 uniform int  x_axis;
@@ -83,7 +88,7 @@ void main(void)
 
     int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
 
-    properties space_properties = (type == 0) ? space2d.ast : space2d.neu;
+    properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
 
     vec2 point_size = space_properties.point_size; // point_size
     vec2 interval = space_properties.interval; // interval this state is between
@@ -103,19 +108,32 @@ void main(void)
    // for skeleton get the value between v_layout3 and v_layout1 using mix with y_axis
    // then get another position for node in layout 1 and layout 2
    // then use these two new values to get the final one along the x axis
-   if (type == 1){ // enruties
-        if (x_axis == extra_info.w)
-           gl_PointSize =  point_size.y;
-        else
-            gl_PointSize =  1;
+   if (type != astrocyte){ // enruties
+        if (x_axis >= interval.y - 5) {
+           float astro_coverage = SSBO_data[ID].info.y;
+           float coverage = translate(astro_coverage, 0, max_astro_coverage, 0, 1);
+           gl_PointSize =  point_size.y + 20 * coverage;
+        } else if (x_axis < interval.y - 10) {
+            // more skeleton
+            gl_PointSize =  4;
+            if ( type == spine || type == bouton ) {
+                // if this is a child and parent is not filtered
+                int ParentID = int(SSBO_data[ID].info.z);
+                int isParentFiltered = int(SSBO_data[ParentID].info.w);
+                if (isParentFiltered == 0) // color this special color that would show this is a mix of parent and child
+                    V_render = 0;
+            }
+        } else {
+            gl_PointSize =  4;
+        }
 
         V_alpha = 1;
-        float position_intp_y = translate(y_axis, extra_info.z, extra_info.w, 0, 1);
+        float position_intp_y = translate(y_axis, interval.x, interval.y - 5, 0, 1);
         vec4 skeleton_pos = mix(v_layout1 , v_layout3, position_intp_y);
         vec4 node_pos  = mix(node_layout2, node_layout1 ,  position_intp_y);
 
         // if type == neurite -> mix (skeleton, node, x )
-        float position_intp_x = translate(x_axis, interval.x, interval.y, 0, 1);
+        float position_intp_x = translate(x_axis, interval.x, interval.y - 5, 0, 1);
         gl_Position =  mix(skeleton_pos, node_pos , position_intp_x);
     } else {
         gl_PointSize = 1;
