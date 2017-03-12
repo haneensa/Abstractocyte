@@ -167,6 +167,17 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     m_lastPos = event->pos();
     setFocus();
+
+    makeCurrent();
+    const qreal retinaScale = devicePixelRatio();
+    GLint viewport[4]; //  return of glGetIntegerv() -> x, y, width, height of viewport
+    glGetIntegerv(GL_VIEWPORT, viewport);
+
+    int x = event->x() * retinaScale;
+    int y = viewport[3] - event->y() * retinaScale;
+    m_opengl_mngr->processSelection(x, y);
+    doneCurrent();
+
     event->accept();
 }
 
@@ -224,7 +235,12 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
     m_lastPos = event->pos();
     event->accept();
+
     update();
+
+
+    doneCurrent();
+
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event)

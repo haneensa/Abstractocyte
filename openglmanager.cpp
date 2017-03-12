@@ -121,17 +121,25 @@ bool OpenGLManager::initOpenGLFunctions()
 
 void OpenGLManager::updateCanvasDim(int w, int h, int retianScale)
 {
+
     if (m_canvas_h != h || m_canvas_w != w){
-        // initSelectionFrameBuffer();
+        m_canvas_h = h * retianScale;
+        m_canvas_w = w * retianScale;
+        m_retinaScale = retianScale;
+        initSelectionFrameBuffer();
+        GL_Error();
     }
-    m_canvas_h = h;
-    m_canvas_w = w;
+
+
 }
 
 // ----------------------------------------------------------------------------
 //
 void OpenGLManager::initSelectionFrameBuffer()
 {
+    qDebug() << "initSelectionFrameBuffer";
+
+    // create FBO
     glGenFramebuffers(1, &m_selectionFrameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
     glGenRenderbuffers(1, &m_selectionRenderBuffer);
@@ -145,16 +153,28 @@ void OpenGLManager::initSelectionFrameBuffer()
 //
 void OpenGLManager::pick()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
-    glClear( GL_COLOR_BUFFER_BIT );
-
-    glDisable( GL_DITHER );
-
-    // draw selection mode
-
-    glEnable(GL_DITHER);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+void OpenGLManager::processSelection(float x, float y)
+{
+  //  draw selection mode
+       qDebug() << "Draw Selection!";
+
+
+
+
+    GLubyte pixel[3];
+
+    qDebug() << x << " " << y;
+    glReadBuffer(GL_BACK);
+    glReadPixels(x, y, 1, 1, GL_RGB,GL_UNSIGNED_BYTE, (void *)pixel);
+    int pickedID = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
+    qDebug() << pixel[0] << " " << pixel[1] << " " << pixel[2];
+
+
+
+    qDebug() << "Picked ID: " << pickedID;
+ }
 
 // ----------------------------------------------------------------------------
 //
@@ -577,25 +597,63 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
     initMeshVertexAttrib();
 
+
     m_vbo_mesh.release();
     m_vao_mesh.release();
+
+
+    /*  start selection buffer **/
+    m_vao_selection_mesh.create();
+    m_vao_selection_mesh.bind();
+
+    m_program_selection_mesh = glCreateProgram();
+    res = initShader(m_program_selection_mesh, ":/shaders/mesh_vert.glsl",
+                                          ":/shaders/mesh_geom.glsl",
+                                          ":/shaders/mesh_selection_frag.glsl");
+    if (res == false)
+        return res;
+
+    glUseProgram(m_program_selection_mesh);
+    m_Neurite_vbo_IndexMesh.bind();
+
+    m_vbo_mesh.bind();
+    initMeshVertexAttrib();
+    m_vbo_mesh.release();
+
+    m_Neurite_vbo_IndexMesh.release();
+
+    m_vao_selection_mesh.release();
+
+    GL_Error();
+    /*  end selection buffer **/
 
 }
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::drawMeshTriangles(struct GlobalUniforms grid_uniforms)
+void OpenGLManager::drawMeshTriangles(struct GlobalUniforms grid_uniforms, bool selection )
 {
-   m_vao_mesh.bind();
-   glUseProgram(m_program_mesh);
    m_uniforms = grid_uniforms;
 
-   updateUniformsLocation(m_program_mesh);
+   if (selection) {
+       m_vao_selection_mesh.bind();
+       glUseProgram(m_program_selection_mesh);
+       updateUniformsLocation(m_program_selection_mesh);
+       m_Neurite_vbo_IndexMesh.bind();
+       glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
+       m_Neurite_vbo_IndexMesh.release();
+       m_vao_selection_mesh.release();
+   } else {
+       m_vao_mesh.bind();
+       glUseProgram(m_program_mesh);
+       updateUniformsLocation(m_program_mesh);
+       m_Neurite_vbo_IndexMesh.bind();
+       glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
+       m_Neurite_vbo_IndexMesh.release();
+       m_vao_mesh.release();
+   }
 
-   m_Neurite_vbo_IndexMesh.bind();
-   glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
-   m_Neurite_vbo_IndexMesh.release();
-   m_vao_mesh.release();
+
 }
 
 // ----------------------------------------------------------------------------
@@ -759,33 +817,54 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     m_uniforms = grid_uniforms;
     write_ssbo_data();
     struct ast_neu_properties space_properties = m_2dspace->getSpaceProper();
+    drawMeshTriangles(grid_uniforms, true);
 
-    drawGlycogenPoints(grid_uniforms);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
+    //clear
+    glClear(GL_COLOR_BUFFER_BIT);
+    //disable dithering -- important
+    glDisable(GL_DITHER);
+    glDisable(GL_BLEND);
+    glDisable(GL_MULTISAMPLE);
 
-    if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1) ) {
-        glDisable (GL_BLEND);
-        glBlendFunc (GL_ONE, GL_ONE);
-        drawSkeletonPoints(grid_uniforms);
-        glEnable (GL_BLEND);
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    } else if (space_properties.neu.render_type.y() == 1) {
-        drawSkeletonPoints(grid_uniforms);
-    }
+    //render graph
 
-    if ( space_properties.ast.render_type.z() == 1 ||  space_properties.neu.render_type.z() == 1)
-        drawSkeletonsGraph(grid_uniforms);
+    drawMeshTriangles(m_uniforms, true);
+
+    //enable dithering again
+    glEnable(GL_DITHER);
+    glEnable(GL_BLEND);
+    glEnable(GL_MULTISAMPLE);
+    //process click
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+//    drawGlycogenPoints(grid_uniforms);
+
+//    if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1) ) {
+//        glDisable (GL_BLEND);
+//        glBlendFunc (GL_ONE, GL_ONE);
+//        drawSkeletonPoints(grid_uniforms);
+//        glEnable (GL_BLEND);
+//        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//    } else {
+//        drawSkeletonPoints(grid_uniforms); // transparency is allowed
+//    }
+
+//    if ( space_properties.ast.render_type.z() == 1 ||  space_properties.neu.render_type.z() == 1)
+//        drawSkeletonsGraph(grid_uniforms);
 
 
-    if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
-        drawSkeletonsGraph(grid_uniforms);
-        drawNeuritesGraph(grid_uniforms);
-    }
+//    if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
+//        drawSkeletonsGraph(grid_uniforms);
+//        drawNeuritesGraph(grid_uniforms);
+//    }
 
-    if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1)
-        drawMeshTriangles(grid_uniforms);
+//    if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1)
+//        drawMeshTriangles(grid_uniforms, false);
 
-    if ( space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x() == 0 )
-        drawSkeletonPoints(grid_uniforms); // transparency is allowed
+//    if ( (space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x()) == 0  )
+//        drawSkeletonPoints(grid_uniforms); // transparency is allowed
 
 }
 

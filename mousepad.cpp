@@ -368,12 +368,6 @@ void MousePad::getSlotsX(int value)
     m_x = value;
     // minimum = 0, maximum = 99
     emit setSignalX(value);
-//    m_vbo_circle.bind();
-//    circle.x = (float)value/100.0;
-//    GLfloat points[] = { circle.x,  circle.y };
-//    m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
-//    m_vbo_circle.release();
-  //  m_updatedPointer = true;
     update();
 
 }
@@ -386,12 +380,6 @@ void MousePad::getSlotsY(int value)
     m_y = value;
     // minimum = 0, maximum = 99
     emit setSignalY(value);
-  //  m_vbo_circle.bind();
-  //  circle.y = (float)(value)/100.0;
-//    GLfloat points[] = { circle.x,  circle.y };
-//    m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
-//    m_vbo_circle.release();
-  //  m_updatedPointer = true;
     update();
 }
 
@@ -448,11 +436,11 @@ void MousePad::processSelection(float x, float y)
     // 4 bytes per pixel (RGBA), 1x1 bitmap
     // width * height * components (RGBA)
     unsigned char res[4];
-    //qDebug() << "Pixel at: " << x << " " << y;
     glReadBuffer(GL_BACK);
     glReadPixels(x,  y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &res);
     int pickedID = res[0] + res[1] * 256 + res[2] * 256 * 256;
 
+    qDebug() << x << " " << y;
     qDebug() <<  res[0] <<  " " << res[1] <<  " " << res[2] << " " << res[3];
 
     if (pickedID == 255 || pickedID == 0) {

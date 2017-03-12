@@ -11,6 +11,8 @@ out vec4        color_val;
 out vec3        normal_out;
 out float       alpha;
 
+out float         G_ID;
+
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
@@ -57,6 +59,7 @@ void main() {
 
   for(int i = 0; i < 3; i++) {
     int ID = V_ID[i];
+    G_ID = float(ID);
     int isFiltered = int(SSBO_data[ID].info.w);
     if (isFiltered == 1)
         return;

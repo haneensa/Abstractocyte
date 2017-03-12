@@ -32,5 +32,6 @@
         <file>shaders/glycogen_vert.glsl</file>
         <file>data/connectivityList.csv</file>
         <file>data/m3mouse3_metadata.hvgx</file>
+        <file>shaders/mesh_selection_frag.glsl</file>
     </qresource>
 </RCC>

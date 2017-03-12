@@ -37,7 +37,7 @@ public:
     bool initMeshTrianglesShaders();
     bool initMeshVertexAttrib();
 
-    void drawMeshTriangles(struct GlobalUniforms grid_uniforms);
+    void drawMeshTriangles(struct GlobalUniforms grid_uniforms, bool selection );
 
     // *********** 3) Skeleton Points    ***********
     bool initSkeletonShaders();
@@ -84,6 +84,7 @@ public:
     void updateCanvasDim(int w, int h, int retianScale);
     void initSelectionFrameBuffer();
     void pick();
+    void processSelection(float x, float y);
 
 
 protected:
@@ -103,12 +104,15 @@ protected:
     // *********** 1) Mesh Triangles     ***********
 
     QOpenGLVertexArrayObject            m_vao_mesh;
+    QOpenGLVertexArrayObject            m_vao_selection_mesh;
+
     QOpenGLBuffer                       m_vbo_mesh;
     QOpenGLBuffer                       m_Neurite_vbo_IndexMesh;
     QOpenGLBuffer                       m_Astro_vbo_IndexMesh;
 
-    GLuint                              m_program_mesh;
 
+    GLuint                              m_program_mesh;
+    GLuint                              m_program_selection_mesh;
 
     // *********** 3) Skeleton Points    ***********
     QOpenGLVertexArrayObject            m_vao_skeleton;
@@ -150,6 +154,7 @@ protected:
     // ********** Selection ************************
     int                                 m_canvas_w;
     int                                 m_canvas_h;
+    int                                 m_retinaScale;
 
     int                                 m_hits;
     GLuint                              m_selectionFrameBuffer;

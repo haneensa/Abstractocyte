@@ -62,7 +62,6 @@ std::set< std::pair<int,int>  > SpatialHash::hashAABB(float x, float y, float r)
 void SpatialHash::insert(Node *node)
 {
     if (node == NULL)   return;
-    qDebug() << "insert";
     float x = node->getLayoutedPosition().x();
     float y = node->getLayoutedPosition().y();
     std::pair<int,int>  cell = hash(x, y);

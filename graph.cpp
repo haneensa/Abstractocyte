@@ -377,8 +377,6 @@ void Graph::runforceDirectedLayout()
     for ( int i = 0; i < m_ITERATIONS; i++ ) {
         if (m_FDL_terminate) goto quit;
 
-        qDebug() << "Iteration # " << i;
-
         // forces on nodes due to node-node repulsion
         for ( auto iter = m_nodes.begin(); iter != m_nodes.end(); iter++ ) {
             if (m_FDL_terminate) goto quit;
@@ -437,7 +435,6 @@ void Graph::runforceDirectedLayout()
             // get amount of force on node
             QVector2D force = m_SLOW_FACTOR * node->getForceSum();
             if ( force.length() > m_MAX_FORCE ) {
-                qDebug() << "MAX_FORCE: " << m_MAX_FORCE;
                 force = force.normalized() * m_MAX_FORCE;
             }
             // calculate how much to move
@@ -449,19 +446,15 @@ void Graph::runforceDirectedLayout()
 
             // limit the movement to the maximum defined
             if ( xMove > m_MAX_VERTEX_MOVEMENT )   {
-                qDebug() << "xMove: " << xMove;
                 xMove = m_MAX_VERTEX_MOVEMENT;
             }
             if ( xMove < -m_MAX_VERTEX_MOVEMENT )   {
-                qDebug() << "xMove: " << xMove;
                 xMove = -m_MAX_VERTEX_MOVEMENT;
             }
             if ( yMove > m_MAX_VERTEX_MOVEMENT )    {
-                qDebug() << "xMove: " << yMove;
                 yMove = m_MAX_VERTEX_MOVEMENT;
             }
             if ( yMove < -m_MAX_VERTEX_MOVEMENT )  {
-                qDebug() << "xMove: " << yMove;
                 yMove = -m_MAX_VERTEX_MOVEMENT;
             }
 
@@ -505,8 +498,6 @@ void Graph::attractConnectedNodes(Edge *edge, float k)
         return;
     }
 
-    qDebug() << "Attraction";
-
     QVector3D n1 = node1->getLayoutedPosition();
     QVector3D n2 = node2->getLayoutedPosition();
 
@@ -541,7 +532,6 @@ QVector2D  Graph::attractionForce(float x1, float y1, float x2, float y2, float 
     float distance = dxy.length();
     float distanceSquared = dxy.lengthSquared();
     if (distance < 0.0001) { // too small
-        qDebug() << "Too small distance " << distance;
         dx = 0.1f * (std::rand() % 100) / 100.0f + 0.1;
         dy = 0.1f * (std::rand() % 100) / 100.0f + 0.1;
         distanceSquared = dx * dx + dy * dy;
@@ -549,7 +539,6 @@ QVector2D  Graph::attractionForce(float x1, float y1, float x2, float y2, float 
 
 
     if (distance > m_MAX_DISTANCE) {
-         qDebug() << "MAX_DISTANCE: " << distance;
          distance = m_MAX_DISTANCE;
          distanceSquared = distance * distance;
      }
