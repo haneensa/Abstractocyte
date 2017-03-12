@@ -46,7 +46,7 @@ public:
     Mesh* getMeshPointer();
 
     Object_t getObjectTypeByID(int hvgxID);
-
+    std::string getObjectName(int hvgxID);
     std::vector<int> getObjectsIDsByType(Object_t type);
 
 protected:

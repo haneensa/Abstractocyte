@@ -36,7 +36,6 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
     : m_vbo_skeleton( QOpenGLBuffer::VertexBuffer ),
       m_vbo_mesh( QOpenGLBuffer::VertexBuffer ),
       m_Neurite_vbo_IndexMesh(QOpenGLBuffer::IndexBuffer),
-      m_Astro_vbo_IndexMesh(QOpenGLBuffer::IndexBuffer),
       m_NeuritesIndexVBO( QOpenGLBuffer::IndexBuffer ),
       m_NeuritesNodesVBO( QOpenGLBuffer::VertexBuffer ),
       m_2D(false),
@@ -96,7 +95,6 @@ bool OpenGLManager::initOpenGLFunctions()
 
 void OpenGLManager::updateCanvasDim(int w, int h, int retianScale)
 {
-
     if (m_canvas_h != h || m_canvas_w != w){
         m_canvas_h = h * retianScale;
         m_canvas_w = w * retianScale;
@@ -104,7 +102,6 @@ void OpenGLManager::updateCanvasDim(int w, int h, int retianScale)
         initSelectionFrameBuffer();
         GL_Error();
     }
-
 
 }
 
@@ -126,10 +123,9 @@ void OpenGLManager::initSelectionFrameBuffer()
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::processSelection(float x, float y)
+int OpenGLManager::processSelection(float x, float y)
 {
-  //  draw selection mode
-       qDebug() << "Draw Selection!";
+    qDebug() << "Draw Selection!";
 
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
@@ -145,6 +141,8 @@ void OpenGLManager::processSelection(float x, float y)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     qDebug() << "Picked ID: " << pickedID;
+
+    return pickedID;
  }
 
 // ----------------------------------------------------------------------------
@@ -913,115 +911,6 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::update2Dflag(bool is2D)
-{
-    m_2D = is2D;
-}
-
-
-// ----------------------------------------------------------------------------
-//
-void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
-{
-    m_uniforms = grid_uniforms;
-    write_ssbo_data();
-    struct ast_neu_properties space_properties = m_2dspace->getSpaceProper();
-
-    drawGlycogenPoints(grid_uniforms);
-
-    if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1) ) {
-        glDisable (GL_BLEND);
-        glBlendFunc (GL_ONE, GL_ONE);
-        drawSkeletonPoints(grid_uniforms, false);
-        glEnable (GL_BLEND);
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }  else if ( space_properties.neu.render_type.y() == 1 ) {
-        drawSkeletonPoints(grid_uniforms, false); // transparency is allowed
-    }
-
-    if ( space_properties.ast.render_type.z() == 1 ||  space_properties.neu.render_type.z() == 1)
-        drawSkeletonsGraph(grid_uniforms, false);
-
-
-    if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
-        drawSkeletonsGraph(grid_uniforms, false);
-        drawNeuritesGraph(grid_uniforms);
-    }
-
-    if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1)
-        drawMeshTriangles(grid_uniforms, false);
-
-    if ( (space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x()) == 0  )
-        drawSkeletonPoints(grid_uniforms, false); // transparency is allowed
-
-
-    glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
-    //clear
-    glClear(GL_COLOR_BUFFER_BIT);
-    //disable dithering -- important
-    glDisable(GL_DITHER);
-    glDisable(GL_MULTISAMPLE);
-
-    //render graph
-    drawMeshTriangles(m_uniforms, true);
-    drawSkeletonPoints(m_uniforms, true);
-    drawSkeletonsGraph(m_uniforms, true);
-
-    //enable dithering again
-    glEnable(GL_DITHER);
-    glEnable(GL_MULTISAMPLE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-}
-
-// ----------------------------------------------------------------------------
-//
-void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
-{
-    if (m_glFunctionsSet == false)
-        return;
-
-    // initialize uniforms
-    GLuint mMatrix = glGetUniformLocation(program, "mMatrix");
-    GLuint m_noRartionMatrix = glGetUniformLocation(program, "m_noRartionMatrix");
-    GLuint vMatrix = glGetUniformLocation(program, "vMatrix");
-    GLint is2D = glGetUniformLocation(program, "is2D");
-    int is2D_value;
-
-    if (m_2D) { // force directed layout started, them use model without rotation
-        is2D_value = 1;
-    } else {
-        is2D_value = 0;
-    }
-    glUniform1iv(is2D, 1, &is2D_value);
-
-    glUniformMatrix4fv(m_noRartionMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
-    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
-
-    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
-
-    GLuint pMatrix = glGetUniformLocation(program, "pMatrix");
-    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
-
-    GLint y_axis = glGetUniformLocation(program, "y_axis");
-    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
-
-    GLint x_axis = glGetUniformLocation(program, "x_axis");
-    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
-
-    GLint viewport = glGetUniformLocation(program, "viewport");
-    float viewport_values[4];
-    viewport_values[0] = m_uniforms.viewport.x();
-    viewport_values[1] = m_uniforms.viewport.y();
-    viewport_values[2] = m_uniforms.viewport.z();
-    viewport_values[3] = m_uniforms.viewport.w();
-
-    glUniform4fv(viewport, 1,  viewport_values);
-}
-
-// ----------------------------------------------------------------------------
-//
 bool OpenGLManager::initGlycogenPointsShaders()
 {
     qDebug() << "OpenGLManager::initGlycogenPointsShaders()";
@@ -1103,7 +992,114 @@ void OpenGLManager::drawGlycogenPoints(struct GlobalUniforms grid_uniforms)
     m_vao_glycogen.release();
 }
 
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::update2Dflag(bool is2D)
+{
+    m_2D = is2D;
+}
 
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
+{
+    m_uniforms = grid_uniforms;
+    write_ssbo_data();
+    struct ast_neu_properties space_properties = m_2dspace->getSpaceProper();
+
+    drawGlycogenPoints(grid_uniforms);
+
+    if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1) ) {
+        glDisable (GL_BLEND);
+        glBlendFunc (GL_ONE, GL_ONE);
+        drawSkeletonPoints(grid_uniforms, false);
+        glEnable (GL_BLEND);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    if ( (space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x() == 0) || space_properties.neu.render_type.y() == 1 )
+        drawSkeletonPoints(grid_uniforms, false); // transparency is allowed
+
+
+    if ( space_properties.ast.render_type.z() == 1 ||  space_properties.neu.render_type.z() == 1)
+        drawSkeletonsGraph(grid_uniforms, false);
+
+
+    if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
+        drawSkeletonsGraph(grid_uniforms, false);
+        drawNeuritesGraph(grid_uniforms);
+    }
+
+    if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1)
+        drawMeshTriangles(grid_uniforms, false);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
+    //clear
+    glClear(GL_COLOR_BUFFER_BIT);
+    //disable dithering -- important
+    glDisable(GL_DITHER);
+    glDisable(GL_MULTISAMPLE);
+
+    //render graph
+    drawMeshTriangles(m_uniforms, true);
+    drawSkeletonPoints(m_uniforms, true);
+    drawSkeletonsGraph(m_uniforms, true);
+
+    //enable dithering again
+    glEnable(GL_DITHER);
+    glEnable(GL_MULTISAMPLE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
+{
+    if (m_glFunctionsSet == false)
+        return;
+
+    // initialize uniforms
+    GLuint mMatrix = glGetUniformLocation(program, "mMatrix");
+    GLuint m_noRartionMatrix = glGetUniformLocation(program, "m_noRartionMatrix");
+    GLuint vMatrix = glGetUniformLocation(program, "vMatrix");
+    GLint is2D = glGetUniformLocation(program, "is2D");
+    int is2D_value;
+
+    if (m_2D) { // force directed layout started, them use model without rotation
+        is2D_value = 1;
+    } else {
+        is2D_value = 0;
+    }
+    glUniform1iv(is2D, 1, &is2D_value);
+
+    glUniformMatrix4fv(m_noRartionMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
+    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    GLuint pMatrix = glGetUniformLocation(program, "pMatrix");
+    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+    GLint y_axis = glGetUniformLocation(program, "y_axis");
+    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
+
+    GLint x_axis = glGetUniformLocation(program, "x_axis");
+    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
+
+    GLint viewport = glGetUniformLocation(program, "viewport");
+    float viewport_values[4];
+    viewport_values[0] = m_uniforms.viewport.x();
+    viewport_values[1] = m_uniforms.viewport.y();
+    viewport_values[2] = m_uniforms.viewport.z();
+    viewport_values[3] = m_uniforms.viewport.w();
+
+    glUniform4fv(viewport, 1,  viewport_values);
+}
+
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::updateUniformsLocation(GLuint program)
 {
     if (m_glFunctionsSet == false)
@@ -1129,6 +1125,8 @@ void OpenGLManager::updateUniformsLocation(GLuint program)
 }
 
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::update_ssbo_data_layout1(QVector2D layout1, int hvgxID)
 {
     if (m_ssbo_data.size() < hvgxID)
@@ -1137,6 +1135,8 @@ void OpenGLManager::update_ssbo_data_layout1(QVector2D layout1, int hvgxID)
     m_ssbo_data[hvgxID].layout1 = layout1;
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::update_ssbo_data_layout2(QVector2D layout2, int hvgxID)
 {
     if (m_ssbo_data.size() < hvgxID)
@@ -1145,6 +1145,8 @@ void OpenGLManager::update_ssbo_data_layout2(QVector2D layout2, int hvgxID)
     m_ssbo_data[hvgxID].layout2 = layout2;
 }
 
+// ----------------------------------------------------------------------------
+//
 // Graph_t::ALL_SKELETONS, dont discriminate between types
 void OpenGLManager::update_skeleton_layout1(QVector2D layout1,  long node_index, int hvgxID)
 {
@@ -1169,6 +1171,8 @@ void OpenGLManager::update_skeleton_layout1(QVector2D layout1,  long node_index,
     m_abstract_skel_nodes[node_index].layout1 = layout1;
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::update_skeleton_layout2(QVector2D layout2,  long node_index, int hvgxID)
 {
     // get the object -> get its skeleton -> update the layout
@@ -1193,6 +1197,8 @@ void OpenGLManager::update_skeleton_layout2(QVector2D layout2,  long node_index,
     m_abstract_skel_nodes[node_index].layout2 = layout2;
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::update_skeleton_layout3(QVector2D layout3,  long node_index, int hvgxID)
 {
     // get the object -> get its skeleton -> update the layout
@@ -1216,6 +1222,8 @@ void OpenGLManager::update_skeleton_layout3(QVector2D layout3,  long node_index,
     m_abstract_skel_nodes[node_index].layout3 = layout3;
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::multiplyWithRotation(QMatrix4x4 rotationMatrix)
 {
     for (int i = 0; i < m_abstract_skel_nodes.size(); ++i) {
@@ -1227,6 +1235,8 @@ void OpenGLManager::multiplyWithRotation(QMatrix4x4 rotationMatrix)
     }
 }
 
+// ----------------------------------------------------------------------------
+//
 Object_t OpenGLManager::getObjectTypeByID(int hvgxID)
 {
     if (m_dataContainer == NULL)
@@ -1235,7 +1245,8 @@ Object_t OpenGLManager::getObjectTypeByID(int hvgxID)
     return m_dataContainer->getObjectTypeByID(hvgxID);
 }
 
-
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::FilterByType(Object_t type)
 {
     // this should be fast, I should somehow group by IDs for types, and when we filter by type I just get all IDs with this type and set them to 1 which means filtered
@@ -1253,6 +1264,8 @@ void OpenGLManager::FilterByType(Object_t type)
     }
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::FilterObject(int ID, bool isfilterd)
 {
     std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
@@ -1276,6 +1289,8 @@ void OpenGLManager::FilterObject(int ID, bool isfilterd)
 
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
@@ -1287,33 +1302,57 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
         if (hvgxID > m_ssbo_data.size())
             continue;
 
-        std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
-        if (objectMap.find(hvgxID) == objectMap.end() || objectMap[hvgxID] == NULL) {
-            return;
-        }
+//        std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
+//        if (objectMap.find(hvgxID) == objectMap.end() || objectMap[hvgxID] == NULL) {
+//            return;
+//        }
 
-        Object *obj = objectMap[hvgxID];
+//        Object *obj = objectMap[hvgxID];
 
-        // if it has a children then get them
-        // else if has parent get them
-        Object *parent = obj->getParent();
-        if (parent == NULL) {
-            qDebug() << obj->getName().data() << " has no parnt";
-        } else {
-            FilterObject(parent->getHVGXID(), false);
+//        // if it has a children then get them
+//        // else if has parent get them
+//        Object *parent = obj->getParent();
+//        if (parent == NULL) {
+//            qDebug() << obj->getName().data() << " has no parnt";
+//        } else {
+//            FilterObject(parent->getHVGXID(), false);
 
-        }
+//        }
 
-        std::vector<Object*> children = obj->getChildren();
-        if (children.size() == 0) {
-            qDebug() << obj->getName().data() << " has no child";
-        } else {
-            for (int i = 0; i < children.size(); i++) {
-                qDebug() << "Showing " << children[i]->getName().data();
-                FilterObject(children[i]->getHVGXID(), false);
-            }
-        }
+//        std::vector<Object*> children = obj->getChildren();
+//        if (children.size() == 0) {
+//            qDebug() << obj->getName().data() << " has no child";
+//        } else {
+//            for (int i = 0; i < children.size(); i++) {
+//                qDebug() << "Showing " << children[i]->getName().data();
+//                FilterObject(children[i]->getHVGXID(), false);
+//            }
+//        }
+
         FilterObject(hvgxID, false);
 
+    }
+}
+
+void OpenGLManager::FilterByID( std::vector<int> tokens_Ids )
+{
+    for (int i = 0; i < m_ssbo_data.size(); ++i) {
+        FilterObject(i, true);
+    }
+
+    for (int i = 0; i < tokens_Ids.size(); ++i) {
+        int hvgxID = tokens_Ids[i];
+        if (hvgxID > m_ssbo_data.size())
+            continue;
+
+        FilterObject(hvgxID, false);
+
+    }
+}
+
+void OpenGLManager::showAll()
+{
+    for (int i = 0; i < m_ssbo_data.size(); ++i) {
+        FilterObject(i, false);
     }
 }

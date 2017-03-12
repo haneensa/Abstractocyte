@@ -37,6 +37,8 @@ public slots:
 
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);
+    void setHoveredID(int);
+    void setHoveredName(QString);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -90,6 +92,9 @@ protected:
 
     QTimer                              *m_refresh_timer;
     QTimer                              *m_rotation_timer;
+
+
+    std::vector<int>                    m_selectedObjects;
 
 };
 

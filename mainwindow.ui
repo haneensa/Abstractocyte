@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1082</width>
-    <height>710</height>
+    <height>780</height>
    </rect>
   </property>
   <property name="cursor">
@@ -48,7 +48,7 @@
    <property name="minimumSize">
     <size>
      <width>300</width>
-     <height>574</height>
+     <height>626</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -399,6 +399,29 @@
           </layout>
          </widget>
         </item>
+        <item row="2" column="0">
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string>Selected</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout_2">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>ID</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>Name</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>
@@ -431,6 +454,8 @@
    <header>glwidget.h</header>
    <slots>
     <signal>setAbstractionData(AbstractionSpace*)</signal>
+    <signal>setHoveredID(int)</signal>
+    <signal>setHoveredName(QString)</signal>
     <slot>getSliderX(int)</slot>
     <slot>getSliderY(int)</slot>
     <slot>getIntervalID(int)</slot>
@@ -711,12 +736,44 @@
    <slot>getFilteredID(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>253</x>
-     <y>647</y>
+     <x>270</x>
+     <y>678</y>
     </hint>
     <hint type="destinationlabel">
      <x>337</x>
      <y>657</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget</sender>
+   <signal>setHoveredID(int)</signal>
+   <receiver>label_7</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>332</x>
+     <y>723</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>39</x>
+     <y>723</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget</sender>
+   <signal>setHoveredName(QString)</signal>
+   <receiver>label_8</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>336</x>
+     <y>699</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>66</x>
+     <y>729</y>
     </hint>
    </hints>
   </connection>

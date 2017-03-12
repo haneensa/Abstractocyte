@@ -294,7 +294,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             m_opengl_mngr->showAll();
         break;
         case(Qt::Key_H): // enable hover
-
+            // tra
         break;
     }
 }

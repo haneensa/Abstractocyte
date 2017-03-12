@@ -78,13 +78,15 @@ public:
     Object_t getObjectTypeByID(int hvgxID);
     void FilterByType(Object_t type);
     void FilterByID( QList<QString> tokens_Ids );
+    void FilterByID(  std::vector<int> tokens_Ids );
+    void showAll();
     void FilterObject(int ID, bool isfilterd);
 
 
     // ********** Selection ************************
     void updateCanvasDim(int w, int h, int retianScale);
     void initSelectionFrameBuffer();
-    void processSelection(float x, float y);
+    int processSelection(float x, float y);
 
 
 protected:
