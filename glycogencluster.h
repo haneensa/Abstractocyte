@@ -4,6 +4,7 @@
 #include <map>
 #include <QVector3D>
 
+class Glycogen;
 
 namespace Clustering
 {

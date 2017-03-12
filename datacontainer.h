@@ -15,6 +15,7 @@
 #include "mesh.h"
 #include "glycogen.h"
 #include "octree.h"
+//#include "dbscan.h"
 
 class DataContainer
 {
@@ -75,6 +76,8 @@ protected:
 	SpacePartitioning::Octree				m_spineOctree;
 	SpacePartitioning::Octree				m_boutonOctree;
 	SpacePartitioning::Octree				m_glycogenOctree;
+
+	//Clustering::DBScan						m_dbscan; //just testing, remove from here
 };
 
 #endif // OBJECTMANAGER_H

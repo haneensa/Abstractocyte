@@ -32,6 +32,7 @@ Glycogen::Glycogen(int ID, std::string name, QVector3D center, float radius)
 void Glycogen::setClusterID(int clusterID)
 {
 	m_clusterID = clusterID;
+	m_center2.skeleton_vertex.setY(m_clusterID);
 }
 
 //----------------------------------------------------------------------------

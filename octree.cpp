@@ -27,7 +27,7 @@ namespace SpacePartitioning
 		m_data = pts;
 
 		uint32_t N = pts->size();
-		std::vector<uint32_t>* indices = new std::vector<uint32_t>(N);
+		std::vector<uint32_t>* indices = new std::vector<uint32_t>();
 
 		float min[3], max[3];
 		min[0] = minX;
@@ -361,7 +361,8 @@ namespace SpacePartitioning
 					continue;
 
 				float dist = L2Distance::compute(x, y, z, p->x(), p->y(), p->z());
-				if (dist < sqrRadius) resultIndices.push_back(idx);
+				if (dist < sqrRadius) 
+					resultIndices.push_back(idx);
 			}
 
 			return;
