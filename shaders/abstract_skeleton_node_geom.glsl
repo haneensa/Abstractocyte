@@ -5,6 +5,7 @@ layout (points, max_vertices = 1) out;
 
 out float       alpha;
 out vec4        color_val;
+out float         G_ID;
 
 in int          V_ID[];
 in float        V_alpha[];
@@ -46,6 +47,7 @@ layout (std430, binding=3) buffer space2d_data
 
 void main() {
     int ID = V_ID[0];
+    G_ID = float(ID);
 
     alpha = V_alpha[0];
     if (alpha < 0.05){

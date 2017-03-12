@@ -39,8 +39,6 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
       m_Astro_vbo_IndexMesh(QOpenGLBuffer::IndexBuffer),
       m_NeuritesIndexVBO( QOpenGLBuffer::IndexBuffer ),
       m_NeuritesNodesVBO( QOpenGLBuffer::VertexBuffer ),
-      m_SkeletonsIndexVBO( QOpenGLBuffer::IndexBuffer ),
-      m_SkeletonsNodesVBO( QOpenGLBuffer::VertexBuffer ),
       m_2D(false),
       m_bindIdx(2) // ssbo biding point
 {
@@ -50,16 +48,26 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
 
     m_program_skeleton  = 0;
     m_program_mesh  = 0;
-    m_program_skeletons_2D_index  = 0;
-    m_program_skeletons_2D_nodes  = 0;
-
-    m_program_skeletons_23D_index  = 0;
-    m_program_skeletons_23D_nodes  = 0;
 
     m_program_glycogen  = 0;
 
     m_program_neurites_nodes  = 0;
     m_program_neurites_index  = 0;
+
+    // Graph Skeleton Programs
+    m_gskeleton_programs["2D_index"] = 0;
+    m_gskeleton_programs["2D_nodes"] = 0;
+    m_gskeleton_programs["selection_2D_nodes"] = 0;
+    m_gskeleton_programs["selection_2D_index"] = 0;
+    m_gskeleton_programs["23D_index"] = 0;
+    m_gskeleton_programs["23D_nodes"] = 0;
+    m_gskeleton_programs["selection_23D_index"] = 0;
+    m_gskeleton_programs["selection_23D_nodes"] = 0;
+
+    m_gskeleton_vbo["nodes"] = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
+    m_gskeleton_vbo["index"] = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
+
+
 }
 
 OpenGLManager::~OpenGLManager()
@@ -69,12 +77,6 @@ OpenGLManager::~OpenGLManager()
 
     glDeleteProgram(m_program_skeleton);
     glDeleteProgram(m_program_mesh);
-    glDeleteProgram(m_program_skeletons_2D_index);
-    glDeleteProgram(m_program_skeletons_2D_nodes);
-
-    glDeleteProgram(m_program_skeletons_23D_index);
-    glDeleteProgram(m_program_skeletons_23D_nodes);
-
     glDeleteProgram(m_program_glycogen);
 
     glDeleteProgram(m_program_neurites_nodes);
@@ -88,9 +90,20 @@ OpenGLManager::~OpenGLManager()
     m_vao_skeleton.destroy();
     m_vbo_skeleton.destroy();
 
-    m_SkeletonsGraphVAO.destroy();
-    m_SkeletonsIndexVBO.destroy();
-    m_SkeletonsNodesVBO.destroy();
+    m_vao_SkeletonsGraph.destroy();
+
+    for (auto iter = m_gskeleton_vbo.begin(); iter != m_gskeleton_vbo.end(); iter++) {
+        QOpenGLBuffer vbo = (*iter).second;
+        vbo.destroy();
+    }
+
+
+    for (auto iter = m_gskeleton_programs.begin(); iter != m_gskeleton_programs.end(); iter++) {
+        GLuint p = (*iter).second;
+        glDeleteProgram(p);
+    }
+
+
 
     m_NeuritesGraphVAO.destroy();
     m_NeuritesNodesVBO.destroy();
@@ -151,17 +164,13 @@ void OpenGLManager::initSelectionFrameBuffer()
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::pick()
-{
-}
-
 void OpenGLManager::processSelection(float x, float y)
 {
   //  draw selection mode
        qDebug() << "Draw Selection!";
 
 
-
+    glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
 
     GLubyte pixel[3];
 
@@ -171,7 +180,7 @@ void OpenGLManager::processSelection(float x, float y)
     int pickedID = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
     qDebug() << pixel[0] << " " << pixel[1] << " " << pixel[2];
 
-
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     qDebug() << "Picked ID: " << pickedID;
  }
@@ -335,22 +344,22 @@ void OpenGLManager::fillVBOsData()
     m_vbo_skeleton.release();
 
     // allocate skeleton nodes
-    m_SkeletonsNodesVBO.create();
-    m_SkeletonsNodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
-    m_SkeletonsNodesVBO.bind();
+    m_gskeleton_vbo["nodes"].create();
+    m_gskeleton_vbo["nodes"].setUsagePattern( QOpenGLBuffer::DynamicDraw );
+    m_gskeleton_vbo["nodes"].bind();
 
-    m_SkeletonsNodesVBO.allocate( m_abstract_skel_nodes.data(),
+    m_gskeleton_vbo["nodes"].allocate( m_abstract_skel_nodes.data(),
                                   m_abstract_skel_nodes.size() * sizeof(struct AbstractSkelNode) );
     GL_Error();
-    m_SkeletonsNodesVBO.release();
+    m_gskeleton_vbo["nodes"].release();
 
     // allocate skeleton edges
-    m_SkeletonsIndexVBO.create();
-    m_SkeletonsIndexVBO.bind();
+    m_gskeleton_vbo["index"].create();
+    m_gskeleton_vbo["index"].bind();
 
-    m_SkeletonsIndexVBO.allocate( m_abstract_skel_edges.data(),
+    m_gskeleton_vbo["index"].allocate( m_abstract_skel_edges.data(),
                                   m_abstract_skel_edges.size() * sizeof(GLuint) );
-    m_SkeletonsIndexVBO.release();
+    m_gskeleton_vbo["index"].release();
     GL_Error();
 
     // allocate neurites nodes
@@ -453,8 +462,8 @@ bool OpenGLManager::initAbstractSkeletonShaders()
         return false;
 
     qDebug() << "nodes shader";
-    m_program_skeletons_2D_nodes = glCreateProgram();
-    bool res = initShader(m_program_skeletons_2D_nodes,
+     m_gskeleton_programs["2D_nodes"]  = glCreateProgram();
+    bool res = initShader( m_gskeleton_programs["2D_nodes"] ,
                           ":/shaders/abstract_skeleton_node_2D_vert.glsl",
                           ":/shaders/abstract_skeleton_node_geom.glsl",
                           ":/shaders/points_3d_frag.glsl");
@@ -462,8 +471,8 @@ bool OpenGLManager::initAbstractSkeletonShaders()
         return res;
 
     qDebug() << "index shader";
-    m_program_skeletons_2D_index = glCreateProgram();
-    res = initShader(m_program_skeletons_2D_index,
+     m_gskeleton_programs["2D_index"] = glCreateProgram();
+    res = initShader( m_gskeleton_programs["2D_index"],
                      ":/shaders/abstract_skeleton_node_2D_vert.glsl",
                      ":/shaders/abstract_skeleton_line_geom.glsl",
                      ":/shaders/points_3d_frag.glsl");
@@ -472,8 +481,8 @@ bool OpenGLManager::initAbstractSkeletonShaders()
         return res;
 
 
-    m_program_skeletons_23D_nodes = glCreateProgram();
-    res = initShader(m_program_skeletons_23D_nodes,
+     m_gskeleton_programs["23D_nodes"]  = glCreateProgram();
+    res = initShader( m_gskeleton_programs["23D_nodes"] ,
                           ":/shaders/abstract_skeleton_node_transition_vert.glsl",
                           ":/shaders/abstract_skeleton_node_geom.glsl",
                           ":/shaders/points_3d_frag.glsl");
@@ -481,8 +490,8 @@ bool OpenGLManager::initAbstractSkeletonShaders()
         return res;
 
     qDebug() << "index shader";
-    m_program_skeletons_23D_index = glCreateProgram();
-    res = initShader(m_program_skeletons_23D_index,
+     m_gskeleton_programs["23D_index"]  = glCreateProgram();
+    res = initShader( m_gskeleton_programs["23D_index"] ,
                      ":/shaders/abstract_skeleton_node_transition_vert.glsl",
                      ":/shaders/abstract_skeleton_line_geom.glsl",
                      ":/shaders/points_3d_frag.glsl");
@@ -490,27 +499,92 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     if (res == false)
         return res;
 
-    m_SkeletonsGraphVAO.create();
-    m_SkeletonsGraphVAO.bind();
+    m_vao_SkeletonsGraph.create();
+    m_vao_SkeletonsGraph.bind();
 
-    m_SkeletonsNodesVBO.bind();
+    m_gskeleton_vbo["nodes"].bind();
 
-    glUseProgram(m_program_skeletons_2D_nodes);
+    glUseProgram( m_gskeleton_programs["2D_nodes"] );
     initSkeletonsVertexAttribPointer();
 
-    glUseProgram(m_program_skeletons_23D_nodes);
+    glUseProgram( m_gskeleton_programs["23D_nodes"] );
     initSkeletonsVertexAttribPointer();
 
     GL_Error();
 
-    m_SkeletonsNodesVBO.release();
+    m_gskeleton_vbo["nodes"].release();
 
-    m_SkeletonsIndexVBO.bind();
-    glUseProgram(m_program_skeletons_2D_index);
-    glUseProgram(m_program_skeletons_23D_index);
+    m_gskeleton_vbo["index"].bind();
+    glUseProgram( m_gskeleton_programs["2D_index"]);
+    glUseProgram( m_gskeleton_programs["23D_index"] );
 
-    m_SkeletonsIndexVBO.release();
-    m_SkeletonsGraphVAO.release();
+    m_gskeleton_vbo["index"].release();
+    m_vao_SkeletonsGraph.release();
+
+
+
+    /* selectin */
+    m_gskeleton_programs["selection_2D_nodes"] = glCreateProgram();
+    res = initShader(m_gskeleton_programs["selection_2D_nodes"],
+                          ":/shaders/abstract_skeleton_node_2D_vert.glsl",
+                          ":/shaders/abstract_skeleton_node_geom.glsl",
+                          ":/shaders/hvgx_selection_frag.glsl");
+    if (res == false)
+        return res;
+
+
+     m_gskeleton_programs["selection_2D_index"]  = glCreateProgram();
+    res = initShader( m_gskeleton_programs["selection_2D_index"] ,
+                     ":/shaders/abstract_skeleton_node_2D_vert.glsl",
+                     ":/shaders/abstract_skeleton_line_geom.glsl",
+                     ":/shaders/hvgx_selection_frag.glsl");
+
+    if (res == false)
+        return res;
+
+
+
+     m_gskeleton_programs["selection_23D_nodes"]  = glCreateProgram();
+    res = initShader( m_gskeleton_programs["selection_23D_nodes"] ,
+                     ":/shaders/abstract_skeleton_node_transition_vert.glsl",
+                     ":/shaders/abstract_skeleton_node_geom.glsl",
+                     ":/shaders/hvgx_selection_frag.glsl");
+
+    if (res == false)
+        return res;
+
+     m_gskeleton_programs["selection_23D_index"]  = glCreateProgram();
+    res = initShader( m_gskeleton_programs["selection_23D_index"] ,
+                     ":/shaders/abstract_skeleton_node_transition_vert.glsl",
+                     ":/shaders/abstract_skeleton_line_geom.glsl",
+                     ":/shaders/hvgx_selection_frag.glsl");
+
+    if (res == false)
+        return res;
+    m_vao_selection_skeletonGraph.create();
+    m_vao_selection_skeletonGraph.bind();
+
+    m_gskeleton_vbo["nodes"].bind();
+
+    glUseProgram(m_gskeleton_programs["selection_2D_nodes"]);
+    initSkeletonsVertexAttribPointer();
+
+    glUseProgram( m_gskeleton_programs["selection_23D_nodes"] );
+    initSkeletonsVertexAttribPointer();
+
+    GL_Error();
+
+    m_gskeleton_vbo["nodes"].release();
+
+    m_gskeleton_vbo["index"].bind();
+    glUseProgram( m_gskeleton_programs["selection_2D_index"] );
+    glUseProgram( m_gskeleton_programs["selection_23D_index"] );
+
+    m_gskeleton_vbo["index"].release();
+
+    m_vao_selection_skeletonGraph.release();
+
+
 }
 
 
@@ -518,7 +592,7 @@ bool OpenGLManager::initAbstractSkeletonShaders()
 //
 // only the edges, the nodes itself they are not needed to be visible
 // this will collabse into a node for the neurites at the most abstract view
-void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms)
+void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms, bool selection )
 {
     if (m_glFunctionsSet == false)
         return;
@@ -526,37 +600,71 @@ void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms)
     // update skeleton data from object manager
     m_uniforms = grid_uniforms;
 
-    m_SkeletonsGraphVAO.bind();
-    m_SkeletonsNodesVBO.bind();
+    if (selection) {
+        m_vao_selection_skeletonGraph.bind();
+        m_gskeleton_vbo["nodes"].bind();
 
-    m_SkeletonsNodesVBO.allocate( m_abstract_skel_nodes.data(),
-                                  m_abstract_skel_nodes.size() * sizeof(struct AbstractSkelNode) );
+        m_gskeleton_vbo["nodes"].allocate( m_abstract_skel_nodes.data(),
+                                      m_abstract_skel_nodes.size() * sizeof(struct AbstractSkelNode) );
 
-    glUseProgram(m_program_skeletons_2D_nodes);
-    updateAbstractUniformsLocation(m_program_skeletons_2D_nodes);
-    glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
+        glUseProgram(m_gskeleton_programs["selection_2D_nodes"]);
+        updateAbstractUniformsLocation(m_gskeleton_programs["selection_2D_nodes"]);
+        glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
 
-    glUseProgram(m_program_skeletons_23D_nodes);
-    updateAbstractUniformsLocation(m_program_skeletons_23D_nodes);
-    glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
+        glUseProgram( m_gskeleton_programs["selection_23D_nodes"] );
+        updateAbstractUniformsLocation( m_gskeleton_programs["selection_23D_nodes"] );
+        glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
 
-    m_SkeletonsIndexVBO.bind();
+        m_gskeleton_vbo["index"].bind();
 
-    glUseProgram(m_program_skeletons_2D_index);
-    updateAbstractUniformsLocation(m_program_skeletons_2D_index);
-    glLineWidth(20);
-    glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
+        glUseProgram( m_gskeleton_programs["selection_2D_index"] );
+        updateAbstractUniformsLocation( m_gskeleton_programs["selection_2D_index"] );
+        glLineWidth(20);
+        glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
 
-    glUseProgram(m_program_skeletons_23D_index);
-    updateAbstractUniformsLocation(m_program_skeletons_23D_index);
-    glLineWidth(20);
-    glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
+        glUseProgram( m_gskeleton_programs["selection_23D_index"] );
+        updateAbstractUniformsLocation( m_gskeleton_programs["selection_23D_index"] );
+        glLineWidth(20);
+        glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
 
-    m_SkeletonsIndexVBO.release();
+        m_gskeleton_vbo["index"].release();
 
 
-    m_SkeletonsNodesVBO.release();
-    m_SkeletonsGraphVAO.release();
+        m_gskeleton_vbo["nodes"].release();
+        m_vao_selection_skeletonGraph.release();
+    } else {
+        m_vao_SkeletonsGraph.bind();
+        m_gskeleton_vbo["nodes"].bind();
+
+        m_gskeleton_vbo["nodes"].allocate( m_abstract_skel_nodes.data(),
+                                      m_abstract_skel_nodes.size() * sizeof(struct AbstractSkelNode) );
+
+        glUseProgram( m_gskeleton_programs["2D_nodes"] );
+        updateAbstractUniformsLocation( m_gskeleton_programs["2D_nodes"] );
+        glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
+
+        glUseProgram( m_gskeleton_programs["23D_nodes"] );
+        updateAbstractUniformsLocation( m_gskeleton_programs["23D_nodes"] );
+        glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
+
+        m_gskeleton_vbo["index"].bind();
+
+        glUseProgram(m_gskeleton_programs["2D_index"]);
+        updateAbstractUniformsLocation(m_gskeleton_programs["2D_index"]);
+        glLineWidth(20);
+        glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
+
+        glUseProgram( m_gskeleton_programs["23D_index"] );
+        updateAbstractUniformsLocation( m_gskeleton_programs["23D_index"] );
+        glLineWidth(20);
+        glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
+
+        m_gskeleton_vbo["index"].release();
+
+
+        m_gskeleton_vbo["nodes"].release();
+        m_vao_SkeletonsGraph.release();
+    }
 }
 
 
@@ -609,7 +717,7 @@ bool OpenGLManager::initMeshTrianglesShaders()
     m_program_selection_mesh = glCreateProgram();
     res = initShader(m_program_selection_mesh, ":/shaders/mesh_vert.glsl",
                                           ":/shaders/mesh_geom.glsl",
-                                          ":/shaders/mesh_selection_frag.glsl");
+                                          ":/shaders/hvgx_selection_frag.glsl");
     if (res == false)
         return res;
 
@@ -694,23 +802,70 @@ bool OpenGLManager::initSkeletonShaders()
 
     m_vbo_skeleton.release();
     m_vao_skeleton.release();
+
+
+    /*   selection */
+    m_program_selection_skeleton = glCreateProgram();
+    res = initShader(m_program_selection_skeleton, ":/shaders/skeleton_point_vert.glsl",
+                                              ":/shaders/skeleton_point_geom.glsl",
+                                              ":/shaders/hvgx_selection_frag.glsl");
+    if (res == false)
+        return res;
+
+    m_vao_selection_skeleton.create();
+    m_vao_selection_skeleton.bind();
+
+    glUseProgram(m_program_selection_skeleton);
+
+    m_vbo_skeleton.bind();
+
+    GL_Error();
+
+    offset = 0;
+    glEnableVertexAttribArray(0); // original position of the skeleton point
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  0);
+
+    offset += sizeof(QVector4D);
+    glEnableVertexAttribArray(1); // simplified skeleton end 1
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  (GLvoid*)offset);
+
+    offset += sizeof(QVector4D);
+    glEnableVertexAttribArray(2);   // simplified skeleton end 2
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(SkeletonPoint),  (GLvoid*)offset);
+
+    GL_Error();
+
+    m_vbo_skeleton.release();
+    m_vao_selection_skeleton.release();
+
+
 }
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::drawSkeletonPoints(struct GlobalUniforms grid_uniforms)
+void OpenGLManager::drawSkeletonPoints(struct GlobalUniforms grid_uniforms, bool selection)
 {
    // qDebug() << "OpenGLManager::drawSkeletonPoints";
     // I need this because vertex <-> skeleton mapping is not complete
-    m_vao_skeleton.bind();
-    glUseProgram(m_program_skeleton);
-
     m_uniforms = grid_uniforms;
-    updateUniformsLocation(m_program_skeleton);
 
-    glDrawArrays(GL_POINTS, 0,  m_dataContainer->getSkeletonPointsSize()  );
-    m_vao_skeleton.release();
+    if (selection) {
+        m_vao_selection_skeleton.bind();
+        glUseProgram(m_program_selection_skeleton);
 
+        updateUniformsLocation(m_program_selection_skeleton);
+
+        glDrawArrays(GL_POINTS, 0,  m_dataContainer->getSkeletonPointsSize()  );
+        m_vao_selection_skeleton.release();
+    } else {
+        m_vao_skeleton.bind();
+        glUseProgram(m_program_skeleton);
+
+        updateUniformsLocation(m_program_skeleton);
+
+        glDrawArrays(GL_POINTS, 0,  m_dataContainer->getSkeletonPointsSize()  );
+        m_vao_skeleton.release();
+    }
 }
 
 
@@ -817,54 +972,52 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     m_uniforms = grid_uniforms;
     write_ssbo_data();
     struct ast_neu_properties space_properties = m_2dspace->getSpaceProper();
-    drawMeshTriangles(grid_uniforms, true);
+
+    drawGlycogenPoints(grid_uniforms);
+
+    if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1) ) {
+        glDisable (GL_BLEND);
+        glBlendFunc (GL_ONE, GL_ONE);
+        drawSkeletonPoints(grid_uniforms, false);
+        glEnable (GL_BLEND);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }  else if ( space_properties.neu.render_type.y() == 1 ) {
+        drawSkeletonPoints(grid_uniforms, false); // transparency is allowed
+    }
+
+    if ( space_properties.ast.render_type.z() == 1 ||  space_properties.neu.render_type.z() == 1)
+        drawSkeletonsGraph(grid_uniforms, false);
+
+
+    if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
+        drawSkeletonsGraph(grid_uniforms, false);
+        drawNeuritesGraph(grid_uniforms);
+    }
+
+    if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1)
+        drawMeshTriangles(grid_uniforms, false);
+
+    if ( (space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x()) == 0  )
+        drawSkeletonPoints(grid_uniforms, false); // transparency is allowed
+
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
     //clear
     glClear(GL_COLOR_BUFFER_BIT);
     //disable dithering -- important
     glDisable(GL_DITHER);
-    glDisable(GL_BLEND);
     glDisable(GL_MULTISAMPLE);
 
     //render graph
-
     drawMeshTriangles(m_uniforms, true);
+    drawSkeletonPoints(m_uniforms, true);
+    drawSkeletonsGraph(m_uniforms, true);
 
     //enable dithering again
     glEnable(GL_DITHER);
-    glEnable(GL_BLEND);
     glEnable(GL_MULTISAMPLE);
-    //process click
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-//    drawGlycogenPoints(grid_uniforms);
-
-//    if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1) ) {
-//        glDisable (GL_BLEND);
-//        glBlendFunc (GL_ONE, GL_ONE);
-//        drawSkeletonPoints(grid_uniforms);
-//        glEnable (GL_BLEND);
-//        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//    } else {
-//        drawSkeletonPoints(grid_uniforms); // transparency is allowed
-//    }
-
-//    if ( space_properties.ast.render_type.z() == 1 ||  space_properties.neu.render_type.z() == 1)
-//        drawSkeletonsGraph(grid_uniforms);
-
-
-//    if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
-//        drawSkeletonsGraph(grid_uniforms);
-//        drawNeuritesGraph(grid_uniforms);
-//    }
-
-//    if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1)
-//        drawMeshTriangles(grid_uniforms, false);
-
-//    if ( (space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x()) == 0  )
-//        drawSkeletonPoints(grid_uniforms); // transparency is allowed
 
 }
 

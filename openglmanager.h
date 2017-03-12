@@ -41,12 +41,12 @@ public:
 
     // *********** 3) Skeleton Points    ***********
     bool initSkeletonShaders();
-    void drawSkeletonPoints(struct GlobalUniforms grid_uniforms);
+    void drawSkeletonPoints(struct GlobalUniforms grid_uniforms, bool selection );
 
     // *********** 4) Abstract Skeleton Graph (Nodes and Edges) ***********
     bool initAbstractSkeletonShaders();
     void initSkeletonsVertexAttribPointer();
-    void drawSkeletonsGraph(struct GlobalUniforms grid_uniforms);
+    void drawSkeletonsGraph(struct GlobalUniforms grid_uniforms, bool selection );
 
     // ***********  5) Neurites Graph (Nodes and Edges) ***********
     bool initNeuritesGraphShaders();
@@ -83,7 +83,6 @@ public:
     // ********** Selection ************************
     void updateCanvasDim(int w, int h, int retianScale);
     void initSelectionFrameBuffer();
-    void pick();
     void processSelection(float x, float y);
 
 
@@ -115,23 +114,22 @@ protected:
     GLuint                              m_program_selection_mesh;
 
     // *********** 3) Skeleton Points    ***********
+    QOpenGLVertexArrayObject            m_vao_selection_skeleton;
     QOpenGLVertexArrayObject            m_vao_skeleton;
     QOpenGLBuffer                       m_vbo_skeleton;
     GLuint                              m_program_skeleton;
+    GLuint                              m_program_selection_skeleton;
 
     // *********** 4) Abstract Skeleton Graph (Nodes and Edges) ***********
     std::vector<struct AbstractSkelNode>   m_abstract_skel_nodes; // all skeletons here
     std::vector<GLuint>                    m_abstract_skel_edges;
 
-    QOpenGLVertexArrayObject            m_SkeletonsGraphVAO;
-    QOpenGLBuffer                       m_SkeletonsIndexVBO;
-    QOpenGLBuffer                       m_SkeletonsNodesVBO;
+    QOpenGLVertexArrayObject                m_vao_selection_skeletonGraph;
+    QOpenGLVertexArrayObject                m_vao_SkeletonsGraph;
+    // todo: gather data needed for each render type in a class
+    std::map<std::string, QOpenGLBuffer>    m_gskeleton_vbo;
+    std::map<std::string, GLuint>           m_gskeleton_programs;
 
-    GLuint                              m_program_skeletons_2D_index;
-    GLuint                              m_program_skeletons_2D_nodes;
-
-    GLuint                              m_program_skeletons_23D_index;
-    GLuint                              m_program_skeletons_23D_nodes;
 
     // ***********  5) Neurites Graph (Nodes and Edges) ***********
     std::vector<GLuint>                 m_neurites_nodes; // (place holders for neurites nodes) this initialized once and not changed after words

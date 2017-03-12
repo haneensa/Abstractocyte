@@ -8,6 +8,7 @@ in float    V_color_intp[];
 out float   color_intp;
 out vec4    color_val;
 out float   alpha;
+out float         G_ID;
 
 
 uniform int     y_axis;
@@ -56,6 +57,7 @@ layout (std430, binding=3) buffer space2d_data
 
 void main() {
     int ID = V_ID[0];
+    G_ID = float(ID);
     int isFiltered = int(SSBO_data[ID].info.w);
     if (isFiltered == 1)
         return;

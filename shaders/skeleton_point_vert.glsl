@@ -84,9 +84,10 @@ void main(void)
     float leftMin = interval.x;
     float leftMax = interval.y;
 
-
-    V_alpha =  translate(slider, leftMin, leftMax, trans_alpha.x, trans_alpha.y);
-
+    if (type == 1)
+        V_alpha = 1;
+    else
+        V_alpha =  translate(slider, leftMin, leftMax, trans_alpha.x, trans_alpha.y);
 
     float position_intp = translate(slider,leftMin, leftMax,  pos_alpha.x, pos_alpha.y);
     V_color_intp = translate(slider, leftMin, leftMax, color_alpha.y, color_alpha.x);

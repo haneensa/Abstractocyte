@@ -34,7 +34,8 @@ SOURCES += main.cpp\
     datacontainer.cpp \
     glycogen.cpp \
     octree.cpp \
-    glycogencluster.cpp
+    glycogencluster.cpp \
+    rendervertexdata.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -57,7 +58,8 @@ HEADERS  += mainwindow.h \
     datacontainer.h \
     glycogen.h \
     octree.h \
-    glycogencluster.h
+    glycogencluster.h \
+    rendervertexdata.h
 
 
 FORMS    += mainwindow.ui

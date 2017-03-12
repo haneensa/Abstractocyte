@@ -26,6 +26,7 @@ in int          V_render[];
 in vec4         v_viewport[];
 out vec4        color_val;
 out float       alpha;
+out float         G_ID;
 
 struct SSBO_datum {
     vec4 color;
@@ -64,6 +65,7 @@ layout (std430, binding=3) buffer space2d_data
 
 void main() {
     int ID = V_ID[0] ;
+    G_ID = float(ID);
 
     if ( int(SSBO_data[V_ID[0]].info.w) == 1 || int(SSBO_data[V_ID[1]].info.w) == 1 )
         return;
