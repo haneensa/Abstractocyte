@@ -1,6 +1,8 @@
 #version 430
 
-#define astrocyte 6
+#define astrocyte   6
+#define spine       5
+#define bouton      3
 
 // in: per vertex data
 layout (location = 0) in vec4 vertex;
@@ -100,13 +102,12 @@ void main(void)
     else
         V_render = 0;
 
-    if ( type != astrocyte && (int(SSBO_data[ID].info.y) == 2 || int(SSBO_data[ID].info.y) == 3) ) {
-        // check if spine or bouton
+    if ( type == spine || type == bouton ) {
         // if this is a child and parent is not filtered
-            int ParentID = int(SSBO_data[ID].info.z);
-            int isParentFiltered = int(SSBO_data[ParentID].info.w);
-            if (isParentFiltered == 0) // color this special color that would show this is a mix of parent and child
-                 V_render = 0;
+        int ParentID = int(SSBO_data[ID].info.z);
+        int isParentFiltered = int(SSBO_data[ParentID].info.w);
+        if (isParentFiltered == 0) // color this special color that would show this is a mix of parent and child
+            V_render = 0;
     }
 
     int slider = (extra_info.x == 1) ? y_axis : x_axis;  // need to make this general and not tied to object type

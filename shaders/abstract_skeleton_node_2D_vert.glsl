@@ -1,6 +1,9 @@
 #version 430
 
-#define astrocyte 6
+#define astrocyte   6
+#define spine       5
+#define bouton      3
+
 // in: per vertex data
 layout (location = 0) in vec4 vertex;
 layout (location = 1) in vec2 layout1;
@@ -107,18 +110,30 @@ void main(void)
    // then use these two new values to get the final one along the x axis
    if (type != astrocyte){ // enruties
         if (x_axis >= interval.y - 5) {
-           float coverage = translate(SSBO_data[ID].info.y, 0, max_astro_coverage, 0, 1);
+           float astro_coverage = SSBO_data[ID].info.y;
+           float coverage = translate(astro_coverage, 0, max_astro_coverage, 0, 1);
            gl_PointSize =  point_size.y + 20 * coverage;
-        } else
+        } else if (x_axis < interval.y - 10) {
+            // more skeleton
             gl_PointSize =  4;
+            if ( type == spine || type == bouton ) {
+                // if this is a child and parent is not filtered
+                int ParentID = int(SSBO_data[ID].info.z);
+                int isParentFiltered = int(SSBO_data[ParentID].info.w);
+                if (isParentFiltered == 0) // color this special color that would show this is a mix of parent and child
+                    V_render = 0;
+            }
+        } else {
+            gl_PointSize =  4;
+        }
 
         V_alpha = 1;
-        float position_intp_y = translate(y_axis, interval.x, interval.y, 0, 1);
+        float position_intp_y = translate(y_axis, interval.x, interval.y - 5, 0, 1);
         vec4 skeleton_pos = mix(v_layout1 , v_layout3, position_intp_y);
         vec4 node_pos  = mix(node_layout2, node_layout1 ,  position_intp_y);
 
         // if type == neurite -> mix (skeleton, node, x )
-        float position_intp_x = translate(x_axis, interval.x, interval.y, 0, 1);
+        float position_intp_x = translate(x_axis, interval.x, interval.y - 5, 0, 1);
         gl_Position =  mix(skeleton_pos, node_pos , position_intp_x);
     } else {
         gl_PointSize = 1;
