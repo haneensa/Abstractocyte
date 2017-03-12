@@ -15,6 +15,7 @@
 #include "mainopengl.h"
 #include "datacontainer.h"
 #include "glsluniform_structs.h"
+#include "rendervertexdata.h"
 
 class OpenGLManager : public MainOpenGL
 {
@@ -102,36 +103,33 @@ protected:
 
     // *********** 1) Mesh Triangles     ***********
 
+    RenderVertexData                    m_TMesh;
     QOpenGLVertexArrayObject            m_vao_mesh;
     QOpenGLVertexArrayObject            m_vao_selection_mesh;
 
     QOpenGLBuffer                       m_vbo_mesh;
     QOpenGLBuffer                       m_Neurite_vbo_IndexMesh;
-    QOpenGLBuffer                       m_Astro_vbo_IndexMesh;
 
-
-    GLuint                              m_program_mesh;
-    GLuint                              m_program_selection_mesh;
 
     // *********** 3) Skeleton Points    ***********
+    RenderVertexData                    m_SkeletonPoints;
     QOpenGLVertexArrayObject            m_vao_selection_skeleton;
     QOpenGLVertexArrayObject            m_vao_skeleton;
     QOpenGLBuffer                       m_vbo_skeleton;
-    GLuint                              m_program_skeleton;
-    GLuint                              m_program_selection_skeleton;
 
     // *********** 4) Abstract Skeleton Graph (Nodes and Edges) ***********
     std::vector<struct AbstractSkelNode>   m_abstract_skel_nodes; // all skeletons here
     std::vector<GLuint>                    m_abstract_skel_edges;
 
+
+    // todo: gather data needed for each render type in a class
+    RenderVertexData                        m_GSkeleton;
     QOpenGLVertexArrayObject                m_vao_selection_skeletonGraph;
     QOpenGLVertexArrayObject                m_vao_SkeletonsGraph;
-    // todo: gather data needed for each render type in a class
-    std::map<std::string, QOpenGLBuffer>    m_gskeleton_vbo;
-    std::map<std::string, GLuint>           m_gskeleton_programs;
 
 
     // ***********  5) Neurites Graph (Nodes and Edges) ***********
+    RenderVertexData                    m_GNeurites;
     std::vector<GLuint>                 m_neurites_nodes; // (place holders for neurites nodes) this initialized once and not changed after words
     std::vector<GLuint>                 m_neurites_edges; // (place holders for neurites edges) this as well
 
@@ -139,14 +137,12 @@ protected:
     QOpenGLBuffer                       m_NeuritesIndexVBO;
     QOpenGLBuffer                       m_NeuritesNodesVBO;
 
-
     // *********** 6) Glycogen Nodes     ***********
+    RenderVertexData                    m_GlycogenPoints;
     QOpenGLVertexArrayObject            m_vao_glycogen;
     QOpenGLBuffer                       m_vbo_glycogen;
-    GLuint                              m_program_glycogen;
 
-    GLuint                              m_program_neurites_nodes;
-    GLuint                              m_program_neurites_index;
+
 
 
     // ********** Selection ************************
