@@ -1273,6 +1273,52 @@ void OpenGLManager::FilterByType(Object_t type)
 
 // ----------------------------------------------------------------------------
 //
+void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
+{
+    std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
+    if (objectMap.find(hvgxID) == objectMap.end() || objectMap[hvgxID] == NULL) {
+        return;
+    }
+
+    FilterObject(hvgxID, isfilterd);
+
+    if (isfilterd) // hide
+        return;
+
+    Object *obj = objectMap[hvgxID];
+
+    // if it has a children then get them
+    // else if has parent get them
+    if (m_display_parent) {
+        Object *parent = obj->getParent();
+        if (parent == NULL) {
+            qDebug() << obj->getName().data() << " has no parnt";
+        } else {
+            FilterObject(parent->getHVGXID(), isfilterd);
+        }
+    }
+
+
+    if (m_display_child) {
+        std::vector<Object*> children = obj->getChildren();
+        if (children.size() == 0) {
+            qDebug() << obj->getName().data() << " has no child";
+        } else {
+            for (int i = 0; i < children.size(); i++) {
+                qDebug() << "Showing " << children[i]->getName().data();
+                FilterObject(children[i]->getHVGXID(), isfilterd);
+            }
+        }
+    }
+
+    if (m_display_synapses) {
+        // get all objects that are connected to this directly or indirectly
+    }
+
+}
+
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::FilterObject(int ID, bool isfilterd)
 {
     std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
@@ -1309,45 +1355,13 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
         if (hvgxID > m_ssbo_data.size())
             continue;
 
-        std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
-        if (objectMap.find(hvgxID) == objectMap.end() || objectMap[hvgxID] == NULL) {
-            return;
-        }
-
-        Object *obj = objectMap[hvgxID];
-
-        // if it has a children then get them
-        // else if has parent get them
-        if (m_display_parent) {
-            Object *parent = obj->getParent();
-            if (parent == NULL) {
-                qDebug() << obj->getName().data() << " has no parnt";
-            } else {
-                FilterObject(parent->getHVGXID(), false);
-            }
-        }
-
-        if (m_display_child) {
-            std::vector<Object*> children = obj->getChildren();
-            if (children.size() == 0) {
-                qDebug() << obj->getName().data() << " has no child";
-            } else {
-                for (int i = 0; i < children.size(); i++) {
-                    qDebug() << "Showing " << children[i]->getName().data();
-                    FilterObject(children[i]->getHVGXID(), false);
-                }
-            }
-        }
-
-        if (m_display_synapses) {
-            // get all objects that are connected to this directly or indirectly
-        }
-
-        FilterObject(hvgxID, false);
+        recursiveFilter(hvgxID, false);
 
     }
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::FilterByID( std::vector<int> tokens_Ids )
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
@@ -1359,11 +1373,13 @@ void OpenGLManager::FilterByID( std::vector<int> tokens_Ids )
         if (hvgxID > m_ssbo_data.size())
             continue;
 
-        FilterObject(hvgxID, false);
+        recursiveFilter(hvgxID, false);
 
     }
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::showAll()
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {

@@ -22,7 +22,7 @@ DataContainer::DataContainer()
     max_volume = 1;
     max_astro_coverage = 1;
 
-    m_limit = 10;
+    m_limit = 1000;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
