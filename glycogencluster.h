@@ -19,6 +19,10 @@ namespace Clustering
 		void addNode(Glycogen* glycogen);
 		QVector3D getAvgNode();
 		bool contains(int id);
+		int  getClusterSize();
+		float getTotalVolume();
+
+		static void clearIDs();
 
 	protected:
 		int					   m_id;

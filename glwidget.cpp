@@ -26,6 +26,9 @@ GLWidget::GLWidget(QWidget *parent)
     // graph manager with 4 graphs and 2D space layouted data
     m_graphManager = new GraphManager( m_data_containter, m_opengl_mngr );
 
+	//glycogen analysis manager with clustering
+	m_glycogenAnalysisManager = new GlycogenAnalysisManager(m_data_containter->getGlycogenMapPtr(), m_data_containter->getGlycogenVertexDataPtr(), m_data_containter->getGlycogenOctree());
+
     m_distance = 1.0;
     m_rotation = QQuaternion();
     //reset rotation

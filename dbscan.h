@@ -3,10 +3,15 @@
 
 #include <vector>
 #include <map>
+#include <stdint.h>
+#include <cassert>
+#include <cmath>
 
 struct VertexData;
 class  GlycogenCluster;
-class  Octree;
+namespace SpacePartitioning {
+	class  Octree;
+}
 class  Glycogen;
 
 namespace Clustering
@@ -22,6 +27,7 @@ namespace Clustering
 		void initialize(std::vector<VertexData*>* data, std::map<int, Glycogen*>* glycogenMap, SpacePartitioning::Octree* octree, float eps = 0.001f, int minPts = 3);
 		void run();
 		std::map<int, GlycogenCluster*> getClusters();
+		std::map<int, VertexData*>  getNoiseList();
 
 
 	protected:

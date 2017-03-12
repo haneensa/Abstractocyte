@@ -34,8 +34,15 @@ public:
     void loadConnectivityGraph(QString path);
     void loadMetaDataHVGX(QString path);
 
+	//glycogen
     int getGlycogenSize()              { return m_glycogenMap.size(); }
     std::map<int, Glycogen*> getGlycogenMap() { return m_glycogenMap; }
+	std::map<int, Glycogen*>* getGlycogenMapPtr() { return &m_glycogenMap; }
+	std::vector<VertexData*>* getGlycogenVertexDataPtr() { return &m_glycogenList; }
+	SpacePartitioning::Octree* getGlycogenOctree() { return &m_glycogenOctree; }
+
+	SpacePartitioning::Octree* getSpineOctree() { return &m_spineOctree; }
+	SpacePartitioning::Octree* getBoutonOctree() { return &m_boutonOctree; }
 
     // graph related function
     std::map<int, Object*>  getObjectsMap();
@@ -77,7 +84,6 @@ protected:
 	SpacePartitioning::Octree				m_boutonOctree;
 	SpacePartitioning::Octree				m_glycogenOctree;
 
-	//Clustering::DBScan						m_dbscan; //just testing, remove from here
 };
 
 #endif // OBJECTMANAGER_H
