@@ -26,7 +26,9 @@ in int          V_render[];
 in vec4         v_viewport[];
 out vec4        color_val;
 out float       alpha;
-out float         G_ID;
+out float       G_ID;
+
+layout(location = 9) uniform int   max_astro_coverage;
 
 struct SSBO_datum {
     vec4 color;
@@ -82,6 +84,11 @@ void main() {
     gl_PointSize =  gl_in[0].gl_PointSize;
 
     color_val = SSBO_data[ID].color;
+    if (color_val.w <= 0.0001) {
+            float coverage = SSBO_data[ID].info.y / (float(max_astro_coverage));
+            vec4 add_color = (color_val - vec4(1, 1, 1, 1)) * coverage;
+            color_val.rgb = color_val.rgb - add_color.rgb;
+    }
 
     vec4 start = gl_in[0].gl_Position;
     vec4 end = gl_in[1].gl_Position;

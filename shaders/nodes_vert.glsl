@@ -108,7 +108,7 @@ void main(void)
 
     gl_PointSize = 2;
 
-    float position_intp_y = translate(y_axis, extra_info.z, extra_info.w, 0, 1);
+    float position_intp_y = translate(y_axis,  interval.x, interval.y - 5, 0, 1);
    // vec4 skeleton_pos = mix(v_layout1 , v_layout3, position_intp_y);
     vec4 node_pos  = mix(node_layout2, node_layout1 ,  position_intp_y);
 

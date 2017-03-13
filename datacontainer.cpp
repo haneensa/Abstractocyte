@@ -4,7 +4,7 @@
 #include <chrono>
 #include "datacontainer.h"
 
-#define MESH_MAX 5
+#define MESH_MAX 5.0f
 
 // todo: each object has to have all elements (mesh, skeleton, ..)
 // if it doesnt then take care of this case (missing data)
@@ -22,21 +22,21 @@ DataContainer::DataContainer()
     max_volume = 1;
     max_astro_coverage = 1;
 
-    m_limit = 10;
+    m_limit = 100000;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
 
-    //importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     importXML("://m3_neurites.xml");    // neurites time:  28802 ms
     // has glycogen data
-    loadMetaDataHVGX(":/data/m3mouse3_metadata.hvgx");
+    loadMetaDataHVGX(":/data/mouse3_metadata_objname_center_astroSyn.hvgx");
 
 	qDebug() << "setting up octrees";
 	//m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
 	//m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
-	m_glycogenOctree.initialize(&m_glycogenList);
+    m_glycogenOctree.initialize(&m_glycogenList);
 	qDebug() << "octrees ready";
 
 	//qDebug() << "testing clustering";
@@ -135,7 +135,33 @@ void DataContainer::loadMetaDataHVGX(QString path)
 
         } else if (wordList[0] == "sg") {
             // update the nodes center here?
-            continue;
+            // get the point from neurite to astrocyte skeleton
+            // update: m_closest_astro_vertex.first -> astro skeleton point ID
+            // or get theat point from astrocyte and mark it with the object ID
+
+            // just to debug the value and see if it is on astrocyte skeleton
+            // use center as this value
+
+            int hvgxID = wordList[1].toInt();
+            if (m_objects.find(hvgxID) == m_objects.end()) {
+                continue;
+            }
+
+            int pID = wordList[18].toInt();
+            float x = wordList[19].toFloat();
+            float y = wordList[20].toFloat();
+            float z = wordList[21].toFloat();
+
+            m_objects[hvgxID]->setCenter(QVector4D(x/MESH_MAX, y/MESH_MAX, z/MESH_MAX, 0));
+
+            // volume
+            int volume = wordList[25].toInt();
+
+            // skeleton center
+            float center_x = wordList[7].toFloat();
+            float center_y = wordList[8].toFloat();
+            float center_z = wordList[9].toFloat();
+
         } else if (wordList[0] == "sy") {
             // add this info to the related objects
             continue;
@@ -148,21 +174,25 @@ void DataContainer::loadMetaDataHVGX(QString path)
                 continue;
             }
 
-            m_objects[hvgxID]->setParentID(m_objects[parentID]);
-
             if (m_objects.find(parentID) == m_objects.end()) {
                 continue;
             }
 
+            m_objects[hvgxID]->setParentID(m_objects[parentID]);
             m_objects[parentID]->addChild(m_objects[hvgxID]);
 
         } else if (wordList[0] == "bo") {
+            // id, vesicleNo, volume, surfaceArea, axon_id, name, is_terminal_branch, is_mitochondrion
             continue;
         } else if (wordList[0] == "sp") {
+            // id, psd_area, volume, dendrite_id, does_form_synapse, with_apparatus, has_glia_nearby, spine name
             continue;
         } else if (wordList[0] == "dn") {
+            // id, function (0:ex,1:in), abs_node_id, name
             continue;
         } else if (wordList[0] == "ax") {
+            // id, function (0:ex,1:in), is_mylenated, abs_node_id, name
+
             continue;
         }
 
@@ -310,6 +340,9 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
          m_objectsIDsByType[obj->getObjectType()] = IdsTemp;
 
          // need to update these info whenever we filter or change the threshold
+         if (obj->getObjectType() == Object_t::ASTROCYTE)
+             return;
+
          if (max_astro_coverage < obj->getAstroCoverage())
             max_astro_coverage = obj->getAstroCoverage();
 
@@ -536,6 +569,7 @@ void DataContainer::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
                     continue;
                 }
 
+                // children? they should not have points
                 float x = stringlist.at(0).toDouble()/MESH_MAX;
                 float y = stringlist.at(1).toDouble()/MESH_MAX;
                 float z = stringlist.at(2).toDouble()/MESH_MAX;
@@ -670,3 +704,24 @@ std::vector<int> DataContainer::getObjectsIDsByType(Object_t type)
 
      return m_objects[hvgxID]->getName();
  }
+
+void DataContainer::recomputeMaxVolAstro()
+{
+    int temp_max_astro_coverage = 1;
+    int temp_max_volume = 1;
+    for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++ ) {
+        Object *obj = (*iter).second;
+        if (obj->isFiltered() || obj->getObjectType() == Object_t::ASTROCYTE)
+            continue;
+        // need to update these info whenever we filter or change the threshold
+        if (temp_max_astro_coverage < obj->getAstroCoverage())
+           temp_max_astro_coverage = obj->getAstroCoverage();
+
+        if (temp_max_volume < obj->getVolume())
+            temp_max_volume = obj->getVolume();
+
+    }
+
+    max_volume = temp_max_volume;
+    max_astro_coverage = temp_max_astro_coverage;
+}

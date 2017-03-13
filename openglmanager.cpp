@@ -439,7 +439,7 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     bool res = m_GSkeleton.compileShader("2D_nodes",
                                       ":/shaders/abstract_skeleton_node_2D_vert.glsl",
                                       ":/shaders/abstract_skeleton_node_geom.glsl",
-                                      ":/shaders/points_3dConnevtivity_frag.glsl");
+                                      ":/shaders/points_3d_frag.glsl");
     if (res == false)
         return res;
 
@@ -561,7 +561,6 @@ bool OpenGLManager::initAbstractSkeletonShaders()
 
 }
 
-
 // ----------------------------------------------------------------------------
 //
 // only the edges, the nodes itself they are not needed to be visible
@@ -634,6 +633,79 @@ void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms, bool
 
 // ----------------------------------------------------------------------------
 //
+// we initialize the vbos for drawing
+bool OpenGLManager::initNeuritesGraphShaders()
+{
+    qDebug() << "OpenGLManager::initNeuritesGraphShaders()";
+
+    if (m_glFunctionsSet == false)
+        return false;
+
+    m_GNeurites.createProgram("index");
+    bool res = m_GNeurites.compileShader("index",
+                                         ":/shaders/nodes_vert.glsl",
+                                         ":/shaders/abstract_skeleton_line_geom.glsl",
+                                         ":/shaders/points_3d_frag.glsl");
+    if (res == false)
+        return res;
+
+    GL_Error();
+
+    // initialize buffers
+    m_NeuritesGraphVAO.create();
+    m_NeuritesGraphVAO.bind();
+
+    m_NeuritesNodesVBO.bind();
+
+    GL_Error();
+
+    initNeuritesVertexAttribPointer();
+
+    GL_Error();
+
+    // initialize uniforms
+
+    m_NeuritesNodesVBO.release();
+
+    m_NeuritesIndexVBO.bind();
+
+    m_GNeurites.useProgram("index");
+
+    m_NeuritesIndexVBO.release();
+    m_NeuritesGraphVAO.release();
+
+    return true;
+}
+
+// ----------------------------------------------------------------------------
+//
+// only the edges, because the skeleton itself will collabse into a node
+void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
+{
+    if (m_glFunctionsSet == false)
+        return;
+
+    m_NeuritesGraphVAO.bind();
+    m_NeuritesNodesVBO.bind();
+
+    m_uniforms = grid_uniforms;
+
+    m_NeuritesIndexVBO.bind();
+
+    m_GNeurites.useProgram("index");
+    updateAbstractUniformsLocation( m_GNeurites.getProgram("index") );
+    glLineWidth(20);
+
+    glDrawElements(GL_LINES,  m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
+
+    m_NeuritesIndexVBO.release();
+
+    m_NeuritesNodesVBO.release();
+    m_NeuritesGraphVAO.release();
+}
+
+// ----------------------------------------------------------------------------
+//
 bool OpenGLManager::initMeshTrianglesShaders()
 {
     qDebug() << "initMeshTrianglesShaders";
@@ -651,7 +723,9 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
     m_TMesh.useProgram("3Dtriangles");
     QVector3D lightDir = QVector3D(-2.5f, -2.5f, -0.9f);
-    GLuint lightDir_loc = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "diffuseLightDirection");
+    GLuint lightDir_loc = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"),
+                                               "diffuseLightDirection");
+
     glUniform3fv(lightDir_loc, 1, &lightDir[0]);
 
     m_vbo_mesh.create();
@@ -679,9 +753,10 @@ bool OpenGLManager::initMeshTrianglesShaders()
     m_vao_selection_mesh.bind();
 
     m_TMesh.createProgram("selection");
-    res = m_TMesh.compileShader("selection", ":/shaders/mesh_vert.glsl",
-                                     ":/shaders/mesh_geom.glsl",
-                                     ":/shaders/hvgx_selection_frag.glsl");
+    res = m_TMesh.compileShader("selection",
+                                ":/shaders/mesh_vert.glsl",
+                                ":/shaders/mesh_geom.glsl",
+                                ":/shaders/hvgx_selection_frag.glsl");
     if (res == false)
         return res;
 
@@ -831,79 +906,6 @@ void OpenGLManager::drawSkeletonPoints(struct GlobalUniforms grid_uniforms, bool
         glDrawArrays(GL_POINTS, 0,  m_dataContainer->getSkeletonPointsSize()  );
         m_vao_skeleton.release();
     }
-}
-
-// ----------------------------------------------------------------------------
-//
-// we initialize the vbos for drawing
-bool OpenGLManager::initNeuritesGraphShaders()
-{
-    qDebug() << "OpenGLManager::initNeuritesGraphShaders()";
-
-    if (m_glFunctionsSet == false)
-        return false;
-
-    m_GNeurites.createProgram("index");
-    bool res = m_GNeurites.compileShader("index",
-                                         ":/shaders/nodes_vert.glsl",
-                                         ":/shaders/abstract_skeleton_line_geom.glsl",
-                                         ":/shaders/points_3d_frag.glsl");
-    if (res == false)
-        return res;
-
-    GL_Error();
-
-    // initialize buffers
-    m_NeuritesGraphVAO.create();
-    m_NeuritesGraphVAO.bind();
-
-    m_NeuritesNodesVBO.bind();
-
-    GL_Error();
-
-    initNeuritesVertexAttribPointer();
-
-    GL_Error();
-
-    // initialize uniforms
-
-    m_NeuritesNodesVBO.release();
-
-    m_NeuritesIndexVBO.bind();
-
-    m_GNeurites.useProgram("index");
-
-    m_NeuritesIndexVBO.release();
-    m_NeuritesGraphVAO.release();
-
-    return true;
-}
-
-// ----------------------------------------------------------------------------
-//
-// only the edges, because the skeleton itself will collabse into a node
-void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
-{
-    if (m_glFunctionsSet == false)
-        return;
-
-    m_NeuritesGraphVAO.bind();
-    m_NeuritesNodesVBO.bind();
-
-    m_uniforms = grid_uniforms;
-
-    m_NeuritesIndexVBO.bind();
-
-    m_GNeurites.useProgram("index");
-    updateAbstractUniformsLocation( m_GNeurites.getProgram("index") );
-    glLineWidth(20);
-
-    glDrawElements(GL_LINES,  m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
-
-    m_NeuritesIndexVBO.release();
-
-    m_NeuritesNodesVBO.release();
-    m_NeuritesGraphVAO.release();
 }
 
 // ----------------------------------------------------------------------------
@@ -1076,6 +1078,7 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
 
     drawGlycogenPoints(grid_uniforms);
 
+
     if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1) ) {
         glDisable (GL_BLEND);
         glBlendFunc (GL_ONE, GL_ONE);
@@ -1163,8 +1166,7 @@ void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
 
     glUniform4fv(viewport, 1,  viewport_values);
 
-    GLint max_volume = glGetUniformLocation(program, "max_volume");
-    glUniform1iv(max_volume, 1, &m_uniforms.max_volume);
+    glUniform1iv(8, 1, &m_uniforms.max_volume);
 
     glUniform1iv(9, 1, &m_uniforms.max_astro_coverage);
 }
@@ -1197,9 +1199,7 @@ void OpenGLManager::updateUniformsLocation(GLuint program)
     glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
 
 
-    GLint max_volume = glGetUniformLocation(program, "max_volume");
-    glUniform1iv(max_volume, 1, &m_uniforms.max_volume);
-
+    glUniform1iv(8, 1, &m_uniforms.max_volume);
     glUniform1iv(9, 1, &m_uniforms.max_astro_coverage);
 }
 
@@ -1341,10 +1341,60 @@ void OpenGLManager::FilterByType(Object_t type)
             FilterObject(hvgxID, true);
         }
     }
+
+    m_dataContainer->recomputeMaxVolAstro();
+
 }
 
 // ----------------------------------------------------------------------------
 //
+void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
+{
+    std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
+    if (objectMap.find(hvgxID) == objectMap.end() || objectMap[hvgxID] == NULL) {
+        return;
+    }
+
+    FilterObject(hvgxID, isfilterd);
+
+    if (isfilterd) // hide
+        return;
+
+    Object *obj = objectMap[hvgxID];
+
+    // if it has a children then get them
+    // else if has parent get them
+    if (m_display_parent) {
+        Object *parent = obj->getParent();
+        if (parent == NULL) {
+            qDebug() << obj->getName().data() << " has no parnt";
+        } else {
+            FilterObject(parent->getHVGXID(), isfilterd);
+        }
+    }
+
+
+    if (m_display_child) {
+        std::vector<Object*> children = obj->getChildren();
+        if (children.size() == 0) {
+            qDebug() << obj->getName().data() << " has no child";
+        } else {
+            for (int i = 0; i < children.size(); i++) {
+                qDebug() << "Showing " << children[i]->getName().data();
+                FilterObject(children[i]->getHVGXID(), isfilterd);
+            }
+        }
+    }
+
+    if (m_display_synapses) {
+        // get all objects that are connected to this directly or indirectly
+    }
+
+}
+
+// ----------------------------------------------------------------------------
+//
+// if we filter the object we need to recompute the maximum astrocyte coverage and volume
 void OpenGLManager::FilterObject(int ID, bool isfilterd)
 {
     std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
@@ -1365,7 +1415,6 @@ void OpenGLManager::FilterObject(int ID, bool isfilterd)
     } else {
         m_ssbo_data[ID].info.setW(0);
     }
-
 }
 
 // ----------------------------------------------------------------------------
@@ -1381,45 +1430,14 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
         if (hvgxID > m_ssbo_data.size())
             continue;
 
-        std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
-        if (objectMap.find(hvgxID) == objectMap.end() || objectMap[hvgxID] == NULL) {
-            return;
-        }
-
-        Object *obj = objectMap[hvgxID];
-
-        // if it has a children then get them
-        // else if has parent get them
-        if (m_display_parent) {
-            Object *parent = obj->getParent();
-            if (parent == NULL) {
-                qDebug() << obj->getName().data() << " has no parnt";
-            } else {
-                FilterObject(parent->getHVGXID(), false);
-            }
-        }
-
-        if (m_display_child) {
-            std::vector<Object*> children = obj->getChildren();
-            if (children.size() == 0) {
-                qDebug() << obj->getName().data() << " has no child";
-            } else {
-                for (int i = 0; i < children.size(); i++) {
-                    qDebug() << "Showing " << children[i]->getName().data();
-                    FilterObject(children[i]->getHVGXID(), false);
-                }
-            }
-        }
-
-        if (m_display_synapses) {
-            // get all objects that are connected to this directly or indirectly
-        }
-
-        FilterObject(hvgxID, false);
-
+        recursiveFilter(hvgxID, false);
     }
+
+    m_dataContainer->recomputeMaxVolAstro();
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::FilterByID( std::vector<int> tokens_Ids )
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
@@ -1431,16 +1449,22 @@ void OpenGLManager::FilterByID( std::vector<int> tokens_Ids )
         if (hvgxID > m_ssbo_data.size())
             continue;
 
-        FilterObject(hvgxID, false);
+        recursiveFilter(hvgxID, false);
 
     }
+
+    m_dataContainer->recomputeMaxVolAstro();
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::showAll()
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
         FilterObject(i, false);
     }
+
+    m_dataContainer->recomputeMaxVolAstro();
 }
 
 void OpenGLManager::setZoom(float zoom)

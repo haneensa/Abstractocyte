@@ -20,6 +20,8 @@ out int         V_ID;
 out float       V_alpha;
 out float       V_color_intp;
 
+layout(location = 8) uniform int   max_volume;
+
 // make common header and add all these shared data together!
 struct SSBO_datum {
     vec4 color;
@@ -94,34 +96,41 @@ void main(void)
     float position_intp = translate(slider,leftMin, leftMax,  pos_alpha.x, pos_alpha.y);
     V_color_intp = translate(slider, leftMin, leftMax, color_alpha.y, color_alpha.x);
 
-    gl_PointSize =  translate(slider, leftMin, leftMax, point_size.x, point_size.y);
 
     // project the points onto line here
-    vec4 A = pvmMatrix * knot1;;
-    vec4 B = pvmMatrix * knot2;;
+    vec4 A = pvmMatrix * knot1;
+    vec4 B = pvmMatrix * knot2;
     vec4 p = skeleton_vertex;
     vec4 projected_point =  project_point_to_lint( A,  B,  p);
 
     int pos1_flag = int(positions.x);
     int pos2_flag = int(positions.y);
 
+    float max_point_size = point_size.y;
+    if (pos2_flag == 6)
+      max_point_size = point_size.y + 20 * (SSBO_data[ID].info.x / float(max_volume));
+    gl_PointSize =  translate(slider, leftMin, leftMax, point_size.x, max_point_size);
+
+
     vec4 center4d  = pvmMatrix * vec4(SSBO_data[ID].center.xyz, 1.0);
     vec4 pos1, pos2;
 
     switch(pos1_flag)
     {
-    case 1: pos1 = skeleton_vertex; break; // duplicate!!
-    case 2: pos1 = skeleton_vertex; break;
-    case 3: pos1 = center4d; break;
-    case 4: pos1 = projected_point; break;
+    case 4: pos1 = skeleton_vertex; break; // duplicate!!
+    case 5: pos1 = projected_point; break;
+    case 6: pos1 = center4d; break;
+    default:
+        pos1 = skeleton_vertex;
     }
 
     switch(pos2_flag)
     {
-    case 1: pos2 = skeleton_vertex; break;
-    case 2: pos2 = skeleton_vertex; break;
-    case 3: pos2 = center4d; break;
-    case 4: pos2 = projected_point; break;
+    case 4: pos2 = skeleton_vertex; break;
+    case 5: pos2 = projected_point; break;
+    case 6: pos2 = center4d; break;
+    default:
+        pos2 = skeleton_vertex;
     }
 
    vec4 new_position = mix(pos1 , pos2, position_intp);

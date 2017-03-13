@@ -66,6 +66,8 @@ void main() {
     if (isFiltered == 1)
         return;
 
+    if (ID == 0)
+        color_val.b = 1;
 
     int type = int(SSBO_data[ID].center.w);
     color_val = V_color_val[i];

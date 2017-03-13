@@ -15,7 +15,7 @@ struct properties {
     QVector2D positions; // x: position 1, y: position 2
     //x: mesh, y: skeleton points, z: transitional graph, w:  2D graph
     QVector4D render_type;
-    // x: axis type (0: x_axis, 1: y_axis), y: EMPTY, z and w: interval of y axis type in 2D space
+    // x: axis type (0: x_axis, 1: y_axis), y: EMPTY, z and w: interval of y axis type in 2D space (not used)
     QVector4D extra_info;
 
 };
@@ -36,7 +36,7 @@ struct ssbo_2DState {
 // data structure for ssbo of objects
 // one element per obejct
 struct ssbo_mesh {
-    QVector4D color;    // w: is astro and neurtie nearest distance
+    QVector4D color;   // w: is astro and neurtie nearest distance
     QVector4D center;  // center.w = type (axon, bouton, spine, dendrite, ..)
     QVector4D info;    // x: normalized volume, y: how many vertices close by astro , z: parent ID, w: filtered
     QVector2D layout1; // layouted position (only neurties)

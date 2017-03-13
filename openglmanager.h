@@ -81,6 +81,7 @@ public:
     void FilterByID(  std::vector<int> tokens_Ids );
     void showAll();
     void FilterObject(int ID, bool isfilterd);
+    void recursiveFilter(int ID, bool isfilterd);
 
     void updateDisplayChildFlag(bool flag)          { m_display_child = flag; }
     void updateDisplayParentFlag(bool flag)         { m_display_parent = flag; }

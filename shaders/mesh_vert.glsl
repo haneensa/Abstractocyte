@@ -116,6 +116,8 @@ void main(void)
     case 1: pos1 = mesh_vertex; break;
     case 2: pos1 = vec4(Vskeleton_vx.xyz, 1.0); break;
     case 3: pos1 = center4d; break;
+    default:
+        pos1 = mesh_vertex;
     }
 
     switch(pos2_flag)
@@ -123,6 +125,8 @@ void main(void)
     case 1: pos2 = mesh_vertex; break;
     case 2: pos2 = vec4(Vskeleton_vx.xyz, 1.0); break;
     case 3: pos2 = center4d; break;
+    default:
+        pos2 = mesh_vertex;
     }
 
    vec4 new_position = mix(pos1 , pos2, position_intp);

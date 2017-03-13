@@ -338,6 +338,10 @@ void MousePad::mouseMoveEvent(QMouseEvent *event)
     int x = event->x() * retinaScale;
     int y = viewport[3] - event->y() * retinaScale;
 
+    if (x > width() || x < 0 || y > height() || y < 0) {
+        return;
+    }
+
     doneCurrent();
     // calculate the offset from press to release, then update the point position
     // get the position were we pressed
@@ -365,6 +369,14 @@ void MousePad::getSlotsX(int value)
     if (m_x == value)
         return;
 
+    if (value > 100 || value < 0) {
+        return;
+    }
+
+    if (value > 95)
+        value = 100;
+
+
     m_x = value;
     // minimum = 0, maximum = 99
     emit setSignalX(value);
@@ -376,6 +388,14 @@ void MousePad::getSlotsY(int value)
 {
     if (m_y == value)
         return;
+
+    if (value > 100 || value < 0) {
+        return;
+    }
+
+    if (value > 95)
+        value = 100;
+
 
     m_y = value;
     // minimum = 0, maximum = 99
