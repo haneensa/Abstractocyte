@@ -1007,6 +1007,7 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
 
     drawGlycogenPoints(grid_uniforms);
 
+
     if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1) ) {
         glDisable (GL_BLEND);
         glBlendFunc (GL_ONE, GL_ONE);
@@ -1319,6 +1320,7 @@ void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
 
 // ----------------------------------------------------------------------------
 //
+// if we filter the object we need to recompute the maximum astrocyte coverage and volume
 void OpenGLManager::FilterObject(int ID, bool isfilterd)
 {
     std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
@@ -1339,7 +1341,6 @@ void OpenGLManager::FilterObject(int ID, bool isfilterd)
     } else {
         m_ssbo_data[ID].info.setW(0);
     }
-
 }
 
 // ----------------------------------------------------------------------------
@@ -1356,8 +1357,9 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
             continue;
 
         recursiveFilter(hvgxID, false);
-
     }
+
+    m_dataContainer->recomputeMaxVolAstro();
 }
 
 // ----------------------------------------------------------------------------
@@ -1376,6 +1378,8 @@ void OpenGLManager::FilterByID( std::vector<int> tokens_Ids )
         recursiveFilter(hvgxID, false);
 
     }
+
+    m_dataContainer->recomputeMaxVolAstro();
 }
 
 // ----------------------------------------------------------------------------

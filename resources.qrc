@@ -32,5 +32,6 @@
         <file>data/m3mouse3_metadata.hvgx</file>
         <file>shaders/hvgx_selection_frag.glsl</file>
         <file>shaders/points_3dConnevtivity_frag.glsl</file>
+        <file>data/mouse3_metadata_objname_center_astroSyn.hvgx</file>
     </qresource>
 </RCC>

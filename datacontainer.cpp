@@ -4,7 +4,7 @@
 #include <chrono>
 #include "datacontainer.h"
 
-#define MESH_MAX 5
+#define MESH_MAX 5.0f
 
 // todo: each object has to have all elements (mesh, skeleton, ..)
 // if it doesnt then take care of this case (missing data)
@@ -22,7 +22,7 @@ DataContainer::DataContainer()
     max_volume = 1;
     max_astro_coverage = 1;
 
-    m_limit = 10000;
+    m_limit = 300;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
@@ -31,12 +31,12 @@ DataContainer::DataContainer()
     importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     importXML("://m3_neurites.xml");    // neurites time:  28802 ms
     // has glycogen data
-    loadMetaDataHVGX(":/data/m3mouse3_metadata.hvgx");
+    loadMetaDataHVGX(":/data/mouse3_metadata_objname_center_astroSyn.hvgx");
 
 	qDebug() << "setting up octrees";
 	//m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
 	//m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
-	m_glycogenOctree.initialize(&m_glycogenList);
+    m_glycogenOctree.initialize(&m_glycogenList);
 	qDebug() << "octrees ready";
 
 	//qDebug() << "testing clustering";
@@ -135,7 +135,28 @@ void DataContainer::loadMetaDataHVGX(QString path)
 
         } else if (wordList[0] == "sg") {
             // update the nodes center here?
-            continue;
+            // get the point from neurite to astrocyte skeleton
+            // update: m_closest_astro_vertex.first -> astro skeleton point ID
+            // or get theat point from astrocyte and mark it with the object ID
+
+            // just to debug the value and see if it is on astrocyte skeleton
+            // use center as this value
+
+            int hvgxID = wordList[1].toInt();
+            if (m_objects.find(hvgxID) == m_objects.end()) {
+                continue;
+            }
+
+            float x = wordList[19].toFloat();
+            float y = wordList[20].toFloat();
+            float z = wordList[21].toFloat();
+
+            m_objects[hvgxID]->setCenter(QVector4D(x/MESH_MAX, y/MESH_MAX, z/MESH_MAX, 0));
+
+            // volume
+
+            // skeleton center
+
         } else if (wordList[0] == "sy") {
             // add this info to the related objects
             continue;
@@ -536,6 +557,7 @@ void DataContainer::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
                     continue;
                 }
 
+                // children? they should not have points
                 float x = stringlist.at(0).toDouble()/MESH_MAX;
                 float y = stringlist.at(1).toDouble()/MESH_MAX;
                 float z = stringlist.at(2).toDouble()/MESH_MAX;
