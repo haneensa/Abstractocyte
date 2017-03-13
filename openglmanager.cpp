@@ -1389,4 +1389,6 @@ void OpenGLManager::showAll()
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
         FilterObject(i, false);
     }
+
+    m_dataContainer->recomputeMaxVolAstro();
 }

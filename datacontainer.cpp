@@ -22,7 +22,7 @@ DataContainer::DataContainer()
     max_volume = 1;
     max_astro_coverage = 1;
 
-    m_limit = 10000;
+    m_limit = 20;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
@@ -147,6 +147,7 @@ void DataContainer::loadMetaDataHVGX(QString path)
                 continue;
             }
 
+            int pID = wordList[18].toInt();
             float x = wordList[19].toFloat();
             float y = wordList[20].toFloat();
             float z = wordList[21].toFloat();
@@ -154,8 +155,12 @@ void DataContainer::loadMetaDataHVGX(QString path)
             m_objects[hvgxID]->setCenter(QVector4D(x/MESH_MAX, y/MESH_MAX, z/MESH_MAX, 0));
 
             // volume
+            int volume = wordList[25].toInt();
 
             // skeleton center
+            float center_x = wordList[7].toFloat();
+            float center_y = wordList[8].toFloat();
+            float center_z = wordList[9].toFloat();
 
         } else if (wordList[0] == "sy") {
             // add this info to the related objects
@@ -691,3 +696,25 @@ std::vector<int> DataContainer::getObjectsIDsByType(Object_t type)
 
      return m_objects[hvgxID]->getName();
  }
+
+void DataContainer::recomputeMaxVolAstro()
+{
+    int temp_max_astro_coverage = 1;
+    int temp_max_volume = 1;
+    for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++ ) {
+        Object *obj = (*iter).second;
+        if (obj->isFiltered())
+            continue;
+
+        // need to update these info whenever we filter or change the threshold
+        if (temp_max_astro_coverage < obj->getAstroCoverage())
+           temp_max_astro_coverage = obj->getAstroCoverage();
+
+        if (temp_max_volume < obj->getVolume())
+            temp_max_volume = obj->getVolume();
+
+    }
+
+    max_volume = temp_max_volume;
+    max_astro_coverage = temp_max_astro_coverage;
+}

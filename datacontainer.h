@@ -65,7 +65,7 @@ public:
     int getMaxVolume()          { return max_volume; }
 
     // iterate over objects and get max volume and astro coverage
-    void recomputeMaxVolAstro()          { return; }
+    void recomputeMaxVolAstro();
 
 protected:
     int                                     m_tempCounter; // how many objects with no contacts to ast based on threshold
