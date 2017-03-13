@@ -373,7 +373,7 @@ void MousePad::getSlotsX(int value)
         return;
     }
 
-    if (value > 98)
+    if (value > 95)
         value = 100;
 
 
@@ -393,7 +393,7 @@ void MousePad::getSlotsY(int value)
         return;
     }
 
-    if (value > 98)
+    if (value > 95)
         value = 100;
 
 

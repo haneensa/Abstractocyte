@@ -27,6 +27,8 @@ uniform int  y_axis;
 uniform int  x_axis;
 uniform vec4 viewport;
 
+layout(location = 8) uniform int   max_volume;
+
 out vec4 v_viewport;
 struct SSBO_datum {
     vec4 color;
@@ -90,7 +92,6 @@ void main(void)
 
     vec2 pos_alpha = space_properties.pos_alpha; // position interpolation (pos1, pos2)
     vec2 trans_alpha = space_properties.trans_alpha; // alpha
-    vec2 color_alpha = space_properties.color_alpha; // color_intp
     vec2 point_size = space_properties.point_size; // point_size
     vec2 interval = space_properties.interval; // interval this state is between
     vec2 positions = space_properties.positions; // which positions to interpolate between them
@@ -106,27 +107,28 @@ void main(void)
         // if this is a child and parent is not filtered
         int ParentID = int(SSBO_data[ID].info.z);
         int isParentFiltered = int(SSBO_data[ParentID].info.w);
-        if (isParentFiltered == 0) // color this special color that would show this is a mix of parent and child
+        if (isParentFiltered == 0 && int(positions.y) != 6) // color this special color that would show this is a mix of parent and child
             V_render = 0;
     }
 
     int slider = (extra_info.x == 1) ? y_axis : x_axis;  // need to make this general and not tied to object type
 
-    float leftMin = interval.x;
-    float leftMax = interval.y;
+    V_alpha =  translate(y_axis, interval.x, interval.y, trans_alpha.x, trans_alpha.y);
 
-    gl_PointSize =  translate(slider, leftMin, leftMax, point_size.x, point_size.y);
+    float max_point_size = point_size.y;
+    float min_point_size = point_size.x;
+    if ( type != astrocyte && (int(positions.y) == 6 || int(positions.y) == 5) )
+      max_point_size = point_size.y + 20 * (SSBO_data[ID].info.x / float(max_volume));
 
+    if ( int(point_size.x) == int(point_size.y) )
+        min_point_size = max_point_size;
 
-    V_alpha =  translate(y_axis, leftMin, leftMax, trans_alpha.x, trans_alpha.y);
-    int pos1_flag = int(positions.x);
-    int pos2_flag = int(positions.y);
+    gl_PointSize =  translate(slider, interval.x, interval.y, min_point_size, max_point_size);
 
     vec4 pos1, pos2;
 
-
-    float position_intp = translate(slider, leftMin, leftMax,  pos_alpha.x, pos_alpha.y);
-    switch(pos1_flag)
+    float position_intp = translate(slider, interval.x, interval.y,  pos_alpha.x, pos_alpha.y);
+    switch( int(positions.x) )
     {
     case 1: pos1 = v_vertex; break;
     case 2: pos1 = v_layout1; break;
@@ -136,7 +138,7 @@ void main(void)
     case 6: pos1 = node_layout2; break;
     }
 
-    switch(pos2_flag)
+    switch( int(positions.y) )
     {
     case 1: pos2 = v_vertex; break;
     case 2: pos2 = v_layout1; break;

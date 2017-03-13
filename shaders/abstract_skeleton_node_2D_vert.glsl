@@ -22,6 +22,7 @@ uniform mat4                vMatrix;
 // Projection transformation
 uniform mat4                pMatrix;
 
+layout(location = 8) uniform int   max_volume;
 layout(location = 9) uniform int   max_astro_coverage;
 
 uniform int                 y_axis;
@@ -112,9 +113,14 @@ void main(void)
     gl_PointSize =   point_size.x;
    if (type != astrocyte){ // enruties
         if (x_axis >= interval.y - 5) {
-           float astro_coverage = SSBO_data[ID].info.y;
-           float coverage = translate(astro_coverage, 0, max_astro_coverage, 0, 1);
-           gl_PointSize =  point_size.y + 20 * coverage;
+            float max_point_size = point_size.y;
+            float min_point_size = point_size.x;
+            max_point_size = point_size.y + 20 * (SSBO_data[ID].info.x / float(max_volume));
+            if ( int(point_size.x) == int(point_size.y) )
+                min_point_size = max_point_size;
+
+            gl_PointSize =  translate(x_axis, interval.x, interval.y, min_point_size, max_point_size);
+
         } else if (x_axis < interval.y - 10) {
             // more skeleton
              if ( type == spine || type == bouton ) {

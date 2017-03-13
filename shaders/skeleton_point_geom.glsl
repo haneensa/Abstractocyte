@@ -16,6 +16,8 @@ out float       G_ID;
 uniform int     y_axis;
 uniform int     x_axis;
 
+layout(location = 8) uniform int   max_volume;
+
 
 layout (points) in;
 layout (points, max_vertices = 1) out;

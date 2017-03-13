@@ -1095,8 +1095,7 @@ void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
 
     glUniform4fv(viewport, 1,  viewport_values);
 
-    GLint max_volume = glGetUniformLocation(program, "max_volume");
-    glUniform1iv(max_volume, 1, &m_uniforms.max_volume);
+    glUniform1iv(8, 1, &m_uniforms.max_volume);
 
     glUniform1iv(9, 1, &m_uniforms.max_astro_coverage);
 }
@@ -1126,9 +1125,7 @@ void OpenGLManager::updateUniformsLocation(GLuint program)
     glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
 
 
-    GLint max_volume = glGetUniformLocation(program, "max_volume");
-    glUniform1iv(max_volume, 1, &m_uniforms.max_volume);
-
+    glUniform1iv(8, 1, &m_uniforms.max_volume);
     glUniform1iv(9, 1, &m_uniforms.max_astro_coverage);
 }
 

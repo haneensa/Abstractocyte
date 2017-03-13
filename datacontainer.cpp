@@ -22,13 +22,13 @@ DataContainer::DataContainer()
     max_volume = 1;
     max_astro_coverage = 1;
 
-    m_limit = 20;
+    m_limit = 100000;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
 
-    //importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     importXML("://m3_neurites.xml");    // neurites time:  28802 ms
     // has glycogen data
     loadMetaDataHVGX(":/data/mouse3_metadata_objname_center_astroSyn.hvgx");
@@ -335,6 +335,9 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
          m_objectsIDsByType[obj->getObjectType()] = IdsTemp;
 
          // need to update these info whenever we filter or change the threshold
+         if (obj->getObjectType() == Object_t::ASTROCYTE)
+             return;
+
          if (max_astro_coverage < obj->getAstroCoverage())
             max_astro_coverage = obj->getAstroCoverage();
 
@@ -703,9 +706,8 @@ void DataContainer::recomputeMaxVolAstro()
     int temp_max_volume = 1;
     for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++ ) {
         Object *obj = (*iter).second;
-        if (obj->isFiltered())
+        if (obj->isFiltered() || obj->getObjectType() == Object_t::ASTROCYTE)
             continue;
-
         // need to update these info whenever we filter or change the threshold
         if (temp_max_astro_coverage < obj->getAstroCoverage())
            temp_max_astro_coverage = obj->getAstroCoverage();
