@@ -60,12 +60,17 @@ layout (std430, binding=3) buffer space2d_data
 void main() {
     int ID = V_ID[0];
     G_ID = float(ID);
+
     int isFiltered = int(SSBO_data[ID].info.w);
     if (isFiltered == 1)
         return;
 
     int type = int(SSBO_data[ID].center.w);
     color_val = SSBO_data[ID].color;
+
+    if (ID == 0)
+        color_val.r = 1;
+
     gl_PointSize =  gl_in[0].gl_PointSize;
 
     properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
