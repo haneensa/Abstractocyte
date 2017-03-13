@@ -76,8 +76,10 @@ void main() {
             color_val.rgb = color_val.rgb - add_color.rgb;
     }
 
-    if (ID == 0)
+    if (ID == 0) {
         color_val.r = 1;
+        return;
+    }
 
     gl_PointSize =  gl_in[0].gl_PointSize;
 

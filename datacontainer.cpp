@@ -182,12 +182,17 @@ void DataContainer::loadMetaDataHVGX(QString path)
             m_objects[parentID]->addChild(m_objects[hvgxID]);
 
         } else if (wordList[0] == "bo") {
+            // id, vesicleNo, volume, surfaceArea, axon_id, name, is_terminal_branch, is_mitochondrion
             continue;
         } else if (wordList[0] == "sp") {
+            // id, psd_area, volume, dendrite_id, does_form_synapse, with_apparatus, has_glia_nearby, spine name
             continue;
         } else if (wordList[0] == "dn") {
+            // id, function (0:ex,1:in), abs_node_id, name
             continue;
         } else if (wordList[0] == "ax") {
+            // id, function (0:ex,1:in), is_mylenated, abs_node_id, name
+
             continue;
         }
 

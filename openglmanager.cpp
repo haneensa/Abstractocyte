@@ -560,7 +560,6 @@ bool OpenGLManager::initAbstractSkeletonShaders()
 
 }
 
-
 // ----------------------------------------------------------------------------
 //
 // only the edges, the nodes itself they are not needed to be visible
@@ -723,7 +722,9 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
     m_TMesh.useProgram("3Dtriangles");
     QVector3D lightDir = QVector3D(-2.5f, -2.5f, -0.9f);
-    GLuint lightDir_loc = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "diffuseLightDirection");
+    GLuint lightDir_loc = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"),
+                                               "diffuseLightDirection");
+
     glUniform3fv(lightDir_loc, 1, &lightDir[0]);
 
     m_vbo_mesh.create();
@@ -751,9 +752,10 @@ bool OpenGLManager::initMeshTrianglesShaders()
     m_vao_selection_mesh.bind();
 
     m_TMesh.createProgram("selection");
-    res = m_TMesh.compileShader("selection", ":/shaders/mesh_vert.glsl",
-                                     ":/shaders/mesh_geom.glsl",
-                                     ":/shaders/hvgx_selection_frag.glsl");
+    res = m_TMesh.compileShader("selection",
+                                ":/shaders/mesh_vert.glsl",
+                                ":/shaders/mesh_geom.glsl",
+                                ":/shaders/hvgx_selection_frag.glsl");
     if (res == false)
         return res;
 
@@ -1267,6 +1269,9 @@ void OpenGLManager::FilterByType(Object_t type)
             FilterObject(hvgxID, true);
         }
     }
+
+    m_dataContainer->recomputeMaxVolAstro();
+
 }
 
 // ----------------------------------------------------------------------------

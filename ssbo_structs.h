@@ -36,7 +36,7 @@ struct ssbo_2DState {
 // data structure for ssbo of objects
 // one element per obejct
 struct ssbo_mesh {
-    QVector4D color;    // w: is astro and neurtie nearest distance
+    QVector4D color;   // w: is astro and neurtie nearest distance
     QVector4D center;  // center.w = type (axon, bouton, spine, dendrite, ..)
     QVector4D info;    // x: normalized volume, y: how many vertices close by astro , z: parent ID, w: filtered
     QVector2D layout1; // layouted position (only neurties)
