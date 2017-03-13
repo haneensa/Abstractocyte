@@ -14,7 +14,8 @@ GLWidget::GLWidget(QWidget *parent)
         m_yaxis(0),
         m_xaxis(0),
         m_FDL_running(false),
-        m_2D(false)
+        m_2D(false),
+        m_hover(false)
 {
     // 2D abstraction space, with intervals properties intializaiton and geometry
     m_2dspace = new AbstractionSpace(100, 100);
@@ -93,7 +94,7 @@ void GLWidget::updateMVPAttrib()
     int max_volume = m_data_containter->getMaxVolume();
     // graph model matrix without rotation, apply rotation to nodes directly
     m_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
-                        m_model_noRotation.data(), m_rotationMatrix, viewport, max_volume, max_astro_coverage};
+                        m_model_noRotation.data(), m_rotationMatrix, viewport, max_volume, max_astro_coverage, 0.0001};
 }
 
 void GLWidget::initializeGL()
@@ -171,12 +172,8 @@ void GLWidget::resizeGL(int w, int h)
     update();
 }
 
-void GLWidget::mousePressEvent(QMouseEvent *event)
+int GLWidget::pickObject(QMouseEvent *event)
 {
-    m_lastPos = event->pos();
-    setFocus();
-
-    makeCurrent();
     const qreal retinaScale = devicePixelRatio();
     GLint viewport[4]; //  return of glGetIntegerv() -> x, y, width, height of viewport
     glGetIntegerv(GL_VIEWPORT, viewport);
@@ -188,6 +185,18 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     std::string name = m_data_containter->getObjectName(hvgxID);
     QString oname = QString::fromUtf8(name.c_str());
     setHoveredName(oname);
+
+    return hvgxID;
+}
+
+void GLWidget::mousePressEvent(QMouseEvent *event)
+{
+    m_lastPos = event->pos();
+    setFocus();
+
+    makeCurrent();
+
+    int hvgxID = pickObject(event);
     m_selectedObjects.push_back(hvgxID);
 
     doneCurrent();
@@ -218,9 +227,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     int deltaX = event->x() - m_lastPos.x();
     int deltaY = event->y() - m_lastPos.y();
 
-    if (m_isRotatable == false) {
+    if (m_isRotatable == false && m_hover == false) {
             m_translation = QVector3D( m_translation.x() + deltaX/(float)width(), m_translation.y() +  -1.0 * (deltaY/(float)height()), 0.0);
-    } else if (m_xaxis < 60 || m_yaxis < 60 ) {
+    } else if ( (m_xaxis < 60 || m_yaxis < 60) && m_hover == false) {
         // Mouse release position - mouse press position
         QVector2D diff = QVector2D(deltaX, deltaY);
         // Rotation axis is perpendicular to the mouse position difference
@@ -244,6 +253,13 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         }
 
          m_rotation_timer->start(500);
+
+    } else if (m_hover) {
+        makeCurrent();
+
+        pickObject(event);
+
+        doneCurrent();
 
     }
 
@@ -302,7 +318,9 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             m_opengl_mngr->showAll();
         break;
         case(Qt::Key_H): // enable hover
-            // tra
+            m_hover = !m_hover;
+            setMouseTracking(m_hover);
+            m_isRotatable = !m_hover;
         break;
     }
 }

@@ -67,7 +67,7 @@ void main() {
     gl_PointSize = gl_in[0].gl_PointSize;
 
     color_val = SSBO_data[ID].color;
-    if (color_val.w <= 0.0001) {
+    if (color_val.w <= 0.0001 /* make this uniform */) {
             float coverage = SSBO_data[ID].info.y / (float(max_astro_coverage));
             vec4 add_color = (color_val - vec4(1, 1, 1, 1)) * coverage;
             color_val.rgb = color_val.rgb - add_color.rgb;

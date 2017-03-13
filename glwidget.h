@@ -21,6 +21,8 @@ public:
 
 	GlycogenAnalysisManager* getGlycogenAnalysisManager() { return m_glycogenAnalysisManager; }
 
+    int pickObject(QMouseEvent *event);
+
 public slots:
     void getSliderX(int value);
     void getSliderY(int value);
@@ -104,6 +106,7 @@ protected:
 
     std::vector<int>                    m_selectedObjects;
 
+    bool                                m_hover;
 };
 
 
