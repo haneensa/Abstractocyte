@@ -10,24 +10,24 @@ layout (location = 1) in vec2 layout1;
 layout (location = 2) in vec2 layout2;
 layout (location = 3) in vec2 layout3;
 
-out int     V_ID;
-out float   V_alpha;
-out int     V_render;
+out int                     V_ID;
+out float                   V_alpha;
+out int                     V_render;
 // World transformation
-uniform mat4 mMatrix;
-uniform mat4 m_noRartionMatrix;
+uniform mat4                mMatrix;
+uniform mat4                m_noRartionMatrix;
 
 // View Transformation
-uniform mat4 vMatrix;
+uniform mat4                vMatrix;
 // Projection transformation
-uniform mat4 pMatrix;
+uniform mat4                pMatrix;
 
 layout(location = 9) uniform int   max_astro_coverage;
 
-uniform int  y_axis;
-uniform int  x_axis;
-uniform vec4 viewport;
-out vec4 v_viewport;
+uniform int                 y_axis;
+uniform int                 x_axis;
+uniform vec4                viewport;
+out vec4                    v_viewport;
 
 struct SSBO_datum {
     vec4 color;
@@ -108,6 +108,8 @@ void main(void)
    // for skeleton get the value between v_layout3 and v_layout1 using mix with y_axis
    // then get another position for node in layout 1 and layout 2
    // then use these two new values to get the final one along the x axis
+
+    gl_PointSize =   point_size.x;
    if (type != astrocyte){ // enruties
         if (x_axis >= interval.y - 5) {
            float astro_coverage = SSBO_data[ID].info.y;
@@ -115,16 +117,13 @@ void main(void)
            gl_PointSize =  point_size.y + 20 * coverage;
         } else if (x_axis < interval.y - 10) {
             // more skeleton
-            gl_PointSize =  4;
-            if ( type == spine || type == bouton ) {
+             if ( type == spine || type == bouton ) {
                 // if this is a child and parent is not filtered
                 int ParentID = int(SSBO_data[ID].info.z);
                 int isParentFiltered = int(SSBO_data[ParentID].info.w);
                 if (isParentFiltered == 0) // color this special color that would show this is a mix of parent and child
                     V_render = 0;
             }
-        } else {
-            gl_PointSize =  4;
         }
 
         V_alpha = 1;
@@ -136,8 +135,7 @@ void main(void)
         float position_intp_x = translate(x_axis, interval.x, interval.y - 5, 0, 1);
         gl_Position =  mix(skeleton_pos, node_pos , position_intp_x);
     } else {
-        gl_PointSize = 1;
-        V_alpha =  translate(y_axis, extra_info.z, extra_info.w, 1, 0);
+        V_alpha =  translate(y_axis, extra_info.z, extra_info.w - 10, 1, 0); // hide astrocyte before end of interval
         // if type == astrocyte -> mix (skeleton layout 1, skeleton layout 2, x )
         float position_intp_x = translate(x_axis, interval.x, interval.y, 0, 1);
         gl_Position = mix(v_layout1,  v_layout2 ,  position_intp_x);

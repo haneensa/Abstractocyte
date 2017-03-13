@@ -153,8 +153,11 @@ void GLWidget::resizeGL(int w, int h)
     qDebug() <<  w * retinaScale << " " << h * retinaScale;
     m_uniforms.viewport = QVector4D(0, 0, w * retinaScale, h * retinaScale);
 
+    qreal aspect = retinaScale * qreal(w) / qreal(h ? h : 1);
     m_projection.setToIdentity();
     m_projection.ortho(GLfloat(-w) / GLfloat(h),  GLfloat(w) / GLfloat(h), -1.0,  1.0f, -5.0, 5.0 );
+
+    // m_projection.perspective(45.0,  aspect, -5.0, 5.0 );
 
     // set up view
     // view matrix: transform a model's vertices from world space to view space, represents the camera
@@ -306,14 +309,24 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 
 void GLWidget::getSliderX(int value)
 {
+    if (value > 100 || value < 0) {
+        return;
+    }
+
     if (value > 98)
         value = 100;
+
     m_xaxis = value;
     update();
 }
 
 void GLWidget::getSliderY(int value)
 {
+    if (value > 100 || value < 0) {
+        return;
+    }
+
+
     if (value > 98)
         value = 100;
     m_yaxis = value;

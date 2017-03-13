@@ -438,7 +438,7 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     bool res = m_GSkeleton.compileShader("2D_nodes",
                                       ":/shaders/abstract_skeleton_node_2D_vert.glsl",
                                       ":/shaders/abstract_skeleton_node_geom.glsl",
-                                      ":/shaders/points_3dConnevtivity_frag.glsl");
+                                      ":/shaders/points_3d_frag.glsl");
     if (res == false)
         return res;
 
@@ -630,6 +630,79 @@ void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms, bool
     }
 }
 
+
+// ----------------------------------------------------------------------------
+//
+// we initialize the vbos for drawing
+bool OpenGLManager::initNeuritesGraphShaders()
+{
+    qDebug() << "OpenGLManager::initNeuritesGraphShaders()";
+
+    if (m_glFunctionsSet == false)
+        return false;
+
+    m_GNeurites.createProgram("index");
+    bool res = m_GNeurites.compileShader("index",
+                                         ":/shaders/nodes_vert.glsl",
+                                         ":/shaders/abstract_skeleton_line_geom.glsl",
+                                         ":/shaders/points_3d_frag.glsl");
+    if (res == false)
+        return res;
+
+    GL_Error();
+
+    // initialize buffers
+    m_NeuritesGraphVAO.create();
+    m_NeuritesGraphVAO.bind();
+
+    m_NeuritesNodesVBO.bind();
+
+    GL_Error();
+
+    initNeuritesVertexAttribPointer();
+
+    GL_Error();
+
+    // initialize uniforms
+
+    m_NeuritesNodesVBO.release();
+
+    m_NeuritesIndexVBO.bind();
+
+    m_GNeurites.useProgram("index");
+
+    m_NeuritesIndexVBO.release();
+    m_NeuritesGraphVAO.release();
+
+    return true;
+}
+
+// ----------------------------------------------------------------------------
+//
+// only the edges, because the skeleton itself will collabse into a node
+void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
+{
+    if (m_glFunctionsSet == false)
+        return;
+
+    m_NeuritesGraphVAO.bind();
+    m_NeuritesNodesVBO.bind();
+
+    m_uniforms = grid_uniforms;
+
+    m_NeuritesIndexVBO.bind();
+
+    m_GNeurites.useProgram("index");
+    updateAbstractUniformsLocation( m_GNeurites.getProgram("index") );
+    glLineWidth(20);
+
+    glDrawElements(GL_LINES,  m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
+
+    m_NeuritesIndexVBO.release();
+
+    m_NeuritesNodesVBO.release();
+    m_NeuritesGraphVAO.release();
+}
 
 // ----------------------------------------------------------------------------
 //
@@ -830,79 +903,6 @@ void OpenGLManager::drawSkeletonPoints(struct GlobalUniforms grid_uniforms, bool
         glDrawArrays(GL_POINTS, 0,  m_dataContainer->getSkeletonPointsSize()  );
         m_vao_skeleton.release();
     }
-}
-
-// ----------------------------------------------------------------------------
-//
-// we initialize the vbos for drawing
-bool OpenGLManager::initNeuritesGraphShaders()
-{
-    qDebug() << "OpenGLManager::initNeuritesGraphShaders()";
-
-    if (m_glFunctionsSet == false)
-        return false;
-
-    m_GNeurites.createProgram("index");
-    bool res = m_GNeurites.compileShader("index",
-                                         ":/shaders/nodes_vert.glsl",
-                                         ":/shaders/abstract_skeleton_line_geom.glsl",
-                                         ":/shaders/points_3d_frag.glsl");
-    if (res == false)
-        return res;
-
-    GL_Error();
-
-    // initialize buffers
-    m_NeuritesGraphVAO.create();
-    m_NeuritesGraphVAO.bind();
-
-    m_NeuritesNodesVBO.bind();
-
-    GL_Error();
-
-    initNeuritesVertexAttribPointer();
-
-    GL_Error();
-
-    // initialize uniforms
-
-    m_NeuritesNodesVBO.release();
-
-    m_NeuritesIndexVBO.bind();
-
-    m_GNeurites.useProgram("index");
-
-    m_NeuritesIndexVBO.release();
-    m_NeuritesGraphVAO.release();
-
-    return true;
-}
-
-// ----------------------------------------------------------------------------
-//
-// only the edges, because the skeleton itself will collabse into a node
-void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
-{
-    if (m_glFunctionsSet == false)
-        return;
-
-    m_NeuritesGraphVAO.bind();
-    m_NeuritesNodesVBO.bind();
-
-    m_uniforms = grid_uniforms;
-
-    m_NeuritesIndexVBO.bind();
-
-    m_GNeurites.useProgram("index");
-    updateAbstractUniformsLocation( m_GNeurites.getProgram("index") );
-    glLineWidth(20);
-
-    glDrawElements(GL_LINES,  m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
-
-    m_NeuritesIndexVBO.release();
-
-    m_NeuritesNodesVBO.release();
-    m_NeuritesGraphVAO.release();
 }
 
 // ----------------------------------------------------------------------------

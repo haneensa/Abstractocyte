@@ -15,7 +15,7 @@ struct properties {
     QVector2D positions; // x: position 1, y: position 2
     //x: mesh, y: skeleton points, z: transitional graph, w:  2D graph
     QVector4D render_type;
-    // x: axis type (0: x_axis, 1: y_axis), y: EMPTY, z and w: interval of y axis type in 2D space
+    // x: axis type (0: x_axis, 1: y_axis), y: EMPTY, z and w: interval of y axis type in 2D space (not used)
     QVector4D extra_info;
 
 };
