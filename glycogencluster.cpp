@@ -16,6 +16,8 @@ namespace Clustering
 		m_sumNode.setX(0);
 		m_sumNode.setY(0);
 		m_sumNode.setZ(0);
+
+		m_state = 1;
 	}
 
 	//--------------------------------------------------------------------------------
@@ -42,6 +44,28 @@ namespace Clustering
 		return m_id;
 	}
 
+	//--------------------------------------------------------------------------------
+	//
+	int  GlycogenCluster::getState()
+	{
+		return m_state;
+	}
+
+	//--------------------------------------------------------------------------------
+	//
+	void GlycogenCluster::setState(int state)
+	{
+		if (state > 2 || state < 0)
+			return;
+
+		m_state = state;
+		for (auto iter = m_glycogenMap.begin(); iter != m_glycogenMap.end(); iter++)
+		{
+			iter->second->setState(state);
+		}
+
+
+	}
 
 	//--------------------------------------------------------------------------------
 	//

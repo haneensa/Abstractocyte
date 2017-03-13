@@ -11,7 +11,7 @@ Glycogen::Glycogen(int ID, std::string name, QVector3D center, float radius)
     m_name = name;
     m_center = center/5.0;
 	m_radius = radius;
-	m_clusterID = -1;
+	m_clusterID = 0;
 
 	//use mesh_vertex for center point and ID of glycogen
 	m_center2.mesh_vertex.setX( m_center.x());
@@ -25,6 +25,7 @@ Glycogen::Glycogen(int ID, std::string name, QVector3D center, float radius)
 	m_center2.skeleton_vertex.setX( radius );
 	m_center2.skeleton_vertex.setY( (4.0f/3.0f)* std::pow(radius,3)*PI ); //volume of sphere
 	m_center2.skeleton_vertex.setZ( m_clusterID );
+	m_center2.skeleton_vertex.setW( 1 ); //0 invisible //1 visible //2 selected
 }
 
 //----------------------------------------------------------------------------
@@ -47,6 +48,23 @@ void Glycogen::setIndex(int index)
 float Glycogen::getVolume()
 {
 	return m_center2.skeleton_vertex.y();
+}
+
+//----------------------------------------------------------------------------
+// 0: invisible 1: visible 2: selected
+int		  Glycogen::getState()
+{
+	return (int)m_center2.skeleton_vertex.w();
+}
+
+//----------------------------------------------------------------------------
+//
+void      Glycogen::setState(int state)
+{
+	if (state > 2 || state < 0)
+		return;
+
+	m_center2.skeleton_vertex.setW(state);
 }
 
 //----------------------------------------------------------------------------

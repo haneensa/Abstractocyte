@@ -48,6 +48,7 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
     m_display_child = false;
     m_display_parent = false;
     m_display_synapses = false;
+	m_zoom = 1.0f;
 
 }
 
@@ -933,39 +934,54 @@ bool OpenGLManager::initGlycogenPointsShaders()
     m_vbo_glycogen.bind();
 
     // fill glycogen points
-    std::map<int, Glycogen*> glycogenMap = m_dataContainer->getGlycogenMap();
-    struct glycogen_datum {
-        int ID;
-        QVector4D center_diam;
-    };
+    //std::map<int, Glycogen*> glycogenMap = m_dataContainer->getGlycogenMap();
+	std::vector<VertexData*>* glycogenList = m_dataContainer->getGlycogenVertexDataPtr();
+    //struct glycogen_datum {
+    //    int ID;
+    //    QVector4D center_diam;
+    //};
 
-    std::vector<struct glycogen_datum> glycogen_data;
-    for (auto iter = glycogenMap.begin(); iter != glycogenMap.end(); iter++ ) {
-        Glycogen*gc = (*iter).second;
-        QVector4D center_diam = gc->getCenter();
-        center_diam.setW(gc->getRadius());
-        struct glycogen_datum gc_datum = {gc->getID(), center_diam};
-        glycogen_data.push_back(gc_datum);
-
-
+    //std::vector<struct glycogen_datum> glycogen_data;
+	std::vector<VertexData> glycogen_data;
+	//for (auto iter = glycogenMap.begin(); iter != glycogenMap.end(); iter++ ) {
+	for (auto iter = glycogenList->begin(); iter != glycogenList->end(); iter++) {
+        //Glycogen*gc = (*iter).second;
+		VertexData* vd = (*iter);
+		//QVector4D center_diam = gc->getCenter();
+        //center_diam.setW(gc->getRadius());
+        //struct glycogen_datum gc_datum = {gc->getID(), center_diam};
+        //glycogen_data.push_back(gc_datum);
+		glycogen_data.push_back(*vd);
     }
-    m_vbo_glycogen.allocate( glycogen_data.data(),
-                                  glycogen_data.size() * sizeof(struct glycogen_datum) );
+
+    //m_vbo_glycogen.allocate( glycogen_data.data(),
+    //                              glycogen_data.size() * sizeof(struct glycogen_datum) );
+
+	m_vbo_glycogen.allocate(glycogen_data.data(), glycogen_data.size() * sizeof(struct VertexData));
     GL_Error();
 
     m_GlycogenPoints.useProgram("3DPoints");
 
     // init pointers
-    int offset = 0;
+   /* int offset = 0;
     glEnableVertexAttribArray(0);
     glVertexAttribIPointer(0, 1, GL_INT, 0, (void*)offset);
 
     offset +=  sizeof(int);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
-                          sizeof(glycogen_datum), (GLvoid*)offset);
+                          sizeof(glycogen_datum), (GLvoid*)offset);*/
+
+	int offset = 0;
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+						  sizeof(struct VertexData), 0);
 
 
+	offset += sizeof(QVector4D);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
+						  sizeof(VertexData), (GLvoid*)offset);
 
     GL_Error();
 
@@ -979,8 +995,10 @@ bool OpenGLManager::initGlycogenPointsShaders()
 //
 void OpenGLManager::drawGlycogenPoints(struct GlobalUniforms grid_uniforms)
 {
+
     // I need this because transitioning from mesh to skeleton is not smooth
     m_vao_glycogen.bind();
+
     m_GlycogenPoints.useProgram("3DPoints");
     m_uniforms = grid_uniforms;
 
@@ -988,6 +1006,57 @@ void OpenGLManager::drawGlycogenPoints(struct GlobalUniforms grid_uniforms)
     glDrawArrays(GL_POINTS, 0,  m_dataContainer->getGlycogenSize() );
 
     m_vao_glycogen.release();
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::updateGlycogenPoints()
+{
+	//m_vao_glycogen.bind();
+	m_vbo_glycogen.bind();
+
+	
+
+	// fill glycogen points
+	//std::map<int, Glycogen*> glycogenMap = m_dataContainer->getGlycogenMap();
+	std::vector<VertexData*>* glycogenList = m_dataContainer->getGlycogenVertexDataPtr();
+	//struct glycogen_datum {
+	//    int ID;
+	//    QVector4D center_diam;
+	//};
+
+	//std::vector<struct glycogen_datum> glycogen_data;
+	std::vector<VertexData> glycogen_data;
+	//for (auto iter = glycogenMap.begin(); iter != glycogenMap.end(); iter++ ) {
+	for (auto iter = glycogenList->begin(); iter != glycogenList->end(); iter++) {
+		//Glycogen*gc = (*iter).second;
+		VertexData* vd = (*iter);
+		//QVector4D center_diam = gc->getCenter();
+		//center_diam.setW(gc->getRadius());
+		//struct glycogen_datum gc_datum = {gc->getID(), center_diam};
+		//glycogen_data.push_back(gc_datum);
+		glycogen_data.push_back(*vd);
+	}
+
+	auto buffer_data = m_vbo_glycogen.map(QOpenGLBuffer::WriteOnly);
+
+	memcpy(buffer_data, glycogen_data.data(), glycogen_data.size() * sizeof(struct VertexData));
+
+	m_vbo_glycogen.unmap();
+	//m_vbo_glycogen.allocate(glycogen_data.data(), glycogen_data.size() * sizeof(struct VertexData));
+
+	/*int offset = 0;
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+		sizeof(struct VertexData), 0);
+
+
+	offset += sizeof(QVector4D);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
+		sizeof(VertexData), (GLvoid*)offset);*/
+
+	m_vbo_glycogen.release();
 }
 
 // ----------------------------------------------------------------------------
@@ -1111,6 +1180,9 @@ void OpenGLManager::updateUniformsLocation(GLuint program)
     // initialize uniforms
     GLuint mMatrix = glGetUniformLocation(program, "mMatrix");
     glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+	GLuint m_noRartionMatrix = glGetUniformLocation(program, "m_noRartionMatrix");
+	glUniformMatrix4fv(m_noRartionMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
 
     GLuint vMatrix = glGetUniformLocation(program, "vMatrix");
     glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
@@ -1369,4 +1441,9 @@ void OpenGLManager::showAll()
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
         FilterObject(i, false);
     }
+}
+
+void OpenGLManager::setZoom(float zoom)
+{
+	m_zoom = zoom;
 }

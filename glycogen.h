@@ -22,6 +22,9 @@ public:
 	void setClusterID(int clusterID);
 	void setIndex(int index);
 
+	int		  getState();
+	void      setState(int state);
+
 protected:
     int             m_ID;
     std::string     m_name;

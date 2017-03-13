@@ -264,7 +264,7 @@ void GLWidget::wheelEvent(QWheelEvent *event)
         } else {
             m_distance *= 0.9;
         }
-
+		m_opengl_mngr->setZoom(m_distance);
         update();
     }
 }
@@ -281,6 +281,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             m_translation = QVector3D(0.0, 0.0, 0.0);
             //reset zoom
             m_distance = 0.2f;
+			m_opengl_mngr->setZoom(m_distance);
             update();
         break;
         case(Qt::Key_T):

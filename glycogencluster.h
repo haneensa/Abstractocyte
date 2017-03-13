@@ -21,15 +21,20 @@ namespace Clustering
 		bool contains(int id);
 		int  getClusterSize();
 		float getTotalVolume();
+		int  getState();
+		void setState(int state);
 
 		static void clearIDs();
 
 	protected:
-		int					   m_id;
-		float				   m_totalVolume;
-		QVector3D			   m_sumNode;
+		//visible = 1, invisble = 0, selected = 2
+		bool					m_state;
+
+		int					    m_id;
+		float				    m_totalVolume;
+		QVector3D			    m_sumNode;
 		std::map<int,Glycogen*> m_glycogenMap;
-		static int			   ID_COUNTER;
+		static int			    ID_COUNTER;
 	};
 
 	
