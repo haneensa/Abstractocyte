@@ -485,6 +485,7 @@ void GLWidget::getNodeSizeEncoding(QString encoding)
         m_opengl_mngr->updateNodeSizeEncoding(Size_e::VOLUME);
     else if (encoding == "Astrocyte Coverage")
         m_opengl_mngr->updateNodeSizeEncoding(Size_e::ASTRO_COVERAGE);
+    update();
 }
 
 void GLWidget::getColorEncoding(QString encoding)
@@ -496,4 +497,6 @@ void GLWidget::getColorEncoding(QString encoding)
         m_opengl_mngr->updateColorEncoding(Color_e::ASTRO_COVERAGE);
     else if (encoding == "Function")
         m_opengl_mngr->updateColorEncoding(Color_e::FUNCTION);
+
+    update();
 }
