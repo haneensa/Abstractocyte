@@ -1521,6 +1521,7 @@ void OpenGLManager::updateSSBO()
         float volume =  translate(obj->getVolume(), 0, m_dataContainer->getMaxVolume(), 0, 1);
         float coverage = translate(obj->getAstroCoverage(),
                                    0, m_dataContainer->getMaxAstroCoverage(),
+                                   0, 0.6);
 
         switch(m_size_encoding) {
         case Size_e::VOLUME:
@@ -1547,6 +1548,7 @@ void OpenGLManager::updateSSBO()
             case Color_e::ASTRO_COVERAGE:
             {
               QVector4D color = obj->getColor();
+              m_ssbo_data[hvgxID].color = QVector4D(color.x() + 0.2, color.y() +  0.2, color.z() + 0.2, color.w()) ;
               QVector4D add_color = QVector4D(1, 1, 1, 0) * coverage;
               m_ssbo_data[hvgxID].color -= add_color;
 
