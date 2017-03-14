@@ -21,6 +21,7 @@ DataContainer::DataContainer()
     max_volume = 1;
     max_astro_coverage = 1;
 
+    m_limit = 10000;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
@@ -225,17 +226,53 @@ void DataContainer::loadMetaDataHVGX(QString path)
 
         } else if (wordList[0] == "bo") {
             // id, vesicleNo, volume, surfaceArea, axon_id, name, is_terminal_branch, is_mitochondrion
-            continue;
+            int hvgxID = wordList[1].toInt();
+            if (m_objects.find(hvgxID) == m_objects.end()) {
+                continue;
+            }
+
+            Object *parent = m_objects[hvgxID]->getParent();
+            if (parent == NULL) {
+                continue;
+            }
+
+            int function = parent->getFunction();
+            m_objects[hvgxID]->setFunction(function);
+
         } else if (wordList[0] == "sp") {
             // id, psd_area, volume, dendrite_id, does_form_synapse, with_apparatus, has_glia_nearby, spine name
-            continue;
+            int hvgxID = wordList[1].toInt();
+            if (m_objects.find(hvgxID) == m_objects.end()) {
+                continue;
+            }
+
+            Object *parent = m_objects[hvgxID]->getParent();
+            if (parent == NULL) {
+                continue;
+            }
+
+            int function = parent->getFunction();
+            m_objects[hvgxID]->setFunction(function);
+
         } else if (wordList[0] == "dn") {
             // id, function (0:ex,1:in), abs_node_id, name
-            continue;
+            int hvgxID = wordList[1].toInt();
+            if (m_objects.find(hvgxID) == m_objects.end()) {
+                continue;
+            }
+
+            int function = wordList[2].toInt();
+            m_objects[hvgxID]->setFunction(function);
+
         } else if (wordList[0] == "ax") {
             // id, function (0:ex,1:in), is_mylenated, abs_node_id, name
+            int hvgxID = wordList[1].toInt();
+            if (m_objects.find(hvgxID) == m_objects.end()) {
+                continue;
+            }
 
-            continue;
+            int function = wordList[2].toInt();
+            m_objects[hvgxID]->setFunction(function);
         }
 
 

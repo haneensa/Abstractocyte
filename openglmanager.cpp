@@ -1486,6 +1486,25 @@ void OpenGLManager::setZoom(float zoom)
 }
 
 
+float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
+{
+    // if value < leftMin -> value = leftMin
+    value = std::max(value, leftMin);
+    // if value > leftMax -> value = leftMax
+    value = std::min(value, leftMax);
+    // Figure out how 'wide' each range is
+    float leftSpan = leftMax - leftMin;
+    float rightSpan = rightMax - rightMin;
+
+    // Convert the left range into a 0-1 range (float)
+    float valueScaled = float(value - leftMin) / float(leftSpan);
+
+    // Convert the 0-1 range into a value in the right range.
+    return rightMin + (valueScaled * rightSpan);
+}
+
+
+
 void OpenGLManager::updateSSBO()
 {
     std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
@@ -1499,8 +1518,10 @@ void OpenGLManager::updateSSBO()
         if (m_ssbo_data.size() <= hvgxID)
             continue;
 
-        float volume =  obj->getVolume() / m_dataContainer->getMaxVolume();
-        float coverage =  obj->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage();
+        float volume =  translate(obj->getVolume(), 0, m_dataContainer->getMaxVolume(), 0, 1);
+        float coverage = translate(obj->getAstroCoverage(),
+                                   0, m_dataContainer->getMaxAstroCoverage(),
+                                   0, 0.75);
 
         switch(m_size_encoding) {
         case Size_e::VOLUME:
@@ -1537,11 +1558,11 @@ void OpenGLManager::updateSSBO()
               int function = obj->getFunction();
               if (function == 0) {
                   m_ssbo_data[hvgxID].color.setX(0.7);
-                  m_ssbo_data[hvgxID].color.setY(0.2);
-                  m_ssbo_data[hvgxID].color.setZ(0.2);
+                  m_ssbo_data[hvgxID].color.setY(0.1);
+                  m_ssbo_data[hvgxID].color.setZ(0.1);
               } else if (function == 1) {
-                  m_ssbo_data[hvgxID].color.setX(0.2);
-                  m_ssbo_data[hvgxID].color.setY(0.2);
+                  m_ssbo_data[hvgxID].color.setX(0.1);
+                  m_ssbo_data[hvgxID].color.setY(0.1);
                   m_ssbo_data[hvgxID].color.setZ(0.7);
               } else {
                   m_ssbo_data[hvgxID].color.setX(0.5);
