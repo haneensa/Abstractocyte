@@ -1376,25 +1376,25 @@ void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
             if (synapse_data.axon != hvgxID
                 && synapse_data.axon
                 && objectMap.find(synapse_data.axon) != objectMap.end()) {
-                recursiveFilter(synapse_data.axon, isfilterd);
+                FilterObject(synapse_data.axon, isfilterd);
             }
 
             if (synapse_data.dendrite != hvgxID
                 && synapse_data.dendrite
                 && objectMap.find(synapse_data.dendrite) != objectMap.end()) {
-                recursiveFilter(synapse_data.dendrite, isfilterd);
+                FilterObject(synapse_data.dendrite, isfilterd);
             }
 
             if (synapse_data.spine != hvgxID
                 && synapse_data.spine
                 && objectMap.find(synapse_data.spine) != objectMap.end()) {
-                recursiveFilter(synapse_data.spine, isfilterd);
+                FilterObject(synapse_data.spine, isfilterd);
             }
 
             if (synapse_data.bouton != hvgxID
                 && synapse_data.bouton
                 && objectMap.find(synapse_data.bouton) != objectMap.end()) {
-                recursiveFilter(synapse_data.bouton, isfilterd);
+                FilterObject(synapse_data.bouton, isfilterd);
             }
         }
     }
