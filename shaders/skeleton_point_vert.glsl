@@ -105,6 +105,7 @@ void main(void)
 
     float max_point_size = point_size.y;
     if (pos2_flag == 6)
+      max_point_size = point_size.y + SSBO_data[ID].info.x;
     gl_PointSize =  translate(slider, interval.x, interval.y, point_size.x, max_point_size);
 
     vec4 center4d  = pvmMatrix * vec4(SSBO_data[ID].center.xyz, 1.0);
