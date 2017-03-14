@@ -739,7 +739,6 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
     m_TMesh.useProgram("selection");
 
-
     m_TMesh.vboBind("MeshVertices");
     initMeshVertexAttrib();
     m_TMesh.vboRelease("MeshVertices");

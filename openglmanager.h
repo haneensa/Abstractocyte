@@ -95,58 +95,55 @@ public:
 	void setZoom(float zoom);
 
 protected:
-    DataContainer                       *m_dataContainer; // get the data to render from here
-    AbstractionSpace                    *m_2dspace;
+    DataContainer                           *m_dataContainer;
+    AbstractionSpace                        *m_2dspace;
 
-    bool                                m_glFunctionsSet;
-    bool                                m_2D;
-    struct GlobalUniforms               m_uniforms;
+    bool                                    m_glFunctionsSet;
+    bool                                    m_2D;
+    struct GlobalUniforms                   m_uniforms;
 
     // *********** 0) SSBO objects Data    ***********
-    // todo: flag in ssbo to indicate this object on/off
-    std::vector<struct ssbo_mesh>       m_ssbo_data; // Color, Cenert, Type
-    GLuint                              m_ssbo;
-    GLuint                              m_bindIdx;
+    std::vector<struct ssbo_mesh>           m_ssbo_data; // Color, Cenert, Type
+    GLuint                                  m_ssbo;
+    GLuint                                  m_bindIdx;
 
     // *********** 1) Mesh Triangles     ***********
-
-    RenderVertexData                    m_TMesh;
-    QOpenGLBuffer                       m_vbo_mesh;
-    QOpenGLBuffer                       m_Neurite_vbo_IndexMesh;
+    RenderVertexData                        m_TMesh;
 
     // *********** 3) Skeleton Points    ***********
-    RenderVertexData                    m_SkeletonPoints;
-    QOpenGLBuffer                       m_vbo_skeleton;
+    RenderVertexData                        m_SkeletonPoints;
 
     // *********** 4) Abstract Skeleton Graph (Nodes and Edges) ***********
-      RenderVertexData                    m_GSkeleton;
-    std::vector<struct AbstractSkelNode>   m_abstract_skel_nodes; // all skeletons here
-    std::vector<GLuint>                    m_abstract_skel_edges;
+    RenderVertexData                        m_GSkeleton;
+    std::vector<struct AbstractSkelNode>    m_abstract_skel_nodes; // all skeletons here
+    std::vector<GLuint>                     m_abstract_skel_edges;
 
     // ***********  5) Neurites Graph (Nodes and Edges) ***********
-    RenderVertexData                    m_GNeurites;
-    std::vector<GLuint>                 m_neurites_nodes; // (place holders for neurites nodes) this initialized once and not changed after words
-    std::vector<GLuint>                 m_neurites_edges; // (place holders for neurites edges) this as well
+    RenderVertexData                        m_GNeurites;
+    // (place holders for neurites nodes) this initialized once and not changed after words
+    std::vector<GLuint>                     m_neurites_nodes;
+    // (place holders for neurites edges) this as well
+    std::vector<GLuint>                     m_neurites_edges;
 
     // *********** 6) Glycogen Nodes     ***********
-    RenderVertexData                    m_GlycogenPoints;
-    QOpenGLVertexArrayObject            m_vao_glycogen;
-    QOpenGLBuffer                       m_vbo_glycogen;
+    RenderVertexData                        m_GlycogenPoints;
+    QOpenGLVertexArrayObject                m_vao_glycogen;
+    QOpenGLBuffer                           m_vbo_glycogen;
 
-	float								m_zoom;
+    float                                   m_zoom;
 
     // ********** Selection ************************
-    int                                 m_canvas_w;
-    int                                 m_canvas_h;
-    int                                 m_retinaScale;
+    int                                     m_canvas_w;
+    int                                     m_canvas_h;
+    int                                     m_retinaScale;
 
-    int                                 m_hits;
-    GLuint                              m_selectionFrameBuffer;
-    GLuint                              m_selectionRenderBuffer;
+    int                                     m_hits;
+    GLuint                                  m_selectionFrameBuffer;
+    GLuint                                  m_selectionRenderBuffer;
 
-    bool                                m_display_child;
-    bool                                m_display_parent;
-    bool                                m_display_synapses;
+    bool                                    m_display_child;
+    bool                                    m_display_parent;
+    bool                                    m_display_synapses;
 
 
  };

@@ -24,7 +24,8 @@ public:
     void vboBind(std::string name);
     void vboRelease(std::string name);
     void vboAllocate(std::string name, const void *data, int count);
-
+    void vboWrite(std::string name, int offset ,const void *data, int count);
+    QOpenGLBuffer getVBO(std::string name);
 
     void vaoCreate(std::string name);
     void vaoBind(std::string name);

@@ -51,6 +51,11 @@ void RenderVertexData::vboAllocate(std::string name, const void *data, int count
     m_vbo[name].allocate( data, count );
 }
 
+void  RenderVertexData::vboWrite(std::string name, int offset ,const void *data, int count)
+{
+    m_vbo[name].write( offset, data, count );
+}
+
 void RenderVertexData::vboCreate(std::string name, Buffer_t type, Buffer_USAGE_t usage)
 {
     if (type == Buffer_t::VERTEX)
@@ -62,7 +67,14 @@ void RenderVertexData::vboCreate(std::string name, Buffer_t type, Buffer_USAGE_t
 
     if (usage == Buffer_USAGE_t::DYNAMIC_DRAW )
         m_vbo[name].setUsagePattern( QOpenGLBuffer::DynamicDraw );
+    else if (usage == Buffer_USAGE_t::STATIC)
+        m_vbo[name].setUsagePattern( QOpenGLBuffer::StaticDraw );
 
+}
+
+QOpenGLBuffer RenderVertexData::getVBO(std::string name)
+{
+    return m_vbo[name];
 }
 
 //************** VAO
