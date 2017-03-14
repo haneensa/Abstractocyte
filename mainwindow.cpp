@@ -1,4 +1,5 @@
 #include "glycogencluster.h"
+#include "object.h"
 #include "glycogenanalysismanager.h"
 #include "glwidget.h"
 #include "openglmanager.h"
@@ -15,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     mainwindow_ui->setupUi(this);
 	m_currentSelectedCluster = 0;
+	m_clusters = 0;
 }
 
 //------------------------------------------------------
@@ -42,17 +44,21 @@ MousePad* MainWindow::getMousePad()
 //
 void MainWindow::on_glycogenVisibilityCheckBox_toggled(bool checked)
 {
-	qDebug() << "glycogen visibility toggled";
+	//qDebug() << "glycogen visibility toggled";
+
+	getGLWidget()->getOpenGLManager()->setRenderGlycogenGranules(checked);
 }
 
 //------------------------------------------------------
 //
 void MainWindow::on_clusterButton_clicked()
 {
-	m_clusters = 0;
+	
 	mainwindow_ui->glycogenClustersTreeWidget->clear();
+	if (m_clusters)
+		m_clusters->clear();
 
-	qDebug() << "cluster button clicked";
+	//qDebug() << "cluster button clicked";
 	GlycogenAnalysisManager* gam = getGLWidget()->getGlycogenAnalysisManager();
 	double eps = mainwindow_ui->epsDoubleSpinBox->value();
 	int minPts = mainwindow_ui->minPtsSpinBox->value();
@@ -133,4 +139,91 @@ void MainWindow::on_glycogenClustersTreeWidget_itemSelectionChanged()
 		m_clusters->at(id)->setState(2);
 	}
 	getGLWidget()->getOpenGLManager()->updateGlycogenPoints();
+}
+
+//------------------------------------------------------
+//
+void MainWindow::on_mapGlycogenGranulesButton_clicked()
+{
+	GlycogenAnalysisManager* gam = getGLWidget()->getGlycogenAnalysisManager();
+
+	bool boutons = mainwindow_ui->glycogenMapToBoutonsCheckBox->isChecked();
+	bool spines = mainwindow_ui->glycogenMapToSpinesCheckBox->isChecked();
+	bool clusters = false;
+
+	std::map<int, std::map<int, int>>* results = gam->computeGlycogenMapping(boutons, spines, clusters);
+
+	DataContainer* dc = getGLWidget()->getDataContainer();
+	std::map<int, Object*>* objects = dc->getObjectsMapPtr();
+
+	mainwindow_ui->glycogenMappingTreeWidget->setColumnCount(3);
+	QStringList headerLabels;
+	headerLabels.push_back(tr("Object ID"));
+	headerLabels.push_back(tr("Name"));
+	headerLabels.push_back(tr("Granules"));
+	mainwindow_ui->glycogenMappingTreeWidget->setHeaderLabels(headerLabels);
+
+	//fill mapping tree widget
+	for (auto iter = results->begin(); iter != results->end(); iter++)
+	{
+		int object_id = iter->first;
+		Object* current_object = objects->at(object_id);
+		
+		//create map item
+		QTreeWidgetItem* map_item = new QTreeWidgetItem(mainwindow_ui->glycogenMappingTreeWidget);
+		map_item->setText(0, QString::number(current_object->getHVGXID()));
+		map_item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+		map_item->setCheckState(0, Qt::Checked);
+
+		map_item->setText(1, QString(current_object->getName().c_str()));
+		map_item->setText(2, QString::number(iter->second.size()));
+	}
+}
+
+//------------------------------------------------------
+//
+void MainWindow::on_mapGlycogenClustersButton_clicked()
+{
+	if (m_clusters && m_clusters->size() > 0)
+	{
+		GlycogenAnalysisManager* gam = getGLWidget()->getGlycogenAnalysisManager();
+
+		bool boutons = mainwindow_ui->glycogenMapToBoutonsCheckBox->isChecked();
+		bool spines = mainwindow_ui->glycogenMapToSpinesCheckBox->isChecked();
+		bool clusters = true;
+
+		std::map<int, std::map<int, int>>* results = gam->computeGlycogenMapping(boutons, spines, clusters);
+	
+		DataContainer* dc = getGLWidget()->getDataContainer();
+		std::map<int, Object*>* objects = dc->getObjectsMapPtr();
+
+		mainwindow_ui->glycogenMappingTreeWidget->setColumnCount(3);
+		QStringList headerLabels;
+		headerLabels.push_back(tr("Object ID"));
+		headerLabels.push_back(tr("Name"));
+		headerLabels.push_back(tr("Clusters"));
+		mainwindow_ui->glycogenMappingTreeWidget->setHeaderLabels(headerLabels);
+
+		//fill mapping tree widget
+		for (auto iter = results->begin(); iter != results->end(); iter++)
+		{
+			int object_id = iter->first;
+			Object* current_object = objects->at(object_id);
+
+			//create map item
+			QTreeWidgetItem* map_item = new QTreeWidgetItem(mainwindow_ui->glycogenMappingTreeWidget);
+			map_item->setText(0, QString::number(current_object->getHVGXID()));
+			map_item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+			map_item->setCheckState(0, Qt::Checked);
+
+			map_item->setText(1, QString(current_object->getName().c_str()));
+			map_item->setText(2, QString::number(iter->second.size()));
+		}
+
+
+	}
+	else
+	{
+		//show message saying: No clusters available, calculate clusters first
+	}
 }

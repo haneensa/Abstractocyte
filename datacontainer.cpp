@@ -22,20 +22,20 @@ DataContainer::DataContainer()
     max_volume = 1;
     max_astro_coverage = 1;
 
-    m_limit = 100000;
+    m_limit = 10000;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
 
-    importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    //importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     importXML("://m3_neurites.xml");    // neurites time:  28802 ms
     // has glycogen data
     loadMetaDataHVGX(":/data/mouse3_metadata_objname_center_astroSyn.hvgx");
 
 	qDebug() << "setting up octrees";
-	//m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
-	//m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
+	m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
+	m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
     m_glycogenOctree.initialize(&m_glycogenList);
 	qDebug() << "octrees ready";
 

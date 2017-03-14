@@ -87,6 +87,8 @@ public:
     void updateDisplayParentFlag(bool flag)         { m_display_parent = flag; }
     void updateDisplaySynapseFlag(bool flag)        { m_display_synapses = flag; }
 
+	void setRenderGlycogenGranules(bool render) { m_renderGlycogenGranules = render; };
+
     // ********** Selection ************************
     void updateCanvasDim(int w, int h, int retianScale);
     void initSelectionFrameBuffer();
@@ -149,7 +151,7 @@ protected:
     QOpenGLVertexArrayObject            m_vao_glycogen;
     QOpenGLBuffer                       m_vbo_glycogen;
 
-
+	bool								m_renderGlycogenGranules;
 	float								m_zoom;
 
     // ********** Selection ************************

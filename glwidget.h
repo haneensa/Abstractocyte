@@ -21,6 +21,7 @@ public:
 
 	GlycogenAnalysisManager* getGlycogenAnalysisManager() { return m_glycogenAnalysisManager; }
 	OpenGLManager*			 getOpenGLManager() { return m_opengl_mngr; }
+	DataContainer*			 getDataContainer() { return m_data_containter; }
 	float getZoomFactor() { return m_distance; }
 
     int pickObject(QMouseEvent *event);

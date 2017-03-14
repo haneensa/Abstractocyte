@@ -28,7 +28,8 @@ GLWidget::GLWidget(QWidget *parent)
     m_graphManager = new GraphManager( m_data_containter, m_opengl_mngr );
 
 	//glycogen analysis manager with clustering
-	m_glycogenAnalysisManager = new GlycogenAnalysisManager(m_data_containter->getGlycogenMapPtr(), m_data_containter->getGlycogenVertexDataPtr(), m_data_containter->getGlycogenOctree());
+	m_glycogenAnalysisManager = new GlycogenAnalysisManager(m_data_containter->getGlycogenMapPtr(), m_data_containter->getGlycogenVertexDataPtr(), m_data_containter->getGlycogenOctree(), m_data_containter->getMeshPointer()->getVerticesList());
+	m_glycogenAnalysisManager->setBoutonAndSpineOctrees(m_data_containter->getBoutonOctree(), m_data_containter->getSpineOctree());
 
     m_distance = 1.0;
     m_rotation = QQuaternion();

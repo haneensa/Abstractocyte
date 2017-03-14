@@ -51,6 +51,7 @@ public:
 
     // graph related function
     std::map<int, Object*>  getObjectsMap();
+	std::map<int, Object*>*  getObjectsMapPtr() { return &m_objects; }
     std::vector<QVector2D> getNeuritesEdges();
 
     int getSkeletonPointsSize();
@@ -99,6 +100,8 @@ protected:
 	SpacePartitioning::Octree				m_spineOctree;
 	SpacePartitioning::Octree				m_boutonOctree;
 	SpacePartitioning::Octree				m_glycogenOctree;
+
+	
 
 };
 

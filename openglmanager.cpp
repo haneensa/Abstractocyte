@@ -49,6 +49,7 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
     m_display_parent = false;
     m_display_synapses = false;
 	m_zoom = 1.0f;
+	m_renderGlycogenGranules = true;
 
 }
 
@@ -1076,7 +1077,8 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     write_ssbo_data();
     struct ast_neu_properties space_properties = m_2dspace->getSpaceProper();
 
-    drawGlycogenPoints(grid_uniforms);
+	if (m_renderGlycogenGranules)
+		drawGlycogenPoints(grid_uniforms);
 
 
     if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1) ) {

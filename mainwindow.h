@@ -27,13 +27,18 @@ public:
 
 public slots:
 
+
 	void on_glycogenVisibilityCheckBox_toggled(bool);
+	//------------- glycogen clustering ----------------------------
 	void on_clusterButton_clicked();
 	//void on_glycogenClustersTreeWidget_itemClicked(QTreeWidgetItem* item, int column);
 	//void on_glycogenClustersTreeWidget_itemActivated(QTreeWidgetItem* item, int column);
 	void on_glycogenClustersTreeWidget_itemChanged(QTreeWidgetItem* item, int column);
 	void on_glycogenClustersTreeWidget_itemSelectionChanged();
-	
+
+	//------------- glycogen mapping -------------------------------
+	void on_mapGlycogenGranulesButton_clicked();
+	void on_mapGlycogenClustersButton_clicked();
 
 private:
     Ui::MainWindow *mainwindow_ui;
