@@ -59,7 +59,7 @@ public:
 
     Object_t getObjectTypeByID(int hvgxID);
     std::string getObjectName(int hvgxID);
-    std::vector<int> getObjectsIDsByType(Object_t type);
+    std::vector<Object*> getObjectsByType(Object_t type);
 
     int getMaxAstroCoverage()   { return max_astro_coverage; }
     int getMaxVolume()          { return max_volume; }
@@ -68,37 +68,37 @@ public:
     void recomputeMaxVolAstro();
 
 protected:
-    int                                     m_tempCounter; // how many objects with no contacts to ast based on threshold
+    int                                         m_tempCounter; // how many objects with no contacts to ast based on threshold
      // maximum volume from displayed objects
-    int                                     max_volume;
+    int                                         max_volume;
     // maximum vertices from neurites covered by astrocyte
-    int                                     max_astro_coverage;
+    int                                         max_astro_coverage;
 
     // store all vertices of the mesh.
     // unique vertices, faces to index them.
-    Mesh                                    *m_mesh;
+    Mesh                                        *m_mesh;
 
-    Object                                  *m_curParent;
-    int                                     m_skeleton_points_size;
-    int                                     m_indices_size;
-    int                                     m_vertex_offset;
-    int                                     m_limit;
+    Object                                      *m_curParent;
+    int                                         m_skeleton_points_size;
+    int                                         m_indices_size; // used to allocate indices of a mesh
+    int                                         m_vertex_offset; // used to unify vertices for one mesh
+    int                                         m_limit;
 
-    std::map<int, Object*>                  m_objects;
+    std::map<int, Object*>                      m_objects;
+    std::map<Object_t, std::vector<Object*> >   m_objectsByType;
+    std::map<Object_t, int >                    m_indices_size_byType;
 
-    // for each type, make a list of their IDs
-    std::map< Object_t, std::vector<int> >  m_objectsIDsByType;
 
     // graph related data
-    std::vector<QVector2D>                  neurites_neurite_edge;
+    std::vector<QVector2D>                      neurites_neurite_edge;
 
-    std::map<int, Glycogen*>                m_glycogenMap;
-	std::vector<VertexData*>				m_glycogenList;
+    std::map<int, Glycogen*>                    m_glycogenMap;
+    std::vector<VertexData*>                    m_glycogenList;
 
 	//octrees
-	SpacePartitioning::Octree				m_spineOctree;
-	SpacePartitioning::Octree				m_boutonOctree;
-	SpacePartitioning::Octree				m_glycogenOctree;
+    SpacePartitioning::Octree                   m_spineOctree;
+    SpacePartitioning::Octree                   m_boutonOctree;
+    SpacePartitioning::Octree                   m_glycogenOctree;
 
 };
 

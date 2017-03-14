@@ -226,3 +226,24 @@ void Object::addChild(Object *child)
     m_children.push_back(child);
 }
 
+
+// if object type == synapse
+void Object::UpdateSynapseData(int axon_id, int dendrite_id, int spine_id, int bouton_id)
+{
+    if (m_object_t != Object_t::SYNAPSE)
+        return;
+
+    m_synapse_data.axon = axon_id;
+    m_synapse_data.dendrite = dendrite_id;
+    m_synapse_data.spine = spine_id;
+    m_synapse_data.bouton = bouton_id;
+
+}
+
+void Object::addSynapse(Object *synapse_object)
+{
+    if (synapse_object == NULL)
+        return;
+
+    m_synapses.push_back(synapse_object);
+}

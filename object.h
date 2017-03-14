@@ -15,6 +15,13 @@
 
 #define ASTRO_DIST_THRESH   0.0001
 
+// if object type == synapse
+struct synapse {
+    int axon;
+    int dendrite;
+    int spine;
+    int bouton;
+};
 
 enum class Object_t { AXON = 2, DENDRITE = 4, BOUTON = 3 , SPINE = 5, MITO = 1, SYNAPSE = 7, ASTROCYTE = 6, GLYCOGEN = 8, UNKNOWN = 0 };
 
@@ -74,7 +81,10 @@ public:
     void updateAstSynapseFlag(bool flag)        { m_isAstroSynapse = flag; }
 
     void updateClosestAstroVertex(float dist,  int vertexIdx);
-
+    void UpdateSynapseData(int axons_id, int dendrite_id, int spine_id, int bouton_id);
+    void addSynapse(Object *synapse_object);
+    std::vector<Object*> getSynapses()          { return m_synapses; }
+    struct synapse getSynapseData()             { return m_synapse_data; }
 
 private:
     std::string                             m_name;
@@ -108,6 +118,14 @@ private:
 
     std::vector<int>                        m_VertexidxCloseToAstro;  // less than ASTRO_DIST_THRESH ----> we can refine this later
 
+
+    // list of synapses
+    std::vector<Object*>                    m_synapses;
+
+
+    struct synapse                          m_synapse_data;
+
+    std::map<Object_t, void*>               m_dataByType; // use this to store info based on data type
 };
 
 #endif // OBJECT_H
