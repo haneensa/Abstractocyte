@@ -51,13 +51,32 @@ void RenderVertexData::vboAllocate(std::string name, const void *data, int count
     m_vbo[name].allocate( data, count );
 }
 
-void RenderVertexData::vboCreate(std::string name, int type)
+void RenderVertexData::vboCreate(std::string name, Buffer_t type, Buffer_USAGE_t usage)
 {
-    if (type == 0)
+    if (type == Buffer_t::VERTEX)
         m_vbo[name] = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-    else
+    else if (type == Buffer_t::INDEX)
         m_vbo[name] = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
 
     m_vbo[name].create();
-   // m_vbo[name].setUsagePattern( QOpenGLBuffer::DynamicDraw );
+
+    if (usage == Buffer_USAGE_t::DYNAMIC_DRAW )
+        m_vbo[name].setUsagePattern( QOpenGLBuffer::DynamicDraw );
+
+}
+
+//************** VAO
+void RenderVertexData::vaoCreate(std::string name)
+{
+    glGenVertexArrays(1, &m_vao[name]);
+}
+
+void RenderVertexData::vaoBind(std::string name)
+{
+    glBindVertexArray(m_vao[name]);
+}
+
+void RenderVertexData::vaoRelease()
+{
+    glBindVertexArray(0);
 }
