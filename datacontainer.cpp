@@ -3,11 +3,10 @@
 // 422, 59
 #include <chrono>
 #include "datacontainer.h"
+#include <set>
 
 #define MESH_MAX 5.0f
 
-// todo: each object has to have all elements (mesh, skeleton, ..)
-// if it doesnt then take care of this case (missing data)
 /*
  * m_objects -> object class for each object (astrocyte, dendrite, ..)
  *           -> get from this the indices of the mesh
@@ -22,7 +21,7 @@ DataContainer::DataContainer()
     max_volume = 1;
     max_astro_coverage = 1;
 
-    m_limit = 10;
+    m_limit = 100;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
@@ -55,15 +54,13 @@ DataContainer::DataContainer()
 
 
     /* 5 */
-    // build halfedge data structure to get the neighbors of a vertex
-    m_mesh->buildMeshHalfEdge();
-
     //  test vertex neighbors
     int v_index = 0;
-    std::vector< trimesh::index_t > neighs;
-    m_mesh->getVertexNeighbors(v_index, neighs);
+    std::set< int > neighs2;
+    m_mesh->getVertexNeighbors(v_index, neighs2);
     qDebug() << "neighbors of vertex " << v_index << ": ";
-    qDebug() <<  neighs;
+    for (auto iter = neighs2.begin(); iter != neighs2.end(); ++iter)
+        qDebug() <<" " << *iter;
 }
 
 //----------------------------------------------------------------------------
@@ -500,7 +497,7 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 /* vertex 3 */
                 obj->addTriangleIndex(t_index3);
 
-                m_mesh->addTriangle(t_index1, t_index2, t_index3);
+                m_mesh->addFace(t_index1, t_index2, t_index3);
 
                 m_indices_size += 3;
 

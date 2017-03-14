@@ -32,26 +32,32 @@ void Mesh::allocateVerticesVBO(QOpenGLBuffer vbo_mesh)
     vbo_mesh.allocate(verticesList.data(), verticesList.size() * sizeof(VertexData));
 }
 
-void Mesh::addTriangle(int index1, int index2, int index3)
+void Mesh::addFace(int index1, int index2, int index3)
 {
-    trimesh::triangle_t triangle;
-    triangle.v[0] = index1;
-    triangle.v[1] = index2;
-    triangle.v[2] = index3;
+    struct face f;
+    f.v[0] = index1;
+    f.v[1] = index2;
+    f.v[2] = index3;
 
-    yig_triangles.push_back(triangle);
+    int face_index = m_faces.size();
+    m_faces.push_back(f);
+
+    m_vertexFaces[index1].push_back(face_index);
+    m_vertexFaces[index2].push_back(face_index);
+    m_vertexFaces[index3].push_back(face_index);
 }
 
-void  Mesh::buildMeshHalfEdge()
-{
-    trimesh::unordered_edges_from_triangles( yig_triangles.size(), &yig_triangles[0], yig_edges );
-    yig_mesh.build( verticesList.size(),
-                    yig_triangles.size(), &yig_triangles[0],
-                    yig_edges.size(), &yig_edges[0] );
-
-}
-void Mesh::getVertexNeighbors(int v_index, std::vector< trimesh::index_t > &neighs)
+void Mesh::getVertexNeighbors(int v_index, std::set< int > &neighs)
 {
     // Use 'mesh' to walk the connectivity.
-    yig_mesh.vertex_vertex_neighbors( v_index, neighs );
+    std::vector<int>  faces_list = m_vertexFaces[v_index];
+    for (int i = 0; i < faces_list.size(); ++i) {
+        struct face f = m_faces[faces_list[i]];
+        for (int j = 0; j < 3; ++j) {
+            if (f.v[j] != v_index) {
+                neighs.insert(f.v[j]);
+            }
+        }
+    }
 }
+
