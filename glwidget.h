@@ -47,6 +47,9 @@ public slots:
 
     void getDepth(int d);
 
+    void getNodeSizeEncoding(QString);
+    void getColorEncoding(QString);
+
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);
     void setHoveredID(int);

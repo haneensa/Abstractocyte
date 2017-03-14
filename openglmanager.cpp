@@ -45,6 +45,10 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
     m_display_synapses = false;
 	m_zoom = 1.0f;
     m_depth = 1;
+
+    m_color_encoding = Color_e::TYPE;
+    m_size_encoding = Size_e::VOLUME;
+
 }
 
 OpenGLManager::~OpenGLManager()
@@ -54,10 +58,6 @@ OpenGLManager::~OpenGLManager()
 
     m_vao_glycogen.destroy();
     m_vbo_glycogen.destroy();
-
-
-
-
 }
 
 bool OpenGLManager::initOpenGLFunctions()
@@ -213,6 +213,8 @@ void OpenGLManager::fillVBOsData()
         }
 
         m_ssbo_data[ID] = object_p->getSSBOData();
+        float volume =  object_p->getVolume() / m_dataContainer->getMaxVolume();
+        m_ssbo_data[ID].info.setX( 20 *  volume);
 
         qDebug() << " allocating: " << object_p->getName().data();
 
@@ -1321,8 +1323,7 @@ void OpenGLManager::FilterByType(Object_t type)
     }
 
     m_dataContainer->recomputeMaxVolAstro();
-
-}
+    updateSSBO();}
 
 // ----------------------------------------------------------------------------
 //
@@ -1443,13 +1444,14 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
     }
 
     m_dataContainer->recomputeMaxVolAstro();
-}
+    updateSSBO();}
 
 // ----------------------------------------------------------------------------
 //
 void OpenGLManager::FilterByID( std::vector<int> tokens_Ids )
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
+        // recompute max vol and astro coverage
         FilterObject(i, true);
     }
 
@@ -1463,20 +1465,100 @@ void OpenGLManager::FilterByID( std::vector<int> tokens_Ids )
     }
 
     m_dataContainer->recomputeMaxVolAstro();
-}
+    updateSSBO();}
 
 // ----------------------------------------------------------------------------
 //
 void OpenGLManager::showAll()
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
+        // recompute max vol and astro coverage
         FilterObject(i, false);
     }
 
     m_dataContainer->recomputeMaxVolAstro();
+    updateSSBO();
 }
 
 void OpenGLManager::setZoom(float zoom)
 {
 	m_zoom = zoom;
+}
+
+
+void OpenGLManager::updateSSBO()
+{
+    std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
+
+    for ( auto iter = objectMap.begin(); iter != objectMap.end(); iter++ ) {
+        Object *obj = (*iter).second;
+        if (obj->isFiltered() || obj->getObjectType() == Object_t::ASTROCYTE)
+            continue;
+
+        int hvgxID = obj->getHVGXID();
+        if (m_ssbo_data.size() <= hvgxID)
+            continue;
+
+        float volume =  obj->getVolume() / m_dataContainer->getMaxVolume();
+
+        float coverage =  obj->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage();
+        switch(m_size_encoding) {
+        case Size_e::VOLUME:
+            m_ssbo_data[hvgxID].info.setX( 20 *  volume);
+            break;
+        case Size_e::ASTRO_COVERAGE:
+            m_ssbo_data[hvgxID].info.setX( 20 *  coverage);
+            break;
+        default:
+            m_ssbo_data[hvgxID].info.setX( 20 *  volume);
+
+        }
+
+        switch(m_color_encoding) {
+            case Color_e::TYPE:
+            {
+                QVector4D color = obj->getColor();
+                m_ssbo_data[hvgxID].color.setX(color.x());
+                m_ssbo_data[hvgxID].color.setY(color.y());
+                m_ssbo_data[hvgxID].color.setZ(color.z());
+
+                break;
+            }
+            case Color_e::ASTRO_COVERAGE:
+            {
+              QVector4D add_color = QVector4D(1, 1, 1, 0) * coverage;
+              m_ssbo_data[hvgxID].color += QVector4D(0.2, 0.2, 0.2, 0) ;
+              m_ssbo_data[hvgxID].color -= add_color;
+
+              break;
+            }
+            case Color_e::FUNCTION:
+            {
+              m_ssbo_data[hvgxID].color.setX(1);
+              break;
+            }
+        }
+
+
+    }
+}
+
+
+void OpenGLManager::updateNodeSizeEncoding(Size_e encoding)
+{
+    if (m_size_encoding == encoding)
+        return;
+
+    m_size_encoding = encoding;
+
+    updateSSBO();
+}
+void OpenGLManager::updateColorEncoding(Color_e encoding)
+{
+    if (m_color_encoding == encoding)
+        return;
+
+    m_color_encoding = encoding;
+
+    updateSSBO();
 }

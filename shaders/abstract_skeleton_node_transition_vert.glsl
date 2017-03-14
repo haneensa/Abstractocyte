@@ -118,7 +118,6 @@ void main(void)
     float max_point_size = point_size.y;
     float min_point_size = point_size.x;
     if ( type != astrocyte && (int(positions.y) == 6 || int(positions.y) == 5) )
-      max_point_size = point_size.y + 20 * (SSBO_data[ID].info.x / float(max_volume));
 
     if ( int(point_size.x) == int(point_size.y) )
         min_point_size = max_point_size;

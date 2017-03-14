@@ -17,6 +17,10 @@
 #include "glsluniform_structs.h"
 #include "rendervertexdata.h"
 
+enum class Size_e { VOLUME, ASTRO_COVERAGE };
+enum class Color_e { TYPE, FUNCTION, ASTRO_COVERAGE };
+
+
 class OpenGLManager : public MainOpenGL
 {
 public:
@@ -88,6 +92,12 @@ public:
     void updateDisplaySynapseFlag(bool flag)        { m_display_synapses = flag; }
 
     void updateDepth(int d)                         { m_depth = d; }
+
+    void updateNodeSizeEncoding(Size_e encoding);
+    void updateColorEncoding(Color_e encoding);
+
+    void updateSSBO();
+
     // ********** Selection ************************
     void updateCanvasDim(int w, int h, int retianScale);
     void initSelectionFrameBuffer();
@@ -146,6 +156,9 @@ protected:
     bool                                    m_display_parent;
     bool                                    m_display_synapses;
     int                                     m_depth;
+
+    Color_e                                 m_color_encoding;
+    Size_e                                  m_size_encoding;
 
 
  };

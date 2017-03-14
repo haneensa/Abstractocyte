@@ -477,3 +477,23 @@ void GLWidget::getDepth(int d)
 
     m_opengl_mngr->updateDepth(d);
 }
+
+void GLWidget::getNodeSizeEncoding(QString encoding)
+{
+    qDebug() << encoding;
+    if (encoding == "Volume")
+        m_opengl_mngr->updateNodeSizeEncoding(Size_e::VOLUME);
+    else if (encoding == "Astrocyte Coverage")
+        m_opengl_mngr->updateNodeSizeEncoding(Size_e::ASTRO_COVERAGE);
+}
+
+void GLWidget::getColorEncoding(QString encoding)
+{
+    qDebug() << encoding;
+    if (encoding == "Type")
+        m_opengl_mngr->updateColorEncoding(Color_e::TYPE);
+    else if (encoding == "Astrocyte Coverage")
+        m_opengl_mngr->updateColorEncoding(Color_e::ASTRO_COVERAGE);
+    else if (encoding == "Function")
+        m_opengl_mngr->updateColorEncoding(Color_e::FUNCTION);
+}

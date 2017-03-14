@@ -134,7 +134,7 @@ struct ssbo_mesh Object::getSSBOData()
     int type = (int) m_object_t;
 
     ssbo_data.center.setW(type);
-    ssbo_data.info.setX(m_volume);
+    ssbo_data.info.setX(1); // node size
 
     qDebug() << "m_VertexidxCloseToAstro: " << m_VertexidxCloseToAstro.size() ;
     ssbo_data.info.setY(m_VertexidxCloseToAstro.size()); // how many vertices are covered by astrocyte

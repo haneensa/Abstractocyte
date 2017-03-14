@@ -306,7 +306,7 @@
      <item row="2" column="0">
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>2</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
@@ -460,7 +460,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="label_16">
             <property name="text">
-             <string>Node Color</string>
+             <string>Color</string>
             </property>
            </widget>
           </item>
@@ -493,32 +493,6 @@
             <property name="text">
              <string>Node Size: </string>
             </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_15">
-            <property name="text">
-             <string>Mesh Color</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QComboBox" name="comboBox_3">
-            <item>
-             <property name="text">
-              <string>Type</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Function</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Glycogen Distribution</string>
-             </property>
-            </item>
            </widget>
           </item>
          </layout>
@@ -668,6 +642,8 @@
     <slot>getFilterWithParent(bool)</slot>
     <slot>getFilterWithSynapses(bool)</slot>
     <slot>getDepth(int)</slot>
+    <slot>getNodeSizeEncoding(QString)</slot>
+    <slot>getColorEncoding(QString)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -1038,6 +1014,38 @@
     <hint type="destinationlabel">
      <x>369</x>
      <y>498</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getNodeSizeEncoding(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>216</x>
+     <y>657</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>315</x>
+     <y>614</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_4</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getColorEncoding(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>202</x>
+     <y>686</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>317</x>
+     <y>689</y>
     </hint>
    </hints>
   </connection>
