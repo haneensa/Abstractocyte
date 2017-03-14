@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QTreeWidgetItem>
 #include <QMainWindow>
 
 namespace Ui {
@@ -28,12 +29,16 @@ public slots:
 
 	void on_glycogenVisibilityCheckBox_toggled(bool);
 	void on_clusterButton_clicked();
-
+	//void on_glycogenClustersTreeWidget_itemClicked(QTreeWidgetItem* item, int column);
+	//void on_glycogenClustersTreeWidget_itemActivated(QTreeWidgetItem* item, int column);
+	void on_glycogenClustersTreeWidget_itemChanged(QTreeWidgetItem* item, int column);
+	void on_glycogenClustersTreeWidget_itemSelectionChanged();
+	
 
 private:
     Ui::MainWindow *mainwindow_ui;
 	std::map<int, Clustering::GlycogenCluster*>* m_clusters;
-
+	QTreeWidgetItem* m_currentSelectedCluster;
 
 };
 

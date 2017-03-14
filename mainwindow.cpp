@@ -1,6 +1,7 @@
 #include "glycogencluster.h"
 #include "glycogenanalysismanager.h"
 #include "glwidget.h"
+#include "openglmanager.h"
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -13,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mainwindow_ui(new Ui::MainWindow)
 {
     mainwindow_ui->setupUi(this);
+	m_currentSelectedCluster = 0;
 }
 
 //------------------------------------------------------
@@ -77,9 +79,58 @@ void MainWindow::on_clusterButton_clicked()
 
 		cluster_item->setText(1, QString::number(cluster->getClusterSize()));
 		cluster_item->setText(2, QString::number(cluster->getTotalVolume() , 'f', 4));
-
-		
 	}
 
+	getGLWidget()->getOpenGLManager()->updateGlycogenPoints();
 	
+}
+
+//------------------------------------------------------
+//
+void MainWindow::on_glycogenClustersTreeWidget_itemChanged(QTreeWidgetItem* item, int column)
+{
+	//qDebug() << "item changed " << item->text(column);
+	if (item)
+	{	
+		int id = item->text(0).toInt();
+		if (m_currentSelectedCluster)
+		{
+			int id2 = m_currentSelectedCluster->text(0).toInt();
+			
+			if (id != id2)
+				m_clusters->at(id)->setState((item->checkState(0) == Qt::Checked) ? 1 : 0);
+		}
+		else
+		{
+			m_clusters->at(id)->setState((item->checkState(0) == Qt::Checked) ? 1 : 0);
+		}
+
+		getGLWidget()->getOpenGLManager()->updateGlycogenPoints();
+	}
+}
+
+//------------------------------------------------------
+//
+void MainWindow::on_glycogenClustersTreeWidget_itemSelectionChanged()
+{
+	//qDebug() << "item selection changed";
+	QList<QTreeWidgetItem*> selected_Items = mainwindow_ui->glycogenClustersTreeWidget->selectedItems();
+	
+	if (m_currentSelectedCluster)
+	{
+
+		int id = m_currentSelectedCluster->text(0).toInt();
+		//unselect
+		m_clusters->at(id)->setState((m_currentSelectedCluster->checkState(0) == Qt::Checked) ? 1 : 0);
+		m_currentSelectedCluster = 0;
+	}
+
+	if (selected_Items.size())
+	{
+		//set selected
+		m_currentSelectedCluster = selected_Items[0];
+		int id = m_currentSelectedCluster->text(0).toInt();
+		m_clusters->at(id)->setState(2);
+	}
+	getGLWidget()->getOpenGLManager()->updateGlycogenPoints();
 }

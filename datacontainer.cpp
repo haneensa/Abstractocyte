@@ -31,7 +31,7 @@ DataContainer::DataContainer()
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
 
     /* 2.1 */
-   // importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     /* 2.2 */
     importXML("://m3_neurites.xml");    // neurites time:  28802 ms
 

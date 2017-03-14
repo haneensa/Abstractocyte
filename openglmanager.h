@@ -58,7 +58,7 @@ public:
     // *********** 6) Mesh Points     ***********
     bool initGlycogenPointsShaders();
     void drawGlycogenPoints(struct GlobalUniforms grid_uniforms);
-
+	void updateGlycogenPoints();
 
 
     // ssbo management
@@ -92,6 +92,7 @@ public:
     void initSelectionFrameBuffer();
     int processSelection(float x, float y);
 
+	void setZoom(float zoom);
 
 protected:
     DataContainer                       *m_dataContainer; // get the data to render from here
@@ -132,7 +133,7 @@ protected:
     QOpenGLVertexArrayObject            m_vao_glycogen;
     QOpenGLBuffer                       m_vbo_glycogen;
 
-
+	float								m_zoom;
 
     // ********** Selection ************************
     int                                 m_canvas_w;

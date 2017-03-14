@@ -20,6 +20,8 @@ public:
     ~GLWidget();
 
 	GlycogenAnalysisManager* getGlycogenAnalysisManager() { return m_glycogenAnalysisManager; }
+	OpenGLManager*			 getOpenGLManager() { return m_opengl_mngr; }
+	float getZoomFactor() { return m_distance; }
 
     int pickObject(QMouseEvent *event);
 
@@ -38,7 +40,6 @@ public slots:
 
     void getFilteredType(QString value);
     void getFilteredID(QString value);
-
 
     void getFilterWithChildren(bool value);
     void getFilterWithParent(bool value);
@@ -84,7 +85,6 @@ protected:
 
     QVector3D                           m_cameraPosition;
 
-
     /* rotation */
     QPoint                              m_lastPos;
     double                              m_distance;
@@ -102,7 +102,6 @@ protected:
 
     QTimer                              *m_refresh_timer;
     QTimer                              *m_rotation_timer;
-
 
     std::vector<int>                    m_selectedObjects;
 
