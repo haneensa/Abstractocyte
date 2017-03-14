@@ -37,8 +37,7 @@ SOURCES += main.cpp\
     glycogencluster.cpp \
     glycogenanalysismanager.cpp \
     dbscan.cpp \
-    rendervertexdata.cpp \
-    trimesh.cpp
+    rendervertexdata.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -64,10 +63,7 @@ HEADERS  += mainwindow.h \
     glycogencluster.h \
     glycogenanalysismanager.h \
     dbscan.h \
-    rendervertexdata.h \
-    glwidget.cpp.autosave \
-    trimesh.h \
-    trimesh_types.h
+    rendervertexdata.h
 
 
 FORMS    += mainwindow.ui
