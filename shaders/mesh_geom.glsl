@@ -67,7 +67,7 @@ void main() {
         return;
 
     if (ID == 0)
-        color_val.b = 1;
+        return;
 
     int type = int(SSBO_data[ID].center.w);
     color_val = V_color_val[i];

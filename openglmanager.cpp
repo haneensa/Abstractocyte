@@ -33,12 +33,7 @@ int id = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
 #include "openglmanager.h"
 
 OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpace)
-    : m_vbo_skeleton( QOpenGLBuffer::VertexBuffer ),
-      m_vbo_mesh( QOpenGLBuffer::VertexBuffer ),
-      m_Neurite_vbo_IndexMesh(QOpenGLBuffer::IndexBuffer),
-      m_NeuritesIndexVBO( QOpenGLBuffer::IndexBuffer ),
-      m_NeuritesNodesVBO( QOpenGLBuffer::VertexBuffer ),
-      m_2D(false),
+    : m_2D(false),
       m_bindIdx(2) // ssbo biding point
 {
     m_dataContainer = obj_mnger;
@@ -49,7 +44,11 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
     m_display_parent = false;
     m_display_synapses = false;
 	m_zoom = 1.0f;
+    m_depth = 1;
 	m_renderGlycogenGranules = true;
+
+    m_color_encoding = Color_e::TYPE;
+    m_size_encoding = Size_e::VOLUME;
 
 }
 
@@ -58,25 +57,8 @@ OpenGLManager::~OpenGLManager()
     if (m_glFunctionsSet == false)
         return;
 
-    m_vao_mesh.destroy();
-    m_vbo_mesh.destroy();
-    m_Neurite_vbo_IndexMesh.destroy();
-
-    m_vao_skeleton.destroy();
-    m_vbo_skeleton.destroy();
-
-    m_vao_SkeletonsGraph.destroy();
-
-    m_NeuritesGraphVAO.destroy();
-    m_NeuritesNodesVBO.destroy();
-    m_NeuritesIndexVBO.destroy();
-
     m_vao_glycogen.destroy();
     m_vbo_glycogen.destroy();
-
-
-
-
 }
 
 bool OpenGLManager::initOpenGLFunctions()
@@ -136,7 +118,6 @@ void OpenGLManager::initSelectionFrameBuffer()
 int OpenGLManager::processSelection(float x, float y)
 {
     qDebug() << "Draw Selection!";
-
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
     glEnable(GL_DEPTH_TEST);
@@ -206,17 +187,19 @@ void OpenGLManager::fillVBOsData()
 {
     m_ssbo_data.resize(1000);
 
-    m_vbo_skeleton.create();
-    m_vbo_skeleton.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    m_vbo_skeleton.bind();
-    m_vbo_skeleton.allocate(NULL, m_dataContainer->getSkeletonPointsSize()  * sizeof(SkeletonPoint));
+    m_SkeletonPoints.vboCreate("SkeletonPoints", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
+    m_SkeletonPoints.vboBind("SkeletonPoints");
+    m_SkeletonPoints.vboAllocate("SkeletonPoints", NULL,
+                            m_dataContainer->getSkeletonPointsSize()  * sizeof(SkeletonPoint));
+
     int neurtite_vbo_IndexMesh_offset = 0;
-    int astr_vbo_IndexMesh_offset = 0;
 
     // initialize index buffers
-    m_Neurite_vbo_IndexMesh.create();
-    m_Neurite_vbo_IndexMesh.bind();
-    m_Neurite_vbo_IndexMesh.allocate( NULL, m_dataContainer->getMeshIndicesSize() * sizeof(GLuint) );
+    m_TMesh.vboCreate("MeshIndices", Buffer_t::INDEX, Buffer_USAGE_t::STATIC);
+    m_TMesh.vboBind("MeshIndices");
+    m_TMesh.vboAllocate("MeshIndices", NULL, m_dataContainer->getMeshIndicesSize() * sizeof(GLuint) );
+
+
     int vbo_skeleton_offset = 0;
 
     std::map<int, Object*> objects_map = m_dataContainer->getObjectsMap();
@@ -231,25 +214,22 @@ void OpenGLManager::fillVBOsData()
         }
 
         m_ssbo_data[ID] = object_p->getSSBOData();
+        float volume =  object_p->getVolume() / m_dataContainer->getMaxVolume();
+        m_ssbo_data[ID].info.setX( 20 *  volume);
 
         qDebug() << " allocating: " << object_p->getName().data();
 
-//        if (object_p->getObjectType() != Object_t::ASTROCYTE) {
-            // allocating mesh indices
-            int vbo_IndexMesh_count = object_p->get_indices_Size() * sizeof(GLuint);
-            // write only neurites, if astrocyte then write in m_Astro_vbo_IndexMesh
-            m_Neurite_vbo_IndexMesh.write(neurtite_vbo_IndexMesh_offset, object_p->get_indices(), vbo_IndexMesh_count);
-            neurtite_vbo_IndexMesh_offset += vbo_IndexMesh_count;
-//        } else {
-//            // allocating mesh indices
-//            int vbo_IndexMesh_count = object_p->get_indices_Size() * sizeof(GLuint);
-//            // write only neurites, if astrocyte then write in m_Astro_vbo_IndexMesh
-//            m_Astro_vbo_IndexMesh.write(astr_vbo_IndexMesh_offset, object_p->get_indices(), vbo_IndexMesh_count);
-//            astr_vbo_IndexMesh_offset += astr_vbo_IndexMesh_offset;
-//        }
+
+        // allocating mesh indices
+        int vbo_IndexMesh_count = object_p->get_indices_Size() * sizeof(GLuint);
+        // write only neurites, if astrocyte then write in m_Astro_vbo_IndexMesh
+        m_TMesh.vboWrite("MeshIndices", neurtite_vbo_IndexMesh_offset, object_p->get_indices(), vbo_IndexMesh_count);
+
+        neurtite_vbo_IndexMesh_offset += vbo_IndexMesh_count;
+
 
         // allocating skeleton vertices, if this object hash no skeleton, then this will return and wont write anything
-        int vbo_skeleton_count = object_p->writeSkeletontoVBO(m_vbo_skeleton, vbo_skeleton_offset);
+        int vbo_skeleton_count = object_p->writeSkeletontoVBO(m_SkeletonPoints.getVBO("SkeletonPoints"), vbo_skeleton_offset);
         vbo_skeleton_offset += vbo_skeleton_count;
 
         // allocate neurites nodes place holders
@@ -260,14 +240,10 @@ void OpenGLManager::fillVBOsData()
             m_neurites_nodes.push_back(ID);
         }
 
-
-        // initialize abstract skeleton data
-        // find a way to fill the skeleton with data
         // get skeleton of the object
         // if no skeleton, this will be skipped, thus no graph for this object
-        Skeleton *skeleton = object_p->getSkeleton(); // not null as long as the object exist
+        Skeleton *skeleton = object_p->getSkeleton();
         // if (spine/bouton) then get their skeleton from their parents
-        // inside of then the indices
         // get the actual nodes from their parents
         // only show them if parent is filtered
 
@@ -280,7 +256,6 @@ void OpenGLManager::fillVBOsData()
         object_p->setSkeletonOffset(m_abstract_skel_nodes.size());
         // each skeleton node has local index within its list of nodes
         // and an offset within list of abstract skel nodes
-        // add nodes
         for ( int i = 0; i < nodes3D.size(); i++) {
             QVector4D vertex = nodes3D[i];
             vertex.setW(ID);
@@ -311,50 +286,10 @@ void OpenGLManager::fillVBOsData()
         m_neurites_edges.push_back(objects_map[nID2]->getNodeIdx());
     }
 
-    m_Neurite_vbo_IndexMesh.release();
-    m_vbo_skeleton.release();
-
-    // allocate skeleton nodes
-    m_GSkeleton.vboCreate("nodes", 0);
-    m_GSkeleton.vboBind("nodes");
-
-    m_GSkeleton.vboAllocate("nodes",
-                            m_abstract_skel_nodes.data(),
-                            m_abstract_skel_nodes.size() * sizeof(struct AbstractSkelNode) );
-
-    GL_Error();
-    m_GSkeleton.vboRelease("nodes");
-
-    // allocate skeleton edges
-    m_GSkeleton.vboCreate("index", 1);
-    m_GSkeleton.vboBind("index");
-
-    m_GSkeleton.vboAllocate("index",
-                            m_abstract_skel_edges.data(),
-                            m_abstract_skel_edges.size() * sizeof(GLuint) );
-
-    m_GSkeleton.vboRelease("index");
-    GL_Error();
+    m_TMesh.vboRelease("MeshIndices");
+    m_SkeletonPoints.vboRelease("SkeletonPoints");
 
     // allocate neurites nodes
-    m_NeuritesNodesVBO.create();
-    m_NeuritesNodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
-    m_NeuritesNodesVBO.bind();
-
-    m_NeuritesNodesVBO.allocate( m_neurites_nodes.data(),
-                            m_neurites_nodes.size() * sizeof(GLuint) );
-    m_NeuritesNodesVBO.release();
-
-
-    // allocate neurites edges
-    m_NeuritesIndexVBO.create();
-    m_NeuritesIndexVBO.bind();
-
-    m_NeuritesIndexVBO.allocate( m_neurites_edges.data(),
-                                 m_neurites_edges.size() * sizeof(GLuint) );
-
-    m_NeuritesIndexVBO.release();
-    GL_Error();
 
 
     qDebug() << "m_abstract_skel_nodes.size(): " << m_abstract_skel_nodes.size();
@@ -473,8 +408,31 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     if (res == false)
         return res;
 
-    m_vao_SkeletonsGraph.create();
-    m_vao_SkeletonsGraph.bind();
+    // allocate skeleton nodes
+    m_GSkeleton.vboCreate("nodes", Buffer_t::VERTEX, Buffer_USAGE_t::DYNAMIC_DRAW);
+    m_GSkeleton.vboBind("nodes");
+
+    m_GSkeleton.vboAllocate("nodes",
+                            m_abstract_skel_nodes.data(),
+                            m_abstract_skel_nodes.size() * sizeof(struct AbstractSkelNode) );
+
+    GL_Error();
+    m_GSkeleton.vboRelease("nodes");
+
+    // allocate skeleton edges
+    m_GSkeleton.vboCreate("index", Buffer_t::INDEX, Buffer_USAGE_t::STATIC);
+    m_GSkeleton.vboBind("index");
+
+    m_GSkeleton.vboAllocate("index",
+                            m_abstract_skel_edges.data(),
+                            m_abstract_skel_edges.size() * sizeof(GLuint) );
+
+    m_GSkeleton.vboRelease("index");
+    GL_Error();
+
+
+    m_GSkeleton.vaoCreate("SkeletonGraph");
+    m_GSkeleton.vaoBind("SkeletonGraph");
 
     m_GSkeleton.vboBind("nodes");
 
@@ -495,7 +453,7 @@ bool OpenGLManager::initAbstractSkeletonShaders()
     m_GSkeleton.useProgram("23D_index");
 
     m_GSkeleton.vboRelease("index");
-    m_vao_SkeletonsGraph.release();
+    m_GSkeleton.vaoRelease();
 
 
 
@@ -535,8 +493,9 @@ bool OpenGLManager::initAbstractSkeletonShaders()
 
     if (res == false)
         return res;
-    m_vao_selection_skeletonGraph.create();
-    m_vao_selection_skeletonGraph.bind();
+
+    m_GSkeleton.vaoCreate("Selection");
+    m_GSkeleton.vaoBind("Selection");
 
     m_GSkeleton.vboBind("nodes");
 
@@ -557,7 +516,7 @@ bool OpenGLManager::initAbstractSkeletonShaders()
 
     m_GSkeleton.vboRelease("index");
 
-    m_vao_selection_skeletonGraph.release();
+    m_GSkeleton.vaoRelease();
 
 
 }
@@ -581,8 +540,7 @@ void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms, bool
     m_GSkeleton.vboRelease("nodes");
 
     if (selection) {
-        m_vao_selection_skeletonGraph.bind();
-
+        m_GSkeleton.vaoBind("Selection");
         m_GSkeleton.useProgram("selection_2D_nodes");
         updateAbstractUniformsLocation(m_GSkeleton.getProgram("selection_2D_nodes"));
         glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
@@ -604,9 +562,9 @@ void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms, bool
         glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
 
         m_GSkeleton.vboRelease("index");
-         m_vao_selection_skeletonGraph.release();
+        m_GSkeleton.vaoRelease();
     } else {
-        m_vao_SkeletonsGraph.bind();
+        m_GSkeleton.vaoBind("SkeletonGraph");
         m_GSkeleton.useProgram("2D_nodes");
         updateAbstractUniformsLocation( m_GSkeleton.getProgram("2D_nodes") );
         glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
@@ -627,7 +585,7 @@ void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms, bool
         glLineWidth(20);
         glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
         m_GSkeleton.vboRelease("index");
-        m_vao_SkeletonsGraph.release();
+        m_GSkeleton.vaoRelease();
     }
 }
 
@@ -652,11 +610,38 @@ bool OpenGLManager::initNeuritesGraphShaders()
 
     GL_Error();
 
-    // initialize buffers
-    m_NeuritesGraphVAO.create();
-    m_NeuritesGraphVAO.bind();
+    // allocate skeleton nodes
+    m_GNeurites.vboCreate("nodes", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
+//    m_NeuritesNodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
 
-    m_NeuritesNodesVBO.bind();
+    m_GNeurites.vboBind("nodes");
+
+    m_GNeurites.vboAllocate("nodes",
+                            m_neurites_nodes.data(),
+                            m_neurites_nodes.size() * sizeof(GLuint));
+
+    GL_Error();
+    m_GNeurites.vboRelease("nodes");
+
+
+    // allocate neurites edges
+    // allocate skeleton edges
+    m_GNeurites.vboCreate("index", Buffer_t::INDEX, Buffer_USAGE_t::STATIC);
+    m_GNeurites.vboBind("index");
+
+    m_GNeurites.vboAllocate("index",
+                            m_neurites_edges.data(),
+                            m_neurites_edges.size() * sizeof(GLuint)  );
+
+    m_GNeurites.vboRelease("index");
+
+    GL_Error();
+
+    // initialize buffers
+    m_GNeurites.vaoCreate("ConnectivityGraph");
+    m_GNeurites.vaoBind("ConnectivityGraph");
+
+    m_GNeurites.vboBind("nodes");
 
     GL_Error();
 
@@ -666,14 +651,14 @@ bool OpenGLManager::initNeuritesGraphShaders()
 
     // initialize uniforms
 
-    m_NeuritesNodesVBO.release();
+    m_GNeurites.vboRelease("nodes");
 
-    m_NeuritesIndexVBO.bind();
+    m_GNeurites.vboBind("index");
 
     m_GNeurites.useProgram("index");
 
-    m_NeuritesIndexVBO.release();
-    m_NeuritesGraphVAO.release();
+    m_GNeurites.vboRelease("index");
+    m_GNeurites.vaoRelease();
 
     return true;
 }
@@ -686,12 +671,12 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
     if (m_glFunctionsSet == false)
         return;
 
-    m_NeuritesGraphVAO.bind();
-    m_NeuritesNodesVBO.bind();
+    m_GNeurites.vaoBind("ConnectivityGraph");
+    m_GNeurites.vboBind("nodes");
 
     m_uniforms = grid_uniforms;
 
-    m_NeuritesIndexVBO.bind();
+    m_GNeurites.vboBind("index");
 
     m_GNeurites.useProgram("index");
     updateAbstractUniformsLocation( m_GNeurites.getProgram("index") );
@@ -699,10 +684,10 @@ void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
 
     glDrawElements(GL_LINES,  m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
 
-    m_NeuritesIndexVBO.release();
+    m_GNeurites.vboRelease("index");
 
-    m_NeuritesNodesVBO.release();
-    m_NeuritesGraphVAO.release();
+    m_GNeurites.vboRelease("nodes");
+    m_GNeurites.vaoRelease();
 }
 
 // ----------------------------------------------------------------------------
@@ -719,8 +704,8 @@ bool OpenGLManager::initMeshTrianglesShaders()
         return res;
 
     // create vbos and vaos
-    m_vao_mesh.create();
-    m_vao_mesh.bind();
+    m_TMesh.vaoCreate("Mesh");
+    m_TMesh.vaoBind("Mesh");
 
     m_TMesh.useProgram("3Dtriangles");
     QVector3D lightDir = QVector3D(-2.5f, -2.5f, -0.9f);
@@ -729,29 +714,23 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
     glUniform3fv(lightDir_loc, 1, &lightDir[0]);
 
-    m_vbo_mesh.create();
-    m_vbo_mesh.setUsagePattern( QOpenGLBuffer::StaticDraw );
-    if ( !m_vbo_mesh.bind() ) {
-        qDebug() << "Could not bind vertex buffer to the context.";
-    }
+    m_TMesh.vboCreate("MeshVertices", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
+    m_TMesh.vboBind("MeshVertices");
 
     Mesh* mesh = m_dataContainer->getMeshPointer();
-    mesh->allocateVerticesVBO(m_vbo_mesh);
-
-    // initialize index buffers
-    m_Neurite_vbo_IndexMesh.bind();
-    m_Neurite_vbo_IndexMesh.release();
+    mesh->allocateVerticesVBO( m_TMesh.getVBO("MeshVertices") );
 
     initMeshVertexAttrib();
 
 
-    m_vbo_mesh.release();
-    m_vao_mesh.release();
+    m_TMesh.vboRelease("MeshVertices");
+    m_TMesh.vaoRelease();
 
 
     /*  start selection buffer **/
-    m_vao_selection_mesh.create();
-    m_vao_selection_mesh.bind();
+    m_TMesh.vaoCreate("Selection");
+    m_TMesh.vaoBind("Selection");
+
 
     m_TMesh.createProgram("selection");
     res = m_TMesh.compileShader("selection",
@@ -763,15 +742,12 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
     m_TMesh.useProgram("selection");
 
-    m_Neurite_vbo_IndexMesh.bind();
-
-    m_vbo_mesh.bind();
+    m_TMesh.vboBind("MeshVertices");
     initMeshVertexAttrib();
-    m_vbo_mesh.release();
+    m_TMesh.vboRelease("MeshVertices");
 
-    m_Neurite_vbo_IndexMesh.release();
 
-    m_vao_selection_mesh.release();
+    m_TMesh.vaoRelease();
 
     GL_Error();
     /*  end selection buffer **/
@@ -785,21 +761,23 @@ void OpenGLManager::drawMeshTriangles(struct GlobalUniforms grid_uniforms, bool 
    m_uniforms = grid_uniforms;
 
    if (selection) {
-       m_vao_selection_mesh.bind();
+       m_TMesh.vaoBind("Selection");
        m_TMesh.useProgram("selection");
        updateUniformsLocation(m_TMesh.getProgram("selection"));
-       m_Neurite_vbo_IndexMesh.bind();
+       m_TMesh.vboBind("MeshIndices");
        glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
-       m_Neurite_vbo_IndexMesh.release();
-       m_vao_selection_mesh.release();
+       m_TMesh.vboRelease("MeshIndices");
+       m_TMesh.vaoRelease();
    } else {
-       m_vao_mesh.bind();
+       m_TMesh.vaoBind("Mesh");
        m_TMesh.useProgram("3Dtriangles");
        updateUniformsLocation(m_TMesh.getProgram("3Dtriangles"));
-       m_Neurite_vbo_IndexMesh.bind();
+
+       m_TMesh.vboBind("MeshIndices");
        glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
-       m_Neurite_vbo_IndexMesh.release();
-       m_vao_mesh.release();
+       m_TMesh.vboRelease("MeshIndices");
+
+       m_TMesh.vaoRelease();
    }
 
 
@@ -820,12 +798,12 @@ bool OpenGLManager::initSkeletonShaders()
     if (res == false)
         return res;
 
-    m_vao_skeleton.create();
-    m_vao_skeleton.bind();
+    m_SkeletonPoints.vaoCreate("SkeletonPoints");
+    m_SkeletonPoints.vaoBind("SkeletonPoints");
 
     m_SkeletonPoints.useProgram("3DPoints");
 
-    m_vbo_skeleton.bind();
+    m_SkeletonPoints.vboBind("SkeletonPoints");
 
     GL_Error();
 
@@ -843,8 +821,8 @@ bool OpenGLManager::initSkeletonShaders()
 
     GL_Error();
 
-    m_vbo_skeleton.release();
-    m_vao_skeleton.release();
+    m_SkeletonPoints.vboRelease("SkeletonPoints");
+    m_SkeletonPoints.vaoRelease();
 
 
     /*   selection */
@@ -857,12 +835,14 @@ bool OpenGLManager::initSkeletonShaders()
     if (res == false)
         return res;
 
-    m_vao_selection_skeleton.create();
-    m_vao_selection_skeleton.bind();
+
+    m_SkeletonPoints.vaoCreate("Selection");
+    m_SkeletonPoints.vaoBind("Selection");
+
 
     m_SkeletonPoints.useProgram("selection");
 
-    m_vbo_skeleton.bind();
+    m_SkeletonPoints.vboBind("SkeletonPoints");
 
     GL_Error();
 
@@ -880,10 +860,8 @@ bool OpenGLManager::initSkeletonShaders()
 
     GL_Error();
 
-    m_vbo_skeleton.release();
-    m_vao_selection_skeleton.release();
-
-
+    m_SkeletonPoints.vboRelease("SkeletonPoints");
+    m_SkeletonPoints.vaoRelease();
 }
 
 // ----------------------------------------------------------------------------
@@ -895,17 +873,17 @@ void OpenGLManager::drawSkeletonPoints(struct GlobalUniforms grid_uniforms, bool
     m_uniforms = grid_uniforms;
 
     if (selection) {
-        m_vao_selection_skeleton.bind();
+        m_SkeletonPoints.vaoBind("Selection");
         m_SkeletonPoints.useProgram("selection");
         updateUniformsLocation(m_SkeletonPoints.getProgram("selection"));
         glDrawArrays(GL_POINTS, 0,  m_dataContainer->getSkeletonPointsSize()  );
-        m_vao_selection_skeleton.release();
+        m_SkeletonPoints.vaoRelease();
     } else {
-        m_vao_skeleton.bind();
+        m_SkeletonPoints.vaoBind("SkeletonPoints");
         m_SkeletonPoints.useProgram("3DPoints");
         updateUniformsLocation(m_SkeletonPoints.getProgram("3DPoints"));
         glDrawArrays(GL_POINTS, 0,  m_dataContainer->getSkeletonPointsSize()  );
-        m_vao_skeleton.release();
+        m_SkeletonPoints.vaoRelease();
     }
 }
 
@@ -937,6 +915,7 @@ bool OpenGLManager::initGlycogenPointsShaders()
     m_vbo_glycogen.bind();
 
     // fill glycogen points
+
     //std::map<int, Glycogen*> glycogenMap = m_dataContainer->getGlycogenMap();
 	std::vector<VertexData*>* glycogenList = m_dataContainer->getGlycogenVertexDataPtr();
     //struct glycogen_datum {
@@ -961,6 +940,7 @@ bool OpenGLManager::initGlycogenPointsShaders()
     //                              glycogen_data.size() * sizeof(struct glycogen_datum) );
 
 	m_vbo_glycogen.allocate(glycogen_data.data(), glycogen_data.size() * sizeof(struct VertexData));
+
     GL_Error();
 
     m_GlycogenPoints.useProgram("3DPoints");
@@ -1018,7 +998,7 @@ void OpenGLManager::updateGlycogenPoints()
 	//m_vao_glycogen.bind();
 	m_vbo_glycogen.bind();
 
-	
+
 
 	// fill glycogen points
 	//std::map<int, Glycogen*> glycogenMap = m_dataContainer->getGlycogenMap();
@@ -1331,11 +1311,11 @@ Object_t OpenGLManager::getObjectTypeByID(int hvgxID)
 void OpenGLManager::FilterByType(Object_t type)
 {
     // this should be fast, I should somehow group by IDs for types, and when we filter by type I just get all IDs with this type and set them to 1 which means filtered
-    std::vector<int> objects_list = m_dataContainer->getObjectsIDsByType(type);
+    std::vector<Object*> objects_list = m_dataContainer->getObjectsByType(type);
     qDebug() << "Filtering " << objects_list.size() << " objects";
 
     for (int i = 0; i < objects_list.size(); i++) {
-        int hvgxID = objects_list[i];
+        int hvgxID = objects_list[i]->getHVGXID();
         qDebug() << "Filtering ID " << hvgxID;
         if (m_ssbo_data[hvgxID].info.w() == 1) {
             FilterObject(hvgxID, false);
@@ -1345,8 +1325,7 @@ void OpenGLManager::FilterByType(Object_t type)
     }
 
     m_dataContainer->recomputeMaxVolAstro();
-
-}
+    updateSSBO();}
 
 // ----------------------------------------------------------------------------
 //
@@ -1381,7 +1360,7 @@ void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
         if (children.size() == 0) {
             qDebug() << obj->getName().data() << " has no child";
         } else {
-            for (int i = 0; i < children.size(); i++) {
+            for (int i = 0; i < children.size(); ++i) {
                 qDebug() << "Showing " << children[i]->getName().data();
                 FilterObject(children[i]->getHVGXID(), isfilterd);
             }
@@ -1390,6 +1369,37 @@ void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
 
     if (m_display_synapses) {
         // get all objects that are connected to this directly or indirectly
+        std::vector<Object*> synapses_list= obj->getSynapses();
+        if (synapses_list.size() == 0)
+            return;
+
+        for (int i = 0; i < synapses_list.size(); ++i) {
+            Object *synapse_obj = synapses_list[i];
+            struct synapse synapse_data = synapse_obj->getSynapseData();
+            if (synapse_data.axon != hvgxID
+                && synapse_data.axon
+                && objectMap.find(synapse_data.axon) != objectMap.end()) {
+                FilterObject(synapse_data.axon, isfilterd);
+            }
+
+            if (synapse_data.dendrite != hvgxID
+                && synapse_data.dendrite
+                && objectMap.find(synapse_data.dendrite) != objectMap.end()) {
+                FilterObject(synapse_data.dendrite, isfilterd);
+            }
+
+            if (synapse_data.spine != hvgxID
+                && synapse_data.spine
+                && objectMap.find(synapse_data.spine) != objectMap.end()) {
+                FilterObject(synapse_data.spine, isfilterd);
+            }
+
+            if (synapse_data.bouton != hvgxID
+                && synapse_data.bouton
+                && objectMap.find(synapse_data.bouton) != objectMap.end()) {
+                FilterObject(synapse_data.bouton, isfilterd);
+            }
+        }
     }
 
 }
@@ -1436,13 +1446,14 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
     }
 
     m_dataContainer->recomputeMaxVolAstro();
-}
+    updateSSBO();}
 
 // ----------------------------------------------------------------------------
 //
 void OpenGLManager::FilterByID( std::vector<int> tokens_Ids )
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
+        // recompute max vol and astro coverage
         FilterObject(i, true);
     }
 
@@ -1456,20 +1467,135 @@ void OpenGLManager::FilterByID( std::vector<int> tokens_Ids )
     }
 
     m_dataContainer->recomputeMaxVolAstro();
-}
+    updateSSBO();}
 
 // ----------------------------------------------------------------------------
 //
 void OpenGLManager::showAll()
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
+        // recompute max vol and astro coverage
         FilterObject(i, false);
     }
 
     m_dataContainer->recomputeMaxVolAstro();
+    updateSSBO();
 }
 
 void OpenGLManager::setZoom(float zoom)
 {
 	m_zoom = zoom;
+}
+
+
+float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
+{
+    // if value < leftMin -> value = leftMin
+    value = std::max(value, leftMin);
+    // if value > leftMax -> value = leftMax
+    value = std::min(value, leftMax);
+    // Figure out how 'wide' each range is
+    float leftSpan = leftMax - leftMin;
+    float rightSpan = rightMax - rightMin;
+
+    // Convert the left range into a 0-1 range (float)
+    float valueScaled = float(value - leftMin) / float(leftSpan);
+
+    // Convert the 0-1 range into a value in the right range.
+    return rightMin + (valueScaled * rightSpan);
+}
+
+
+
+void OpenGLManager::updateSSBO()
+{
+    std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
+
+    for ( auto iter = objectMap.begin(); iter != objectMap.end(); iter++ ) {
+        Object *obj = (*iter).second;
+        if (obj->isFiltered() || obj->getObjectType() == Object_t::ASTROCYTE)
+            continue;
+
+        int hvgxID = obj->getHVGXID();
+        if (m_ssbo_data.size() <= hvgxID)
+            continue;
+
+        float volume =  translate(obj->getVolume(), 0, m_dataContainer->getMaxVolume(), 0, 1);
+        float coverage = translate(obj->getAstroCoverage(),
+                                   0, m_dataContainer->getMaxAstroCoverage(),
+                                   0, 0.6);
+
+        switch(m_size_encoding) {
+        case Size_e::VOLUME:
+            m_ssbo_data[hvgxID].info.setX( 20 *  volume);
+            break;
+        case Size_e::ASTRO_COVERAGE:
+            m_ssbo_data[hvgxID].info.setX( 20 *  coverage);
+            break;
+        default:
+            m_ssbo_data[hvgxID].info.setX( 20 *  volume);
+
+        }
+
+        switch(m_color_encoding) {
+            case Color_e::TYPE:
+            {
+                QVector4D color = obj->getColor();
+                m_ssbo_data[hvgxID].color.setX(color.x());
+                m_ssbo_data[hvgxID].color.setY(color.y());
+                m_ssbo_data[hvgxID].color.setZ(color.z());
+
+                break;
+            }
+            case Color_e::ASTRO_COVERAGE:
+            {
+              QVector4D color = obj->getColor();
+              m_ssbo_data[hvgxID].color = QVector4D(color.x() + 0.2, color.y() +  0.2, color.z() + 0.2, color.w()) ;
+              QVector4D add_color = QVector4D(1, 1, 1, 0) * coverage;
+              m_ssbo_data[hvgxID].color -= add_color;
+
+              break;
+            }
+            case Color_e::FUNCTION:
+            {
+              int function = obj->getFunction();
+              if (function == 0) {
+                  m_ssbo_data[hvgxID].color.setX(0.7);
+                  m_ssbo_data[hvgxID].color.setY(0.1);
+                  m_ssbo_data[hvgxID].color.setZ(0.1);
+              } else if (function == 1) {
+                  m_ssbo_data[hvgxID].color.setX(0.1);
+                  m_ssbo_data[hvgxID].color.setY(0.1);
+                  m_ssbo_data[hvgxID].color.setZ(0.7);
+              } else {
+                  m_ssbo_data[hvgxID].color.setX(0.5);
+                  m_ssbo_data[hvgxID].color.setY(0.5);
+                  m_ssbo_data[hvgxID].color.setZ(0.5);
+
+              }
+
+              break;
+            }
+        }
+    }
+}
+
+
+void OpenGLManager::updateNodeSizeEncoding(Size_e encoding)
+{
+    if (m_size_encoding == encoding)
+        return;
+
+    m_size_encoding = encoding;
+
+    updateSSBO();
+}
+void OpenGLManager::updateColorEncoding(Color_e encoding)
+{
+    if (m_color_encoding == encoding)
+        return;
+
+    m_color_encoding = encoding;
+
+    updateSSBO();
 }

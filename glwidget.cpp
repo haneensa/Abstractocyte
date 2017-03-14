@@ -445,28 +445,59 @@ void GLWidget::getFilteredID(QString value)
     update();
 }
 
- void GLWidget::stopForecDirectedLayout()
- {
-     // stop force layout
-     m_refresh_timer->stop();
-     for (int i = 0; i < 4; ++i)
-         m_graphManager->stopForceDirectedLayout(i);
+void GLWidget::stopForecDirectedLayout()
+{
+    // stop force layout
+    m_refresh_timer->stop();
+    for (int i = 0; i < 4; ++i)
+        m_graphManager->stopForceDirectedLayout(i);
 
-     m_FDL_running = false;
- }
+    m_FDL_running = false;
+}
 
- void GLWidget::getFilterWithChildren(bool value)
- {
-     // update this in openglmanager
+void GLWidget::getFilterWithChildren(bool value)
+{
+    // update this in openglmanager
     m_opengl_mngr->updateDisplayChildFlag(value);
- }
+}
 
- void GLWidget::getFilterWithParent(bool value)
- {
-     m_opengl_mngr->updateDisplayParentFlag(value);
- }
+void GLWidget::getFilterWithParent(bool value)
+{
+    m_opengl_mngr->updateDisplayParentFlag(value);
+}
 
- void GLWidget::getFilterWithSynapses(bool value)
- {
-     m_opengl_mngr->updateDisplaySynapseFlag(value);
- }
+void GLWidget::getFilterWithSynapses(bool value)
+{
+    m_opengl_mngr->updateDisplaySynapseFlag(value);
+}
+
+void GLWidget::getDepth(int d)
+{
+    if (d < 0)
+        return;
+
+    m_opengl_mngr->updateDepth(d);
+}
+
+void GLWidget::getNodeSizeEncoding(QString encoding)
+{
+    qDebug() << encoding;
+    if (encoding == "Volume")
+        m_opengl_mngr->updateNodeSizeEncoding(Size_e::VOLUME);
+    else if (encoding == "Astrocyte Coverage")
+        m_opengl_mngr->updateNodeSizeEncoding(Size_e::ASTRO_COVERAGE);
+    update();
+}
+
+void GLWidget::getColorEncoding(QString encoding)
+{
+    qDebug() << encoding;
+    if (encoding == "Type")
+        m_opengl_mngr->updateColorEncoding(Color_e::TYPE);
+    else if (encoding == "Astrocyte Coverage")
+        m_opengl_mngr->updateColorEncoding(Color_e::ASTRO_COVERAGE);
+    else if (encoding == "Function")
+        m_opengl_mngr->updateColorEncoding(Color_e::FUNCTION);
+
+    update();
+}

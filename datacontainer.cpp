@@ -3,11 +3,10 @@
 // 422, 59
 #include <chrono>
 #include "datacontainer.h"
+#include <set>
 
 #define MESH_MAX 5.0f
 
-// todo: each object has to have all elements (mesh, skeleton, ..)
-// if it doesnt then take care of this case (missing data)
 /*
  * m_objects -> object class for each object (astrocyte, dendrite, ..)
  *           -> get from this the indices of the mesh
@@ -26,13 +25,21 @@ DataContainer::DataContainer()
     m_vertex_offset = 0;
     m_mesh = new Mesh();
 
+
+    /* 1 */
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
 
-    //importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    /* 2.1 */
+    importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    /* 2.2 */
     importXML("://m3_neurites.xml");    // neurites time:  28802 ms
-    // has glycogen data
+
+
+    /* 3 */
     loadMetaDataHVGX(":/data/mouse3_metadata_objname_center_astroSyn.hvgx");
 
+
+    /* 4 */
 	qDebug() << "setting up octrees";
 	m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
 	m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
@@ -44,7 +51,16 @@ DataContainer::DataContainer()
 	//m_dbscan.initialize(&m_glycogenList, &m_glycogenMap, &m_glycogenOctree);
 	//m_dbscan.run();
 	//qDebug() << "done clustering";
-	
+
+
+    /* 5 */
+    //  test vertex neighbors
+    int v_index = 0;
+    std::set< int > neighs2;
+    m_mesh->getVertexNeighbors(v_index, neighs2);
+    qDebug() << "neighbors of vertex " << v_index << ": ";
+    for (auto iter = neighs2.begin(); iter != neighs2.end(); ++iter)
+        qDebug() <<" " << *iter;
 }
 
 //----------------------------------------------------------------------------
@@ -88,8 +104,6 @@ void DataContainer::loadConnectivityGraph(QString path)
             QVector2D edge_info = QVector2D(nodeID1, nodeID2);
             neurites_neurite_edge.push_back(edge_info);
         }
-
-
     }
 
     file.close();
@@ -164,7 +178,36 @@ void DataContainer::loadMetaDataHVGX(QString path)
 
         } else if (wordList[0] == "sy") {
             // add this info to the related objects
-            continue;
+            // id, vol_node_id, abs_edge_id, axon_id, dendrite_id, spine_id, bouton_id, name
+            int hvgxID = wordList[1].toInt();
+            if (m_objects.find(hvgxID) == m_objects.end()) {
+                continue;
+            }
+
+            int axon_id = wordList[4].toInt();
+            int dendrite_id = wordList[5].toInt();
+            int spine_id = wordList[6].toInt();
+            int bouton_id = wordList[7].toInt();
+
+            Object *synapse = m_objects[hvgxID];
+            synapse->UpdateSynapseData(axon_id, dendrite_id, spine_id, bouton_id);
+
+            if (axon_id && m_objects.find(axon_id) != m_objects.end()) {
+                m_objects[axon_id]->addSynapse(synapse);
+            }
+
+            if (dendrite_id && m_objects.find(dendrite_id) != m_objects.end()) {
+                m_objects[dendrite_id]->addSynapse(synapse);
+            }
+
+            if (spine_id && m_objects.find(spine_id) != m_objects.end()) {
+                m_objects[spine_id]->addSynapse(synapse);
+            }
+
+            if (bouton_id && m_objects.find(bouton_id) != m_objects.end()) {
+                m_objects[bouton_id]->addSynapse(synapse);
+            }
+
         } else if (wordList[0] == "mt") {
             // update mitochoneria parent here if any exists
             //"mt,1053,307,DENDRITE,144,mito_d048_01_029\n"
@@ -183,17 +226,53 @@ void DataContainer::loadMetaDataHVGX(QString path)
 
         } else if (wordList[0] == "bo") {
             // id, vesicleNo, volume, surfaceArea, axon_id, name, is_terminal_branch, is_mitochondrion
-            continue;
+            int hvgxID = wordList[1].toInt();
+            if (m_objects.find(hvgxID) == m_objects.end()) {
+                continue;
+            }
+
+            Object *parent = m_objects[hvgxID]->getParent();
+            if (parent == NULL) {
+                continue;
+            }
+
+            int function = parent->getFunction();
+            m_objects[hvgxID]->setFunction(function);
+
         } else if (wordList[0] == "sp") {
             // id, psd_area, volume, dendrite_id, does_form_synapse, with_apparatus, has_glia_nearby, spine name
-            continue;
+            int hvgxID = wordList[1].toInt();
+            if (m_objects.find(hvgxID) == m_objects.end()) {
+                continue;
+            }
+
+            Object *parent = m_objects[hvgxID]->getParent();
+            if (parent == NULL) {
+                continue;
+            }
+
+            int function = parent->getFunction();
+            m_objects[hvgxID]->setFunction(function);
+
         } else if (wordList[0] == "dn") {
             // id, function (0:ex,1:in), abs_node_id, name
-            continue;
+            int hvgxID = wordList[1].toInt();
+            if (m_objects.find(hvgxID) == m_objects.end()) {
+                continue;
+            }
+
+            int function = wordList[2].toInt();
+            m_objects[hvgxID]->setFunction(function);
+
         } else if (wordList[0] == "ax") {
             // id, function (0:ex,1:in), is_mylenated, abs_node_id, name
+            int hvgxID = wordList[1].toInt();
+            if (m_objects.find(hvgxID) == m_objects.end()) {
+                continue;
+            }
 
-            continue;
+            int function = wordList[2].toInt();
+            m_objects[hvgxID]->setFunction(function);
         }
 
 
@@ -335,9 +414,9 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
             return;
 
          m_objects[hvgxID] =  obj;
-         std::vector<int> IdsTemp = m_objectsIDsByType[obj->getObjectType()];
-         IdsTemp.push_back(obj->getHVGXID());
-         m_objectsIDsByType[obj->getObjectType()] = IdsTemp;
+         std::vector<Object*> objects_list = m_objectsByType[obj->getObjectType()];
+         objects_list.push_back(obj);
+         m_objectsByType[obj->getObjectType()] = objects_list;
 
          // need to update these info whenever we filter or change the threshold
          if (obj->getObjectType() == Object_t::ASTROCYTE)
@@ -442,15 +521,27 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                     break;
                 }
 
+                int t_index1 = f1_index - 1;
+                int t_index2 = f2_index - 1;
+                int t_index3 = f3_index - 1;
+
                 // add faces indices to object itself
                 /* vertex 1 */
-                obj->addTriangleIndex(f1_index - 1);
+                obj->addTriangleIndex(t_index1);
                 /* vertex 2 */
-                obj->addTriangleIndex(f2_index - 1);
+                obj->addTriangleIndex(t_index2);
                 /* vertex 3 */
-                obj->addTriangleIndex(f3_index - 1);
+                obj->addTriangleIndex(t_index3);
+
+                m_mesh->addFace(t_index1, t_index2, t_index3);
+
                 m_indices_size += 3;
 
+                if (m_indices_size_byType.find(obj->getObjectType()) == m_indices_size_byType.end() ) {
+                    m_indices_size_byType[obj->getObjectType()] = 0;
+                }
+
+                m_indices_size_byType[obj->getObjectType()] += 3;
                 // parse normals
 
             }
@@ -692,9 +783,9 @@ Object_t DataContainer::getObjectTypeByID(int hvgxID)
 
 //----------------------------------------------------------------------------
 //
-std::vector<int> DataContainer::getObjectsIDsByType(Object_t type)
+std::vector<Object*> DataContainer::getObjectsByType(Object_t type)
 {
-  return m_objectsIDsByType[type];
+  return m_objectsByType[type];
 }
 
  std::string DataContainer::getObjectName(int hvgxID)

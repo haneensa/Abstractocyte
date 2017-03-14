@@ -3,7 +3,13 @@
 
 #include "mainopengl.h"
 
+#include <set>
+
 enum class Object_t;
+
+struct face {
+   int v[3];
+};
 
 // mesh vertex
 struct VertexData {
@@ -44,11 +50,19 @@ public:
     std::vector< struct VertexData >* getVerticesList()  { return &verticesList; }
     std::vector< VertexData* >* getVerticesListByType(Object_t type)  {  return &m_typeVertexList[(int)type]; }
 
+    void addFace(int index1, int index2, int index3);
+    void getVertexNeighbors(int v_index, std::set< int > &neighs);
+
 protected:
-    // faces indices
+    std::vector< struct face >          m_faces;
+
+    // each vertex could belong to more than one face
+    // for each vertex in each face, add face to vertex
+
     // set of faces
     std::vector< struct VertexData >    verticesList;
 
+    std::map<int, std::vector<int> >    m_vertexFaces;
 
     std::vector<VertexData*> m_typeVertexList[9];
     /*std::vector<VertexData*> m_spineVertexList;

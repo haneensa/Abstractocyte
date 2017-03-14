@@ -17,6 +17,10 @@
 #include "glsluniform_structs.h"
 #include "rendervertexdata.h"
 
+enum class Size_e { VOLUME, ASTRO_COVERAGE };
+enum class Color_e { TYPE, FUNCTION, ASTRO_COVERAGE };
+
+
 class OpenGLManager : public MainOpenGL
 {
 public:
@@ -88,6 +92,12 @@ public:
     void updateDisplaySynapseFlag(bool flag)        { m_display_synapses = flag; }
 
 	void setRenderGlycogenGranules(bool render) { m_renderGlycogenGranules = render; };
+    void updateDepth(int d)                         { m_depth = d; }
+
+    void updateNodeSizeEncoding(Size_e encoding);
+    void updateColorEncoding(Color_e encoding);
+
+    void updateSSBO();
 
     // ********** Selection ************************
     void updateCanvasDim(int w, int h, int retianScale);
@@ -97,75 +107,60 @@ public:
 	void setZoom(float zoom);
 
 protected:
-    DataContainer                       *m_dataContainer; // get the data to render from here
-    AbstractionSpace                    *m_2dspace;
+    DataContainer                           *m_dataContainer;
+    AbstractionSpace                        *m_2dspace;
 
-    bool                                m_glFunctionsSet;
-    bool                                m_2D;
-    struct GlobalUniforms               m_uniforms;
+    bool                                    m_glFunctionsSet;
+    bool                                    m_2D;
+    struct GlobalUniforms                   m_uniforms;
 
     // *********** 0) SSBO objects Data    ***********
-    // todo: flag in ssbo to indicate this object on/off
-    std::vector<struct ssbo_mesh>       m_ssbo_data; // Color, Cenert, Type
-    GLuint                              m_ssbo;
-    GLuint                              m_bindIdx;
+    std::vector<struct ssbo_mesh>           m_ssbo_data; // Color, Cenert, Type
+    GLuint                                  m_ssbo;
+    GLuint                                  m_bindIdx;
 
     // *********** 1) Mesh Triangles     ***********
-
-    RenderVertexData                    m_TMesh;
-    QOpenGLVertexArrayObject            m_vao_mesh;
-    QOpenGLVertexArrayObject            m_vao_selection_mesh;
-
-    QOpenGLBuffer                       m_vbo_mesh;
-    QOpenGLBuffer                       m_Neurite_vbo_IndexMesh;
-
+    RenderVertexData                        m_TMesh;
 
     // *********** 3) Skeleton Points    ***********
-    RenderVertexData                    m_SkeletonPoints;
-    QOpenGLVertexArrayObject            m_vao_selection_skeleton;
-    QOpenGLVertexArrayObject            m_vao_skeleton;
-    QOpenGLBuffer                       m_vbo_skeleton;
+    RenderVertexData                        m_SkeletonPoints;
 
     // *********** 4) Abstract Skeleton Graph (Nodes and Edges) ***********
-    std::vector<struct AbstractSkelNode>   m_abstract_skel_nodes; // all skeletons here
-    std::vector<GLuint>                    m_abstract_skel_edges;
-
-
-    // todo: gather data needed for each render type in a class
     RenderVertexData                        m_GSkeleton;
-    QOpenGLVertexArrayObject                m_vao_selection_skeletonGraph;
-    QOpenGLVertexArrayObject                m_vao_SkeletonsGraph;
-
+    std::vector<struct AbstractSkelNode>    m_abstract_skel_nodes; // all skeletons here
+    std::vector<GLuint>                     m_abstract_skel_edges;
 
     // ***********  5) Neurites Graph (Nodes and Edges) ***********
-    RenderVertexData                    m_GNeurites;
-    std::vector<GLuint>                 m_neurites_nodes; // (place holders for neurites nodes) this initialized once and not changed after words
-    std::vector<GLuint>                 m_neurites_edges; // (place holders for neurites edges) this as well
-
-    QOpenGLVertexArrayObject            m_NeuritesGraphVAO;
-    QOpenGLBuffer                       m_NeuritesIndexVBO;
-    QOpenGLBuffer                       m_NeuritesNodesVBO;
+    RenderVertexData                        m_GNeurites;
+    // (place holders for neurites nodes) this initialized once and not changed after words
+    std::vector<GLuint>                     m_neurites_nodes;
+    // (place holders for neurites edges) this as well
+    std::vector<GLuint>                     m_neurites_edges;
 
     // *********** 6) Glycogen Nodes     ***********
-    RenderVertexData                    m_GlycogenPoints;
-    QOpenGLVertexArrayObject            m_vao_glycogen;
-    QOpenGLBuffer                       m_vbo_glycogen;
+    RenderVertexData                        m_GlycogenPoints;
+    QOpenGLVertexArrayObject                m_vao_glycogen;
+    QOpenGLBuffer                           m_vbo_glycogen;
 
 	bool								m_renderGlycogenGranules;
-	float								m_zoom;
+    float                                   m_zoom;
 
     // ********** Selection ************************
-    int                                 m_canvas_w;
-    int                                 m_canvas_h;
-    int                                 m_retinaScale;
+    int                                     m_canvas_w;
+    int                                     m_canvas_h;
+    int                                     m_retinaScale;
 
-    int                                 m_hits;
-    GLuint                              m_selectionFrameBuffer;
-    GLuint                              m_selectionRenderBuffer;
+    int                                     m_hits;
+    GLuint                                  m_selectionFrameBuffer;
+    GLuint                                  m_selectionRenderBuffer;
 
-    bool                                m_display_child;
-    bool                                m_display_parent;
-    bool                                m_display_synapses;
+    bool                                    m_display_child;
+    bool                                    m_display_parent;
+    bool                                    m_display_synapses;
+    int                                     m_depth;
+
+    Color_e                                 m_color_encoding;
+    Size_e                                  m_size_encoding;
 
 
  };
