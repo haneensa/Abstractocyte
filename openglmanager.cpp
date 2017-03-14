@@ -1547,8 +1547,9 @@ void OpenGLManager::updateSSBO()
             }
             case Color_e::ASTRO_COVERAGE:
             {
+            QVector4D color = obj->getColor();
               QVector4D add_color = QVector4D(1, 1, 1, 0) * coverage;
-              m_ssbo_data[hvgxID].color += QVector4D(0.2, 0.2, 0.2, 0) ;
+              m_ssbo_data[hvgxID].color = QVector4D(color.x() + 0.2, color.y() +  0.2, color.z() + 0.2, 0) ;
               m_ssbo_data[hvgxID].color -= add_color;
 
               break;
