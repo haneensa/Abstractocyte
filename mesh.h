@@ -2,6 +2,7 @@
 #define MESH_H
 
 #include "mainopengl.h"
+#include "trimesh.h"
 
 enum class Object_t;
 
@@ -44,8 +45,18 @@ public:
     std::vector< struct VertexData >* getVerticesList()  { return &verticesList; }
     std::vector< VertexData* >* getVerticesListByType(Object_t type)  {  return &m_typeVertexList[(int)type]; }
 
+    void addTriangle(int index1, int index2, int index3);
+
+    void buildMeshHalfEdge();
+
+    void getVertexNeighbors(int v_index, std::vector< trimesh::index_t > &neighs);
+
 protected:
     // faces indices
+    std::vector< trimesh::triangle_t >          yig_triangles;
+    std::vector< trimesh::edge_t >              yig_edges;
+    trimesh::trimesh_t                          yig_mesh;
+
     // set of faces
     std::vector< struct VertexData >    verticesList;
 

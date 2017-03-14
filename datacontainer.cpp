@@ -40,6 +40,7 @@ DataContainer::DataContainer()
     loadMetaDataHVGX(":/data/mouse3_metadata_objname_center_astroSyn.hvgx");
 
 
+    /* 4 */
 	qDebug() << "setting up octrees";
 	//m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
 	//m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
@@ -51,7 +52,18 @@ DataContainer::DataContainer()
 	//m_dbscan.initialize(&m_glycogenList, &m_glycogenMap, &m_glycogenOctree);
 	//m_dbscan.run();
 	//qDebug() << "done clustering";
-	
+
+
+    /* 5 */
+    // build halfedge data structure to get the neighbors of a vertex
+    m_mesh->buildMeshHalfEdge();
+
+    //  test vertex neighbors
+    int v_index = 0;
+    std::vector< trimesh::index_t > neighs;
+    m_mesh->getVertexNeighbors(v_index, neighs);
+    qDebug() << "neighbors of vertex " << v_index << ": ";
+    qDebug() <<  neighs;
 }
 
 //----------------------------------------------------------------------------
@@ -476,13 +488,20 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                     break;
                 }
 
+                int t_index1 = f1_index - 1;
+                int t_index2 = f2_index - 1;
+                int t_index3 = f3_index - 1;
+
                 // add faces indices to object itself
                 /* vertex 1 */
-                obj->addTriangleIndex(f1_index - 1);
+                obj->addTriangleIndex(t_index1);
                 /* vertex 2 */
-                obj->addTriangleIndex(f2_index - 1);
+                obj->addTriangleIndex(t_index2);
                 /* vertex 3 */
-                obj->addTriangleIndex(f3_index - 1);
+                obj->addTriangleIndex(t_index3);
+
+                m_mesh->addTriangle(t_index1, t_index2, t_index3);
+
                 m_indices_size += 3;
 
                 if (m_indices_size_byType.find(obj->getObjectType()) == m_indices_size_byType.end() ) {

@@ -719,15 +719,12 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
     initMeshVertexAttrib();
 
-
     m_TMesh.vboRelease("MeshVertices");
     m_TMesh.vaoRelease();
-
 
     /*  start selection buffer **/
     m_TMesh.vaoCreate("Selection");
     m_TMesh.vaoBind("Selection");
-
 
     m_TMesh.createProgram("selection");
     res = m_TMesh.compileShader("selection",
@@ -739,11 +736,9 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
     m_TMesh.useProgram("selection");
 
-
     m_TMesh.vboBind("MeshVertices");
     initMeshVertexAttrib();
     m_TMesh.vboRelease("MeshVertices");
-
 
     m_TMesh.vaoRelease();
 
