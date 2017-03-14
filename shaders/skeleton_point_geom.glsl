@@ -72,7 +72,6 @@ void main() {
     color_val = SSBO_data[ID].color;
 
     if (ID == 0) {
-        color_val.r = 1;
         return;
     }
 

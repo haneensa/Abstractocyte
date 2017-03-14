@@ -53,8 +53,10 @@ public:
     Object* getParent()                 { return m_parent; }
     std::vector<Object*> getChildren()  { return m_children; }
     int getAstroCoverage()              { return m_VertexidxCloseToAstro.size(); }
+    int getFunction()                   { return m_function; }
 
     // properties setters
+    void setFunction(int function)      { m_function = function; }
     void setColor(QVector4D color)      {  m_color = color; }
     void setCenter(QVector4D center);
     void setAstPoint(QVector4D ast_point);

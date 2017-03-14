@@ -1500,8 +1500,8 @@ void OpenGLManager::updateSSBO()
             continue;
 
         float volume =  obj->getVolume() / m_dataContainer->getMaxVolume();
-
         float coverage =  obj->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage();
+
         switch(m_size_encoding) {
         case Size_e::VOLUME:
             m_ssbo_data[hvgxID].info.setX( 20 *  volume);
@@ -1534,12 +1534,25 @@ void OpenGLManager::updateSSBO()
             }
             case Color_e::FUNCTION:
             {
-              m_ssbo_data[hvgxID].color.setX(1);
+              int function = obj->getFunction();
+              if (function == 0) {
+                  m_ssbo_data[hvgxID].color.setX(0.7);
+                  m_ssbo_data[hvgxID].color.setY(0.2);
+                  m_ssbo_data[hvgxID].color.setZ(0.2);
+              } else if (function == 1) {
+                  m_ssbo_data[hvgxID].color.setX(0.2);
+                  m_ssbo_data[hvgxID].color.setY(0.2);
+                  m_ssbo_data[hvgxID].color.setZ(0.7);
+              } else {
+                  m_ssbo_data[hvgxID].color.setX(0.5);
+                  m_ssbo_data[hvgxID].color.setY(0.5);
+                  m_ssbo_data[hvgxID].color.setZ(0.5);
+
+              }
+
               break;
             }
         }
-
-
     }
 }
 
