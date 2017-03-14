@@ -44,7 +44,7 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
     m_display_parent = false;
     m_display_synapses = false;
 	m_zoom = 1.0f;
-
+    m_depth = 1;
 }
 
 OpenGLManager::~OpenGLManager()
@@ -719,12 +719,15 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
     initMeshVertexAttrib();
 
+
     m_TMesh.vboRelease("MeshVertices");
     m_TMesh.vaoRelease();
+
 
     /*  start selection buffer **/
     m_TMesh.vaoCreate("Selection");
     m_TMesh.vaoBind("Selection");
+
 
     m_TMesh.createProgram("selection");
     res = m_TMesh.compileShader("selection",
@@ -739,6 +742,7 @@ bool OpenGLManager::initMeshTrianglesShaders()
     m_TMesh.vboBind("MeshVertices");
     initMeshVertexAttrib();
     m_TMesh.vboRelease("MeshVertices");
+
 
     m_TMesh.vaoRelease();
 
@@ -991,7 +995,7 @@ void OpenGLManager::updateGlycogenPoints()
 	//m_vao_glycogen.bind();
 	m_vbo_glycogen.bind();
 
-	
+
 
 	// fill glycogen points
 	//std::map<int, Glycogen*> glycogenMap = m_dataContainer->getGlycogenMap();
@@ -1372,25 +1376,25 @@ void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
             if (synapse_data.axon != hvgxID
                 && synapse_data.axon
                 && objectMap.find(synapse_data.axon) != objectMap.end()) {
-                FilterObject(synapse_data.axon, isfilterd);
+                recursiveFilter(synapse_data.axon, isfilterd);
             }
 
             if (synapse_data.dendrite != hvgxID
                 && synapse_data.dendrite
                 && objectMap.find(synapse_data.dendrite) != objectMap.end()) {
-                FilterObject(synapse_data.dendrite, isfilterd);
+                recursiveFilter(synapse_data.dendrite, isfilterd);
             }
 
             if (synapse_data.spine != hvgxID
                 && synapse_data.spine
                 && objectMap.find(synapse_data.spine) != objectMap.end()) {
-                FilterObject(synapse_data.spine, isfilterd);
+                recursiveFilter(synapse_data.spine, isfilterd);
             }
 
             if (synapse_data.bouton != hvgxID
                 && synapse_data.bouton
                 && objectMap.find(synapse_data.bouton) != objectMap.end()) {
-                FilterObject(synapse_data.bouton, isfilterd);
+                recursiveFilter(synapse_data.bouton, isfilterd);
             }
         }
     }

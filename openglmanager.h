@@ -87,6 +87,7 @@ public:
     void updateDisplayParentFlag(bool flag)         { m_display_parent = flag; }
     void updateDisplaySynapseFlag(bool flag)        { m_display_synapses = flag; }
 
+    void updateDepth(int d)                         { m_depth = d; }
     // ********** Selection ************************
     void updateCanvasDim(int w, int h, int retianScale);
     void initSelectionFrameBuffer();
@@ -144,6 +145,7 @@ protected:
     bool                                    m_display_child;
     bool                                    m_display_parent;
     bool                                    m_display_synapses;
+    int                                     m_depth;
 
 
  };

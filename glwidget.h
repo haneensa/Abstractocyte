@@ -45,6 +45,8 @@ public slots:
     void getFilterWithParent(bool value);
     void getFilterWithSynapses(bool value);
 
+    void getDepth(int d);
+
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);
     void setHoveredID(int);

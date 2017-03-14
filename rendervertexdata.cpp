@@ -7,8 +7,20 @@ RenderVertexData::RenderVertexData()
 
 RenderVertexData::~RenderVertexData()
 {
-    // delete all programs     glDeleteProgram(m_program_skeleton);
+    for ( auto iter = m_programs.begin(); iter != m_programs.end(); iter++ ) {
+        GLuint program = (*iter).second;
+        glDeleteProgram(program);
+    }
 
+    for ( auto iter = m_vbo.begin(); iter != m_vbo.end(); iter++ ) {
+        QOpenGLBuffer vbo = (*iter).second;
+        vbo.destroy();
+    }
+
+    for ( auto iter = m_vao.begin(); iter != m_vao.end(); iter++ ) {
+        GLuint vao = (*iter).second;
+        glDeleteVertexArrays(1, &vao);
+    }
 }
 
 void RenderVertexData::initOpenGLFunctions()

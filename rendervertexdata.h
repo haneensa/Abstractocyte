@@ -34,7 +34,7 @@ public:
 protected:
     std::map<std::string, GLuint>           m_programs;
     std::map<std::string, QOpenGLBuffer>    m_vbo;
-    std::map<std::string, GLuint>    m_vao;
+    std::map<std::string, GLuint>           m_vao;
 
 };
 

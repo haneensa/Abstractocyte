@@ -85,16 +85,13 @@ void main(void)
 
     int slider = (extra_info.x == 1) ? y_axis : x_axis;  // need to make this general and not tied to object type
 
-    float leftMin = interval.x;
-    float leftMax = interval.y;
-
     if (type == astrocyte)
-        V_alpha =  translate(slider, leftMin, leftMax, trans_alpha.x, trans_alpha.y);
+        V_alpha =  translate(slider, interval.x, interval.y, trans_alpha.x, trans_alpha.y);
     else
         V_alpha = 1;
 
-    float position_intp = translate(slider,leftMin, leftMax,  pos_alpha.x, pos_alpha.y);
-    V_color_intp = translate(slider, leftMin, leftMax, color_alpha.y, color_alpha.x);
+    float position_intp = translate(slider,interval.x, interval.y,  pos_alpha.x, pos_alpha.y);
+    V_color_intp = translate(slider, interval.x, interval.y, color_alpha.y, color_alpha.x);
 
 
     // project the points onto line here
@@ -109,8 +106,7 @@ void main(void)
     float max_point_size = point_size.y;
     if (pos2_flag == 6)
       max_point_size = point_size.y + 20 * (SSBO_data[ID].info.x / float(max_volume));
-    gl_PointSize =  translate(slider, leftMin, leftMax, point_size.x, max_point_size);
-
+    gl_PointSize =  translate(slider, interval.x, interval.y, point_size.x, max_point_size);
 
     vec4 center4d  = pvmMatrix * vec4(SSBO_data[ID].center.xyz, 1.0);
     vec4 pos1, pos2;
