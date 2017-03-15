@@ -1308,27 +1308,6 @@ Object_t OpenGLManager::getObjectTypeByID(int hvgxID)
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::FilterByType(Object_t type)
-{
-    // this should be fast, I should somehow group by IDs for types, and when we filter by type I just get all IDs with this type and set them to 1 which means filtered
-    std::vector<Object*> objects_list = m_dataContainer->getObjectsByType(type);
-    qDebug() << "Filtering " << objects_list.size() << " objects";
-
-    for (int i = 0; i < objects_list.size(); i++) {
-        int hvgxID = objects_list[i]->getHVGXID();
-        qDebug() << "Filtering ID " << hvgxID;
-        if (m_ssbo_data[hvgxID].info.w() == 1) {
-            FilterObject(hvgxID, false);
-        } else {
-            FilterObject(hvgxID, true);
-        }
-    }
-
-    m_dataContainer->recomputeMaxVolAstro();
-    updateSSBO();}
-
-// ----------------------------------------------------------------------------
-//
 void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
 {
     std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
@@ -1431,6 +1410,25 @@ void OpenGLManager::FilterObject(int ID, bool isfilterd)
 
 // ----------------------------------------------------------------------------
 //
+void OpenGLManager::FilterByType(Object_t type, bool flag)
+{
+    // this should be fast, I should somehow group by IDs for types, and when we filter by type I just get all IDs with this type and set them to 1 which means filtered
+    std::vector<Object*> objects_list = m_dataContainer->getObjectsByType(type);
+    qDebug() << "Filtering " << objects_list.size() << " objects";
+
+    for (int i = 0; i < objects_list.size(); i++) {
+        int hvgxID = objects_list[i]->getHVGXID();
+        qDebug() << "Filtering ID " << hvgxID;
+        FilterObject(hvgxID, flag);
+
+    }
+    m_dataContainer->recomputeMaxVolAstro();
+    updateSSBO();
+}
+
+
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
@@ -1523,7 +1521,7 @@ void OpenGLManager::updateSSBO()
         float volume =  translate(obj->getVolume(), 0, m_dataContainer->getMaxVolume(), 0, 1);
         float coverage = translate(obj->getAstroCoverage(),
                                    0, m_dataContainer->getMaxAstroCoverage(),
-                                   0, 0.6);
+                                   0, 0.7);
 
         switch(m_size_encoding) {
         case Size_e::VOLUME:
@@ -1550,7 +1548,7 @@ void OpenGLManager::updateSSBO()
             case Color_e::ASTRO_COVERAGE:
             {
               QVector4D color = obj->getColor();
-              m_ssbo_data[hvgxID].color = QVector4D(color.x() + 0.2, color.y() +  0.2, color.z() + 0.2, color.w()) ;
+              m_ssbo_data[hvgxID].color = QVector4D(color.x() + 0.25, color.y() +  0.25, color.z() + 0.25, color.w()) ;
               QVector4D add_color = QVector4D(1, 1, 1, 0) * coverage;
               m_ssbo_data[hvgxID].color -= add_color;
 

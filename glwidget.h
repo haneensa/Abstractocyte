@@ -39,7 +39,7 @@ public slots:
     void getGraphParam7(double value);
     void lockRotation2D();
 
-    void getFilteredType(QString value);
+    void getFilteredType(QString value, bool);
     void getFilteredID(QString value);
 
     void getFilterWithChildren(bool value);
@@ -50,6 +50,8 @@ public slots:
 
     void getNodeSizeEncoding(QString);
     void getColorEncoding(QString);
+
+    void getItemChanged(QListWidgetItem*);
 
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);

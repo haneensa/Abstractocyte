@@ -80,7 +80,7 @@ public:
 
     std::map<int, Object*>  getObjectsMap() { return m_dataContainer->getObjectsMap(); }
     Object_t getObjectTypeByID(int hvgxID);
-    void FilterByType(Object_t type);
+    void FilterByType(Object_t type, bool);
     void FilterByID( QList<QString> tokens_Ids );
     void FilterByID(  std::vector<int> tokens_Ids );
     void showAll();
@@ -91,7 +91,7 @@ public:
     void updateDisplayParentFlag(bool flag)         { m_display_parent = flag; }
     void updateDisplaySynapseFlag(bool flag)        { m_display_synapses = flag; }
 
-	void setRenderGlycogenGranules(bool render) { m_renderGlycogenGranules = render; };
+    void setRenderGlycogenGranules(bool render) { m_renderGlycogenGranules = render; }
     void updateDepth(int d)                         { m_depth = d; }
 
     void updateNodeSizeEncoding(Size_e encoding);
@@ -161,8 +161,6 @@ protected:
 
     Color_e                                 m_color_encoding;
     Size_e                                  m_size_encoding;
-
-
  };
 
 #endif // OPENGLMANAGER_H

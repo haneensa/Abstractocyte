@@ -393,38 +393,6 @@ void GLWidget::getGraphParam7(double value)
     m_graphManager->updateGraphParam7(value);
 }
 
-void GLWidget::getFilteredType(QString value)
-{
-    qDebug() << "Filter: " << value;
-    if (m_opengl_mngr == NULL)
-        return;
-
-    stopForecDirectedLayout();
-
-    Object_t object_type = Object_t::UNKNOWN;
-    if (value == "AXON")
-        object_type = Object_t::AXON;
-    else if (value == "DENDRITE")
-        object_type = Object_t::DENDRITE;
-    else if (value == "BOUTON")
-        object_type = Object_t::BOUTON;
-    else if (value == "SPINE")
-        object_type = Object_t::SPINE;
-    else if (value == "MITO")
-        object_type = Object_t::MITO;
-    else if (value == "SYNAPSE")
-        object_type = Object_t::SYNAPSE;
-    else if (value == "ASTROCYTE")
-        object_type = Object_t::ASTROCYTE;
-
-    m_opengl_mngr->FilterByType(object_type);
-
-    // start force layout
-    m_rotation_timer->start(0);
-
-
-    update();
-}
 
 void GLWidget::getFilteredID(QString value)
 {
@@ -498,6 +466,50 @@ void GLWidget::getColorEncoding(QString encoding)
         m_opengl_mngr->updateColorEncoding(Color_e::ASTRO_COVERAGE);
     else if (encoding == "Function")
         m_opengl_mngr->updateColorEncoding(Color_e::FUNCTION);
+
+    update();
+}
+
+void GLWidget::getItemChanged(QListWidgetItem* item)
+{
+    Qt::CheckState state =  item->checkState();
+    bool flag = false;
+    if (state == Qt::Unchecked) // do filter them from view
+        flag = true;
+
+    getFilteredType( item->text(), flag);
+}
+
+
+void GLWidget::getFilteredType(QString value, bool flag)
+{
+    qDebug() << "Filter: " << value << " " << flag;
+    if (m_opengl_mngr == NULL)
+        return;
+
+    stopForecDirectedLayout();
+
+    Object_t object_type = Object_t::UNKNOWN;
+    if (value == "Axons")
+        object_type = Object_t::AXON;
+    else if (value == "Dendrites")
+        object_type = Object_t::DENDRITE;
+    else if (value == "Boutons")
+        object_type = Object_t::BOUTON;
+    else if (value == "Spines")
+        object_type = Object_t::SPINE;
+    else if (value == "Mitochondria")
+        object_type = Object_t::MITO;
+    else if (value == "Synapse")
+        object_type = Object_t::SYNAPSE;
+    else if (value == "Astrocyte")
+        object_type = Object_t::ASTROCYTE;
+
+    m_opengl_mngr->FilterByType(object_type, flag);
+
+    // start force layout
+    m_rotation_timer->start(0);
+
 
     update();
 }
