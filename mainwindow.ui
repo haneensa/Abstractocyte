@@ -255,15 +255,15 @@
          <item>
           <widget class="QToolBox" name="toolBox">
            <property name="currentIndex">
-            <number>1</number>
+            <number>0</number>
            </property>
            <widget class="QWidget" name="page">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>129</width>
-              <height>180</height>
+              <width>272</width>
+              <height>688</height>
              </rect>
             </property>
             <attribute name="label">
@@ -477,140 +477,205 @@
            <property name="title">
             <string/>
            </property>
-           <layout class="QFormLayout" name="formLayout_3">
-            <item row="0" column="0" colspan="2">
-             <widget class="QGroupBox" name="groupBox_8">
-              <property name="title">
-               <string>Selected Objects</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_9">
-               <item row="0" column="0">
-                <widget class="QTreeView" name="treeView"/>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item row="1" column="0" colspan="2">
-             <widget class="QGroupBox" name="groupBox_5">
-              <property name="title">
-               <string>Filter By Type:</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_2">
-               <item row="0" column="0">
-                <widget class="QListWidget" name="listWidget">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string>Astrocyte</string>
-                  </property>
-                  <property name="checkState">
-                   <enum>Checked</enum>
-                  </property>
-                  <property name="flags">
-                   <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Axons</string>
-                  </property>
-                  <property name="checkState">
-                   <enum>Checked</enum>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Dendrites</string>
-                  </property>
-                  <property name="checkState">
-                   <enum>Checked</enum>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Spines</string>
-                  </property>
-                  <property name="checkState">
-                   <enum>Checked</enum>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Boutons</string>
-                  </property>
-                  <property name="checkState">
-                   <enum>Checked</enum>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Mitochondria</string>
-                  </property>
-                  <property name="checkState">
-                   <enum>Checked</enum>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Synapse</string>
-                  </property>
-                  <property name="checkState">
-                   <enum>Checked</enum>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item row="2" column="0" colspan="2">
-             <widget class="QGroupBox" name="groupBox_7">
-              <property name="title">
-               <string>Filter By ID:</string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_5">
+           <widget class="QGroupBox" name="groupBox_5">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>241</y>
+              <width>238</width>
+              <height>225</height>
+             </rect>
+            </property>
+            <property name="title">
+             <string>Filter By Type:</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_2">
+             <item row="1" column="0">
+              <widget class="QListWidget" name="listWidget">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <item>
-                <widget class="QLineEdit" name="lineEdit"/>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item row="3" column="0" colspan="2">
-             <widget class="QGroupBox" name="groupBox_6">
-              <property name="title">
-               <string>Preserve</string>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_4">
-               <item>
-                <widget class="QCheckBox" name="checkBox">
-                 <property name="text">
-                  <string>Substructures</string>
-                 </property>
-                </widget>
+                <property name="text">
+                 <string>Astrocyte</string>
+                </property>
+                <property name="checkState">
+                 <enum>Checked</enum>
+                </property>
+                <property name="flags">
+                 <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+                </property>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBox_2">
-                 <property name="text">
-                  <string>Parent</string>
-                 </property>
-                </widget>
+                <property name="text">
+                 <string>Axons</string>
+                </property>
+                <property name="checkState">
+                 <enum>Checked</enum>
+                </property>
                </item>
                <item>
-                <widget class="QCheckBox" name="checkBox_3">
-                 <property name="text">
-                  <string>Synapses</string>
-                 </property>
-                </widget>
+                <property name="text">
+                 <string>Dendrites</string>
+                </property>
+                <property name="checkState">
+                 <enum>Checked</enum>
+                </property>
                </item>
-              </layout>
-             </widget>
-            </item>
-           </layout>
+               <item>
+                <property name="text">
+                 <string>Spines</string>
+                </property>
+                <property name="checkState">
+                 <enum>Checked</enum>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Boutons</string>
+                </property>
+                <property name="checkState">
+                 <enum>Checked</enum>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Mitochondria</string>
+                </property>
+                <property name="checkState">
+                 <enum>Checked</enum>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Synapse</string>
+                </property>
+                <property name="checkState">
+                 <enum>Checked</enum>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QGroupBox" name="groupBox_6">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>531</y>
+              <width>110</width>
+              <height>96</height>
+             </rect>
+            </property>
+            <property name="title">
+             <string>Preserve</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <item>
+              <widget class="QCheckBox" name="checkBox">
+               <property name="text">
+                <string>Substructures</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkBox_2">
+               <property name="text">
+                <string>Parent</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkBox_3">
+               <property name="text">
+                <string>Synapses</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QGroupBox" name="groupBox_7">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>472</y>
+              <width>153</width>
+              <height>53</height>
+             </rect>
+            </property>
+            <property name="title">
+             <string>Filter By ID:</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <item>
+              <widget class="QLineEdit" name="lineEdit"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QGroupBox" name="groupBox_8">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>10</y>
+              <width>238</width>
+              <height>225</height>
+             </rect>
+            </property>
+            <property name="title">
+             <string>Selected Objects</string>
+            </property>
+            <widget class="QTableView" name="tableView">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>23</y>
+               <width>218</width>
+               <height>161</height>
+              </rect>
+             </property>
+             <property name="editTriggers">
+              <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
+             </property>
+             <property name="dragDropOverwriteMode">
+              <bool>false</bool>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectRows</enum>
+             </property>
+             <property name="textElideMode">
+              <enum>Qt::ElideNone</enum>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="pushButton">
+             <property name="geometry">
+              <rect>
+               <x>150</x>
+               <y>190</y>
+               <width>75</width>
+               <height>23</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Fitler </string>
+             </property>
+            </widget>
+           </widget>
+           <widget class="QPushButton" name="pushButton_2">
+            <property name="geometry">
+             <rect>
+              <x>170</x>
+              <y>710</y>
+              <width>75</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Reset Filter</string>
+            </property>
+           </widget>
           </widget>
          </item>
         </layout>
@@ -857,6 +922,9 @@
     <slot>getNodeSizeEncoding(QString)</slot>
     <slot>getColorEncoding(QString)</slot>
     <slot>getItemChanged(QListWidgetItem*)</slot>
+    <slot>getDoubleClickedTableView(QModelIndex)</slot>
+    <slot>getFitlerButtonClicked(bool)</slot>
+    <slot>getResetFitlerButtonClicked(bool)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -1189,7 +1257,7 @@
    <slot>getFilteredID(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>234</x>
+     <x>172</x>
      <y>948</y>
     </hint>
     <hint type="destinationlabel">
@@ -1205,7 +1273,7 @@
    <slot>getFilterWithChildren(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>242</x>
+     <x>129</x>
      <y>999</y>
     </hint>
     <hint type="destinationlabel">
@@ -1221,7 +1289,7 @@
    <slot>getFilterWithParent(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>178</x>
+     <x>129</x>
      <y>1025</y>
     </hint>
     <hint type="destinationlabel">
@@ -1237,12 +1305,60 @@
    <slot>getFilterWithSynapses(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>230</x>
+     <x>129</x>
      <y>1051</y>
     </hint>
     <hint type="destinationlabel">
      <x>358</x>
      <y>1054</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tableView</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getDoubleClickedTableView(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>226</x>
+     <y>556</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>372</x>
+     <y>559</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getFitlerButtonClicked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>237</x>
+     <y>655</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>315</x>
+     <y>656</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getResetFitlerButtonClicked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>1170</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>349</x>
+     <y>1164</y>
     </hint>
    </hints>
   </connection>

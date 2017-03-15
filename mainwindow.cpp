@@ -17,6 +17,27 @@ MainWindow::MainWindow(QWidget *parent) :
     mainwindow_ui->setupUi(this);
 	m_currentSelectedCluster = 0;
 	m_clusters = 0;
+
+    // setup the table view
+    tableView = new QStandardItemModel(0,2,this); //0 Rows and 2 Columns
+    tableView->setHorizontalHeaderItem(0, new QStandardItem(QString("ID")));
+    tableView->setHorizontalHeaderItem(1, new QStandardItem(QString("Name")));
+    mainwindow_ui->tableView->setModel(tableView);
+    QObject::connect(getGLWidget(), SIGNAL(object_clicked(QList<QStandardItem*>)),
+                     this, SLOT(on_object_clicked(QList<QStandardItem*>)));
+
+    QObject::connect(getGLWidget(), SIGNAL(clearRowsTable()),
+                     this, SLOT(clearTable()));
+
+    QObject::connect(getGLWidget(), SIGNAL(RemoveRowAt_GL(QModelIndex)),
+                     this, SLOT(RemoveRowAt(QModelIndex)));
+
+    QObject::connect(this, SIGNAL(getDeletedData(int)),
+                     getGLWidget(), SLOT(getDeletedHVGXID(int)));
+
+    QObject::connect(getGLWidget(), SIGNAL(checkAllListWidget_GL()),
+                     this, SLOT(checkAllListWidget()));
+
 }
 
 //------------------------------------------------------
@@ -38,6 +59,43 @@ GLWidget* MainWindow::getGLWidget()
 MousePad* MainWindow::getMousePad()
 {
 	return mainwindow_ui->openGLWidget_2;
+}
+
+//------------------------------------------------------
+//
+void MainWindow::on_object_clicked(QList<QStandardItem*> items)
+{
+    tableView->appendRow(items);
+}
+
+//------------------------------------------------------
+//
+void MainWindow::clearTable()
+{
+    tableView->removeRows(0, tableView->rowCount(), QModelIndex());
+
+}
+
+//------------------------------------------------------
+//
+void MainWindow::checkAllListWidget()
+{
+    qDebug() << "checkAllListWidget";
+    for (int row = 0; row < mainwindow_ui->listWidget->count(); row++) {
+        QListWidgetItem *item = mainwindow_ui->listWidget->item(row);
+        item->setCheckState(Qt::Checked);
+    }
+}
+
+//------------------------------------------------------
+//
+void MainWindow::RemoveRowAt(QModelIndex selectedIndex)
+{
+    QModelIndex hvgxID_index = tableView->index(selectedIndex.row() , 0);
+    QVariant hvgxID_item =  tableView->data(hvgxID_index);
+    int hvgxID = hvgxID_item.toInt();
+    getDeletedData(hvgxID);
+    tableView->removeRows(selectedIndex.row(), 1, QModelIndex());
 }
 
 //------------------------------------------------------

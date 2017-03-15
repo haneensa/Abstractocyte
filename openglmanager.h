@@ -82,7 +82,7 @@ public:
     Object_t getObjectTypeByID(int hvgxID);
     void FilterByType(Object_t type, bool);
     void FilterByID( QList<QString> tokens_Ids );
-    void FilterByID(  std::vector<int> tokens_Ids );
+    void FilterByID(  std::set<int> tokens_Ids );
     void showAll();
     void FilterObject(int ID, bool isfilterd);
     void recursiveFilter(int ID, bool isfilterd);

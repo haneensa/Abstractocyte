@@ -3,6 +3,7 @@
 
 #include <QTreeWidgetItem>
 #include <QMainWindow>
+#include <QStandardItemModel>
 
 namespace Ui {
 class MainWindow;
@@ -26,8 +27,6 @@ public:
 	MousePad* getMousePad();
 
 public slots:
-
-
 	void on_glycogenVisibilityCheckBox_toggled(bool);
 	//------------- glycogen clustering ----------------------------
 	void on_clusterButton_clicked();
@@ -40,10 +39,20 @@ public slots:
 	void on_mapGlycogenGranulesButton_clicked();
 	void on_mapGlycogenClustersButton_clicked();
 
+    //----- selected objects
+    void on_object_clicked(QList<QStandardItem*>);
+    void clearTable();
+    void RemoveRowAt(QModelIndex);
+    void checkAllListWidget();
+
+signals:
+    void getDeletedData(int);
+
 private:
     Ui::MainWindow *mainwindow_ui;
 	std::map<int, Clustering::GlycogenCluster*>* m_clusters;
 	QTreeWidgetItem* m_currentSelectedCluster;
+    QStandardItemModel *tableView;
 
 };
 

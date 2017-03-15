@@ -198,11 +198,35 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     makeCurrent();
 
     int hvgxID = pickObject(event);
-    m_selectedObjects.push_back(hvgxID);
+
+    if (m_selectedObjects.size() == 0) {
+        clearRowsTable();
+    }
+
+    if ( m_selectedObjects.find(hvgxID) == m_selectedObjects.end() ) {
+        m_selectedObjects.insert(hvgxID);
+        insertInTable(hvgxID);
+    }
 
     doneCurrent();
 
     event->accept();
+}
+
+void GLWidget::insertInTable(int hvgxID)
+{
+
+    std::string name = m_data_containter->getObjectName(hvgxID);
+    if (name == "Unknown")
+        return;
+
+    QString oname = QString::fromUtf8(name.c_str());
+
+    QList<QStandardItem*> items;
+    items.append(new QStandardItem(QString::number(hvgxID)));
+    items.append(new QStandardItem(oname));
+    object_clicked(items);
+
 }
 
 void GLWidget::lockRotation2D()
@@ -312,13 +336,6 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         case(Qt::Key_X): // stop layouting algorithm
             stopForecDirectedLayout();
         break;
-        case(Qt::Key_P): // select objects
-            m_opengl_mngr->FilterByID(m_selectedObjects);
-            m_selectedObjects.clear();
-        break;
-        case(Qt::Key_R): // reset filter
-            m_opengl_mngr->showAll();
-        break;
         case(Qt::Key_H): // enable hover
             m_hover = !m_hover;
             setMouseTracking(m_hover);
@@ -345,7 +362,6 @@ void GLWidget::getSliderY(int value)
     if (value > 100 || value < 0) {
         return;
     }
-
 
     if (value > 98)
         value = 100;
@@ -383,17 +399,22 @@ void GLWidget::getGraphParam5(double value)
     m_graphManager->updateGraphParam5(value);
 }
 
+//------------------------------------------------------
+//
 void GLWidget::getGraphParam6(double value)
 {
     m_graphManager->updateGraphParam6(value);
 }
 
+//------------------------------------------------------
+//
 void GLWidget::getGraphParam7(double value)
 {
     m_graphManager->updateGraphParam7(value);
 }
 
-
+//------------------------------------------------------
+//
 void GLWidget::getFilteredID(QString value)
 {
     qDebug() << "Filter: " << value;
@@ -413,6 +434,8 @@ void GLWidget::getFilteredID(QString value)
     update();
 }
 
+//------------------------------------------------------
+//
 void GLWidget::stopForecDirectedLayout()
 {
     // stop force layout
@@ -423,22 +446,30 @@ void GLWidget::stopForecDirectedLayout()
     m_FDL_running = false;
 }
 
+//------------------------------------------------------
+//
 void GLWidget::getFilterWithChildren(bool value)
 {
     // update this in openglmanager
     m_opengl_mngr->updateDisplayChildFlag(value);
 }
 
+//------------------------------------------------------
+//
 void GLWidget::getFilterWithParent(bool value)
 {
     m_opengl_mngr->updateDisplayParentFlag(value);
 }
 
+//------------------------------------------------------
+//
 void GLWidget::getFilterWithSynapses(bool value)
 {
     m_opengl_mngr->updateDisplaySynapseFlag(value);
 }
 
+//------------------------------------------------------
+//
 void GLWidget::getDepth(int d)
 {
     if (d < 0)
@@ -447,6 +478,8 @@ void GLWidget::getDepth(int d)
     m_opengl_mngr->updateDepth(d);
 }
 
+//------------------------------------------------------
+//
 void GLWidget::getNodeSizeEncoding(QString encoding)
 {
     qDebug() << encoding;
@@ -457,6 +490,8 @@ void GLWidget::getNodeSizeEncoding(QString encoding)
     update();
 }
 
+//------------------------------------------------------
+//
 void GLWidget::getColorEncoding(QString encoding)
 {
     qDebug() << encoding;
@@ -470,6 +505,8 @@ void GLWidget::getColorEncoding(QString encoding)
     update();
 }
 
+//------------------------------------------------------
+//
 void GLWidget::getItemChanged(QListWidgetItem* item)
 {
     Qt::CheckState state =  item->checkState();
@@ -477,10 +514,14 @@ void GLWidget::getItemChanged(QListWidgetItem* item)
     if (state == Qt::Unchecked) // do filter them from view
         flag = true;
 
-    getFilteredType( item->text(), flag);
+
+   getFilteredType( item->text(), flag);
+
+   update();
 }
 
-
+//------------------------------------------------------
+//
 void GLWidget::getFilteredType(QString value, bool flag)
 {
     qDebug() << "Filter: " << value << " " << flag;
@@ -513,3 +554,35 @@ void GLWidget::getFilteredType(QString value, bool flag)
 
     update();
 }
+
+//------------------------------------------------------
+//
+void GLWidget::getDoubleClickedTableView(QModelIndex index)
+{
+    RemoveRowAt_GL(index);
+}
+
+//------------------------------------------------------
+//
+void GLWidget::getDeletedHVGXID(int hvgxID)
+{
+    m_selectedObjects.erase(hvgxID);
+}
+
+//------------------------------------------------------
+//
+void GLWidget::getFitlerButtonClicked(bool)
+{
+    m_opengl_mngr->FilterByID(m_selectedObjects);
+    update();
+}
+
+//------------------------------------------------------
+//
+void GLWidget::getResetFitlerButtonClicked(bool)
+{
+    m_opengl_mngr->showAll();
+    checkAllListWidget_GL();
+    update();
+}
+

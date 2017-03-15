@@ -25,6 +25,7 @@ public:
 	float getZoomFactor() { return m_distance; }
 
     int pickObject(QMouseEvent *event);
+    void insertInTable(int);
 
 public slots:
     void getSliderX(int value);
@@ -52,11 +53,19 @@ public slots:
     void getColorEncoding(QString);
 
     void getItemChanged(QListWidgetItem*);
+    void getDoubleClickedTableView(QModelIndex);
+    void getDeletedHVGXID(int);
+    void getFitlerButtonClicked(bool);
+    void getResetFitlerButtonClicked(bool);
 
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);
     void setHoveredID(int);
     void setHoveredName(QString);
+    void object_clicked(QList<QStandardItem*>);
+    void clearRowsTable();
+    void RemoveRowAt_GL(QModelIndex);
+    void checkAllListWidget_GL();
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -111,7 +120,7 @@ protected:
     QTimer                              *m_refresh_timer;
     QTimer                              *m_rotation_timer;
 
-    std::vector<int>                    m_selectedObjects;
+    std::set<int>                       m_selectedObjects;
 
     bool                                m_hover;
 };

@@ -1448,15 +1448,15 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::FilterByID( std::vector<int> tokens_Ids )
+void OpenGLManager::FilterByID( std::set<int> tokens_Ids )
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
         // recompute max vol and astro coverage
         FilterObject(i, true);
     }
 
-    for (int i = 0; i < tokens_Ids.size(); ++i) {
-        int hvgxID = tokens_Ids[i];
+    for (auto iter = tokens_Ids.begin(); iter != tokens_Ids.end(); ++iter) {
+        int hvgxID = *iter;
         if (hvgxID > m_ssbo_data.size())
             continue;
 
