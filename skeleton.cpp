@@ -29,6 +29,7 @@ void Skeleton::addPoint(QVector3D coords)
     points_vec.push_back({point, knot1, knot2});
 }
 
+// make sure a parent is not fully marked - at least one point is marked as parent
 void Skeleton::markPoint(int pIndex, int IDMark)
 {
     if (m_points.size() < pIndex) {

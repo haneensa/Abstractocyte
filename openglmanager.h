@@ -32,6 +32,8 @@ public:
     void updateAbstractUniformsLocation(GLuint program);
     void update2Dflag(bool is2D);
 
+    void updateUniformsData(struct GlobalUniforms grid_uniforms)    {    m_uniforms = grid_uniforms; }
+
     void drawAll(struct GlobalUniforms grid_uniforms);
 
     // *********** 0) SSBO objects Data    ***********
@@ -106,6 +108,12 @@ public:
 
 	void setZoom(float zoom);
 
+    // ************ Glycogen 2D Abstraction *******
+    void init_Gly2DHeatMap();
+    bool init_Gly2DHeatMapShaders();
+
+    void drawIntoTexture();
+
 protected:
     DataContainer                           *m_dataContainer;
     AbstractionSpace                        *m_2dspace;
@@ -161,6 +169,20 @@ protected:
 
     Color_e                                 m_color_encoding;
     Size_e                                  m_size_encoding;
+
+    //*********************************
+    GLuint                                  m_gly_2D_heatMap_FBO;
+    GLuint                                  m_gly_2D_heatMap_Tex;
+    int                                     m_quadSize;
+    std::vector<QVector4D>                  m_Texquad;
+    // gen
+    // bind
+    // resize the fbo
+    // render nodes using blur shader
+    // whereever the node is use 1 else 0
+    // blur the glycogen density value present at node using gaussian blur
+    // render the results
+
  };
 
 #endif // OPENGLMANAGER_H

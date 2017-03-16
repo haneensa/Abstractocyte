@@ -33,5 +33,11 @@
         <file>shaders/hvgx_selection_frag.glsl</file>
         <file>shaders/points_3dConnevtivity_frag.glsl</file>
         <file>data/mouse3_metadata_objname_center_astroSyn.hvgx</file>
+        <file>shaders/nodes_2DHeatMap_frag.glsl</file>
+        <file>shaders/nodes_2DHeatMap_geom.glsl</file>
+        <file>shaders/nodes_2DHeatMap_vert.glsl</file>
+        <file>shaders/nodes_2DHeatMap_tex_frag.glsl</file>
+        <file>shaders/nodes_2DHeatMap_tex_geom.glsl</file>
+        <file>shaders/nodes_2DHeatMap_tex_vert.glsl</file>
     </qresource>
 </RCC>

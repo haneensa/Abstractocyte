@@ -96,18 +96,22 @@ void GLWidget::updateMVPAttrib()
     // graph model matrix without rotation, apply rotation to nodes directly
     m_uniforms = {m_yaxis, m_xaxis, m_mMatrix.data(), m_vMatrix.data(), m_projection.data(),
                         m_model_noRotation.data(), m_rotationMatrix, viewport, max_volume, max_astro_coverage, 0.0001};
+    m_opengl_mngr->updateUniformsData(m_uniforms);
 }
 
 void GLWidget::initializeGL()
 {
     qDebug() << "initializeGL";
     initializeOpenGLFunctions();
+
+    updateMVPAttrib();
+
+
     m_2dspace->initOpenGLFunctions();
     m_opengl_mngr->initOpenGLFunctions();
     m_graphManager->ExtractGraphFromMesh();
 
 
-    updateMVPAttrib();
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -141,7 +145,9 @@ void GLWidget::paintGL()
     updateMVPAttrib();
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    m_opengl_mngr->updateUniformsData(m_uniforms);
     m_opengl_mngr->drawAll(m_uniforms);
+    m_opengl_mngr->drawIntoTexture();
 
 }
 

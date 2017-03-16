@@ -61,6 +61,41 @@ OpenGLManager::~OpenGLManager()
     m_vbo_glycogen.destroy();
 }
 
+void OpenGLManager::init_Gly2DHeatMap()
+{
+    m_gly_2D_heatMap_FBO = 0;
+
+    glGenFramebuffers(1, &m_gly_2D_heatMap_FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
+    GL_Error();
+
+    glGenTextures(1, &m_gly_2D_heatMap_Tex);
+    glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
+    GL_Error();
+
+    // create empty image
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_canvas_w, m_canvas_h, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    GL_Error();
+
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_gly_2D_heatMap_Tex, 0);
+    GL_Error();
+
+    // set the list of draw buffers
+    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, DrawBuffers);
+    GL_Error();
+
+    // check if frame buffer is ok
+   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+       qDebug() << "ERROR!!!!";
+       return;
+    }
+
+}
+
 bool OpenGLManager::initOpenGLFunctions()
 {
     m_glFunctionsSet = true;
@@ -92,6 +127,7 @@ void OpenGLManager::updateCanvasDim(int w, int h, int retianScale)
         m_canvas_w = w * retianScale;
         m_retinaScale = retianScale;
         initSelectionFrameBuffer();
+        init_Gly2DHeatMap();
         GL_Error();
     }
 
@@ -125,7 +161,6 @@ int OpenGLManager::processSelection(float x, float y)
     GLubyte pixel[3];
 
     qDebug() << x << " " << y;
-    //glReadBuffer(GL_BACK);
     glReadPixels(x, y, 1, 1, GL_RGB,GL_UNSIGNED_BYTE, (void *)pixel);
     int pickedID = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
     qDebug() << pixel[0] << " " << pixel[1] << " " << pixel[2];
@@ -612,7 +647,6 @@ bool OpenGLManager::initNeuritesGraphShaders()
 
     // allocate skeleton nodes
     m_GNeurites.vboCreate("nodes", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
-//    m_NeuritesNodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
 
     m_GNeurites.vboBind("nodes");
 
@@ -622,7 +656,6 @@ bool OpenGLManager::initNeuritesGraphShaders()
 
     GL_Error();
     m_GNeurites.vboRelease("nodes");
-
 
     // allocate neurites edges
     // allocate skeleton edges
@@ -656,11 +689,95 @@ bool OpenGLManager::initNeuritesGraphShaders()
     m_GNeurites.vboBind("index");
 
     m_GNeurites.useProgram("index");
+    updateAbstractUniformsLocation( m_GNeurites.getProgram("index") );
+    GL_Error();
 
     m_GNeurites.vboRelease("index");
     m_GNeurites.vaoRelease();
 
+
+    init_Gly2DHeatMapShaders();
+
     return true;
+}
+
+bool OpenGLManager::init_Gly2DHeatMapShaders()
+{
+    // init 2D HeatMap
+    m_GNeurites.createProgram("2DHeatMap");
+    bool res = m_GNeurites.compileShader("2DHeatMap",
+                                    ":/shaders/nodes_2DHeatMap_vert.glsl",
+                                    ":/shaders/nodes_2DHeatMap_geom.glsl",
+                                    ":/shaders/nodes_2DHeatMap_frag.glsl");
+    if (res == false)
+        return res;
+    GL_Error();
+
+    m_GNeurites.vaoCreate("2DHeatMap");
+    m_GNeurites.vaoBind("2DHeatMap");
+    GL_Error();
+
+    m_GNeurites.vboBind("nodes");
+
+    GL_Error();
+
+    m_GNeurites.useProgram("2DHeatMap");
+
+    initNeuritesVertexAttribPointer();
+
+    m_GNeurites.vboRelease("nodes");
+
+    m_GNeurites.vaoRelease();
+
+    GL_Error();
+
+    m_GNeurites.createProgram("2DHeatMap_Texture");
+    res = m_GNeurites.compileShader("2DHeatMap_Texture",
+                                    ":/shaders/nodes_2DHeatMap_tex_vert.glsl",
+                                    ":/shaders/nodes_2DHeatMap_tex_geom.glsl",
+                                    ":/shaders/nodes_2DHeatMap_tex_frag.glsl");
+    if (res == false)
+        return res;
+
+    // todo: initialize uniforms
+
+    m_GNeurites.vaoCreate("2DHeatMap_Quad");
+    m_GNeurites.vaoBind("2DHeatMap_Quad");
+
+    m_Texquad.push_back(QVector4D(-1.0f, -1.0f,  0.0f, 0));
+    m_Texquad.push_back(QVector4D( 1.0f, -1.0f,  1.0f, 0));
+    m_Texquad.push_back(QVector4D(-1.0f,  1.0f,  0.0f, 1));
+    m_Texquad.push_back(QVector4D(-1.0f,  1.0f,  0.0f, 1));
+    m_Texquad.push_back(QVector4D( 1.0f, -1.0f,  1.0f, 0));
+    m_Texquad.push_back(QVector4D( 1.0f,  1.0f,  1.0f, 1));
+
+
+
+    // allocate skeleton nodes
+    m_GNeurites.vboCreate("quad", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
+    m_GNeurites.vboBind("quad");
+    m_GNeurites.vboAllocate("quad",
+                            m_Texquad.data(),
+                            m_Texquad.size() * sizeof(QVector4D));
+
+    m_GNeurites.useProgram("2DHeatMap_Texture");
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0,  0);
+
+//     float w = 230; //m_canvas_w/m_retinaScale;
+//    glUniform1f(1, w);
+
+
+//     float h = 240; //m_canvas_h/m_retinaScale;
+//    glUniform1f(2,  h);
+
+
+    m_GNeurites.vboRelease("quad");
+    m_GNeurites.vaoRelease();
+
+    GL_Error();
+
+
 }
 
 // ----------------------------------------------------------------------------
@@ -779,8 +896,6 @@ void OpenGLManager::drawMeshTriangles(struct GlobalUniforms grid_uniforms, bool 
 
        m_TMesh.vaoRelease();
    }
-
-
 }
 
 // ----------------------------------------------------------------------------
@@ -1057,8 +1172,20 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     write_ssbo_data();
     struct ast_neu_properties space_properties = m_2dspace->getSpaceProper();
 
-	if (m_renderGlycogenGranules)
-		drawGlycogenPoints(grid_uniforms);
+
+    // ********* Debug Texture
+    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
+        m_GNeurites.vaoBind("2DHeatMap_Quad");
+        m_GNeurites.useProgram("2DHeatMap_Texture");
+        glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
+        m_GNeurites.vaoRelease();
+    }
+
+
+    // ********* Render Abstraction
+
+    if (m_renderGlycogenGranules)
+        drawGlycogenPoints(grid_uniforms);
 
 
     if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1) ) {
@@ -1076,12 +1203,17 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
         drawSkeletonsGraph(grid_uniforms, false);
 
     if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
+        glDisable(GL_DEPTH_TEST);
         drawSkeletonsGraph(grid_uniforms, false);
         drawNeuritesGraph(grid_uniforms);
+        glEnable(GL_DEPTH_TEST);
     }
 
     if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1)
         drawMeshTriangles(grid_uniforms, false);
+
+
+    // ********* Render Selection
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
     //clear
@@ -1090,6 +1222,7 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     glDisable(GL_DITHER);
     glDisable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
+    glDisable (GL_BLEND);
 
     //render graph
     drawMeshTriangles(m_uniforms, true);
@@ -1098,10 +1231,32 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
 
     //enable dithering again
     glEnable(GL_DITHER);
+    glEnable (GL_BLEND);
     glEnable(GL_MULTISAMPLE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
 
+void OpenGLManager::drawIntoTexture()
+{
+    //****************** Render Nodes Into Texture ***********************
+    glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+    m_GNeurites.vaoBind("2DHeatMap");
+    m_GNeurites.vboBind("nodes");
+
+    m_GNeurites.useProgram("2DHeatMap");
+    updateAbstractUniformsLocation( m_GNeurites.getProgram("2DHeatMap") );
+    glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
+
+    m_GNeurites.vboRelease("nodes");
+    m_GNeurites.vaoRelease();
+
+    glFlush();
+    glFinish();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -1519,10 +1674,10 @@ void OpenGLManager::updateSSBO()
             continue;
 
         float volume =  translate(obj->getVolume(), 0, m_dataContainer->getMaxVolume(), 0, 1);
-        float coverage = translate(obj->getAstroCoverage(),
+        float coverage = translate( obj->getAstroCoverage(),
                                    0, m_dataContainer->getMaxAstroCoverage(),
                                    0, 0.7);
-
+        qDebug() << obj->getAstroCoverage() << " " << m_dataContainer->getMaxAstroCoverage();
         switch(m_size_encoding) {
         case Size_e::VOLUME:
             m_ssbo_data[hvgxID].info.setX( 20 *  volume);
@@ -1548,7 +1703,7 @@ void OpenGLManager::updateSSBO()
             case Color_e::ASTRO_COVERAGE:
             {
               QVector4D color = obj->getColor();
-              m_ssbo_data[hvgxID].color = QVector4D(color.x() + 0.25, color.y() +  0.25, color.z() + 0.25, color.w()) ;
+              m_ssbo_data[hvgxID].color = QVector4D(color.x() + 0.3, color.y() +  0.3, color.z() + 0.3, color.w()) ;
               QVector4D add_color = QVector4D(1, 1, 1, 0) * coverage;
               m_ssbo_data[hvgxID].color -= add_color;
 
@@ -1597,3 +1752,18 @@ void OpenGLManager::updateColorEncoding(Color_e encoding)
 
     updateSSBO();
 }
+
+/*
+ *     float gaussFilterX[7] = { -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0  };
+    float gaussFilterY[7] = { 0.015625, 0.09375, 0.234375, 0.3125, 0.234375, 0.09375,0.015625  };
+
+//    vec4 color = vec4(0.0);
+//    for( int i = 0; i < 7; i++ )
+//    {
+//         vec2 tc = vec2( G_fragTexCoord.x + gaussFilterX[i]  * u_Scale.x, G_fragTexCoord.y+gaussFilterY[i]  * u_Scale.y );
+//         vec4 add_color = texture2D( tex,  tc ) * gaussFilterY[i];
+//         color += add_color;
+//    }
+
+//    outcol = color;
+*/

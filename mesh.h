@@ -54,13 +54,13 @@ public:
     void getVertexNeighbors(int v_index, std::set< int > &neighs);
 
 protected:
-    std::vector< struct face >          m_faces;
+    std::vector< struct face >          m_faces; // .
 
     // each vertex could belong to more than one face
     // for each vertex in each face, add face to vertex
 
     // set of faces
-    std::vector< struct VertexData >    verticesList;
+    std::vector< struct VertexData  >    verticesList; // .
 
     std::map<int, std::vector<int> >    m_vertexFaces;
 
