@@ -34,7 +34,7 @@ public:
 
     void updateUniformsData(struct GlobalUniforms grid_uniforms)    {    m_uniforms = grid_uniforms; }
 
-    void drawAll(struct GlobalUniforms grid_uniforms);
+    void drawAll();
 
     // *********** 0) SSBO objects Data    ***********
     bool initSSBO();
@@ -44,28 +44,30 @@ public:
     bool initMeshTrianglesShaders();
     bool initMeshVertexAttrib();
 
-    void drawMeshTriangles(struct GlobalUniforms grid_uniforms, bool selection );
+    void drawMeshTriangles(bool selection );
 
     // *********** 3) Skeleton Points    ***********
     bool initSkeletonShaders();
-    void drawSkeletonPoints(struct GlobalUniforms grid_uniforms, bool selection );
+    void drawSkeletonPoints(bool selection );
 
     // *********** 4) Abstract Skeleton Graph (Nodes and Edges) ***********
     bool initAbstractSkeletonShaders();
     void initSkeletonsVertexAttribPointer();
-    void drawSkeletonsGraph(struct GlobalUniforms grid_uniforms, bool selection );
+    void drawSkeletonsGraph(bool selection );
 
     // ***********  5) Neurites Graph (Nodes and Edges) ***********
     bool initNeuritesGraphShaders();
     void initNeuritesVertexAttribPointer();
-    void drawNeuritesGraph(struct GlobalUniforms grid_uniforms);
+    void drawNeuritesGraph();
 
 
     // *********** 6) Mesh Points     ***********
     bool initGlycogenPointsShaders();
-    void drawGlycogenPoints(struct GlobalUniforms grid_uniforms);
+    void drawGlycogenPoints();
 	void updateGlycogenPoints();
 
+    //***************************************
+    void renderAbstractions();
 
     // ssbo management
     // function to update ssbo data (layout 1, layout 2)
@@ -105,14 +107,15 @@ public:
     void updateCanvasDim(int w, int h, int retianScale);
     void initSelectionFrameBuffer();
     int processSelection(float x, float y);
+    void renderSelection();
 
 	void setZoom(float zoom);
 
     // ************ Glycogen 2D Abstraction *******
     void init_Gly2DHeatMap();
     bool init_Gly2DHeatMapShaders();
-
     void drawIntoTexture();
+    void renderTexture2D();
 
 protected:
     DataContainer                           *m_dataContainer;

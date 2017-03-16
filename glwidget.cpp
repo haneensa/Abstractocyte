@@ -146,9 +146,7 @@ void GLWidget::paintGL()
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     m_opengl_mngr->updateUniformsData(m_uniforms);
-    m_opengl_mngr->drawAll(m_uniforms);
-    m_opengl_mngr->drawIntoTexture();
-
+    m_opengl_mngr->drawAll();
 }
 
 void GLWidget::resizeGL(int w, int h)

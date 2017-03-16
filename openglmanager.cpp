@@ -560,13 +560,12 @@ bool OpenGLManager::initAbstractSkeletonShaders()
 //
 // only the edges, the nodes itself they are not needed to be visible
 // this will collabse into a node for the neurites at the most abstract view
-void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms, bool selection )
+void OpenGLManager::drawSkeletonsGraph(bool selection )
 {
     if (m_glFunctionsSet == false)
         return;
 
     // update skeleton data from object manager
-    m_uniforms = grid_uniforms;
 
     m_GSkeleton.vboBind("nodes");
     m_GSkeleton.vboAllocate("nodes",
@@ -783,15 +782,13 @@ bool OpenGLManager::init_Gly2DHeatMapShaders()
 // ----------------------------------------------------------------------------
 //
 // only the edges, because the skeleton itself will collabse into a node
-void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
+void OpenGLManager::drawNeuritesGraph()
 {
     if (m_glFunctionsSet == false)
         return;
 
     m_GNeurites.vaoBind("ConnectivityGraph");
     m_GNeurites.vboBind("nodes");
-
-    m_uniforms = grid_uniforms;
 
     m_GNeurites.vboBind("index");
 
@@ -873,10 +870,8 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::drawMeshTriangles(struct GlobalUniforms grid_uniforms, bool selection )
+void OpenGLManager::drawMeshTriangles(bool selection )
 {
-   m_uniforms = grid_uniforms;
-
    if (selection) {
        m_TMesh.vaoBind("Selection");
        m_TMesh.useProgram("selection");
@@ -981,12 +976,10 @@ bool OpenGLManager::initSkeletonShaders()
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::drawSkeletonPoints(struct GlobalUniforms grid_uniforms, bool selection)
+void OpenGLManager::drawSkeletonPoints(bool selection)
 {
    // qDebug() << "OpenGLManager::drawSkeletonPoints";
     // I need this because vertex <-> skeleton mapping is not complete
-    m_uniforms = grid_uniforms;
-
     if (selection) {
         m_SkeletonPoints.vaoBind("Selection");
         m_SkeletonPoints.useProgram("selection");
@@ -1091,14 +1084,13 @@ bool OpenGLManager::initGlycogenPointsShaders()
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::drawGlycogenPoints(struct GlobalUniforms grid_uniforms)
+void OpenGLManager::drawGlycogenPoints()
 {
 
     // I need this because transitioning from mesh to skeleton is not smooth
     m_vao_glycogen.bind();
 
     m_GlycogenPoints.useProgram("3DPoints");
-    m_uniforms = grid_uniforms;
 
     updateUniformsLocation(m_GlycogenPoints.getProgram("3DPoints"));
     glDrawArrays(GL_POINTS, 0,  m_dataContainer->getGlycogenSize() );
@@ -1166,13 +1158,61 @@ void OpenGLManager::update2Dflag(bool is2D)
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
+void OpenGLManager::renderAbstractions()
 {
-    m_uniforms = grid_uniforms;
-    write_ssbo_data();
     struct ast_neu_properties space_properties = m_2dspace->getSpaceProper();
 
+    // ********* Render Abstraction
 
+    if (m_renderGlycogenGranules)
+        drawGlycogenPoints();
+
+
+    if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1) ) {
+        glDisable (GL_BLEND);
+        glBlendFunc (GL_ONE, GL_ONE);
+        drawSkeletonPoints(false);
+        glEnable (GL_BLEND);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    if ( (space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x() == 0) || space_properties.neu.render_type.y() == 1 )
+        drawSkeletonPoints(false); // transparency is allowed
+
+    if ( space_properties.ast.render_type.z() == 1 ||  space_properties.neu.render_type.z() == 1)
+        drawSkeletonsGraph(false);
+
+    if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
+        glDisable(GL_DEPTH_TEST);
+        drawSkeletonsGraph(false);
+        drawNeuritesGraph();
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1)
+        drawMeshTriangles(false);
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::drawAll()
+{
+    write_ssbo_data();
+
+    renderTexture2D();
+
+    renderAbstractions();
+
+    renderSelection();
+
+    drawIntoTexture();
+
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::renderTexture2D()
+{
     // ********* Debug Texture
     if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
         m_GNeurites.vaoBind("2DHeatMap_Quad");
@@ -1180,39 +1220,12 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
         glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
         m_GNeurites.vaoRelease();
     }
+}
 
-
-    // ********* Render Abstraction
-
-    if (m_renderGlycogenGranules)
-        drawGlycogenPoints(grid_uniforms);
-
-
-    if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1) ) {
-        glDisable (GL_BLEND);
-        glBlendFunc (GL_ONE, GL_ONE);
-        drawSkeletonPoints(grid_uniforms, false);
-        glEnable (GL_BLEND);
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-
-    if ( (space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x() == 0) || space_properties.neu.render_type.y() == 1 )
-        drawSkeletonPoints(grid_uniforms, false); // transparency is allowed
-
-    if ( space_properties.ast.render_type.z() == 1 ||  space_properties.neu.render_type.z() == 1)
-        drawSkeletonsGraph(grid_uniforms, false);
-
-    if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
-        glDisable(GL_DEPTH_TEST);
-        drawSkeletonsGraph(grid_uniforms, false);
-        drawNeuritesGraph(grid_uniforms);
-        glEnable(GL_DEPTH_TEST);
-    }
-
-    if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1)
-        drawMeshTriangles(grid_uniforms, false);
-
-
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::renderSelection()
+{
     // ********* Render Selection
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
@@ -1225,9 +1238,9 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     glDisable (GL_BLEND);
 
     //render graph
-    drawMeshTriangles(m_uniforms, true);
-    drawSkeletonPoints(m_uniforms, true);
-    drawSkeletonsGraph(m_uniforms, true);
+    drawMeshTriangles(true);
+    drawSkeletonPoints(true);
+    drawSkeletonsGraph(true);
 
     //enable dithering again
     glEnable(GL_DITHER);
@@ -1236,6 +1249,8 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::drawIntoTexture()
 {
     //****************** Render Nodes Into Texture ***********************
