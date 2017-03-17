@@ -6,7 +6,6 @@ out vec4            outcol;
 //layout (location = 2) uniform float       ResT;
 uniform sampler2D   tex;
 uniform sampler1D   tf;
-uniform sampler3D   astro_tex;
 
 in vec2             G_fragTexCoord;
 
@@ -39,13 +38,10 @@ void main(void)
     target += 4.*(i00);
     target /= 16.;
 
-    vec4 t_color = texture(tf, 0.1);
-
-    vec3 coord = vec3(0, 0, 1);
-    vec4 vol_color = texture(astro_tex, coord);
+    float t = target.r;
+    vec4 t_color = texture(tf, t);
 
     //outcol = vec4( target, 1. );
     outcol = t_color;
     outcol.b = target.r;
-    outcol.g = vol_color.r;
 }

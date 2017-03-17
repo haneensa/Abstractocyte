@@ -733,7 +733,7 @@ void OpenGLManager::init_Gly2DHeatMap()
 void OpenGLManager::load3DTexturesFromRaw(QString path)
 {
     int size = 999 * 999 * 449;
-    void *rawData = m_dataContainer->loadRawFile(":/data/mask_745_.raw", size);
+    char *rawData = m_dataContainer->loadRawFile(":/data/mask_745_.raw", size);
     //load data into a 3D texture
     glGenTextures(1, &m_astro_3DTex);
     glBindTexture(GL_TEXTURE_3D, m_astro_3DTex);
@@ -745,8 +745,24 @@ void OpenGLManager::load3DTexturesFromRaw(QString path)
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-    glTexImage3D(GL_TEXTURE_3D,0 ,GL_INTENSITY, 999, 999, 449,0, GL_LUMINANCE, GL_UNSIGNED_BYTE, rawData);
+    char *bufferRGBA = new char[size * 4];
+
+
+    // convert to rgba
+    for (int i = 0; i < size; ++i) {
+//         if ( (int)rawData[i] == 1)
+//            qDebug() << i << " " << (int) rawData[i];
+
+        bufferRGBA[i*4] = rawData[i];
+        bufferRGBA[i*4 + 1] = rawData[i];
+        bufferRGBA[i*4 + 2] = rawData[i];
+        bufferRGBA[i*4 + 3] = rawData[i];
+
+    }
+
+    glTexImage3D(GL_TEXTURE_3D,0 ,GL_RGBA, 999, 999, 449,0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) bufferRGBA);
     delete [] rawData;
+    delete [] bufferRGBA;
 }
 
 bool OpenGLManager::init_Gly2DHeatMapShaders()
@@ -826,12 +842,6 @@ bool OpenGLManager::init_Gly2DHeatMapShaders()
     glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
     GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
     glUniform1i(  tf, 1 );
-
-
-//    glActiveTexture(GL_TEXTURE2);
-//    glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
-//    GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
-//    glUniform1i(  astro_tex, 2 );
 
     qDebug() << tex ;
     GL_Error();
@@ -1273,13 +1283,13 @@ void OpenGLManager::drawAll()
 {
     write_ssbo_data();
 
-    renderTexture2D();
+//    renderTexture2D();
 
-//    renderAbstractions();
+    renderAbstractions();
 
-//    renderSelection();
+    renderSelection();
 
-    drawIntoTexture();
+//    drawIntoTexture();
 
 }
 
