@@ -44,7 +44,7 @@ class Mesh
 public:
     Mesh();
 
-    int addVertex(struct VertexData vdata, Object_t type);
+    int addVertex(struct VertexData* vdata, Object_t type);
     bool isValidFaces(int f1, int f2, int f3);
     int  getVerticesSize()       { return verticesList.size(); }
     void allocateVerticesVBO(QOpenGLBuffer vbo_mesh);

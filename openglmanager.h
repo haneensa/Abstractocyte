@@ -117,6 +117,9 @@ public:
     void drawIntoTexture();
     void renderTexture2D();
 
+	void init_Gly3DTex();
+	void upload_Gly3DTex(void* data, int sizeX = 1000, int sizeY = 1000, int sizeZ = 1000, GLenum type = GL_FLOAT);
+
 protected:
     DataContainer                           *m_dataContainer;
     AbstractionSpace                        *m_2dspace;
@@ -178,6 +181,9 @@ protected:
     GLuint                                  m_gly_2D_heatMap_Tex;
     int                                     m_quadSize;
     std::vector<QVector4D>                  m_Texquad;
+
+	GLuint									m_gly_3D_Tex;
+
     // gen
     // bind
     // resize the fbo

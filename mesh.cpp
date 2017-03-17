@@ -14,16 +14,16 @@ Mesh::Mesh()
 }
 
 
-int Mesh::addVertex(struct VertexData vdata, Object_t type)
+int Mesh::addVertex(struct VertexData* vdata, Object_t type)
 {
-    int idx = verticesList.size();
-	vdata.index = idx;
-    verticesList.push_back(vdata);
+    //int idx = verticesList.size();
+	//vdata.index = idx;
+    //verticesList.push_back(vdata);
 	
 	int type_idx = static_cast<int>(type);
 	//std::vector<VertexData*>* typeVector = (m_typeVertexList[type_idx]);
-	m_typeVertexList[type_idx].push_back(verticesList.data() + idx);
-    return idx;
+	m_typeVertexList[type_idx].push_back(verticesList.data() + vdata->index);
+	return vdata->index;
 }
 
 bool Mesh::isValidFaces(int f1, int f2, int f3)

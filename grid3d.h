@@ -23,6 +23,7 @@ namespace SpacePartitioning
 		void addNormalizedPoint(float x, float y, float z, float value);
 		void setSize(int sizeX, int sizeY, int sizeZ);
 		void reset();
+		float* getData();
 	protected:
 
 		int m_size[3];

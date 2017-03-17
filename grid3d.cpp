@@ -68,3 +68,10 @@ void SpacePartitioning::Grid3D::addNormalizedPoint(float nX, float nY, float nZ,
 	data[gX + gY * m_size[X] + gZ * m_size[Y] * m_size[Z]] += value;
 
 }
+
+//-----------------------------------------------------------------------------
+//
+float* SpacePartitioning::Grid3D::getData()
+{
+	return data;
+}

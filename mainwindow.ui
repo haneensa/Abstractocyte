@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1357</width>
-    <height>1261</height>
+    <width>1472</width>
+    <height>1401</height>
    </rect>
   </property>
   <property name="cursor">
@@ -32,8 +32,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1357</width>
-     <height>21</height>
+     <width>1472</width>
+     <height>31</height>
     </rect>
    </property>
   </widget>
@@ -47,15 +47,18 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>300</width>
+     <width>372</width>
      <height>1200</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>300</width>
-     <height>1200</height>
+     <width>400</width>
+     <height>2000</height>
     </size>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
    </property>
    <property name="features">
     <set>QDockWidget::NoDockWidgetFeatures</set>
@@ -76,13 +79,13 @@
     <property name="cursor">
      <cursorShape>ArrowCursor</cursorShape>
     </property>
-    <layout class="QGridLayout" name="gridLayout_7">
-     <item row="0" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout_9">
+     <item>
       <widget class="QGroupBox" name="groupBox">
        <property name="minimumSize">
         <size>
-         <width>250</width>
-         <height>250</height>
+         <width>300</width>
+         <height>300</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -152,7 +155,7 @@
           <property name="baseSize">
            <size>
             <width>1</width>
-            <height>0</height>
+            <height>1</height>
            </size>
           </property>
          </widget>
@@ -170,7 +173,7 @@
        <zorder>verticalSlider</zorder>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item>
       <widget class="QFrame" name="frame_2">
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
@@ -179,16 +182,7 @@
         <enum>QFrame::Raised</enum>
        </property>
        <layout class="QGridLayout" name="gridLayout_6">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
+        <property name="margin">
          <number>0</number>
         </property>
         <property name="spacing">
@@ -220,10 +214,10 @@
        </layout>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>2</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
@@ -255,15 +249,15 @@
          <item>
           <widget class="QToolBox" name="toolBox">
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="page">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>272</width>
-              <height>688</height>
+              <width>336</width>
+              <height>597</height>
              </rect>
             </property>
             <attribute name="label">
@@ -273,16 +267,7 @@
              <property name="spacing">
               <number>4</number>
              </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
+             <property name="margin">
               <number>0</number>
              </property>
              <item>
@@ -370,8 +355,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>174</width>
-              <height>188</height>
+              <width>336</width>
+              <height>597</height>
              </rect>
             </property>
             <attribute name="label">
@@ -472,210 +457,181 @@
          <string>Filtering</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_10">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
          <item row="0" column="0">
           <widget class="QGroupBox" name="groupBox_2">
            <property name="title">
             <string/>
            </property>
-           <widget class="QGroupBox" name="groupBox_5">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>241</y>
-              <width>238</width>
-              <height>225</height>
-             </rect>
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <property name="margin">
+             <number>0</number>
             </property>
-            <property name="title">
-             <string>Filter By Type:</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_2">
-             <item row="1" column="0">
-              <widget class="QListWidget" name="listWidget">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
+            <item>
+             <widget class="QGroupBox" name="groupBox_8">
+              <property name="title">
+               <string>Selected Objects</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_7">
                <item>
-                <property name="text">
-                 <string>Astrocyte</string>
-                </property>
-                <property name="checkState">
-                 <enum>Checked</enum>
-                </property>
-                <property name="flags">
-                 <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-                </property>
+                <widget class="QTableView" name="tableView">
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
+                 </property>
+                 <property name="dragDropOverwriteMode">
+                  <bool>false</bool>
+                 </property>
+                 <property name="selectionBehavior">
+                  <enum>QAbstractItemView::SelectRows</enum>
+                 </property>
+                 <property name="textElideMode">
+                  <enum>Qt::ElideNone</enum>
+                 </property>
+                </widget>
                </item>
                <item>
-                <property name="text">
-                 <string>Axons</string>
-                </property>
-                <property name="checkState">
-                 <enum>Checked</enum>
-                </property>
+                <widget class="QPushButton" name="pushButton">
+                 <property name="text">
+                  <string>Fitler </string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_5">
+              <property name="title">
+               <string>Filter By Type:</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_2">
+               <item row="1" column="0">
+                <widget class="QListWidget" name="listWidget">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>Astrocyte</string>
+                  </property>
+                  <property name="checkState">
+                   <enum>Checked</enum>
+                  </property>
+                  <property name="flags">
+                   <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Axons</string>
+                  </property>
+                  <property name="checkState">
+                   <enum>Checked</enum>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Dendrites</string>
+                  </property>
+                  <property name="checkState">
+                   <enum>Checked</enum>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Spines</string>
+                  </property>
+                  <property name="checkState">
+                   <enum>Checked</enum>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Boutons</string>
+                  </property>
+                  <property name="checkState">
+                   <enum>Checked</enum>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Mitochondria</string>
+                  </property>
+                  <property name="checkState">
+                   <enum>Checked</enum>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Synapse</string>
+                  </property>
+                  <property name="checkState">
+                   <enum>Checked</enum>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_7">
+              <property name="title">
+               <string>Filter By ID:</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_5">
+               <item>
+                <widget class="QLineEdit" name="lineEdit"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_6">
+              <property name="title">
+               <string>Preserve</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <item>
+                <widget class="QCheckBox" name="checkBox">
+                 <property name="text">
+                  <string>Substructures</string>
+                 </property>
+                </widget>
                </item>
                <item>
-                <property name="text">
-                 <string>Dendrites</string>
-                </property>
-                <property name="checkState">
-                 <enum>Checked</enum>
-                </property>
+                <widget class="QCheckBox" name="checkBox_2">
+                 <property name="text">
+                  <string>Parent</string>
+                 </property>
+                </widget>
                </item>
                <item>
-                <property name="text">
-                 <string>Spines</string>
-                </property>
-                <property name="checkState">
-                 <enum>Checked</enum>
-                </property>
+                <widget class="QCheckBox" name="checkBox_3">
+                 <property name="text">
+                  <string>Synapses</string>
+                 </property>
+                </widget>
                </item>
-               <item>
-                <property name="text">
-                 <string>Boutons</string>
-                </property>
-                <property name="checkState">
-                 <enum>Checked</enum>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Mitochondria</string>
-                </property>
-                <property name="checkState">
-                 <enum>Checked</enum>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Synapse</string>
-                </property>
-                <property name="checkState">
-                 <enum>Checked</enum>
-                </property>
-               </item>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QGroupBox" name="groupBox_6">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>531</y>
-              <width>110</width>
-              <height>96</height>
-             </rect>
-            </property>
-            <property name="title">
-             <string>Preserve</string>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_4">
-             <item>
-              <widget class="QCheckBox" name="checkBox">
-               <property name="text">
-                <string>Substructures</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="checkBox_2">
-               <property name="text">
-                <string>Parent</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="checkBox_3">
-               <property name="text">
-                <string>Synapses</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QGroupBox" name="groupBox_7">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>472</y>
-              <width>153</width>
-              <height>53</height>
-             </rect>
-            </property>
-            <property name="title">
-             <string>Filter By ID:</string>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_5">
-             <item>
-              <widget class="QLineEdit" name="lineEdit"/>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QGroupBox" name="groupBox_8">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>238</width>
-              <height>225</height>
-             </rect>
-            </property>
-            <property name="title">
-             <string>Selected Objects</string>
-            </property>
-            <widget class="QTableView" name="tableView">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>23</y>
-               <width>218</width>
-               <height>161</height>
-              </rect>
-             </property>
-             <property name="editTriggers">
-              <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
-             </property>
-             <property name="dragDropOverwriteMode">
-              <bool>false</bool>
-             </property>
-             <property name="selectionBehavior">
-              <enum>QAbstractItemView::SelectRows</enum>
-             </property>
-             <property name="textElideMode">
-              <enum>Qt::ElideNone</enum>
-             </property>
-            </widget>
-            <widget class="QPushButton" name="pushButton">
-             <property name="geometry">
-              <rect>
-               <x>150</x>
-               <y>190</y>
-               <width>75</width>
-               <height>23</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Fitler </string>
-             </property>
-            </widget>
-           </widget>
-           <widget class="QPushButton" name="pushButton_2">
-            <property name="geometry">
-             <rect>
-              <x>170</x>
-              <y>710</y>
-              <width>75</width>
-              <height>23</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Reset Filter</string>
-            </property>
-           </widget>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_2">
+              <property name="text">
+               <string>Reset Filter</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
@@ -684,76 +640,85 @@
         <attribute name="title">
          <string>Encodeing</string>
         </attribute>
-        <widget class="QFrame" name="frame">
-         <property name="geometry">
-          <rect>
-           <x>9</x>
-           <y>9</y>
-           <width>207</width>
-           <height>66</height>
-          </rect>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_8">
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_16">
-            <property name="text">
-             <string>Color</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="comboBox">
-            <item>
-             <property name="text">
-              <string>Volume</string>
-             </property>
+        <layout class="QVBoxLayout" name="verticalLayout_8">
+         <item>
+          <widget class="QFrame" name="frame">
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_8">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_14">
+              <property name="text">
+               <string>Node Size: </string>
+              </property>
+             </widget>
             </item>
-            <item>
-             <property name="text">
-              <string>Astrocyte Coverage</string>
-             </property>
+            <item row="2" column="1">
+             <widget class="QComboBox" name="comboBox_4">
+              <item>
+               <property name="text">
+                <string>Type</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Function</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Astrocyte Coverage</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Glycogen Distribution</string>
+               </property>
+              </item>
+             </widget>
             </item>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_14">
-            <property name="text">
-             <string>Node Size: </string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QComboBox" name="comboBox_4">
-            <item>
-             <property name="text">
-              <string>Type</string>
-             </property>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="comboBox">
+              <item>
+               <property name="text">
+                <string>Volume</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Astrocyte Coverage</string>
+               </property>
+              </item>
+             </widget>
             </item>
-            <item>
-             <property name="text">
-              <string>Function</string>
-             </property>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_16">
+              <property name="text">
+               <string>Color</string>
+              </property>
+             </widget>
             </item>
-            <item>
-             <property name="text">
-              <string>Astrocyte Coverage</string>
-             </property>
+            <item row="3" column="1">
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
             </item>
-            <item>
-             <property name="text">
-              <string>Glycogen Distribution</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-         </layout>
-        </widget>
+           </layout>
+          </widget>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tab">
         <attribute name="title">

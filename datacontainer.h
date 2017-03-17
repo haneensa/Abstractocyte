@@ -37,6 +37,14 @@ public:
     void parseBranch(QXmlStreamReader &xml, Object *obj);
     void parseSkeletonPoints(QXmlStreamReader &xml, Object *obj);
 
+	/*bool importXML_DOM(QString path);
+	void parseObject_DOM(QXmlStreamReader &xml, Object *obj);
+	void parseMesh_DOM(QXmlStreamReader &xml, Object *obj);
+	void parseSkeleton_DOM(QXmlStreamReader &xml, Object *obj);
+	void parseSkeletonNodes_DOM(QXmlStreamReader &xml, Object *obj);
+	void parseBranch_DOM(QXmlStreamReader &xml, Object *obj);
+	void parseSkeletonPoints_DOM(QXmlStreamReader &xml, Object *obj);*/
+
     void loadConnectivityGraph(QString path);
     void loadMetaDataHVGX(QString path);
 
@@ -49,6 +57,7 @@ public:
 
 	SpacePartitioning::Octree* getSpineOctree() { return &m_spineOctree; }
 	SpacePartitioning::Octree* getBoutonOctree() { return &m_boutonOctree; }
+	float* getGlycogen3DGridData();
 
     // graph related function
     std::map<int, Object*>  getObjectsMap();
