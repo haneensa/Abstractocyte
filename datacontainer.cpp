@@ -75,6 +75,28 @@ DataContainer::~DataContainer()
 
 //----------------------------------------------------------------------------
 //
+void* DataContainer::loadRawFile(QString path, int size)
+{
+    qDebug() << "Func: loadRawFile";
+
+    QFile  file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "Could not open the file for reading";
+        return false;
+    }
+
+    QDataStream in (&file);
+    in.setVersion(5);
+    char *buffer = new char[size];
+    in.device()->reset();
+    int nbytes = in.readRawData(buffer,size);
+    qDebug() << nbytes;
+
+    return (void *)buffer;
+ }
+
+//----------------------------------------------------------------------------
+//
 void DataContainer::loadConnectivityGraph(QString path)
 {
     qDebug() << "Func: loadConnectivityGraph";

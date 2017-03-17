@@ -117,6 +117,9 @@ public:
     void drawIntoTexture();
     void renderTexture2D();
 
+    // ***************************************
+    void load3DTexturesFromRaw(QString path);
+
 protected:
     DataContainer                           *m_dataContainer;
     AbstractionSpace                        *m_2dspace;

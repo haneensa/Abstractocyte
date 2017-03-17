@@ -700,6 +700,25 @@ bool OpenGLManager::initNeuritesGraphShaders()
     return true;
 }
 
+void OpenGLManager::load3DTexturesFromRaw(QString path)
+{
+    int size = 999 * 999 * 449;
+    void *rawData = m_dataContainer->loadRawFile(":/data/mask_745_.raw", size);
+    //load data into a 3D texture
+    glGenTextures(1, &m_astro_3DTex);
+    glBindTexture(GL_TEXTURE_3D, m_astro_3DTex);
+
+     // set the texture parameters
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    glTexImage3D(GL_TEXTURE_3D,0 ,GL_INTENSITY, 999, 999, 449,0, GL_LUMINANCE, GL_UNSIGNED_BYTE, rawData);
+    delete [] rawData;
+}
+
 bool OpenGLManager::init_Gly2DHeatMapShaders()
 {
     // init 2D HeatMap
