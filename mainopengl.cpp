@@ -112,6 +112,11 @@ bool MainOpenGL::initShader(GLuint program, const char *vshader, const char *gsh
     glGetShaderiv(fs, GL_COMPILE_STATUS, &compile_ok);
     if (!compile_ok) {
         qDebug() << "Error in fragment shader";
+        GLint infoLogLength;
+        glGetShaderiv(fs, GL_INFO_LOG_LENGTH, &infoLogLength);
+        GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+        glGetShaderInfoLog(fs, infoLogLength, NULL, strInfoLog);
+        qDebug() <<strInfoLog;
         return false;
     }
 
