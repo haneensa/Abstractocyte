@@ -188,6 +188,8 @@ protected:
     // whereever the node is use 1 else 0
     // blur the glycogen density value present at node using gaussian blur
     // render the results
+    //**************************************
+    GLuint                                  m_astro_3DTex;
 
  };
 

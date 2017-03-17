@@ -96,6 +96,8 @@ void OpenGLManager::init_Gly2DHeatMap()
 
 }
 
+// ----------------------------------------------------------------------------
+//
 bool OpenGLManager::initOpenGLFunctions()
 {
     m_glFunctionsSet = true;
@@ -106,6 +108,8 @@ bool OpenGLManager::initOpenGLFunctions()
     m_SkeletonPoints.initOpenGLFunctions();
     m_GNeurites.initOpenGLFunctions();
     m_GlycogenPoints.initOpenGLFunctions();
+
+    load3DTexturesFromRaw(":/data/mask_745_.raw");
 
     fillVBOsData();
 
@@ -120,6 +124,8 @@ bool OpenGLManager::initOpenGLFunctions()
     return true;
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::updateCanvasDim(int w, int h, int retianScale)
 {
     if (m_canvas_h != h || m_canvas_w != w){
