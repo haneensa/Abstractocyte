@@ -44,14 +44,19 @@ public:
     Mesh();
 
     int addVertex(struct VertexData vdata, Object_t type);
+    int addVertexNormal(QVector4D vnormal);
     bool isValidFaces(int f1, int f2, int f3);
     int  getVerticesSize()       { return verticesList.size(); }
-    void allocateVerticesVBO(QOpenGLBuffer vbo_mesh);
+
     std::vector< struct VertexData >* getVerticesList()  { return &verticesList; }
     std::vector< VertexData* >* getVerticesListByType(Object_t type)  {  return &m_typeVertexList[(int)type]; }
 
     void addFace(int index1, int index2, int index3);
     void getVertexNeighbors(int v_index, std::set< int > &neighs);
+
+    // opengl functions
+    void allocateVerticesVBO(QOpenGLBuffer vbo_mesh);
+    void allocateNormalsVBO(QOpenGLBuffer vbo_mesh);
 
 protected:
     std::vector< struct face >          m_faces; // .
@@ -61,8 +66,9 @@ protected:
 
     // set of faces
     std::vector< struct VertexData  >    verticesList; // .
-
     std::map<int, std::vector<int> >    m_vertexFaces;
+
+    std::vector< QVector4D >            m_normalsList;
 
     std::vector<VertexData*> m_typeVertexList[9];
     /*std::vector<VertexData*> m_spineVertexList;

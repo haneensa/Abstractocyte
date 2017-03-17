@@ -189,7 +189,7 @@ int Object::writeSkeletontoVBO(QOpenGLBuffer vbo, int offset)
 void Object::addSkeletonBranch(SkeletonBranch *branch)
 {
     if ( m_parent != NULL &&
-         (m_object_t == Object_t::SPINE || m_object_t == Object_t::BOUTON)) {
+         (m_object_t == Object_t::SPINE || m_object_t == Object_t::BOUTON || m_object_t == Object_t::MITO)) {
         // I have the parent
         // access the parent
         // mark the points and nodes in this branch at the parent

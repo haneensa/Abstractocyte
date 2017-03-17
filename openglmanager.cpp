@@ -46,7 +46,7 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
 	m_zoom = 1.0f;
     m_depth = 1;
 	m_renderGlycogenGranules = true;
-
+    m_normals_enabled = false;
     m_color_encoding = Color_e::TYPE;
     m_size_encoding = Size_e::VOLUME;
 
@@ -826,7 +826,6 @@ bool OpenGLManager::init_Gly2DHeatMapShaders()
     m_GNeurites.vboRelease("quad");
     m_GNeurites.vaoRelease();
 
-    GL_Error();
 
 
 }
@@ -885,9 +884,18 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
     Mesh* mesh = m_dataContainer->getMeshPointer();
     mesh->allocateVerticesVBO( m_TMesh.getVBO("MeshVertices") );
-
     initMeshVertexAttrib();
 
+    // create normals vbo
+    if (m_normals_enabled) {
+        m_TMesh.vboCreate("VertexNormals", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
+        m_TMesh.vboBind("VertexNormals");
+        // allocate
+        mesh->allocateNormalsVBO( m_TMesh.getVBO("VertexNormals") );
+
+        // initVertexPointer for normals ? then I need to initialize indices as well ?
+        m_TMesh.vboBind("VertexNormals");
+    }
 
     m_TMesh.vboRelease("MeshVertices");
     m_TMesh.vaoRelease();
@@ -1271,7 +1279,7 @@ void OpenGLManager::renderTexture2D()
         m_GNeurites.useProgram("2DHeatMap_Texture");
         glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
         m_GNeurites.vaoRelease();
-    }
+//    }
 }
 
 // ----------------------------------------------------------------------------
@@ -1702,12 +1710,15 @@ void OpenGLManager::showAll()
     updateSSBO();
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::setZoom(float zoom)
 {
 	m_zoom = zoom;
 }
 
-
+// ----------------------------------------------------------------------------
+//
 float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
 {
     // if value < leftMin -> value = leftMin
@@ -1725,8 +1736,8 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
     return rightMin + (valueScaled * rightSpan);
 }
 
-
-
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::updateSSBO()
 {
     std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
@@ -1800,7 +1811,8 @@ void OpenGLManager::updateSSBO()
     }
 }
 
-
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::updateNodeSizeEncoding(Size_e encoding)
 {
     if (m_size_encoding == encoding)
@@ -1810,6 +1822,9 @@ void OpenGLManager::updateNodeSizeEncoding(Size_e encoding)
 
     updateSSBO();
 }
+
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::updateColorEncoding(Color_e encoding)
 {
     if (m_color_encoding == encoding)

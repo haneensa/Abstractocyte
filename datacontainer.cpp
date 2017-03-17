@@ -30,9 +30,10 @@ DataContainer::DataContainer()
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
 
     /* 2.1 */
-    // importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+   // importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     /* 2.2 */
-    importXML("://m3_neurites.xml");    // neurites time:  28802 ms
+    //importXML("://m3_neurites.xml");    // neurites time:  28802 ms
+     importXML("://pipeline_scripts/output/m3_neurites.xml");    // neurites time:  28802 ms
 
 
     /* 3 */
@@ -40,7 +41,7 @@ DataContainer::DataContainer()
 
 
     /* 4 */
-	qDebug() << "setting up octrees";
+    qDebug() << "setting up octrees";
 	m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
 	m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
     m_glycogenOctree.initialize(&m_glycogenList);
@@ -126,6 +127,50 @@ void DataContainer::loadConnectivityGraph(QString path)
             QVector2D edge_info = QVector2D(nodeID1, nodeID2);
             neurites_neurite_edge.push_back(edge_info);
         }
+    }
+
+    file.close();
+}
+
+void DataContainer::loadParentFromHVGX(QString path)
+{
+    qDebug() << "Func: loadMetaDataHVGX";
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        qDebug() << "Could not open the file for reading";
+        return;
+    }
+
+    QTextStream in(&file);
+    QList<QByteArray> wordList;
+    int glycogenCount = 0;
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        wordList = line.split(',');
+
+
+        if (wordList[0] == "sg") {
+            // vast_id, flags, r,g,b, pattern1, r2, g2, b2, pattern2, anchorx, anchory, anchorz, parent_id, child_id, previous_sibiling_id, next_sibiling_id, collapsed, bboxx1, bboxy1, bboxz1, bboxx2, bboxy2, bboxz2, voxels, type, object_id, name
+
+            if (wordList[26] == "MITOCHONDERIA") {
+                qDebug() << line;
+                continue;
+            }
+
+            int hvgxID = wordList[1].toInt();
+            int parentID = wordList[14].toInt();
+
+            m_parents[hvgxID] = parentID;
+
+        } else if (wordList[0] == "mt") {
+            // update mitochoneria parent here if any exists
+            //"mt,1053,307,DENDRITE,144,mito_d048_01_029\n"
+            int hvgxID = wordList[1].toInt();
+            int parentID = wordList[4].toInt();
+            m_parents[hvgxID] = parentID;
+        }
+
+
     }
 
     file.close();
@@ -522,8 +567,8 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
 
                 int vertexIdx = m_mesh->addVertex(v, obj->getObjectType());
                 obj->updateClosestAstroVertex(VertexToAstroDist, vertexIdx);
-            } else if (xml.name() == "f") {
-                ++faces;
+            } else if (xml.name() == "vn") {
+                // add normal to mesh
                 xml.readNext();
                 QString coords = xml.text().toString();
                 QStringList stringlist = coords.split(" ");
@@ -531,31 +576,45 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                     continue;
                 }
 
-                int f1_index = stringlist.at(0).toInt()  + m_vertex_offset;
-                int f2_index = stringlist.at(1).toInt()  + m_vertex_offset;
-                int f3_index = stringlist.at(2).toInt()  + m_vertex_offset;
+                float x = stringlist.at(0).toDouble();
+                float y = stringlist.at(1).toDouble();
+                float z = stringlist.at(2).toDouble();
+                m_mesh->addVertexNormal(QVector4D(x, y, z, 0));
 
-                if (! m_mesh->isValidFaces(f1_index, f2_index, f3_index) ) {
+            } else if (xml.name() == "f") { // f v1/vt1/vn1 v2/vt2/vn2/ v3/vt3/vn3
+                ++faces;
+                xml.readNext();
+                int vertexIdx[3];
+
+                QString coords = xml.text().toString();
+                QStringList stringlist = coords.split(" ");
+                if (stringlist.size() < 3) {
+                    continue;
+                }
+
+                for (int i = 0; i < 3; ++i) {
+                    // I dont need normal index because its the same as vertex index
+                    QStringList face = stringlist.at(i).split("/");
+                    vertexIdx[i] = face.at(0).toInt()  + m_vertex_offset;
+
+                }
+
+                if (! m_mesh->isValidFaces(vertexIdx[0], vertexIdx[1], vertexIdx[2]) ) {
                     // error, break
                     qDebug() << "Error in obj file! " << obj->getName().data() << " " << obj->getHVGXID()
-                             << " " << f1_index << " " << f2_index << " " << f3_index ;
+                             << " " << vertexIdx[0] << " " << vertexIdx[1] << " " << vertexIdx[2] ;
                     delete obj;
                     break;
                 }
 
-                int t_index1 = f1_index - 1;
-                int t_index2 = f2_index - 1;
-                int t_index3 = f3_index - 1;
+                int t_index[3];
+                for (int i = 0; i < 3; ++i) {
+                    t_index[i] =  vertexIdx[i] - 1;
+                    // add faces indices to object itself
+                    obj->addTriangleIndex(t_index[i]);
+                }
 
-                // add faces indices to object itself
-                /* vertex 1 */
-                obj->addTriangleIndex(t_index1);
-                /* vertex 2 */
-                obj->addTriangleIndex(t_index2);
-                /* vertex 3 */
-                obj->addTriangleIndex(t_index3);
-
-                m_mesh->addFace(t_index1, t_index2, t_index3);
+                m_mesh->addFace(t_index[0], t_index[1], t_index[2]);
 
                 m_indices_size += 3;
 
@@ -818,6 +877,8 @@ std::vector<Object*> DataContainer::getObjectsByType(Object_t type)
      return m_objects[hvgxID]->getName();
  }
 
+ //----------------------------------------------------------------------------
+ //
 void DataContainer::recomputeMaxVolAstro()
 {
     float temp_max_astro_coverage = 0;
@@ -838,3 +899,5 @@ void DataContainer::recomputeMaxVolAstro()
     max_volume = temp_max_volume;
     max_astro_coverage = temp_max_astro_coverage;
 }
+
+

@@ -38,6 +38,7 @@ public:
 
     void loadConnectivityGraph(QString path);
     void loadMetaDataHVGX(QString path);
+    void loadParentFromHVGX(QString path);
 
 	//glycogen
     int getGlycogenSize()              { return m_glycogenMap.size(); }
@@ -88,6 +89,7 @@ protected:
     int                                         m_vertex_offset; // used to unify vertices for one mesh
     int                                         m_limit;
 
+    std::map<int, int>                          m_parents;
     std::map<int, Object*>                      m_objects;
     std::map<Object_t, std::vector<Object*> >   m_objectsByType;
     std::map<Object_t, int >                    m_indices_size_byType;

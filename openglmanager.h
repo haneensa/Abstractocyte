@@ -135,6 +135,7 @@ protected:
 
     // *********** 1) Mesh Triangles     ***********
     RenderVertexData                        m_TMesh;
+    bool                                    m_normals_enabled;
 
     // *********** 3) Skeleton Points    ***********
     RenderVertexData                        m_SkeletonPoints;
