@@ -70,7 +70,7 @@ public:
     void recomputeMaxVolAstro();
 
     //************ Load Raw Data
-    void* loadRawFile(QString path, int size);
+    char* loadRawFile(QString path, int size);
 
 protected:
     int                                         m_tempCounter; // how many objects with no contacts to ast based on threshold

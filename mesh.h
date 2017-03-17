@@ -58,6 +58,9 @@ public:
     void allocateVerticesVBO(QOpenGLBuffer vbo_mesh);
     void allocateNormalsVBO(QOpenGLBuffer vbo_mesh);
 
+    void dumpVericesList();
+    void readVertexBinary();
+
 protected:
     std::vector< struct face >          m_faces; // .
 

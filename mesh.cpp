@@ -1,10 +1,35 @@
 #include "mesh.h"
+#include <fstream>
+#include <sstream>
 
 Mesh::Mesh()
 {
 
 }
 
+void Mesh::dumpVericesList()
+{
+    const char* filename = "binary_data.dat";
+    std::ofstream outfile(filename, std::ios::binary);
+    // write size of file into binary and read it the first thing to allocate
+    for (int i = 0; i < verticesList.size(); ++i) {
+        outfile.write((char*)&verticesList[i], sizeof(struct VertexData));
+    }
+
+    outfile.close();
+}
+
+void Mesh::readVertexBinary()
+{
+    const int size = 21;
+    struct VertexData  v[size];
+    const char *filename = "binary_data.dat";
+    std::ifstream ss(filename, std::ios::binary);
+    ss.read((char*)&v, size * sizeof(struct VertexData));
+    for (int i = 0; i < size; i++) {
+        qDebug() << v[i].mesh_vertex << " " << v[i].skeleton_vertex << " " << v[i].index;
+    }
+}
 
 int Mesh::addVertex(struct VertexData vdata, Object_t type)
 {

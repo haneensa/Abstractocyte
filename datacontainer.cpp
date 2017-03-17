@@ -21,20 +21,23 @@ DataContainer::DataContainer()
     max_volume = 1;
     max_astro_coverage = 0;
 
-    m_limit = 10;
+    m_limit = 1;
     m_vertex_offset = 0;
     m_mesh = new Mesh();
+
 
 
     /* 1 */
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
 
     /* 2.1 */
-   // importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    // importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     /* 2.2 */
     //importXML("://m3_neurites.xml");    // neurites time:  28802 ms
      importXML("://pipeline_scripts/output/m3_neurites.xml");    // neurites time:  28802 ms
 
+//    m_mesh->dumpVericesList();
+//    m_mesh->readVertexBinary();
 
     /* 3 */
     loadMetaDataHVGX(":/data/mouse3_metadata_objname_center_astroSyn.hvgx");
@@ -76,7 +79,7 @@ DataContainer::~DataContainer()
 
 //----------------------------------------------------------------------------
 //
-void* DataContainer::loadRawFile(QString path, int size)
+char* DataContainer::loadRawFile(QString path, int size)
 {
     qDebug() << "Func: loadRawFile";
 
@@ -93,7 +96,7 @@ void* DataContainer::loadRawFile(QString path, int size)
     int nbytes = in.readRawData(buffer,size);
     qDebug() << nbytes;
 
-    return (void *)buffer;
+    return  buffer;
  }
 
 //----------------------------------------------------------------------------
@@ -421,6 +424,10 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
     } else if (obj->getObjectType() == Object_t::BOUTON ||obj->getObjectType() == Object_t::SPINE) {
         obj->setParentID(m_curParent);
         m_objects[m_curParent->getHVGXID()]->addChild(obj);
+    } else {
+        if (m_parents.find(hvgxID) != m_parents.end()) {
+            obj->setParentID(m_curParent);
+        }
     }
 
     QVector4D color = obj->getColor();
@@ -542,11 +549,7 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                     // place holder
                     qDebug() << "Problem!";
                     v.skeleton_vertex = mesh_vertex;
-                } else if ( obj->getObjectType() == Object_t::MITO || obj->getObjectType() == Object_t::SYNAPSE ) {
-                    QVector4D center = obj->getCenter();
-                    center.setW(0);
-                    v.skeleton_vertex = center;
-                } else {
+                }  else {
                     // I could use index to be able to connect vertices logically
                     float x2 = stringlist.at(3).toFloat()/MESH_MAX;
                     float y2 = stringlist.at(4).toFloat()/MESH_MAX;
@@ -566,7 +569,7 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 // it touches the astrocyte or not
 
                 int vertexIdx = m_mesh->addVertex(v, obj->getObjectType());
-                obj->updateClosestAstroVertex(VertexToAstroDist, vertexIdx);
+                obj->updateClosestAstroVertex(VertexToAstroDist, vertexIdx); // make local function that goes through all vertices of this object (store unique indices) and compute this
             } else if (xml.name() == "vn") {
                 // add normal to mesh
                 xml.readNext();
