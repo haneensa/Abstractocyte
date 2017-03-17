@@ -63,7 +63,7 @@ public:
     std::string getObjectName(int hvgxID);
     std::vector<Object*> getObjectsByType(Object_t type);
 
-    int getMaxAstroCoverage()   { return max_astro_coverage; }
+    float getMaxAstroCoverage()   { return max_astro_coverage; }
     int getMaxVolume()          { return max_volume; }
 
     // iterate over objects and get max volume and astro coverage
@@ -74,7 +74,7 @@ protected:
      // maximum volume from displayed objects
     int                                         max_volume;
     // maximum vertices from neurites covered by astrocyte
-    int                                         max_astro_coverage;
+    float                                       max_astro_coverage;
 
     // store all vertices of the mesh.
     // unique vertices, faces to index them.

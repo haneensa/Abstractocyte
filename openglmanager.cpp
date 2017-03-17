@@ -61,6 +61,41 @@ OpenGLManager::~OpenGLManager()
     m_vbo_glycogen.destroy();
 }
 
+void OpenGLManager::init_Gly2DHeatMap()
+{
+    m_gly_2D_heatMap_FBO = 0;
+
+    glGenFramebuffers(1, &m_gly_2D_heatMap_FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
+    GL_Error();
+
+    glGenTextures(1, &m_gly_2D_heatMap_Tex);
+    glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
+    GL_Error();
+
+    // create empty image
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_canvas_w, m_canvas_h, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    GL_Error();
+
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_gly_2D_heatMap_Tex, 0);
+    GL_Error();
+
+    // set the list of draw buffers
+    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, DrawBuffers);
+    GL_Error();
+
+    // check if frame buffer is ok
+   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+       qDebug() << "ERROR!!!!";
+       return;
+    }
+
+}
+
 bool OpenGLManager::initOpenGLFunctions()
 {
     m_glFunctionsSet = true;
@@ -92,6 +127,7 @@ void OpenGLManager::updateCanvasDim(int w, int h, int retianScale)
         m_canvas_w = w * retianScale;
         m_retinaScale = retianScale;
         initSelectionFrameBuffer();
+        init_Gly2DHeatMap();
         GL_Error();
     }
 
@@ -125,7 +161,6 @@ int OpenGLManager::processSelection(float x, float y)
     GLubyte pixel[3];
 
     qDebug() << x << " " << y;
-    //glReadBuffer(GL_BACK);
     glReadPixels(x, y, 1, 1, GL_RGB,GL_UNSIGNED_BYTE, (void *)pixel);
     int pickedID = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
     qDebug() << pixel[0] << " " << pixel[1] << " " << pixel[2];
@@ -525,13 +560,12 @@ bool OpenGLManager::initAbstractSkeletonShaders()
 //
 // only the edges, the nodes itself they are not needed to be visible
 // this will collabse into a node for the neurites at the most abstract view
-void OpenGLManager::drawSkeletonsGraph(struct GlobalUniforms grid_uniforms, bool selection )
+void OpenGLManager::drawSkeletonsGraph(bool selection )
 {
     if (m_glFunctionsSet == false)
         return;
 
     // update skeleton data from object manager
-    m_uniforms = grid_uniforms;
 
     m_GSkeleton.vboBind("nodes");
     m_GSkeleton.vboAllocate("nodes",
@@ -612,7 +646,6 @@ bool OpenGLManager::initNeuritesGraphShaders()
 
     // allocate skeleton nodes
     m_GNeurites.vboCreate("nodes", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
-//    m_NeuritesNodesVBO.setUsagePattern( QOpenGLBuffer::DynamicDraw );
 
     m_GNeurites.vboBind("nodes");
 
@@ -622,7 +655,6 @@ bool OpenGLManager::initNeuritesGraphShaders()
 
     GL_Error();
     m_GNeurites.vboRelease("nodes");
-
 
     // allocate neurites edges
     // allocate skeleton edges
@@ -656,25 +688,107 @@ bool OpenGLManager::initNeuritesGraphShaders()
     m_GNeurites.vboBind("index");
 
     m_GNeurites.useProgram("index");
+    updateAbstractUniformsLocation( m_GNeurites.getProgram("index") );
+    GL_Error();
 
     m_GNeurites.vboRelease("index");
     m_GNeurites.vaoRelease();
 
+
+    init_Gly2DHeatMapShaders();
+
     return true;
+}
+
+bool OpenGLManager::init_Gly2DHeatMapShaders()
+{
+    // init 2D HeatMap
+    m_GNeurites.createProgram("2DHeatMap");
+    bool res = m_GNeurites.compileShader("2DHeatMap",
+                                    ":/shaders/nodes_2DHeatMap_vert.glsl",
+                                    ":/shaders/nodes_2DHeatMap_geom.glsl",
+                                    ":/shaders/nodes_2DHeatMap_frag.glsl");
+    if (res == false)
+        return res;
+    GL_Error();
+
+    m_GNeurites.vaoCreate("2DHeatMap");
+    m_GNeurites.vaoBind("2DHeatMap");
+    GL_Error();
+
+    m_GNeurites.vboBind("nodes");
+
+    GL_Error();
+
+    m_GNeurites.useProgram("2DHeatMap");
+
+    initNeuritesVertexAttribPointer();
+
+    m_GNeurites.vboRelease("nodes");
+
+    m_GNeurites.vaoRelease();
+
+    GL_Error();
+
+    m_GNeurites.createProgram("2DHeatMap_Texture");
+    res = m_GNeurites.compileShader("2DHeatMap_Texture",
+                                    ":/shaders/nodes_2DHeatMap_tex_vert.glsl",
+                                    ":/shaders/nodes_2DHeatMap_tex_geom.glsl",
+                                    ":/shaders/nodes_2DHeatMap_tex_frag.glsl");
+    if (res == false)
+        return res;
+
+    // todo: initialize uniforms
+
+    m_GNeurites.vaoCreate("2DHeatMap_Quad");
+    m_GNeurites.vaoBind("2DHeatMap_Quad");
+
+    m_Texquad.push_back(QVector4D(-1.0f, -1.0f,  0.0f, 0));
+    m_Texquad.push_back(QVector4D( 1.0f, -1.0f,  1.0f, 0));
+    m_Texquad.push_back(QVector4D(-1.0f,  1.0f,  0.0f, 1));
+    m_Texquad.push_back(QVector4D(-1.0f,  1.0f,  0.0f, 1));
+    m_Texquad.push_back(QVector4D( 1.0f, -1.0f,  1.0f, 0));
+    m_Texquad.push_back(QVector4D( 1.0f,  1.0f,  1.0f, 1));
+
+
+
+    // allocate skeleton nodes
+    m_GNeurites.vboCreate("quad", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
+    m_GNeurites.vboBind("quad");
+    m_GNeurites.vboAllocate("quad",
+                            m_Texquad.data(),
+                            m_Texquad.size() * sizeof(QVector4D));
+
+    m_GNeurites.useProgram("2DHeatMap_Texture");
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0,  0);
+
+//     float w = 230; //m_canvas_w/m_retinaScale;
+//    glUniform1f(1, w);
+
+
+//     float h = 240; //m_canvas_h/m_retinaScale;
+//    glUniform1f(2,  h);
+
+
+    m_GNeurites.vboRelease("quad");
+    m_GNeurites.vaoRelease();
+
+    GL_Error();
+
+
 }
 
 // ----------------------------------------------------------------------------
 //
 // only the edges, because the skeleton itself will collabse into a node
-void OpenGLManager::drawNeuritesGraph(struct GlobalUniforms grid_uniforms)
+void OpenGLManager::drawNeuritesGraph()
 {
     if (m_glFunctionsSet == false)
         return;
 
     m_GNeurites.vaoBind("ConnectivityGraph");
     m_GNeurites.vboBind("nodes");
-
-    m_uniforms = grid_uniforms;
 
     m_GNeurites.vboBind("index");
 
@@ -756,10 +870,8 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::drawMeshTriangles(struct GlobalUniforms grid_uniforms, bool selection )
+void OpenGLManager::drawMeshTriangles(bool selection )
 {
-   m_uniforms = grid_uniforms;
-
    if (selection) {
        m_TMesh.vaoBind("Selection");
        m_TMesh.useProgram("selection");
@@ -779,8 +891,6 @@ void OpenGLManager::drawMeshTriangles(struct GlobalUniforms grid_uniforms, bool 
 
        m_TMesh.vaoRelease();
    }
-
-
 }
 
 // ----------------------------------------------------------------------------
@@ -866,12 +976,10 @@ bool OpenGLManager::initSkeletonShaders()
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::drawSkeletonPoints(struct GlobalUniforms grid_uniforms, bool selection)
+void OpenGLManager::drawSkeletonPoints(bool selection)
 {
    // qDebug() << "OpenGLManager::drawSkeletonPoints";
     // I need this because vertex <-> skeleton mapping is not complete
-    m_uniforms = grid_uniforms;
-
     if (selection) {
         m_SkeletonPoints.vaoBind("Selection");
         m_SkeletonPoints.useProgram("selection");
@@ -976,14 +1084,13 @@ bool OpenGLManager::initGlycogenPointsShaders()
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::drawGlycogenPoints(struct GlobalUniforms grid_uniforms)
+void OpenGLManager::drawGlycogenPoints()
 {
 
     // I need this because transitioning from mesh to skeleton is not smooth
     m_vao_glycogen.bind();
 
     m_GlycogenPoints.useProgram("3DPoints");
-    m_uniforms = grid_uniforms;
 
     updateUniformsLocation(m_GlycogenPoints.getProgram("3DPoints"));
     glDrawArrays(GL_POINTS, 0,  m_dataContainer->getGlycogenSize() );
@@ -1051,37 +1158,75 @@ void OpenGLManager::update2Dflag(bool is2D)
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
+void OpenGLManager::renderAbstractions()
 {
-    m_uniforms = grid_uniforms;
-    write_ssbo_data();
     struct ast_neu_properties space_properties = m_2dspace->getSpaceProper();
 
-	if (m_renderGlycogenGranules)
-		drawGlycogenPoints(grid_uniforms);
+    // ********* Render Abstraction
+
+    if (m_renderGlycogenGranules)
+        drawGlycogenPoints();
 
 
     if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1) ) {
         glDisable (GL_BLEND);
         glBlendFunc (GL_ONE, GL_ONE);
-        drawSkeletonPoints(grid_uniforms, false);
+        drawSkeletonPoints(false);
         glEnable (GL_BLEND);
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     if ( (space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x() == 0) || space_properties.neu.render_type.y() == 1 )
-        drawSkeletonPoints(grid_uniforms, false); // transparency is allowed
+        drawSkeletonPoints(false); // transparency is allowed
 
     if ( space_properties.ast.render_type.z() == 1 ||  space_properties.neu.render_type.z() == 1)
-        drawSkeletonsGraph(grid_uniforms, false);
+        drawSkeletonsGraph(false);
 
     if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
-        drawSkeletonsGraph(grid_uniforms, false);
-        drawNeuritesGraph(grid_uniforms);
+        glDisable(GL_DEPTH_TEST);
+        drawSkeletonsGraph(false);
+        drawNeuritesGraph();
+        glEnable(GL_DEPTH_TEST);
     }
 
     if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1)
-        drawMeshTriangles(grid_uniforms, false);
+        drawMeshTriangles(false);
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::drawAll()
+{
+    write_ssbo_data();
+
+    renderTexture2D();
+
+    renderAbstractions();
+
+    renderSelection();
+
+    drawIntoTexture();
+
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::renderTexture2D()
+{
+    // ********* Debug Texture
+    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
+        m_GNeurites.vaoBind("2DHeatMap_Quad");
+        m_GNeurites.useProgram("2DHeatMap_Texture");
+        glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
+        m_GNeurites.vaoRelease();
+    }
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::renderSelection()
+{
+    // ********* Render Selection
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
     //clear
@@ -1090,18 +1235,43 @@ void OpenGLManager::drawAll(struct GlobalUniforms grid_uniforms)
     glDisable(GL_DITHER);
     glDisable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
+    glDisable (GL_BLEND);
 
     //render graph
-    drawMeshTriangles(m_uniforms, true);
-    drawSkeletonPoints(m_uniforms, true);
-    drawSkeletonsGraph(m_uniforms, true);
+    drawMeshTriangles(true);
+    drawSkeletonPoints(true);
+    drawSkeletonsGraph(true);
 
     //enable dithering again
     glEnable(GL_DITHER);
+    glEnable (GL_BLEND);
     glEnable(GL_MULTISAMPLE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
 
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::drawIntoTexture()
+{
+    //****************** Render Nodes Into Texture ***********************
+    glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+    m_GNeurites.vaoBind("2DHeatMap");
+    m_GNeurites.vboBind("nodes");
+
+    m_GNeurites.useProgram("2DHeatMap");
+    updateAbstractUniformsLocation( m_GNeurites.getProgram("2DHeatMap") );
+    glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
+
+    m_GNeurites.vboRelease("nodes");
+    m_GNeurites.vaoRelease();
+
+    glFlush();
+    glFinish();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -1308,27 +1478,6 @@ Object_t OpenGLManager::getObjectTypeByID(int hvgxID)
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::FilterByType(Object_t type)
-{
-    // this should be fast, I should somehow group by IDs for types, and when we filter by type I just get all IDs with this type and set them to 1 which means filtered
-    std::vector<Object*> objects_list = m_dataContainer->getObjectsByType(type);
-    qDebug() << "Filtering " << objects_list.size() << " objects";
-
-    for (int i = 0; i < objects_list.size(); i++) {
-        int hvgxID = objects_list[i]->getHVGXID();
-        qDebug() << "Filtering ID " << hvgxID;
-        if (m_ssbo_data[hvgxID].info.w() == 1) {
-            FilterObject(hvgxID, false);
-        } else {
-            FilterObject(hvgxID, true);
-        }
-    }
-
-    m_dataContainer->recomputeMaxVolAstro();
-    updateSSBO();}
-
-// ----------------------------------------------------------------------------
-//
 void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
 {
     std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
@@ -1431,6 +1580,25 @@ void OpenGLManager::FilterObject(int ID, bool isfilterd)
 
 // ----------------------------------------------------------------------------
 //
+void OpenGLManager::FilterByType(Object_t type, bool flag)
+{
+    // this should be fast, I should somehow group by IDs for types, and when we filter by type I just get all IDs with this type and set them to 1 which means filtered
+    std::vector<Object*> objects_list = m_dataContainer->getObjectsByType(type);
+    qDebug() << "Filtering " << objects_list.size() << " objects";
+
+    for (int i = 0; i < objects_list.size(); i++) {
+        int hvgxID = objects_list[i]->getHVGXID();
+        qDebug() << "Filtering ID " << hvgxID;
+        FilterObject(hvgxID, flag);
+
+    }
+    m_dataContainer->recomputeMaxVolAstro();
+    updateSSBO();
+}
+
+
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
@@ -1450,15 +1618,15 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::FilterByID( std::vector<int> tokens_Ids )
+void OpenGLManager::FilterByID( std::set<int> tokens_Ids )
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
         // recompute max vol and astro coverage
         FilterObject(i, true);
     }
 
-    for (int i = 0; i < tokens_Ids.size(); ++i) {
-        int hvgxID = tokens_Ids[i];
+    for (auto iter = tokens_Ids.begin(); iter != tokens_Ids.end(); ++iter) {
+        int hvgxID = *iter;
         if (hvgxID > m_ssbo_data.size())
             continue;
 
@@ -1521,10 +1689,10 @@ void OpenGLManager::updateSSBO()
             continue;
 
         float volume =  translate(obj->getVolume(), 0, m_dataContainer->getMaxVolume(), 0, 1);
-        float coverage = translate(obj->getAstroCoverage(),
+        float coverage = translate( obj->getAstroCoverage(),
                                    0, m_dataContainer->getMaxAstroCoverage(),
-                                   0, 0.6);
-
+                                   0, 0.7);
+        qDebug() << obj->getAstroCoverage() << " " << m_dataContainer->getMaxAstroCoverage();
         switch(m_size_encoding) {
         case Size_e::VOLUME:
             m_ssbo_data[hvgxID].info.setX( 20 *  volume);
@@ -1550,7 +1718,7 @@ void OpenGLManager::updateSSBO()
             case Color_e::ASTRO_COVERAGE:
             {
               QVector4D color = obj->getColor();
-              m_ssbo_data[hvgxID].color = QVector4D(color.x() + 0.2, color.y() +  0.2, color.z() + 0.2, color.w()) ;
+              m_ssbo_data[hvgxID].color = QVector4D(color.x() + 0.3, color.y() +  0.3, color.z() + 0.3, color.w()) ;
               QVector4D add_color = QVector4D(1, 1, 1, 0) * coverage;
               m_ssbo_data[hvgxID].color -= add_color;
 
@@ -1599,3 +1767,18 @@ void OpenGLManager::updateColorEncoding(Color_e encoding)
 
     updateSSBO();
 }
+
+/*
+ *     float gaussFilterX[7] = { -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0  };
+    float gaussFilterY[7] = { 0.015625, 0.09375, 0.234375, 0.3125, 0.234375, 0.09375,0.015625  };
+
+//    vec4 color = vec4(0.0);
+//    for( int i = 0; i < 7; i++ )
+//    {
+//         vec2 tc = vec2( G_fragTexCoord.x + gaussFilterX[i]  * u_Scale.x, G_fragTexCoord.y+gaussFilterY[i]  * u_Scale.y );
+//         vec4 add_color = texture2D( tex,  tc ) * gaussFilterY[i];
+//         color += add_color;
+//    }
+
+//    outcol = color;
+*/

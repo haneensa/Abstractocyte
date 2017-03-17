@@ -19,9 +19,9 @@ DataContainer::DataContainer()
     m_skeleton_points_size = 0;
 
     max_volume = 1;
-    max_astro_coverage = 1;
+    max_astro_coverage = 0;
 
-    m_limit = 10000;
+    m_limit = 10;
     m_vertex_offset = 0;
 
     m_mesh = new Mesh();
@@ -32,7 +32,7 @@ DataContainer::DataContainer()
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
 
     /* 2.1 */
-    importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
+    // importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
     /* 2.2 */
     importXML("://m3_neurites.xml");    // neurites time:  28802 ms
 
@@ -802,7 +802,7 @@ std::vector<Object*> DataContainer::getObjectsByType(Object_t type)
 
 void DataContainer::recomputeMaxVolAstro()
 {
-    int temp_max_astro_coverage = 1;
+    float temp_max_astro_coverage = 0;
     int temp_max_volume = 1;
     for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++ ) {
         Object *obj = (*iter).second;

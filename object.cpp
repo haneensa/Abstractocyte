@@ -2,7 +2,8 @@
 // filter objects by properties
 // color objects by different properties: funtion, type, ?
 // label
-//
+// check if parent and child has the same center
+// if yes then add offset to one of them
 
 #include "object.h"
 #include <QDebug>
@@ -32,6 +33,7 @@ Object::Object(std::string name, int ID)
 
     m_function = -1;
     qDebug() << "create " << m_name.data() << " hvgxID: " << m_ID;
+    m_averageDistance = 0;
 }
 
 Object::~Object()
@@ -40,6 +42,7 @@ Object::~Object()
 
 void Object::updateClosestAstroVertex(float dist, int vertexIdx)
 {
+    m_averageDistance += dist;
     if (dist < m_closest_astro_vertex.second) {
         m_closest_astro_vertex.first = -1; //   I want from astrocyte skeleton :(
         m_closest_astro_vertex.second = dist;
@@ -246,4 +249,11 @@ void Object::addSynapse(Object *synapse_object)
         return;
 
     m_synapses.push_back(synapse_object);
+}
+
+float Object::getAstroCoverage()
+{
+    // return m_VertexidxCloseToAstro.size();
+    qDebug() << m_averageDistance << " " <<  m_averageDistance /(float) m_meshIndices.size();
+    return 1.0/(m_averageDistance /(float) m_meshIndices.size()); // the smaller the better value
 }

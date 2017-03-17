@@ -52,7 +52,7 @@ public:
     struct ssbo_mesh getSSBOData();
     Object* getParent()                 { return m_parent; }
     std::vector<Object*> getChildren()  { return m_children; }
-    int getAstroCoverage()              { return m_VertexidxCloseToAstro.size(); }
+    float getAstroCoverage();
     int getFunction()                   { return m_function; }
 
     // properties setters
@@ -119,7 +119,7 @@ private:
     std::pair<int, float>                   m_closest_astro_vertex;
 
     std::vector<int>                        m_VertexidxCloseToAstro;  // less than ASTRO_DIST_THRESH ----> we can refine this later
-
+    float                                     m_averageDistance;
 
     // list of synapses
     std::vector<Object*>                    m_synapses;

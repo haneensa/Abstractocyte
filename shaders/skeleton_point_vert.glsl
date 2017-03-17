@@ -1,6 +1,8 @@
 #version 430
 
 #define astrocyte 6
+#define spine       5
+#define bouton      3
 
 layout(location = 0) in vec4    vertex;
 layout(location = 1) in vec4    knot1;
@@ -70,6 +72,14 @@ void main(void)
     int ID = int(vertex.w);
 
     int type = int(SSBO_data[ID].center.w);     // 0: astrocyte, 1: neurite
+    int isFiltered = int(SSBO_data[ID].info.w);
+    if ( type == spine || type == bouton ) {
+        // if this is a child and parent is not filtered
+        int ParentID = int(SSBO_data[ID].info.z);
+        int isParentFiltered = int(SSBO_data[ParentID].info.w);
+        if (isParentFiltered == 0 && isFiltered == 1)  // parent not filtered but child is
+            ID = ParentID;
+    }
 
     V_ID = ID;
 

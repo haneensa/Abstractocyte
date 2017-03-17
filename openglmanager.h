@@ -32,7 +32,9 @@ public:
     void updateAbstractUniformsLocation(GLuint program);
     void update2Dflag(bool is2D);
 
-    void drawAll(struct GlobalUniforms grid_uniforms);
+    void updateUniformsData(struct GlobalUniforms grid_uniforms)    {    m_uniforms = grid_uniforms; }
+
+    void drawAll();
 
     // *********** 0) SSBO objects Data    ***********
     bool initSSBO();
@@ -42,28 +44,30 @@ public:
     bool initMeshTrianglesShaders();
     bool initMeshVertexAttrib();
 
-    void drawMeshTriangles(struct GlobalUniforms grid_uniforms, bool selection );
+    void drawMeshTriangles(bool selection );
 
     // *********** 3) Skeleton Points    ***********
     bool initSkeletonShaders();
-    void drawSkeletonPoints(struct GlobalUniforms grid_uniforms, bool selection );
+    void drawSkeletonPoints(bool selection );
 
     // *********** 4) Abstract Skeleton Graph (Nodes and Edges) ***********
     bool initAbstractSkeletonShaders();
     void initSkeletonsVertexAttribPointer();
-    void drawSkeletonsGraph(struct GlobalUniforms grid_uniforms, bool selection );
+    void drawSkeletonsGraph(bool selection );
 
     // ***********  5) Neurites Graph (Nodes and Edges) ***********
     bool initNeuritesGraphShaders();
     void initNeuritesVertexAttribPointer();
-    void drawNeuritesGraph(struct GlobalUniforms grid_uniforms);
+    void drawNeuritesGraph();
 
 
     // *********** 6) Mesh Points     ***********
     bool initGlycogenPointsShaders();
-    void drawGlycogenPoints(struct GlobalUniforms grid_uniforms);
+    void drawGlycogenPoints();
 	void updateGlycogenPoints();
 
+    //***************************************
+    void renderAbstractions();
 
     // ssbo management
     // function to update ssbo data (layout 1, layout 2)
@@ -80,9 +84,9 @@ public:
 
     std::map<int, Object*>  getObjectsMap() { return m_dataContainer->getObjectsMap(); }
     Object_t getObjectTypeByID(int hvgxID);
-    void FilterByType(Object_t type);
+    void FilterByType(Object_t type, bool);
     void FilterByID( QList<QString> tokens_Ids );
-    void FilterByID(  std::vector<int> tokens_Ids );
+    void FilterByID(  std::set<int> tokens_Ids );
     void showAll();
     void FilterObject(int ID, bool isfilterd);
     void recursiveFilter(int ID, bool isfilterd);
@@ -91,7 +95,7 @@ public:
     void updateDisplayParentFlag(bool flag)         { m_display_parent = flag; }
     void updateDisplaySynapseFlag(bool flag)        { m_display_synapses = flag; }
 
-	void setRenderGlycogenGranules(bool render) { m_renderGlycogenGranules = render; };
+    void setRenderGlycogenGranules(bool render) { m_renderGlycogenGranules = render; }
     void updateDepth(int d)                         { m_depth = d; }
 
     void updateNodeSizeEncoding(Size_e encoding);
@@ -103,8 +107,15 @@ public:
     void updateCanvasDim(int w, int h, int retianScale);
     void initSelectionFrameBuffer();
     int processSelection(float x, float y);
+    void renderSelection();
 
 	void setZoom(float zoom);
+
+    // ************ Glycogen 2D Abstraction *******
+    void init_Gly2DHeatMap();
+    bool init_Gly2DHeatMapShaders();
+    void drawIntoTexture();
+    void renderTexture2D();
 
 protected:
     DataContainer                           *m_dataContainer;
@@ -162,6 +173,18 @@ protected:
     Color_e                                 m_color_encoding;
     Size_e                                  m_size_encoding;
 
+    //*********************************
+    GLuint                                  m_gly_2D_heatMap_FBO;
+    GLuint                                  m_gly_2D_heatMap_Tex;
+    int                                     m_quadSize;
+    std::vector<QVector4D>                  m_Texquad;
+    // gen
+    // bind
+    // resize the fbo
+    // render nodes using blur shader
+    // whereever the node is use 1 else 0
+    // blur the glycogen density value present at node using gaussian blur
+    // render the results
 
  };
 

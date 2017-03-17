@@ -1,6 +1,8 @@
 #version 430
 
 #define astrocyte 6
+#define spine       5
+#define bouton      3
 
 in int          V_ID[];
 
@@ -62,13 +64,15 @@ layout (std430, binding=3) buffer space2d_data
 
 void main() {
     int ID = V_ID[0];
-    G_ID = float(ID);
+    int type = int(SSBO_data[ID].center.w);
 
+    // if child is filtered, and parent is not then show the child as parent
     int isFiltered = int(SSBO_data[ID].info.w);
     if (isFiltered == 1)
         return;
 
-    int type = int(SSBO_data[ID].center.w);
+    G_ID = float(ID);
+
     color_val = SSBO_data[ID].color;
 
     if (ID == 0) {
