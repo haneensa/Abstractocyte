@@ -822,10 +822,10 @@ bool OpenGLManager::init_Gly2DHeatMapShaders()
     glUniform1i(  tex, 0 );
 
     // transfer function
-//    glActiveTexture(GL_TEXTURE1);
-//    glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
-//    GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
-//    glUniform1i(  tf, 1 );
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
+    GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
+    glUniform1i(  tf, 1 );
 
 
 //    glActiveTexture(GL_TEXTURE2);
@@ -833,7 +833,7 @@ bool OpenGLManager::init_Gly2DHeatMapShaders()
 //    GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
 //    glUniform1i(  astro_tex, 2 );
 
-//    qDebug() << tex << " " << astro_tex << " " << tf;
+    qDebug() << tex ;
     GL_Error();
 
 
@@ -1275,9 +1275,9 @@ void OpenGLManager::drawAll()
 
     renderTexture2D();
 
-    renderAbstractions();
+//    renderAbstractions();
 
-    renderSelection();
+//    renderSelection();
 
     drawIntoTexture();
 
@@ -1288,7 +1288,7 @@ void OpenGLManager::drawAll()
 void OpenGLManager::renderTexture2D()
 {
     // ********* Debug Texture
-    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
+//    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
         m_GNeurites.vaoBind("2DHeatMap_Quad");
         m_GNeurites.useProgram("2DHeatMap_Texture");
         glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );

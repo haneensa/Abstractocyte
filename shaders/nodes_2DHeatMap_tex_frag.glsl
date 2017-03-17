@@ -41,4 +41,5 @@ void main(void)
     vec4 t_color = texture(tf, 0.5);
     //outcol = vec4( target, 1. );
     outcol = t_color;
+    outcol.b = target.r;
 }
