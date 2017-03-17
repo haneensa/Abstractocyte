@@ -20,6 +20,7 @@
 #include "mesh.h"
 #include "glycogen.h"
 #include "octree.h"
+#include "grid3d.h"
 //#include "dbscan.h"
 
 class DataContainer
@@ -36,6 +37,14 @@ public:
     void parseBranch(QXmlStreamReader &xml, Object *obj);
     void parseSkeletonPoints(QXmlStreamReader &xml, Object *obj);
 
+	/*bool importXML_DOM(QString path);
+	void parseObject_DOM(QXmlStreamReader &xml, Object *obj);
+	void parseMesh_DOM(QXmlStreamReader &xml, Object *obj);
+	void parseSkeleton_DOM(QXmlStreamReader &xml, Object *obj);
+	void parseSkeletonNodes_DOM(QXmlStreamReader &xml, Object *obj);
+	void parseBranch_DOM(QXmlStreamReader &xml, Object *obj);
+	void parseSkeletonPoints_DOM(QXmlStreamReader &xml, Object *obj);*/
+
     void loadConnectivityGraph(QString path);
     void loadMetaDataHVGX(QString path);
     void loadParentFromHVGX(QString path);
@@ -49,6 +58,7 @@ public:
 
 	SpacePartitioning::Octree* getSpineOctree() { return &m_spineOctree; }
 	SpacePartitioning::Octree* getBoutonOctree() { return &m_boutonOctree; }
+	float* getGlycogen3DGridData();
 
     // graph related function
     std::map<int, Object*>  getObjectsMap();
@@ -98,10 +108,12 @@ protected:
     // graph related data
     std::vector<QVector2D>                      neurites_neurite_edge;
 
+	// glycogen
     std::map<int, Glycogen*>                    m_glycogenMap;
     std::vector<VertexData*>                    m_glycogenList;
+	SpacePartitioning::Grid3D					m_glycogen3DGrid;
 
-	//octrees
+	// octrees
     SpacePartitioning::Octree                   m_spineOctree;
     SpacePartitioning::Octree                   m_boutonOctree;
     SpacePartitioning::Octree                   m_glycogenOctree;

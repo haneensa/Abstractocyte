@@ -14,6 +14,13 @@ CONFIG += c++11
 TARGET = juxtastrocyte
 TEMPLATE = app
 
+CONFIG(release, debug|release) {
+    #This is a release build
+    DEFINES += QT_NO_DEBUG_OUTPUT
+} else {
+    #This is a debug build
+}
+
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -37,6 +44,7 @@ SOURCES += main.cpp\
     glycogencluster.cpp \
     glycogenanalysismanager.cpp \
     dbscan.cpp \
+    grid3d.cpp \
     rendervertexdata.cpp
 
 HEADERS  += mainwindow.h \
@@ -63,6 +71,7 @@ HEADERS  += mainwindow.h \
     glycogencluster.h \
     glycogenanalysismanager.h \
     dbscan.h \
+    grid3d.h \
     rendervertexdata.h
 
 

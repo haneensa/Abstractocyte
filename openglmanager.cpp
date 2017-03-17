@@ -65,6 +65,31 @@ OpenGLManager::~OpenGLManager()
 
 // ----------------------------------------------------------------------------
 //
+void OpenGLManager::init_Gly3DTex()
+{
+	m_gly_3D_Tex = 0;
+
+	glGenTextures(1, &m_gly_3D_Tex);
+	glBindTexture(GL_TEXTURE_3D, m_gly_3D_Tex);
+	GL_Error();
+
+	//glTexImage3D(GL_TEXTURE_3D, 0, GL_RED, 1000, 1000, 1000, 0, GL_RED, GL_FLOAT, 0);
+
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+	GL_Error();
+}
+
+void OpenGLManager::upload_Gly3DTex(void* data, int sizeX, int sizeY, int sizeZ, GLenum type)
+{
+	glBindTexture(GL_TEXTURE_3D, m_gly_3D_Tex);
+
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_RED, sizeX, sizeY, sizeZ, 0, GL_RED, type, data);
+}
+
 bool OpenGLManager::initOpenGLFunctions()
 {
     m_glFunctionsSet = true;

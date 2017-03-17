@@ -4,6 +4,7 @@
 #include <chrono>
 #include "datacontainer.h"
 #include <set>
+#include <QDomDocument>
 
 #define MESH_MAX 5.0f
 
@@ -23,8 +24,11 @@ DataContainer::DataContainer()
 
     m_limit = 1;
     m_vertex_offset = 0;
+
+
     m_mesh = new Mesh();
 
+	m_glycogen3DGrid.setSize(1000,1000,1000);
 
 
     /* 1 */
@@ -38,6 +42,7 @@ DataContainer::DataContainer()
 
 //    m_mesh->dumpVericesList();
 //    m_mesh->readVertexBinary();
+    //importXML_DOM("://m3_neurites.xml");
 
     /* 3 */
     loadMetaDataHVGX(":/data/mouse3_metadata_objname_center_astroSyn.hvgx");
@@ -215,6 +220,8 @@ void DataContainer::loadMetaDataHVGX(QString path)
 			glycogenCount++;
             m_glycogenMap[ID] = gc;
 			m_glycogenList.push_back(gc->getVertexData());
+
+			m_glycogen3DGrid.addNormalizedPoint(gc->x(), gc->y(), gc->z(), gc->getVolume());
 
 
         } else if (wordList[0] == "sg") {
@@ -395,6 +402,59 @@ bool DataContainer::importXML(QString path)
     qDebug() << "time: " << ms.count() << "ms, m_tempCounter: " << m_tempCounter;
 }
 
+
+//----------------------------------------------------------------------------
+// Experimental
+/*bool DataContainer::importXML_DOM(QString path)
+{
+	qDebug() << "Func: importXML";
+	auto t1 = std::chrono::high_resolution_clock::now();
+
+	QFile  *file = new QFile(path);
+	if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
+		qDebug() << "Could not open the file for reading";
+		return false;
+	}
+
+	QDomDocument doc;
+	if (!doc.setContent(file)) {
+		file->close();
+		return 0;
+	}
+	file->close();
+
+	m_vertex_offset += m_mesh->getVerticesSize();
+	QDomNode n = doc.firstChild();
+	while (!n.isNull()) {
+		//QXmlStreamReader::TokenType token = xml.readNext();
+		//if (token == QXmlStreamReader::StartDocument) {
+		//	continue;
+		//}
+
+		/*if (token == QXmlStreamReader::StartElement) {
+			if (xml.name() == "o") {
+				if (m_objects.size() > m_limit) {
+					qDebug() << "* Reached size limit.";
+					break;
+				}
+				Object *obj = NULL;
+
+				// make a thread that would read this ?
+				// the astrocyte wast most of the time
+				// so if we can optimize reading one object would be better
+				parseObject(xml, obj); // fills the object with obj info
+			}
+		}
+		n = n.firstChild();
+	}
+
+	auto t2 = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double, std::milli> ms = t2 - t1;
+	qDebug() << "time: " << ms.count() << "ms, m_tempCounter: " << m_tempCounter;
+}*/
+
+
+
 //----------------------------------------------------------------------------
 //
 // load the object with all its related informations
@@ -539,23 +599,30 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 float z1 = stringlist.at(2).toDouble()/MESH_MAX;
 
                 QVector4D mesh_vertex(x1, y1, z1,  obj->getHVGXID());
-                struct VertexData v;
-				v.isGlycogen = false;
-                v.mesh_vertex = mesh_vertex;
+				std::vector< struct VertexData >* meshVertexList = m_mesh->getVerticesList();
+
+				meshVertexList->emplace_back();
+				int vertexIdx = meshVertexList->size() - 1;
+				struct VertexData* v = &meshVertexList->at(vertexIdx);
+				v->index = vertexIdx;
+                //struct VertexData v;
+				//v.isGlycogen = false;
+                v->mesh_vertex = mesh_vertex;
 
                 // todo: get the skeleton vertex from the skeleton itself using an index
                 // get the point branch knots as well
                 if (stringlist.size() < 5) {
                     // place holder
                     qDebug() << "Problem!";
-                    v.skeleton_vertex = mesh_vertex;
-                }  else {
+
+                    v->skeleton_vertex = mesh_vertex;
+                } else {
                     // I could use index to be able to connect vertices logically
                     float x2 = stringlist.at(3).toFloat()/MESH_MAX;
                     float y2 = stringlist.at(4).toFloat()/MESH_MAX;
                     float z2 = stringlist.at(5).toFloat()/MESH_MAX;
                     QVector4D skeleton_vertex(x2, y2, z2, 0);
-                    v.skeleton_vertex = skeleton_vertex;
+                    v->skeleton_vertex = skeleton_vertex;
                 }
 
                 float VertexToAstroDist = 100;
@@ -564,13 +631,15 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                   //  qDebug() << "### VertexToAstroDist: " << VertexToAstroDist;
                 }
 
-                v.skeleton_vertex.setW(VertexToAstroDist); // distance from neurite to astrocyte
+                v->skeleton_vertex.setW(VertexToAstroDist); // distance from neurite to astrocyte
                 // find the minimum distance and store it in the object so we can easily decide if
                 // it touches the astrocyte or not
 
-                int vertexIdx = m_mesh->addVertex(v, obj->getObjectType());
+                vertexIdx = m_mesh->addVertex(v, obj->getObjectType());
                 obj->updateClosestAstroVertex(VertexToAstroDist, vertexIdx); // make local function that goes through all vertices of this object (store unique indices) and compute this
-            } else if (xml.name() == "vn") {
+
+                m_mesh->addVertex(v, obj->getObjectType());
+             } else if (xml.name() == "vn") {
                 // add normal to mesh
                 xml.readNext();
                 QString coords = xml.text().toString();
@@ -838,6 +907,13 @@ Mesh* DataContainer::getMeshPointer()
 int DataContainer::getMeshIndicesSize()
 {
     return m_indices_size;
+}
+
+//----------------------------------------------------------------------------
+//
+float* DataContainer::getGlycogen3DGridData()
+{
+		return m_glycogen3DGrid.getData();
 }
 
 //----------------------------------------------------------------------------

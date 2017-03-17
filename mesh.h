@@ -4,6 +4,7 @@
 #include "mainopengl.h"
 
 #include <set>
+#include <vector>
 
 enum class Object_t;
 
@@ -18,7 +19,7 @@ struct VertexData {
 
 
     int			index;
-    bool		isGlycogen;			//because glycogen ids and object ids are seperate
+    //bool		isGlycogen;			//because glycogen ids and object ids are seperate
 
     float  x()  const
     {
@@ -43,13 +44,13 @@ class Mesh
 public:
     Mesh();
 
-    int addVertex(struct VertexData vdata, Object_t type);
+    int addVertex(struct VertexData* vdata, Object_t type);
     int addVertexNormal(QVector4D vnormal);
     bool isValidFaces(int f1, int f2, int f3);
     int  getVerticesSize()       { return verticesList.size(); }
 
     std::vector< struct VertexData >* getVerticesList()  { return &verticesList; }
-    std::vector< VertexData* >* getVerticesListByType(Object_t type)  {  return &m_typeVertexList[(int)type]; }
+    std::vector< VertexData* >* getVerticesListByType(Object_t type)  {  return &(m_typeVertexList[(int)type]); }
 
     void addFace(int index1, int index2, int index3);
     void getVertexNeighbors(int v_index, std::set< int > &neighs);
