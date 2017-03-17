@@ -46,10 +46,10 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
 	m_zoom = 1.0f;
     m_depth = 1;
 	m_renderGlycogenGranules = true;
-    m_normals_enabled = false;
+
     m_color_encoding = Color_e::TYPE;
     m_size_encoding = Size_e::VOLUME;
-
+    m_normals_enabled = false;
 }
 
 // ----------------------------------------------------------------------------
@@ -815,12 +815,26 @@ bool OpenGLManager::init_Gly2DHeatMapShaders()
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0,  0);
     GL_Error();
 
-//     float w = 230; //m_canvas_w/m_retinaScale;
-//    glUniform1f(1, w);
+    // heatmap texture
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
+    GLint tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tex");
+    glUniform1i(  tex, 0 );
+
+    // transfer function
+//    glActiveTexture(GL_TEXTURE1);
+//    glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
+//    GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
+//    glUniform1i(  tf, 1 );
 
 
-//     float h = 240; //m_canvas_h/m_retinaScale;
-//    glUniform1f(2,  h);
+//    glActiveTexture(GL_TEXTURE2);
+//    glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
+//    GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
+//    glUniform1i(  astro_tex, 2 );
+
+//    qDebug() << tex << " " << astro_tex << " " << tf;
+    GL_Error();
 
 
     m_GNeurites.vboRelease("quad");
