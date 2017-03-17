@@ -164,7 +164,6 @@ protected:
     int                                     m_canvas_h;
     int                                     m_retinaScale;
 
-    int                                     m_hits;
     GLuint                                  m_selectionFrameBuffer;
     GLuint                                  m_selectionRenderBuffer;
 
@@ -181,13 +180,9 @@ protected:
     GLuint                                  m_gly_2D_heatMap_Tex;
     int                                     m_quadSize;
     std::vector<QVector4D>                  m_Texquad;
-    // gen
-    // bind
-    // resize the fbo
-    // render nodes using blur shader
-    // whereever the node is use 1 else 0
-    // blur the glycogen density value present at node using gaussian blur
-    // render the results
+    std::vector<QVector4D>                  m_tf_2DHeatmap;
+    GLuint                                  m_tf_2DHeatMap_tex;
+
     //**************************************
     GLuint                                  m_astro_3DTex;
 

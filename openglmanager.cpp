@@ -52,6 +52,8 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
 
 }
 
+// ----------------------------------------------------------------------------
+//
 OpenGLManager::~OpenGLManager()
 {
     if (m_glFunctionsSet == false)
@@ -59,41 +61,6 @@ OpenGLManager::~OpenGLManager()
 
     m_vao_glycogen.destroy();
     m_vbo_glycogen.destroy();
-}
-
-void OpenGLManager::init_Gly2DHeatMap()
-{
-    m_gly_2D_heatMap_FBO = 0;
-
-    glGenFramebuffers(1, &m_gly_2D_heatMap_FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
-    GL_Error();
-
-    glGenTextures(1, &m_gly_2D_heatMap_Tex);
-    glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
-    GL_Error();
-
-    // create empty image
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_canvas_w, m_canvas_h, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    GL_Error();
-
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_gly_2D_heatMap_Tex, 0);
-    GL_Error();
-
-    // set the list of draw buffers
-    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-    glDrawBuffers(1, DrawBuffers);
-    GL_Error();
-
-    // check if frame buffer is ok
-   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-       qDebug() << "ERROR!!!!";
-       return;
-    }
-
 }
 
 // ----------------------------------------------------------------------------
@@ -706,6 +673,63 @@ bool OpenGLManager::initNeuritesGraphShaders()
     return true;
 }
 
+
+void OpenGLManager::init_Gly2DHeatMap()
+{
+    m_gly_2D_heatMap_FBO = 0;
+
+    glGenFramebuffers(1, &m_gly_2D_heatMap_FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
+    GL_Error();
+
+    glGenTextures(1, &m_gly_2D_heatMap_Tex);
+    glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
+    GL_Error();
+
+    // create empty image
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_canvas_w, m_canvas_h, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    GL_Error();
+
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_gly_2D_heatMap_Tex, 0);
+    GL_Error();
+
+    // set the list of draw buffers
+    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, DrawBuffers);
+    GL_Error();
+
+    // check if frame buffer is ok
+   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+       qDebug() << "ERROR!!!!";
+       return;
+    }
+   GL_Error();
+
+
+   // init transfer function
+   m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 1.0f));
+   m_tf_2DHeatmap.push_back(QVector4D(1.0f, 1.0f, 1.0f, 1.0f));
+
+
+   glGenTextures( 1, &m_tf_2DHeatMap_tex);
+   GL_Error();
+
+   glBindTexture( GL_TEXTURE_1D, m_tf_2DHeatMap_tex);
+   GL_Error();
+
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+   GL_Error();
+
+    glTexImage1D( GL_TEXTURE_1D, 0, GL_RGBA, 2, 0, GL_RGBA, GL_FLOAT, m_tf_2DHeatmap.data());
+
+    GL_Error();
+
+}
 void OpenGLManager::load3DTexturesFromRaw(QString path)
 {
     int size = 999 * 999 * 449;
@@ -760,6 +784,8 @@ bool OpenGLManager::init_Gly2DHeatMapShaders()
                                     ":/shaders/nodes_2DHeatMap_tex_vert.glsl",
                                     ":/shaders/nodes_2DHeatMap_tex_geom.glsl",
                                     ":/shaders/nodes_2DHeatMap_tex_frag.glsl");
+    GL_Error();
+
     if (res == false)
         return res;
 
@@ -787,6 +813,7 @@ bool OpenGLManager::init_Gly2DHeatMapShaders()
     m_GNeurites.useProgram("2DHeatMap_Texture");
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0,  0);
+    GL_Error();
 
 //     float w = 230; //m_canvas_w/m_retinaScale;
 //    glUniform1f(1, w);
