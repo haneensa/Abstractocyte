@@ -39,5 +39,6 @@
         <file>shaders/nodes_2DHeatMap_tex_frag.glsl</file>
         <file>shaders/nodes_2DHeatMap_tex_geom.glsl</file>
         <file>shaders/nodes_2DHeatMap_tex_vert.glsl</file>
+        <file>data/mask_745_.raw</file>
     </qresource>
 </RCC>
