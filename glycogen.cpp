@@ -19,7 +19,7 @@ Glycogen::Glycogen(int ID, std::string name, QVector3D center, float radius)
 	m_center2.mesh_vertex.setZ( m_center.z());
 	m_center2.mesh_vertex.setW( ID );
 
-	m_center2.isGlycogen = true;
+	//m_center2.isGlycogen = true;
 
 	//use skeleton_vertex for other info
 	m_center2.skeleton_vertex.setX( radius );
@@ -52,14 +52,14 @@ float Glycogen::getVolume()
 
 //----------------------------------------------------------------------------
 // 0: invisible 1: visible 2: selected
-int		  Glycogen::getState()
+int Glycogen::getState()
 {
 	return (int)m_center2.skeleton_vertex.w();
 }
 
 //----------------------------------------------------------------------------
 //
-void      Glycogen::setState(int state)
+void Glycogen::setState(int state)
 {
 	if (state > 2 || state < 0)
 		return;

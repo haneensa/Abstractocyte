@@ -2,16 +2,27 @@
 
 Mesh::Mesh()
 {
-
+	verticesList.reserve(9000000);		   //v: 8,123,031
+	m_faces.reserve(16500000);			   //f: 16,253,222
+	m_typeVertexList[1].reserve(300000);   //mitos.v: 270,303
+	m_typeVertexList[2].reserve(2900000);  //axons.v: 2,858,984
+	m_typeVertexList[3].reserve(1400000);  //bouts.v: 1,300,846
+	m_typeVertexList[4].reserve(14500000); //dends.v: 14,449,558
+	m_typeVertexList[5].reserve(750000);   //spine.v: 696,496
+	m_typeVertexList[6].reserve(1300000);  //astro.v: 1,246,096
+	m_typeVertexList[7].reserve(350000);   //synps.v: 300,748
 }
 
 
 int Mesh::addVertex(struct VertexData vdata, Object_t type)
 {
     int idx = verticesList.size();
+	vdata.index = idx;
     verticesList.push_back(vdata);
-	vdata.index = verticesList.size() - 1;
-	m_typeVertexList[static_cast<int>(type)].push_back(&vdata);
+	
+	int type_idx = static_cast<int>(type);
+	//std::vector<VertexData*>* typeVector = (m_typeVertexList[type_idx]);
+	m_typeVertexList[type_idx].push_back(verticesList.data() + idx);
     return idx;
 }
 

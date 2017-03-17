@@ -23,8 +23,10 @@ DataContainer::DataContainer()
 
     m_limit = 10000;
     m_vertex_offset = 0;
+
     m_mesh = new Mesh();
 
+	m_glycogen3DGrid.setSize(1000,1000,1000);
 
     /* 1 */
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
@@ -145,6 +147,8 @@ void DataContainer::loadMetaDataHVGX(QString path)
 			glycogenCount++;
             m_glycogenMap[ID] = gc;
 			m_glycogenList.push_back(gc->getVertexData());
+
+			m_glycogen3DGrid.addNormalizedPoint(gc->x(), gc->y(), gc->z(), gc->getVolume());
 
 
         } else if (wordList[0] == "sg") {
@@ -466,7 +470,7 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
 
                 QVector4D mesh_vertex(x1, y1, z1,  obj->getHVGXID());
                 struct VertexData v;
-				v.isGlycogen = false;
+				//v.isGlycogen = false;
                 v.mesh_vertex = mesh_vertex;
 
                 // todo: get the skeleton vertex from the skeleton itself using an index
@@ -533,7 +537,7 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 /* vertex 3 */
                 obj->addTriangleIndex(t_index3);
 
-                m_mesh->addFace(t_index1, t_index2, t_index3);
+                //m_mesh->addFace(t_index1, t_index2, t_index3); UNCOMMENT
 
                 m_indices_size += 3;
 
