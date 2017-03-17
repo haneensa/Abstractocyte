@@ -120,6 +120,9 @@ public:
 	void init_Gly3DTex();
 	void upload_Gly3DTex(void* data, int sizeX = 1000, int sizeY = 1000, int sizeZ = 1000, GLenum type = GL_FLOAT);
 
+    // ***************************************
+    void load3DTexturesFromRaw(QString path);
+
 protected:
     DataContainer                           *m_dataContainer;
     AbstractionSpace                        *m_2dspace;
@@ -135,6 +138,7 @@ protected:
 
     // *********** 1) Mesh Triangles     ***********
     RenderVertexData                        m_TMesh;
+    bool                                    m_normals_enabled;
 
     // *********** 3) Skeleton Points    ***********
     RenderVertexData                        m_SkeletonPoints;
@@ -164,7 +168,6 @@ protected:
     int                                     m_canvas_h;
     int                                     m_retinaScale;
 
-    int                                     m_hits;
     GLuint                                  m_selectionFrameBuffer;
     GLuint                                  m_selectionRenderBuffer;
 
@@ -182,15 +185,13 @@ protected:
     int                                     m_quadSize;
     std::vector<QVector4D>                  m_Texquad;
 
+    
 	GLuint									m_gly_3D_Tex;
+    GLuint                                  m_tf_2DHeatMap_tex;
+	std::vector<QVector4D>                  m_tf_2DHeatmap;
 
-    // gen
-    // bind
-    // resize the fbo
-    // render nodes using blur shader
-    // whereever the node is use 1 else 0
-    // blur the glycogen density value present at node using gaussian blur
-    // render the results
+    //**************************************
+    GLuint                                  m_astro_3DTex;
 
  };
 

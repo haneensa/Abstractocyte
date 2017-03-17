@@ -49,9 +49,11 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
 
     m_color_encoding = Color_e::TYPE;
     m_size_encoding = Size_e::VOLUME;
-
+    m_normals_enabled = false;
 }
 
+// ----------------------------------------------------------------------------
+//
 OpenGLManager::~OpenGLManager()
 {
     if (m_glFunctionsSet == false)
@@ -61,41 +63,8 @@ OpenGLManager::~OpenGLManager()
     m_vbo_glycogen.destroy();
 }
 
-void OpenGLManager::init_Gly2DHeatMap()
-{
-    m_gly_2D_heatMap_FBO = 0;
-
-    glGenFramebuffers(1, &m_gly_2D_heatMap_FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
-    GL_Error();
-
-    glGenTextures(1, &m_gly_2D_heatMap_Tex);
-    glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
-    GL_Error();
-
-    // create empty image
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_canvas_w, m_canvas_h, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    GL_Error();
-
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_gly_2D_heatMap_Tex, 0);
-    GL_Error();
-
-    // set the list of draw buffers
-    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-    glDrawBuffers(1, DrawBuffers);
-    GL_Error();
-
-    // check if frame buffer is ok
-   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-       qDebug() << "ERROR!!!!";
-       return;
-    }
-
-}
-
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::init_Gly3DTex()
 {
 	m_gly_3D_Tex = 0;
@@ -132,6 +101,8 @@ bool OpenGLManager::initOpenGLFunctions()
     m_GNeurites.initOpenGLFunctions();
     m_GlycogenPoints.initOpenGLFunctions();
 
+    load3DTexturesFromRaw(":/data/mask_745_.raw");
+
     fillVBOsData();
 
     initSSBO();
@@ -145,6 +116,8 @@ bool OpenGLManager::initOpenGLFunctions()
     return true;
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::updateCanvasDim(int w, int h, int retianScale)
 {
     if (m_canvas_h != h || m_canvas_w != w){
@@ -725,6 +698,82 @@ bool OpenGLManager::initNeuritesGraphShaders()
     return true;
 }
 
+
+void OpenGLManager::init_Gly2DHeatMap()
+{
+    m_gly_2D_heatMap_FBO = 0;
+
+    glGenFramebuffers(1, &m_gly_2D_heatMap_FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
+    GL_Error();
+
+    glGenTextures(1, &m_gly_2D_heatMap_Tex);
+    glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
+    GL_Error();
+
+    // create empty image
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_canvas_w, m_canvas_h, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    GL_Error();
+
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_gly_2D_heatMap_Tex, 0);
+    GL_Error();
+
+    // set the list of draw buffers
+    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, DrawBuffers);
+    GL_Error();
+
+    // check if frame buffer is ok
+   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+       qDebug() << "ERROR!!!!";
+       return;
+    }
+   GL_Error();
+
+
+   // init transfer function
+   m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 1.0f));
+   m_tf_2DHeatmap.push_back(QVector4D(1.0f, 1.0f, 1.0f, 1.0f));
+
+
+   glGenTextures( 1, &m_tf_2DHeatMap_tex);
+   GL_Error();
+
+   glBindTexture( GL_TEXTURE_1D, m_tf_2DHeatMap_tex);
+   GL_Error();
+
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+   GL_Error();
+
+    glTexImage1D( GL_TEXTURE_1D, 0, GL_RGBA, 2, 0, GL_RGBA, GL_FLOAT, m_tf_2DHeatmap.data());
+
+    GL_Error();
+
+}
+void OpenGLManager::load3DTexturesFromRaw(QString path)
+{
+    int size = 999 * 999 * 449;
+    void *rawData = m_dataContainer->loadRawFile(":/data/mask_745_.raw", size);
+    //load data into a 3D texture
+    glGenTextures(1, &m_astro_3DTex);
+    glBindTexture(GL_TEXTURE_3D, m_astro_3DTex);
+
+     // set the texture parameters
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    glTexImage3D(GL_TEXTURE_3D,0 ,GL_INTENSITY, 999, 999, 449,0, GL_LUMINANCE, GL_UNSIGNED_BYTE, rawData);
+    delete [] rawData;
+}
+
 bool OpenGLManager::init_Gly2DHeatMapShaders()
 {
     // init 2D HeatMap
@@ -760,6 +809,8 @@ bool OpenGLManager::init_Gly2DHeatMapShaders()
                                     ":/shaders/nodes_2DHeatMap_tex_vert.glsl",
                                     ":/shaders/nodes_2DHeatMap_tex_geom.glsl",
                                     ":/shaders/nodes_2DHeatMap_tex_frag.glsl");
+    GL_Error();
+
     if (res == false)
         return res;
 
@@ -787,19 +838,33 @@ bool OpenGLManager::init_Gly2DHeatMapShaders()
     m_GNeurites.useProgram("2DHeatMap_Texture");
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0,  0);
+    GL_Error();
 
-//     float w = 230; //m_canvas_w/m_retinaScale;
-//    glUniform1f(1, w);
+    // heatmap texture
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
+    GLint tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tex");
+    glUniform1i(  tex, 0 );
+
+    // transfer function
+//    glActiveTexture(GL_TEXTURE1);
+//    glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
+//    GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
+//    glUniform1i(  tf, 1 );
 
 
-//     float h = 240; //m_canvas_h/m_retinaScale;
-//    glUniform1f(2,  h);
+//    glActiveTexture(GL_TEXTURE2);
+//    glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
+//    GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
+//    glUniform1i(  astro_tex, 2 );
+
+//    qDebug() << tex << " " << astro_tex << " " << tf;
+    GL_Error();
 
 
     m_GNeurites.vboRelease("quad");
     m_GNeurites.vaoRelease();
 
-    GL_Error();
 
 
 }
@@ -858,9 +923,18 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
     Mesh* mesh = m_dataContainer->getMeshPointer();
     mesh->allocateVerticesVBO( m_TMesh.getVBO("MeshVertices") );
-
     initMeshVertexAttrib();
 
+    // create normals vbo
+    if (m_normals_enabled) {
+        m_TMesh.vboCreate("VertexNormals", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
+        m_TMesh.vboBind("VertexNormals");
+        // allocate
+        mesh->allocateNormalsVBO( m_TMesh.getVBO("VertexNormals") );
+
+        // initVertexPointer for normals ? then I need to initialize indices as well ?
+        m_TMesh.vboBind("VertexNormals");
+    }
 
     m_TMesh.vboRelease("MeshVertices");
     m_TMesh.vaoRelease();
@@ -1244,7 +1318,7 @@ void OpenGLManager::renderTexture2D()
         m_GNeurites.useProgram("2DHeatMap_Texture");
         glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
         m_GNeurites.vaoRelease();
-    }
+//    }
 }
 
 // ----------------------------------------------------------------------------
@@ -1675,12 +1749,15 @@ void OpenGLManager::showAll()
     updateSSBO();
 }
 
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::setZoom(float zoom)
 {
 	m_zoom = zoom;
 }
 
-
+// ----------------------------------------------------------------------------
+//
 float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax)
 {
     // if value < leftMin -> value = leftMin
@@ -1698,8 +1775,8 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
     return rightMin + (valueScaled * rightSpan);
 }
 
-
-
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::updateSSBO()
 {
     std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
@@ -1773,7 +1850,8 @@ void OpenGLManager::updateSSBO()
     }
 }
 
-
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::updateNodeSizeEncoding(Size_e encoding)
 {
     if (m_size_encoding == encoding)
@@ -1783,6 +1861,9 @@ void OpenGLManager::updateNodeSizeEncoding(Size_e encoding)
 
     updateSSBO();
 }
+
+// ----------------------------------------------------------------------------
+//
 void OpenGLManager::updateColorEncoding(Color_e encoding)
 {
     if (m_color_encoding == encoding)

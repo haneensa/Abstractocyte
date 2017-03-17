@@ -5,6 +5,8 @@ out vec4            outcol;
 //layout (location = 1) uniform float       ResS;
 //layout (location = 2) uniform float       ResT;
 uniform sampler2D   tex;
+uniform sampler1D   tf;
+
 in vec2             G_fragTexCoord;
 
 void main(void)
@@ -35,5 +37,8 @@ void main(void)
     target += 2. * (im10 + ip10 + i0m1 + i0p1);
     target += 4.*(i00);
     target /= 16.;
-    outcol = vec4( target, 1. );
+
+    vec4 t_color = texture(tf, 0.5);
+    //outcol = vec4( target, 1. );
+    outcol = t_color;
 }

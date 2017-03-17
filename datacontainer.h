@@ -47,6 +47,7 @@ public:
 
     void loadConnectivityGraph(QString path);
     void loadMetaDataHVGX(QString path);
+    void loadParentFromHVGX(QString path);
 
 	//glycogen
     int getGlycogenSize()              { return m_glycogenMap.size(); }
@@ -78,6 +79,9 @@ public:
     // iterate over objects and get max volume and astro coverage
     void recomputeMaxVolAstro();
 
+    //************ Load Raw Data
+    void* loadRawFile(QString path, int size);
+
 protected:
     int                                         m_tempCounter; // how many objects with no contacts to ast based on threshold
      // maximum volume from displayed objects
@@ -95,6 +99,7 @@ protected:
     int                                         m_vertex_offset; // used to unify vertices for one mesh
     int                                         m_limit;
 
+    std::map<int, int>                          m_parents;
     std::map<int, Object*>                      m_objects;
     std::map<Object_t, std::vector<Object*> >   m_objectsByType;
     std::map<Object_t, int >                    m_indices_size_byType;

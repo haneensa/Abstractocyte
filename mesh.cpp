@@ -26,6 +26,13 @@ int Mesh::addVertex(struct VertexData* vdata, Object_t type)
 	return vdata->index;
 }
 
+int Mesh::addVertexNormal(QVector4D vnormal)
+{
+    int idx = m_normalsList.size();
+    m_normalsList.push_back(vnormal);
+    return idx;
+}
+
 bool Mesh::isValidFaces(int f1, int f2, int f3)
 {
     if (    f1 > verticesList.size()
@@ -41,6 +48,11 @@ bool Mesh::isValidFaces(int f1, int f2, int f3)
 void Mesh::allocateVerticesVBO(QOpenGLBuffer vbo_mesh)
 {
     vbo_mesh.allocate(verticesList.data(), verticesList.size() * sizeof(VertexData));
+}
+
+void Mesh::allocateNormalsVBO(QOpenGLBuffer vbo_mesh)
+{
+    vbo_mesh.allocate(m_normalsList.data(), m_normalsList.size() * sizeof(QVector4D));
 }
 
 void Mesh::addFace(int index1, int index2, int index3)
