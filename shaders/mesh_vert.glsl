@@ -1,6 +1,7 @@
 #version 430
 
 #define astrocyte 6
+#define synapse 7
 
 // todo later: find a way to include header
 #extension GL_ARB_shading_language_include : require
@@ -133,6 +134,9 @@ void main(void)
     default:
         pos2 = mesh_vertex;
     }
+
+    if (type == synapse)
+        pos2 = mesh_vertex;
 
    vec4 new_position = mix(pos1 , pos2, position_intp);
 
