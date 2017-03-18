@@ -83,6 +83,8 @@ public:
     // ********** Filtering ************************
 
     std::map<int, Object*>  getObjectsMap() { return m_dataContainer->getObjectsMap(); }
+    std::map<int, Object*>*  getObjectsMapPtr() { return &m_dataContainer->getObjectsMap(); }
+
     Object_t getObjectTypeByID(int hvgxID);
     void FilterByType(Object_t type, bool);
     void FilterByID( QList<QString> tokens_Ids );

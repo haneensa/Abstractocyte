@@ -49,7 +49,8 @@ public:
     void*  getSkeletonPoints();
     int getSkeletonPointsSize();
 
-    std::map<int, std::pair< int, struct SkeletonPoint> >  getPointsMap();
+    std::map<int, std::pair< int, struct SkeletonPoint> >  getPointsMap() { return m_points; }
+    std::map<int, std::pair< int, struct SkeletonPoint> >*  getPointsMapPtr() { return &m_points; }
 
      // for simplified graph, we need the branches
     // knots IDs and their edges

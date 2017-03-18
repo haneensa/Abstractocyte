@@ -59,11 +59,6 @@ int  Skeleton::getSkeletonPointsSize()
     return m_points.size();
 }
 
-std::map<int, std::pair< int, struct SkeletonPoint> >  Skeleton::getPointsMap()
-{
-    return m_points;
-}
-
  // for each branch we add if spine or bouton then construct nodes and points
 void Skeleton::addBranch(SkeletonBranch *branch, Skeleton *parentSkeleton)
 {
@@ -80,24 +75,24 @@ void Skeleton::addBranch(SkeletonBranch *branch, Skeleton *parentSkeleton)
 
            //  if spine or bouton use parent skeleton points and nodes
            // use parent instead
-            std::map<int, std::pair< int, struct SkeletonPoint> >  parentPoints = parentSkeleton->getPointsMap();
-            if (parentPoints.find(index) == parentPoints.end())
+            std::map<int, std::pair< int, struct SkeletonPoint> >* parentPoints = parentSkeleton->getPointsMapPtr();
+            if (parentPoints->find(index) == parentPoints->end())
             {
                 qDebug() << "Point not fount at index " << index;
                 return;
             }
 
-            std::pair< int, struct SkeletonPoint > datum = parentPoints[index];
+            std::pair< int, struct SkeletonPoint > datum = parentPoints->at(index);
 
             std::vector<QVector3D> parentNodes = parentSkeleton->getGraphNodes();
 
-            if (parentPoints.size() < knots.x() || parentPoints.size() < knots.y() ) {
-                qDebug() << "Node index is incorrect" << parentPoints.size() << " " << knots;
+            if (parentPoints->size() < knots.x() || parentPoints->size() < knots.y() ) {
+                qDebug() << "Node index is incorrect" << parentPoints->size() << " " << knots;
                 return;
             }
 
-            std::pair< int, struct SkeletonPoint > sk_n1 = parentPoints[knots.x()];
-            std::pair< int, struct SkeletonPoint > sk_n2 = parentPoints[knots.y()];
+            std::pair< int, struct SkeletonPoint > sk_n1 = parentPoints->at(knots.x());
+            std::pair< int, struct SkeletonPoint > sk_n2 = parentPoints->at(knots.y());
 
             QVector3D n1 = sk_n1.second.vertex.toVector3D();
             QVector3D n2 = sk_n2.second.vertex.toVector3D();
