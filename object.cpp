@@ -142,10 +142,8 @@ struct ssbo_mesh Object::getSSBOData()
     qDebug() << "m_VertexidxCloseToAstro: " << m_VertexidxCloseToAstro.size() ;
     ssbo_data.info.setY(m_VertexidxCloseToAstro.size()); // how many vertices are covered by astrocyte
 
-    if (m_parent != NULL)
-        ssbo_data.info.setZ(m_parent->getHVGXID());
-    else
-        ssbo_data.info.setZ(-1);
+    // make sure it is valid ID?
+    ssbo_data.info.setZ(m_parentID);
 
     ssbo_data.info.setW(0); // filtered? 0: no, 1: yes
     ssbo_data.layout1 = m_center.toVector2D();
@@ -186,18 +184,28 @@ int Object::writeSkeletontoVBO(QOpenGLBuffer vbo, int offset)
 
     return count;
 }
-void Object::addSkeletonBranch(SkeletonBranch *branch)
+void Object::addSkeletonBranch(SkeletonBranch *branch, Object *parent)
 {
-    if ( m_parent != NULL &&
+    if ( parent != NULL &&
          (m_object_t == Object_t::SPINE || m_object_t == Object_t::BOUTON || m_object_t == Object_t::MITO)) {
         // I have the parent
         // access the parent
         // mark the points and nodes in this branch at the parent
         // with this child ID
-        m_parent->markChildSubSkeleton(branch, m_ID);
-        Skeleton *parentSkeleton = m_parent->getSkeleton();
+        if (m_object_t == Object_t::MITO) {
+            qDebug() << "MITO with parent  " << parent->getHVGXID() ;
+        }
+        if (parent->hasParent()) {
+            qDebug() << "parent has parent! ";
+            return;
+        }
+        parent->markChildSubSkeleton(branch, m_ID);
+        Skeleton *parentSkeleton = parent->getSkeleton();
         m_skeleton->addBranch(branch, parentSkeleton);
     } else {
+        if (m_object_t == Object_t::MITO) {
+            qDebug() << "MITO ! " << m_parentID;
+        }
         m_skeleton->addBranch(branch, NULL);
     }
 
@@ -212,15 +220,8 @@ void Object::markChildSubSkeleton(SkeletonBranch *childBranch, int childID)
     std::vector<int> childPoints = childBranch->getPointsIndxs();
     for (int i = 0; i < childPoints.size(); ++i) {
         m_skeleton->markPoint(childPoints[i], childID);
-
     }
 
-}
-
-void Object::setParentID(Object *parent)
-{
-    qDebug() << "Adding " << parent->getHVGXID() << " as parent to " <<  m_ID;
-    m_parent = parent;
 }
 
 void Object::addChild(Object *child)
@@ -256,4 +257,12 @@ float Object::getAstroCoverage()
     // return m_VertexidxCloseToAstro.size();
     qDebug() << m_averageDistance << " " <<  m_averageDistance /(float) m_meshIndices.size();
     return 1.0/(m_averageDistance /(float) m_meshIndices.size()); // the smaller the better value
+}
+
+bool Object::hasParent()
+{
+   if (m_object_t == Object_t::BOUTON || m_object_t == Object_t::SPINE ||  m_object_t == Object_t::MITO  )
+       return true;
+
+   return false;
 }

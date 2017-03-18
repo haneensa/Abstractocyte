@@ -399,7 +399,7 @@ void DataContainer::loadMetaDataHVGX(QString path)
                 continue;
             }
 
-            m_objects[hvgxID]->setParentID(m_objects[parentID]);
+            m_objects[hvgxID]->setParentID(parentID);
             m_objects[parentID]->addChild(m_objects[hvgxID]);
 
         } else if (wordList[0] == "bo") {
@@ -409,11 +409,12 @@ void DataContainer::loadMetaDataHVGX(QString path)
                 continue;
             }
 
-            Object *parent = m_objects[hvgxID]->getParent();
-            if (parent == NULL) {
+            int parentID = m_objects[hvgxID]->getParentID();
+            if (m_objects.find(parentID) == m_objects.end()) {
                 continue;
             }
 
+            Object *parent = m_objects[parentID];
             int function = parent->getFunction();
             m_objects[hvgxID]->setFunction(function);
 
@@ -424,11 +425,12 @@ void DataContainer::loadMetaDataHVGX(QString path)
                 continue;
             }
 
-            Object *parent = m_objects[hvgxID]->getParent();
-            if (parent == NULL) {
+            int parentID = m_objects[hvgxID]->getParentID();
+            if (m_objects.find(parentID) == m_objects.end()) {
                 continue;
             }
 
+            Object *parent = m_objects[parentID];
             int function = parent->getFunction();
             m_objects[hvgxID]->setFunction(function);
 
@@ -462,7 +464,7 @@ void DataContainer::loadMetaDataHVGX(QString path)
 //----------------------------------------------------------------------------
 //
 // need a way to optimize this!!!!!
-bool DataContainer::importXML(QString path)
+int DataContainer::importXML(QString path)
 {
     qDebug() << "Func: importXML";
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -584,15 +586,22 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
     // Parent -> Child
     // if axon then all boutons afterwards are its children
     // else if dendrite all consecutive spines are its children
-    if (obj->getObjectType() == Object_t::AXON || obj->getObjectType() ==  Object_t::DENDRITE) { // assuming: all spines/boutons has parents
-        m_curParent = obj;
-    } else if (obj->getObjectType() == Object_t::BOUTON ||obj->getObjectType() == Object_t::SPINE) {
-        obj->setParentID(m_curParent);
-        m_objects[m_curParent->getHVGXID()]->addChild(obj);
-    } else {
-        if (m_parents.find(hvgxID) != m_parents.end()) {
-            obj->setParentID(m_curParent);
-        }
+    // make parent IDs not pointers to objects
+    if (m_parents.find(hvgxID) != m_parents.end()) {
+        int parentID = m_parents[hvgxID];
+        obj->setParentID(parentID);
+
+        if (m_objects.find(parentID) != m_objects.end()) {
+            if (m_objects[parentID]->hasParent()) {
+                int parentParentID = m_objects[parentID]->getParentID();
+                // get parent of this parent
+                if (m_objects.find(parentID) != m_objects.end()) {
+                    parentID = parentParentID;
+                }
+            }
+            m_objects[parentID]->addChild(obj);
+        } else
+            qDebug() << "Object has no parents in m_objects yet " << parentID;
     }
 
     QVector4D color = obj->getColor();
@@ -894,7 +903,7 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
 
                 // todo: get the skeleton vertex from the skeleton itself using an index
                 // get the point branch knots as well
-                if (stringlist.size() < 5) {
+                if (stringlist.size() < 5 || obj->getObjectType() == Object_t::SYNAPSE) {
                     // place holder
                     qDebug() << "Problem!";
 
@@ -920,8 +929,6 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
 
                 vertexIdx = m_mesh->addVertex(v, obj->getObjectType());
                 obj->updateClosestAstroVertex(VertexToAstroDist, vertexIdx); // make local function that goes through all vertices of this object (store unique indices) and compute this
-
-                m_mesh->addVertex(v, obj->getObjectType());
              } else if (xml.name() == "vn") {
                 // add normal to mesh
                 xml.readNext();
@@ -1002,7 +1009,7 @@ void DataContainer::parseSkeleton(QXmlStreamReader &xml, Object *obj)
     qDebug() << xml.name();
 
     xml.readNext();
-    if ( obj->getObjectType() == Object_t::MITO || obj->getObjectType() == Object_t::SYNAPSE )
+    if ( obj->getObjectType() == Object_t::SYNAPSE )
         return;
 
     // this object structure is not done
@@ -1164,7 +1171,12 @@ void DataContainer::parseBranch(QXmlStreamReader &xml, Object *obj)
                 QString coords = xml.text().toString();
                 QStringList stringlist = coords.split(" ");
                 branch->addPointsIndxs(stringlist);
-                obj->addSkeletonBranch(branch);
+                int parentID = obj->getParentID();
+                Object *parent = NULL;
+                if (m_objects.find(parentID) != m_objects.end()) {
+                    parent = m_objects[parentID];
+                }
+                obj->addSkeletonBranch(branch, parent); // pass parent here if exists else null
             }
         } // if start element
         xml.readNext();
