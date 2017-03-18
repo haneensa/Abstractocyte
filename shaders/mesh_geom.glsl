@@ -55,9 +55,12 @@ layout (std430, binding=3) buffer space2d_data
 
 
 void main() {
+
+  // if smooth shading is disabled
   vec3 A = gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz;
   vec3 B = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
   normal_out = normalize(cross(A,B));
+  // else use vertex normal
 
   for(int i = 0; i < 3; i++) {
     int ID = V_ID[i];
