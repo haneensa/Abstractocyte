@@ -23,7 +23,7 @@ struct synapse {
     int bouton;
 };
 
-enum class Object_t { AXON = 2, DENDRITE = 4, BOUTON = 3 , SPINE = 5, MITO = 1, SYNAPSE = 7, ASTROCYTE = 6, GLYCOGEN = 8, UNKNOWN = 0 };
+enum class Object_t { AXON = 2, DENDRITE = 4, BOUTON = 3 , SPINE = 5, MITO = 1, SYNAPSE = 7, ASTROCYTE = 6, GLYCOGEN = 8, UNKNOWN = 0, ASTRO_MITO = 9 };
 
 class Skeleton;
 class Object
@@ -42,6 +42,7 @@ public:
     void* get_indices()                 { return m_meshIndices.data(); }
 
     // properties getters
+    bool hasParent();
     Object_t getObjectType();
     std::string getName()               {  return m_name; }
     QVector4D getColor();
@@ -50,7 +51,10 @@ public:
     int getVolume()                     { return m_volume; }
     int getHVGXID()                     { return m_ID; }
     struct ssbo_mesh getSSBOData();
+
     Object* getParent()                 { return m_parent; }
+    int getParentID()                   { return m_parentID; }
+
     std::vector<Object*> getChildren()  { return m_children; }
     float getAstroCoverage();
     int getFunction()                   { return m_function; }
@@ -61,12 +65,14 @@ public:
     void setCenter(QVector4D center);
     void setAstPoint(QVector4D ast_point);
     void setVolume(int volume)          { m_volume = volume; }
-    void setParentID(Object *parent);
+
+    void setParentID(int parentID)      { m_parentID = parentID; }
+
     void addChild(Object *child);
     // skeleton management
     void addSkeletonNode(QVector3D coords);
     void addSkeletonPoint(QVector3D coords);
-    void addSkeletonBranch(SkeletonBranch *branch);
+    void addSkeletonBranch(SkeletonBranch *branch, Object *parent);
     Skeleton* getSkeleton()            { return m_skeleton; }
 
     void setSkeletonOffset(int offset) { m_skeleton->setIndexOffset(offset);}
@@ -100,6 +106,7 @@ private:
     int                                     m_function;     // -1:not applicable, 0:ex, 1:in, 3:unknown
 
     Object                                  *m_parent;    // NULL if none
+    int                                     m_parentID;
     std::vector<Object*>                    m_children;   // axon-> bouton, den->spine
 
     QVector4D                               m_center;

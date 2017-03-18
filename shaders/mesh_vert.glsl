@@ -5,8 +5,11 @@
 // todo later: find a way to include header
 #extension GL_ARB_shading_language_include : require
 
+#define smooth  1
 layout(location = 0) in vec4    mesh_vx;
 layout(location = 1) in vec4    skeleton_vx;
+
+//layout(location = 3) in vec4    vertex_normal;
 
 out int         V_ID;
 out vec4        V_color_val;

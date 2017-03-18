@@ -73,6 +73,9 @@ void main(void)
     int ID = int(vertex.w);
 
     int type = int(SSBO_data[ID].center.w);     // 0: astrocyte, 1: neurite
+
+    properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
+
     int isFiltered = int(SSBO_data[ID].info.w);
     if ( type == spine || type == bouton || type == mito) {
         // if this is a child and parent is not filtered
@@ -80,11 +83,13 @@ void main(void)
         int isParentFiltered = int(SSBO_data[ParentID].info.w);
         if (isParentFiltered == 0 && isFiltered == 1)  // parent not filtered but child is
             ID = ParentID;
+        int parentType = int(SSBO_data[ParentID].center.w);
+        if (type == mito && parentType == astrocyte)
+            space_properties = space2d.ast;
     }
 
     V_ID = ID;
 
-    properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
 
     vec2 pos_alpha = space_properties.pos_alpha; // position interpolation (pos1, pos2)
     vec2 trans_alpha = space_properties.trans_alpha; // alpha

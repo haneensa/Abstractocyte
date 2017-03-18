@@ -235,8 +235,8 @@ void OpenGLManager::fillVBOsData()
 
     int vbo_skeleton_offset = 0;
 
-    std::map<int, Object*> objects_map = m_dataContainer->getObjectsMap();
-    for ( auto iter = objects_map.begin(); iter != objects_map.end(); iter++) {
+    std::map<int, Object*> *objects_map = m_dataContainer->getObjectsMapPtr();
+    for ( auto iter = objects_map->begin(); iter != objects_map->end(); iter++) {
         Object *object_p = (*iter).second;
         int ID = object_p->getHVGXID();
 
@@ -311,12 +311,12 @@ void OpenGLManager::fillVBOsData()
     for (int i = 0; i < edges_info.size(); ++i) {
         int nID1 = edges_info[i].x();
         int nID2 = edges_info[i].y();
-        if (objects_map.find(nID1) == objects_map.end()
-            || objects_map.find(nID2) == objects_map.end()) {
+        if (objects_map->find(nID1) == objects_map->end()
+            || objects_map->find(nID2) == objects_map->end()) {
             continue;
         }
-        m_neurites_edges.push_back(objects_map[nID1]->getNodeIdx());
-        m_neurites_edges.push_back(objects_map[nID2]->getNodeIdx());
+        m_neurites_edges.push_back(objects_map->at(nID1)->getNodeIdx());
+        m_neurites_edges.push_back(objects_map->at(nID2)->getNodeIdx());
     }
 
     m_TMesh.vboRelease("MeshIndices");
@@ -778,10 +778,10 @@ void OpenGLManager::load3DTexturesFromRaw(QString path)
 //         if ( (int)rawData[i] == 1)
 //            qDebug() << i << " " << (int) rawData[i];
 
-        bufferRGBA[i*4] = rawData[i];
-        bufferRGBA[i*4 + 1] = rawData[i];
+        bufferRGBA[i*4] = 100;//rawData[i];
+        bufferRGBA[i*4 + 1] = 200;//rawData[i];
         bufferRGBA[i*4 + 2] = rawData[i];
-        bufferRGBA[i*4 + 3] = rawData[i];
+        bufferRGBA[i*4 + 3] = 1;//rawData[i];
 
     }
 
@@ -868,7 +868,13 @@ bool OpenGLManager::init_Gly2DHeatMapShaders()
     GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
     glUniform1i(  tf, 1 );
 
-    qDebug() << tex ;
+    // transfer function
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
+    GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
+    glUniform1i(  astro_tex, 2 );
+
+//    qDebug() << tex ;
     GL_Error();
 
 
@@ -1491,13 +1497,13 @@ void OpenGLManager::update_ssbo_data_layout2(QVector2D layout2, int hvgxID)
 void OpenGLManager::update_skeleton_layout1(QVector2D layout1,  long node_index, int hvgxID)
 {
     // get the object -> get its skeleton -> update the layout
-    std::map<int, Object*> objects_map = m_dataContainer->getObjectsMap();
+    std::map<int, Object*> *objects_map = m_dataContainer->getObjectsMapPtr();
 
-    if (objects_map.find(hvgxID) == objects_map.end()) {
+    if (objects_map->find(hvgxID) == objects_map->end()) {
         return;
     }
 
-    Skeleton *skel = objects_map[hvgxID]->getSkeleton();
+    Skeleton *skel = objects_map->at(hvgxID)->getSkeleton();
     if (skel == NULL) {
         qDebug() << "No Skeleton " << hvgxID;
         return;
@@ -1517,13 +1523,13 @@ void OpenGLManager::update_skeleton_layout2(QVector2D layout2,  long node_index,
 {
     // get the object -> get its skeleton -> update the layout
     // get the object -> get its skeleton -> update the layout
-    std::map<int, Object*> objects_map = m_dataContainer->getObjectsMap();
-    if (objects_map.find(hvgxID) == objects_map.end()) {
+    std::map<int, Object*> *objects_map = m_dataContainer->getObjectsMapPtr();
+    if (objects_map->find(hvgxID) == objects_map->end()) {
         qDebug() << "Object not found";
         return;
     }
 
-    Skeleton *skel = objects_map[hvgxID]->getSkeleton();
+    Skeleton *skel = objects_map->at(hvgxID)->getSkeleton();
     if (skel == NULL) {
         qDebug() << "No Skeleton " << hvgxID;
         return;
@@ -1543,12 +1549,12 @@ void OpenGLManager::update_skeleton_layout3(QVector2D layout3,  long node_index,
 {
     // get the object -> get its skeleton -> update the layout
     // get the object -> get its skeleton -> update the layout
-    std::map<int, Object*> objects_map = m_dataContainer->getObjectsMap();
-    if (objects_map.find(hvgxID) == objects_map.end()) {
+    std::map<int, Object*> *objects_map = m_dataContainer->getObjectsMapPtr();
+    if (objects_map->find(hvgxID) == objects_map->end()) {
         return;
     }
 
-    Skeleton *skel = objects_map[hvgxID]->getSkeleton();
+    Skeleton *skel = objects_map->at(hvgxID)->getSkeleton();
     if (skel == NULL) {
         qDebug() << "No Skeleton " << hvgxID;
         return;
@@ -1589,8 +1595,8 @@ Object_t OpenGLManager::getObjectTypeByID(int hvgxID)
 //
 void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
 {
-    std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
-    if (objectMap.find(hvgxID) == objectMap.end() || objectMap[hvgxID] == NULL) {
+    std::map<int, Object*> *objectMap = m_dataContainer->getObjectsMapPtr();
+    if (objectMap->find(hvgxID) == objectMap->end() || objectMap->at(hvgxID) == NULL) {
         return;
     }
 
@@ -1599,16 +1605,16 @@ void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
     if (isfilterd) // hide
         return;
 
-    Object *obj = objectMap[hvgxID];
+    Object *obj = objectMap->at(hvgxID);
 
     // if it has a children then get them
     // else if has parent get them
     if (m_display_parent) {
-        Object *parent = obj->getParent();
-        if (parent == NULL) {
+        int parentID = obj->getParentID();
+        if (objectMap->find(parentID) == objectMap->end()) {
             qDebug() << obj->getName().data() << " has no parnt";
         } else {
-            FilterObject(parent->getHVGXID(), isfilterd);
+            FilterObject(parentID, isfilterd);
         }
     }
 
@@ -1636,25 +1642,25 @@ void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
             struct synapse synapse_data = synapse_obj->getSynapseData();
             if (synapse_data.axon != hvgxID
                 && synapse_data.axon
-                && objectMap.find(synapse_data.axon) != objectMap.end()) {
+                && objectMap->find(synapse_data.axon) != objectMap->end()) {
                 FilterObject(synapse_data.axon, isfilterd);
             }
 
             if (synapse_data.dendrite != hvgxID
                 && synapse_data.dendrite
-                && objectMap.find(synapse_data.dendrite) != objectMap.end()) {
+                && objectMap->find(synapse_data.dendrite) != objectMap->end()) {
                 FilterObject(synapse_data.dendrite, isfilterd);
             }
 
             if (synapse_data.spine != hvgxID
                 && synapse_data.spine
-                && objectMap.find(synapse_data.spine) != objectMap.end()) {
+                && objectMap->find(synapse_data.spine) != objectMap->end()) {
                 FilterObject(synapse_data.spine, isfilterd);
             }
 
             if (synapse_data.bouton != hvgxID
                 && synapse_data.bouton
-                && objectMap.find(synapse_data.bouton) != objectMap.end()) {
+                && objectMap->find(synapse_data.bouton) != objectMap->end()) {
                 FilterObject(synapse_data.bouton, isfilterd);
             }
         }
@@ -1667,16 +1673,16 @@ void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
 // if we filter the object we need to recompute the maximum astrocyte coverage and volume
 void OpenGLManager::FilterObject(int ID, bool isfilterd)
 {
-    std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
+    std::map<int, Object*> *objectMap = m_dataContainer->getObjectsMapPtr();
     if ( ID > m_ssbo_data.size() ||
-         objectMap.find(ID) == objectMap.end() ||
-         objectMap[ID] == NULL )
+         objectMap->find(ID) == objectMap->end() ||
+         objectMap->at(ID) == NULL )
     {
         // no need to filter something that doesnt exist
         return;
     }
 
-    Object *obj = objectMap[ID];
+    Object *obj = objectMap->at(ID);
     obj->updateFilteredFlag(isfilterd);
 
 
@@ -1789,9 +1795,9 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 //
 void OpenGLManager::updateSSBO()
 {
-    std::map<int, Object*>  objectMap = m_dataContainer->getObjectsMap();
+    std::map<int, Object*> *objectMap = m_dataContainer->getObjectsMapPtr();
 
-    for ( auto iter = objectMap.begin(); iter != objectMap.end(); iter++ ) {
+    for ( auto iter = objectMap->begin(); iter != objectMap->end(); iter++ ) {
         Object *obj = (*iter).second;
         if (obj->isFiltered() || obj->getObjectType() == Object_t::ASTROCYTE)
             continue;

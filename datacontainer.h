@@ -23,15 +23,25 @@
 #include "grid3d.h"
 //#include "dbscan.h"
 
+enum class LoadData_t { ALL, ASTRO, NEURITES };
+enum class LoadFile_t { DUMP_ASTRO, DUMP_NEURITES, LOAD_MESH_NO_VERTEX, LOAD_MESH_W_VERTEX };
+enum class Normals_t { DUMP_NORMAL, LOAD_NORMAL, NO_NORMALS };
+
 class DataContainer
 {
 public:
     DataContainer();
     ~DataContainer();
 
-    bool importXML(QString path);
+    void loadData();
+
+    void loadNormals(QString path, const char* filename);
+    void loadObjNormals(QString path);
+
+    int importXML(QString path);
     void parseObject(QXmlStreamReader &xml, Object *obj);
     void parseMesh(QXmlStreamReader &xml, Object *obj);
+    void parseMeshNoVertexnoFace(QXmlStreamReader &xml, Object *obj);
     void parseSkeleton(QXmlStreamReader &xml, Object *obj);
     void parseSkeletonNodes(QXmlStreamReader &xml, Object *obj);
     void parseBranch(QXmlStreamReader &xml, Object *obj);
@@ -97,6 +107,8 @@ protected:
     int                                         m_skeleton_points_size;
     int                                         m_indices_size; // used to allocate indices of a mesh
     int                                         m_vertex_offset; // used to unify vertices for one mesh
+    int                                         m_faces_offset; // used to unify vertices for one mesh
+
     int                                         m_limit;
 
     std::map<int, int>                          m_parents;
@@ -118,8 +130,10 @@ protected:
     SpacePartitioning::Octree                   m_boutonOctree;
     SpacePartitioning::Octree                   m_glycogenOctree;
 
-	
-
+    // file management
+    Normals_t                                   m_normals_t;
+    LoadFile_t                                  m_loadType;
+    LoadData_t                                  m_load_data;
 };
 
 #endif // OBJECTMANAGER_H

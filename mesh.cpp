@@ -15,28 +15,85 @@ Mesh::Mesh()
 	m_typeVertexList[7].reserve(350000);   //synps.v: 300,748
 }
 
-void Mesh::dumpVericesList()
+void Mesh::dumpVertexData(const char* filename)
 {
-    const char* filename = "binary_data.dat";
     std::ofstream outfile(filename, std::ios::binary);
     // write size of file into binary and read it the first thing to allocate
-    for (int i = 0; i < verticesList.size(); ++i) {
+    int size = verticesList.size(); // astro: 1246096
+    outfile.write((char*)&size, sizeof(int));
+    for (int i = 0; i < size; ++i) {
         outfile.write((char*)&verticesList[i], sizeof(struct VertexData));
     }
 
+    // write size of file into binary and read it the first thing to allocate
+    size = m_faces.size(); // astro: 2497612
+    outfile.write((char*)&size, sizeof(int));
+    for (int i = 0; i < size; ++i) {
+        outfile.write((char*)&m_faces[i], sizeof( struct face ));
+    }
+
     outfile.close();
+ }
+
+void  Mesh::readVertexData(const char* filename)
+{
+    int size = 0;
+    std::ifstream ss(filename, std::ios::binary);
+
+    // check if the file was correctly open
+
+    ss.read((char*)&size, sizeof(int)); // astro: 1246096
+    //struct vertex  *v = (struct vertex*)malloc(size * sizeof(struct vertex));
+    // to make it dynamic I need to remove qvector4f and use float [4] instead -> not worth it
+    for (int i = 0; i < size; i++) {
+        struct VertexData v;
+        ss.read((char*)&v,  sizeof(struct VertexData));
+        verticesList.push_back(v);
+        //qDebug() << v.mesh_vertex  << " " << v.skeleton_vertex  << " " << v.index;
+    }
+
+
+    size = 0;
+    // check if the file was correctly open
+
+    ss.read((char*)&size, sizeof(int));  // astro: 2497612
+    //struct vertex  *v = (struct vertex*)malloc(size * sizeof(struct vertex));
+    // to make it dynamic I need to remove qvector4f and use float [4] instead -> not worth it
+    for (int i = 0; i < size; i++) {
+        struct face v;
+        ss.read((char*)&v,  sizeof( struct face));
+        m_faces.push_back(v);
+    }
+
+    ss.close();
+
+
+    qDebug() << " verticesList: " << verticesList.size() << " m_faces: " << m_faces.size();
 }
 
-void Mesh::readVertexBinary()
+void Mesh::dumpNormalsList(const char* filename)
 {
-    const int size = 21;
-    struct VertexData  v[size];
-    const char *filename = "binary_data.dat";
-    std::ifstream ss(filename, std::ios::binary);
-    ss.read((char*)&v, size * sizeof(struct VertexData));
-    for (int i = 0; i < size; i++) {
-        qDebug() << v[i].mesh_vertex << " " << v[i].skeleton_vertex << " " << v[i].index;
+    std::ofstream outfile(filename, std::ios::binary);
+    // write size of file into binary and read it the first thing to allocate
+    int size = m_normalsList.size();
+    outfile.write((char*)&size, sizeof(int));
+    for (int i = 0; i < size; ++i) {
+        outfile.write((char*)&m_normalsList[i], sizeof(QVector4D));
     }
+
+    outfile.close();
+
+}
+
+bool Mesh::readNormalsBinary(const char* filename)
+{
+    int size = 0;
+    std::ifstream ss(filename, std::ios::binary);
+    ss.read((char*)&size, sizeof(int));
+    struct normal  *v = (struct normal*)malloc(size * sizeof(QVector4D));
+    ss.read((char*)&v,  sizeof(QVector4D));
+
+    return true;
 }
 
 int Mesh::addVertex(struct VertexData* vdata, Object_t type)
@@ -80,6 +137,12 @@ void Mesh::allocateNormalsVBO(QOpenGLBuffer vbo_mesh)
     vbo_mesh.allocate(m_normalsList.data(), m_normalsList.size() * sizeof(QVector4D));
 }
 
+void Mesh::addVertexNeighbor(int v_index, int face_index)
+{
+    m_vertexFaces[v_index].push_back(face_index);
+
+}
+
 void Mesh::addFace(int index1, int index2, int index3)
 {
     struct face f;
@@ -90,9 +153,9 @@ void Mesh::addFace(int index1, int index2, int index3)
     int face_index = m_faces.size();
     m_faces.push_back(f);
 
-    m_vertexFaces[index1].push_back(face_index);
-    m_vertexFaces[index2].push_back(face_index);
-    m_vertexFaces[index3].push_back(face_index);
+    addVertexNeighbor(index1, face_index);
+    addVertexNeighbor(index2, face_index);
+    addVertexNeighbor(index3, face_index);
 }
 
 void Mesh::getVertexNeighbors(int v_index, std::set< int > &neighs)

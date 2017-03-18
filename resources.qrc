@@ -24,15 +24,12 @@
         <file>shaders/abstract_skeleton_node_2D_vert.glsl</file>
         <file>shaders/abstract_skeleton_node_transition_vert.glsl</file>
         <file>shaders/common.glslh</file>
-        <file>data/mouse3_metadata_objname_center.hvgx</file>
         <file>shaders/glycogen_frag.glsl</file>
         <file>shaders/glycogen_geom.glsl</file>
         <file>shaders/glycogen_vert.glsl</file>
         <file>data/connectivityList.csv</file>
-        <file>data/m3mouse3_metadata.hvgx</file>
         <file>shaders/hvgx_selection_frag.glsl</file>
         <file>shaders/points_3dConnevtivity_frag.glsl</file>
-        <file>data/mouse3_metadata_objname_center_astroSyn.hvgx</file>
         <file>shaders/nodes_2DHeatMap_frag.glsl</file>
         <file>shaders/nodes_2DHeatMap_geom.glsl</file>
         <file>shaders/nodes_2DHeatMap_vert.glsl</file>
@@ -40,5 +37,6 @@
         <file>shaders/nodes_2DHeatMap_tex_geom.glsl</file>
         <file>shaders/nodes_2DHeatMap_tex_vert.glsl</file>
         <file>data/mask_745_.raw</file>
+        <file>data/mouse3_metadata_objname_center_astroSyn.hvgx</file>
     </qresource>
 </RCC>
