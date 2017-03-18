@@ -14,41 +14,22 @@
  *           -> get the skeleton vertices
  */
 DataContainer::DataContainer()
+    :   m_tempCounter(0),
+        m_indices_size(0),
+        m_skeleton_points_size(0),
+        max_volume(2),
+        max_astro_coverage(0),
+        m_limit(1),
+        m_vertex_offset(0),
+        m_faces_offset(0)
 {
-    m_tempCounter = 0;
-    m_indices_size = 0;
-    m_skeleton_points_size = 0;
-
-    max_volume = 1;
-    max_astro_coverage = 0;
-
-    m_limit = 1;
-    m_vertex_offset = 0;
-
-
     m_mesh = new Mesh();
-
 	m_glycogen3DGrid.setSize(1000,1000,1000);
 
+    /* 1: load all data */
+    loadData();
 
-    /* 1 */
-    loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
-
-    /* 2.1 */
-    // importXML("://m3_astrocyte.xml");   // astrocyte  time:  79150.9 ms
-    /* 2.2 */
-    //importXML("://m3_neurites.xml");    // neurites time:  28802 ms
-     importXML("://pipeline_scripts/output/m3_neurites.xml");    // neurites time:  28802 ms
-
-//    m_mesh->dumpVericesList();
-//    m_mesh->readVertexBinary();
-    //importXML_DOM("://m3_neurites.xml");
-
-    /* 3 */
-    loadMetaDataHVGX(":/data/mouse3_metadata_objname_center_astroSyn.hvgx");
-
-
-    /* 4 */
+    /* 2 */
     qDebug() << "setting up octrees";
 	m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
 	m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
@@ -61,8 +42,6 @@ DataContainer::DataContainer()
 	//m_dbscan.run();
 	//qDebug() << "done clustering";
 
-
-    /* 5 */
     //  test vertex neighbors
     int v_index = 0;
     std::set< int > neighs2;
@@ -80,6 +59,129 @@ DataContainer::~DataContainer()
     for (std::size_t i = 0; i != m_objects.size(); i++) {
         delete m_objects[i];
     }
+}
+
+void DataContainer::loadData()
+{
+    //  28044.8 ms just to read astrocyte without processing
+
+    m_limit = 10000000;
+    /* 1: no need for this, I can later construct this from hvgx file */
+    loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
+    QString hvgxFile = ":/data/mouse3_metadata_objname_center_astroSyn.hvgx";
+    loadParentFromHVGX(hvgxFile);
+
+    m_normals_t = Normals_t::NO_NORMALS;
+    // test for astrocyte
+    if (m_load_data == LoadData_t::ASTRO && m_normals_t != Normals_t::NO_NORMALS) {
+        loadNormals("astro_normal.obj", "astro_normals.dat");
+        // loadNormals("neurites_normals.obj", "neurites_normals.dat");
+    }
+
+    m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
+    m_load_data = LoadData_t::ALL;
+
+    if (m_loadType == LoadFile_t::DUMP_ASTRO || m_loadType == LoadFile_t::DUMP_NEURITES) {
+        if (m_loadType == LoadFile_t::DUMP_ASTRO) {
+            importXML("://pipeline_scripts/output/m3_astrocyte.xml");   // 155,266  ms ~ 2.6 min
+            const char* filename1 = "astro_data_fv.dat";
+            m_mesh->dumpVertexData(filename1);
+        } else {
+            const char* filename2 = "neurites_data_fv.dat";
+            importXML("://pipeline_scripts/output/m3_neurites.xml");    // 910741
+            m_mesh->dumpVertexData(filename2);
+        }
+    } else if (m_loadType == LoadFile_t::LOAD_MESH_NO_VERTEX)  {
+
+        if (m_load_data == LoadData_t::ASTRO) {
+            const char* filename1 = "astro_data_fv.dat";
+            m_mesh->readVertexData(filename1);
+            importXML("://pipeline_scripts/output/m3_astrocyte_noVertex.xml");   //  110,928  ms ~ 2 min -> 17306
+        } else if (m_load_data == LoadData_t::NEURITES) {
+            const char* filename2 = "neurites_data_fv.dat";
+            m_mesh->readVertexData(filename2); //
+            importXML("://pipeline_scripts/output/m3_neurites_noVertex.xml");    // 674046 ~ 12 min -> 118107 ms -> 134884 with vertex type classification
+        } else if (m_load_data == LoadData_t::ALL) {
+            const char* filename1 = "astro_data_fv.dat";
+            m_mesh->readVertexData(filename1);
+            importXML("://pipeline_scripts/output/m3_astrocyte_noVertex.xml");   //   110,928  ms ~ 2 min -> 17306 ms
+
+            const char* filename2 = "neurites_data_fv.dat";
+            m_mesh->readVertexData(filename2); //
+            importXML("://pipeline_scripts/output/m3_neurites_noVertex.xml");    // 674046 ~ 12 min -> 118107 ms
+        }
+
+    } else {
+        if (m_load_data == LoadData_t::ASTRO) {
+            importXML("://pipeline_scripts/output/m3_astrocyte.xml");   // 155,266  ms ~ 2.6 min
+        } else if (m_load_data == LoadData_t::NEURITES) {
+            importXML("://pipeline_scripts/output/m3_neurites.xml");    // 910741
+        } else if (m_load_data == LoadData_t::ALL) {
+            importXML("://pipeline_scripts/output/m3_astrocyte.xml");   // 155,266  ms ~ 2.6 min
+            importXML("://pipeline_scripts/output/m3_neurites.xml");    // 910741
+        }
+
+    }
+
+
+
+    //importXML_DOM("://m3_neurites.xml");
+
+    /* 3 */
+    loadMetaDataHVGX(hvgxFile);
+}
+
+void DataContainer::loadNormals(QString path, const char* filename)
+{
+    if (m_normals_t == Normals_t::DUMP_NORMAL ) {
+        loadObjNormals(path);               // load all normals
+        m_mesh->dumpNormalsList(filename);  // dump them in binary file
+    } else if ( m_normals_t == Normals_t::LOAD_NORMAL ) {
+        m_mesh->readNormalsBinary(filename);
+    }
+}
+
+void DataContainer::loadObjNormals(QString path)
+{
+    qDebug() <<  "Func: loadObjNormals";
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        qDebug() << "Could not open the file for reading";
+        return;
+    }
+
+    QTextStream in(&file);
+    QList<QByteArray> wordList;
+
+    // temp containters
+    std::vector< unsigned int > vertexIndices;
+    std::vector< struct VertexData > temp_vertices;
+    bool flag_prev = false;
+    std::string name;
+    auto t1 = std::chrono::high_resolution_clock::now();
+
+    // load all vertices once -> should be fast
+    // for each object "o", go through its faces, and substitute using vertices loaded at the start
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        wordList = line.split(' ');
+        if (wordList[0]  == "vn") {
+            float x = atof(wordList[1].data());
+            float y = atof(wordList[2].data());
+            float z = atof(wordList[3].data());
+            m_mesh->addVertexNormal(QVector4D(x, y, z, 0));
+        }
+    }
+
+    file.close();
+
+    qDebug() << "Done Func: loadObjNormals";
+    auto t2 = std::chrono::high_resolution_clock::now();
+    qDebug() << "f() took "
+                 << std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count()
+                 << " milliseconds";
+
+    return;
 }
 
 //----------------------------------------------------------------------------
@@ -177,8 +279,6 @@ void DataContainer::loadParentFromHVGX(QString path)
             int parentID = wordList[4].toInt();
             m_parents[hvgxID] = parentID;
         }
-
-
     }
 
     file.close();
@@ -285,6 +385,7 @@ void DataContainer::loadMetaDataHVGX(QString path)
                 m_objects[bouton_id]->addSynapse(synapse);
             }
 
+
         } else if (wordList[0] == "mt") {
             // update mitochoneria parent here if any exists
             //"mt,1053,307,DENDRITE,144,mito_d048_01_029\n"
@@ -369,10 +470,9 @@ bool DataContainer::importXML(QString path)
     QFile  *file = new QFile(path);
     if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug() << "Could not open the file for reading";
-        return false;
+        return 0;
     }
 
-    m_vertex_offset += m_mesh->getVerticesSize();
 
     QXmlStreamReader xml(file);
     while( !xml.atEnd() && !xml.hasError() ) {
@@ -400,6 +500,11 @@ bool DataContainer::importXML(QString path)
     auto t2 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> ms = t2 - t1;
     qDebug() << "time: " << ms.count() << "ms, m_tempCounter: " << m_tempCounter;
+
+    m_faces_offset += m_mesh->getFacesListSize();
+    m_vertex_offset += m_mesh->getVerticesSize();
+
+    return 0;
 }
 
 
@@ -495,12 +600,22 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
 
     xml.readNext();
 
+
     // this object structure is not done
     while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "o")) {
         // go to the next child of object node
         if (xml.tokenType() == QXmlStreamReader::StartElement) {
             if (xml.name() == "mesh") {
-                parseMesh(xml, obj); // takes the most time
+                auto t1 = std::chrono::high_resolution_clock::now();
+
+                if (m_loadType == LoadFile_t::LOAD_MESH_NO_VERTEX) { //130823
+                    parseMeshNoVertexnoFace(xml, obj); // takes the most time
+                } else {
+                    parseMesh(xml, obj); // 175008
+                }
+                auto t2 = std::chrono::high_resolution_clock::now();
+                std::chrono::duration<double, std::milli> ms = t2 - t1;
+                qDebug() << "time: " << ms.count() << "ms ";
             } else if (xml.name() == "skeleton") {
                 parseSkeleton(xml, obj);
             } else if (xml.name() == "volume") {
@@ -564,6 +679,174 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
     }
 
 }
+
+
+//----------------------------------------------------------------------------
+//
+void DataContainer::parseMeshNoVertexnoFace(QXmlStreamReader &xml, Object *obj)
+{
+    // read vertices and their faces into the mesh
+    if (xml.tokenType() != QXmlStreamReader::StartElement && xml.name() != "mesh") {
+        qDebug() << "Called XML parseObejct without attribs";
+        return;
+    }
+
+    qDebug() << xml.name();
+    xml.readNext();
+
+
+    // this object structure is not done
+    while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "mesh")) {
+        // go to the next child of object node
+        if (xml.tokenType() == QXmlStreamReader::StartElement) {
+            if (xml.name() == "vc") {
+                xml.readNext();
+                QString coords = xml.text().toString();
+                QStringList stringlist = coords.split(" ");
+                if (stringlist.size() < 2) {
+                    continue;
+                }
+
+                int vertexIdx = stringlist.at(0).toInt() + m_vertex_offset;
+                int vertexCount = stringlist.at(1).toInt();
+                // mark vertices in vertex list with this range as they belong to the object type
+
+                std::vector< struct VertexData >* meshVertexList = m_mesh->getVerticesList();
+
+                for (int i = vertexIdx; i < (vertexIdx + vertexCount); ++i ) {
+                    struct VertexData* mesh_vertex = &meshVertexList->at(i);
+                    float VertexToAstroDist = mesh_vertex->skeleton_vertex.w();
+                    obj->updateClosestAstroVertex(VertexToAstroDist, i);
+                    m_mesh->addVertex(mesh_vertex, obj->getObjectType());
+                }
+
+            } else if (xml.name() == "fc") {
+                xml.readNext();
+                QString coords = xml.text().toString();
+                QStringList stringlist = coords.split(" ");
+                if (stringlist.size() < 2) {
+                    continue;
+                }
+
+                int faceIdx = stringlist.at(0).toInt() + m_faces_offset;
+                int faceCount = stringlist.at(1).toInt();
+
+                std::vector< struct face > * facesList = m_mesh->getFacesList();
+                // process faces that start from index "faceIdx" with count as faceCount here
+
+                for (int i = faceIdx; i < (faceCount+faceIdx); ++i) {
+                     struct face f = facesList->at(i);
+                     obj->addTriangleIndex(f.v[0] + m_vertex_offset ); // do I have to add the offset?
+                     obj->addTriangleIndex(f.v[1] + m_vertex_offset  );
+                     obj->addTriangleIndex(f.v[2] + m_vertex_offset  );
+
+                     m_mesh->addVertexNeighbor(f.v[0] + m_vertex_offset, i);
+                     m_mesh->addVertexNeighbor(f.v[1] + m_vertex_offset, i);
+                     m_mesh->addVertexNeighbor(f.v[2] + m_vertex_offset, i);
+                }
+
+                m_indices_size += (faceCount * 3);
+
+                if (m_indices_size_byType.find(obj->getObjectType()) == m_indices_size_byType.end() ) {
+                    m_indices_size_byType[obj->getObjectType()] = 0;
+                }
+
+                m_indices_size_byType[obj->getObjectType()] += (faceCount * 3);
+                qDebug() << obj->get_indices_Size();
+
+                // update synapse center
+                if (obj->getObjectType() == Object_t::SYNAPSE) {
+                    // get any vertex that belong to the synapse
+                    std::vector< struct VertexData >* vertixList = m_mesh->getVerticesList();
+                    struct face f = facesList->at(faceIdx);
+                    struct VertexData vertex = vertixList->at( f.v[0] + m_vertex_offset );
+                    obj->setCenter(QVector4D(vertex.mesh_vertex.x(),
+                                                           vertex.mesh_vertex.y(),
+                                                           vertex.mesh_vertex.z(), 0));
+
+                }
+
+            }
+        } // if start element
+        xml.readNext();
+    } // while
+
+}
+
+
+//----------------------------------------------------------------------------
+//
+void DataContainer::parseMeshNoVertex(QXmlStreamReader &xml, Object *obj)
+{
+    // read vertices and their faces into the mesh
+    if (xml.tokenType() != QXmlStreamReader::StartElement && xml.name() != "mesh") {
+        qDebug() << "Called XML parseObejct without attribs";
+        return;
+    }
+
+    qDebug() << xml.name();
+    xml.readNext();
+
+    int vertices = 0;
+    int faces = 0;
+
+    // this object structure is not done
+    while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "mesh")) {
+        // go to the next child of object node
+        if (xml.tokenType() == QXmlStreamReader::StartElement) {
+             if (xml.name() == "f") { // f v1/vt1/vn1 v2/vt2/vn2/ v3/vt3/vn3
+                ++faces;
+                xml.readNext();
+                int vertexIdx[3];
+
+                QString coords = xml.text().toString();
+                QStringList stringlist = coords.split(" ");
+                if (stringlist.size() < 3) {
+                    continue;
+                }
+
+                for (int i = 0; i < 3; ++i) {
+                    // I dont need normal index because its the same as vertex index
+                    QStringList face = stringlist.at(i).split("/");
+                    vertexIdx[i] = face.at(0).toInt()  + m_vertex_offset;
+
+                }
+
+                if (! m_mesh->isValidFaces(vertexIdx[0], vertexIdx[1], vertexIdx[2]) ) {
+                    // error, break
+                    qDebug() << "Error in obj file! " << obj->getName().data() << " " << obj->getHVGXID()
+                             << " " << vertexIdx[0] << " " << vertexIdx[1] << " " << vertexIdx[2] ;
+                    delete obj;
+                    break;
+                }
+
+                int t_index[3];
+                for (int i = 0; i < 3; ++i) {
+                    t_index[i] =  vertexIdx[i] - 1;
+                    // add faces indices to object itself
+                    obj->addTriangleIndex(t_index[i]);
+                }
+
+                m_mesh->addFace(t_index[0], t_index[1], t_index[2]);
+
+                m_indices_size += 3;
+
+                if (m_indices_size_byType.find(obj->getObjectType()) == m_indices_size_byType.end() ) {
+                    m_indices_size_byType[obj->getObjectType()] = 0;
+                }
+
+                m_indices_size_byType[obj->getObjectType()] += 3;
+                // parse normals
+
+            }
+        } // if start element
+        xml.readNext();
+    } // while
+
+
+    qDebug() << "vertices count: " << vertices << " faces: " << faces;
+}
+
 
 //----------------------------------------------------------------------------
 //
