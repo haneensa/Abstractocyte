@@ -7,12 +7,13 @@ in  int         V_ID[];
 in vec4         V_color_val[];
 in float        V_alpha[];
 in float        V_color_intp[];
+in vec4			V_worldPos[];
 
 out float       color_intp;
 out vec4        color_val;
 out vec3        normal_out;
 out float       alpha;
-
+out vec3		vposition;
 out float         G_ID;
 
 layout(triangles) in;
@@ -89,7 +90,7 @@ void main() {
 
 
     color_intp =  V_color_intp[i];
-
+	vposition = V_worldPos[i].xyz;
     gl_Position = gl_in[i].gl_Position;
     EmitVertex();
   }

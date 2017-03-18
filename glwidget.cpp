@@ -330,7 +330,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             //reset translation
             m_translation = QVector3D(0.0, 0.0, 0.0);
             //reset zoom
-            m_distance = 0.2f;
+            m_distance = 1.0f;
 			m_opengl_mngr->setZoom(m_distance);
             update();
         break;

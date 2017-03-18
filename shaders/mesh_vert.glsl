@@ -13,6 +13,7 @@ out vec4        V_color_val;
 out float       V_alpha;
 out float       V_color_intp;
 out int         V_render;
+out vec4		V_worldPos;
 
 uniform int     y_axis;
 uniform int     x_axis;
@@ -65,6 +66,7 @@ void main(void)
 { 
 
     mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
+	V_worldPos = mMatrix * vec4(mesh_vx.xyz, 1.0);
     vec4 mesh_vertex =  pvmMatrix * vec4(mesh_vx.xyz , 1.0);
     vec4 Vskeleton_vx = pvmMatrix * vec4(skeleton_vx.xyz, 1.0);
     int ID = int(mesh_vx.w);

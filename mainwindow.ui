@@ -217,7 +217,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
@@ -256,8 +256,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>336</width>
-              <height>597</height>
+              <width>206</width>
+              <height>257</height>
              </rect>
             </property>
             <attribute name="label">
@@ -356,7 +356,7 @@
               <x>0</x>
               <y>0</y>
               <width>336</width>
-              <height>597</height>
+              <height>737</height>
              </rect>
             </property>
             <attribute name="label">
@@ -423,6 +423,12 @@
              </item>
              <item>
               <widget class="QTreeWidget" name="glycogenMappingTreeWidget">
+               <property name="sortingEnabled">
+                <bool>true</bool>
+               </property>
+               <property name="allColumnsShowFocus">
+                <bool>true</bool>
+               </property>
                <property name="columnCount">
                 <number>3</number>
                </property>

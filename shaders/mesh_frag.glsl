@@ -4,36 +4,68 @@ in vec3         normal_out;
 in float        alpha;
 in float        color_intp;
 in vec4         color_val;
+in vec3			vposition;
 out vec4        outcol;
 
 
 //-------------------- DIFFUSE LIGHT PROPERTIES --------------------
 uniform vec3 diffuseLightDirection;
 
+
 // ------------------- TOON SHADER PROPERTIES ----------------------
 // vec3 lineColor = vec4(0.0, 0.0,  0.0, 1.0); -> color to draw the lines in  (black)
 // float lineThickness = 0.03
 
-float cosTheta = clamp( dot( normal_out, diffuseLightDirection ), 0, 1 );
-float intensity = dot(diffuseLightDirection, normal_out);
+vec3 lightDir2 = vec3(-2.5f, -2.5f, -1.0f);
+vec3 E = vec3(0.5, 0.5, -1.0);
+vec3 N = normalize(normal_out);
+vec3 L = normalize(diffuseLightDirection);
+vec3 L2 = normalize(lightDir2);
 
 void main() {
-    vec4 color = color_val;
-    vec4 toon_color = vec4(color.r, color.g, color.b, 1.0);
-    vec4 phong_color = vec4(color.r, color.g, color.b, 1.0) * cosTheta;
+	
+	//N.z = -1 * N.z;
+	float cosTheta = clamp(dot(N, L), 0, 1);
+	float cosTheta2 = clamp(dot(N, L2), 0, 1);
 
-    if (intensity > 0.95)
-        toon_color = vec4(1.0, 1.0, 1.0, 1.0) * toon_color;
-    else if (intensity > 0.5)
-        toon_color = vec4(0.7, 0.7, 0.7, 1.0) * toon_color;
-    else if (intensity > 0.05)
-        toon_color = vec4(0.35, 0.35, 0.35, 1.0) * toon_color;
-    else
-        toon_color = vec4(0.1, 0.1, 0.1, 1.0) * toon_color;
+	float ambiance = 0.2;
+	float intensity = clamp(dot(L2, N), 0, 1);
+	vec3 V = normalize(E - vposition);
+	vec3 E = normalize(E);
+	vec3 H = normalize(L + E);
+	float sf = max(0.0, dot(N, H));
+	sf = pow(sf, 3.0);
 
+	vec4 color = vec4(color_val.rgb, 1.0);
+    vec4 toon_color = vec4(color.rgb, 1.0);
+	vec4 phong_color = (ambiance *  color) + (color * cosTheta2);//mix(vec4(color.rgb, 1.0) * cosTheta, vec4(color.rgb, 1.0) * cosTheta2, 0.3);
+
+	if (intensity > 0.8)
+		toon_color = vec4(1.0, 1.0, 1.0, 1.0) *toon_color;
+	else if (intensity > 0.25)
+		toon_color = vec4(0.7, 0.7, 0.7, 1.0) *toon_color;
+	else if (intensity > 0.05)
+		toon_color = vec4(0.35, 0.35, 0.35, 1.0) *toon_color;
+	else
+		toon_color = vec4(0.1, 0.1, 0.1, 1.0) *toon_color;
+
+	
+	//borders
+	float border_value = abs(dot(V, normal_out));
+	float edgeDetection = (border_value > 0.7) ? 1 : 0;
     // interpolate between two colors
     // todo: based on the mesh type (astro, neurite)
-    outcol =  phong_color * color_intp +   (1.0 - color_intp) * toon_color ;
-    outcol.a = alpha;
+	outcol = phong_color * color_intp + (1.0 - color_intp) * edgeDetection * toon_color;
+	float al = 0;
+	if (alpha < 1.0 && edgeDetection < 0.5)
+	{
+		al = max(1.0 - border_value, alpha);
+	}
+	else
+	{
+		al = alpha;
+	}
+
+    outcol.a = al;
 
 }

@@ -131,6 +131,8 @@ void MainWindow::on_clusterButton_clicked()
 	headerLabels.push_back(tr("Volume"));
 	mainwindow_ui->glycogenClustersTreeWidget->setHeaderLabels(headerLabels);
 
+	mainwindow_ui->glycogenClustersTreeWidget->setSortingEnabled(false);
+
 	//fill clustering tree widget
 	for (auto iter = m_clusters->begin(); iter != m_clusters->end(); iter++)
 	{
@@ -144,7 +146,8 @@ void MainWindow::on_clusterButton_clicked()
 		cluster_item->setText(1, QString::number(cluster->getClusterSize()));
 		cluster_item->setText(2, QString::number(cluster->getTotalVolume() , 'f', 4));
 	}
-
+	mainwindow_ui->glycogenClustersTreeWidget->setSortingEnabled(true);
+	mainwindow_ui->glycogenClustersTreeWidget->sortByColumn(2, Qt::SortOrder::DescendingOrder);
 	getGLWidget()->getOpenGLManager()->updateGlycogenPoints();
 	
 }
