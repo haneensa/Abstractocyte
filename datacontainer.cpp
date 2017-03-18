@@ -61,6 +61,15 @@ DataContainer::~DataContainer()
     }
 }
 
+//----------------------------------------------------------------------------
+//
+// *** To write binary files:
+// run 1)  m_loadType = LoadFile_t::DUMP_ASTRO;
+// run 2)  m_loadType = LoadFile_t::DUMP_NEURITES;
+// *** To read from binary files:
+// m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
+// *** To read from normal xml:
+// m_loadType = LoadFile_t::LOAD_MESH_W_VERTEX;
 void DataContainer::loadData()
 {
     //  28044.8 ms just to read astrocyte without processing
