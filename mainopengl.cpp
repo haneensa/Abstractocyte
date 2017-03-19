@@ -90,6 +90,11 @@ bool MainOpenGL::initShader(GLuint program, const char *vshader, const char *gsh
     glGetShaderiv(vs, GL_COMPILE_STATUS, &compile_ok);
     if (!compile_ok) {
         qDebug() << "Error in vertex shader";
+        GLint infoLogLength;
+        glGetShaderiv(vs, GL_INFO_LOG_LENGTH, &infoLogLength);
+        GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+        glGetShaderInfoLog(vs, infoLogLength, NULL, strInfoLog);
+        qDebug() <<strInfoLog;
         return false;
     }
 
@@ -100,7 +105,12 @@ bool MainOpenGL::initShader(GLuint program, const char *vshader, const char *gsh
     glCompileShader(gs);
     glGetShaderiv(gs, GL_COMPILE_STATUS, &compile_ok);
     if (!compile_ok) {
-        qDebug() << "Error in geometry shader";
+        qDebug() << "Error in geom shader";
+        GLint infoLogLength;
+        glGetShaderiv(gs, GL_INFO_LOG_LENGTH, &infoLogLength);
+        GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+        glGetShaderInfoLog(gs, infoLogLength, NULL, strInfoLog);
+        qDebug() <<strInfoLog;
         return false;
     }
 
