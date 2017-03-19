@@ -91,6 +91,8 @@ void DataContainer::loadData()
     m_normals_t = Normals_t::LOAD_NORMAL;
 
 
+    auto t1 = std::chrono::high_resolution_clock::now();
+
     if (m_loadType == LoadFile_t::DUMP_ASTRO || m_loadType == LoadFile_t::DUMP_NEURITES) {
         if (m_loadType == LoadFile_t::DUMP_ASTRO) {
             importXML("://pipeline_scripts/output/m3_astrocyte.xml");   // 155,266  ms ~ 2.6 min
@@ -133,9 +135,15 @@ void DataContainer::loadData()
 
     }
 
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> ms = t2 - t1;
+
+    qDebug() << "Objects Loading time: " << ms.count();
+
+
 
      if (m_normals_t == Normals_t::DUMP_NORMAL) {
-         auto t1 = std::chrono::high_resolution_clock::now();
+        t1 = std::chrono::high_resolution_clock::now();
         if (m_load_data == LoadData_t::ASTRO) {
             m_mesh->computeNormalsPerVertex(); // Normals Computing time:  9440.12
             m_mesh->dumpNormalsList("astro_normals.dat");
@@ -143,8 +151,8 @@ void DataContainer::loadData()
             m_mesh->computeNormalsPerVertex(); // Normals Computing time:  44305.1
             m_mesh->dumpNormalsList("neurites_normals.dat");
         }
-        auto t2 = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double, std::milli> ms = t2 - t1;
+        t2 = std::chrono::high_resolution_clock::now();
+        ms = t2 - t1;
 
         qDebug() << "Normals Computing time: " << ms.count();
 
@@ -158,6 +166,10 @@ void DataContainer::loadData()
             m_mesh->readNormalsBinary("neurites_normals.dat");
         }
     }
+
+     qDebug() << " faces: "  << m_mesh->getFacesListSize() << " " <<
+                 " vertices: "  << m_mesh->getVerticesSize() << " " <<
+                 " normals: "  << m_mesh->getNormalsListSize();
 
 
 

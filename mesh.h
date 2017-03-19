@@ -48,7 +48,7 @@ public:
     int addVertex(struct VertexData* vdata, Object_t type);
     int addVertexNormal(QVector4D vnormal);
     bool isValidFaces(int f1, int f2, int f3);
-    int  getVerticesSize()       { return verticesList.size(); }
+    size_t  getVerticesSize()       { return verticesList.size(); }
 
     void addVertexNeighbor(int v_index, int face_index);
 
@@ -59,7 +59,7 @@ public:
     void getVertexNeighbors(int v_index, std::set< int > &neighs);
 
     std::vector< struct face > *getFacesList()      { return &m_faces; }
-    int getFacesListSize()                          { return m_faces.size(); }
+    size_t getFacesListSize()                          { return m_faces.size(); }
 
     // opengl functions
     void allocateVerticesVBO(QOpenGLBuffer vbo_mesh);
@@ -79,6 +79,8 @@ public:
     QVector3D computeFaceNormal(struct face);
     void dumpNormalsList(const char* filename);
     bool readNormalsBinary(const char* filename);
+
+    size_t getNormalsListSize()         { return m_normalsList.size(); }
 
 protected:
     std::vector< struct face >          m_faces; // sequential, write
