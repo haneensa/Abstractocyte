@@ -7,14 +7,15 @@ in  int         V_ID[];
 in vec4         V_color_val[];
 in float        V_alpha[];
 in float        V_color_intp[];
-in vec4			V_worldPos[];
+in vec4		V_worldPos[];
+in vec4         V_normal[];
 
 out float       color_intp;
 out vec4        color_val;
 out vec3        normal_out;
 out float       alpha;
-out vec3		vposition;
-out float         G_ID;
+out vec3	vposition;
+out float       G_ID;
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
@@ -56,14 +57,8 @@ layout(std430, binding = 3) buffer space2d_data
 
 
 void main() {
-
-	// if smooth shading is disabled
-	vec3 A = gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz;
-	vec3 B = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
-	normal_out = normalize(cross(A, B));
-	// else use vertex normal
-
 	for (int i = 0; i < 3; i++) {
+                normal_out = V_normal[i].rgb;
 		int ID = V_ID[i];
 		G_ID = float(ID);
 		int isFiltered = int(SSBO_data[ID].info.w);

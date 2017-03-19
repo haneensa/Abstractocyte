@@ -3,6 +3,7 @@
 #define astrocyte   6
 #define spine       5
 #define bouton      3
+#define mito      1
 
 // in: per vertex data
 layout (location = 0) in vec4 vertex;
@@ -122,7 +123,7 @@ void main(void)
 
         } else if (x_axis < interval.y - 10) {
             // more skeleton
-             if ( type == spine || type == bouton ) {
+             if ( type == spine || type == bouton || type == mito ) {
                 // if this is a child and parent is not filtered
                 int ParentID = int(SSBO_data[ID].info.z);
                 int isParentFiltered = int(SSBO_data[ParentID].info.w);

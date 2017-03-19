@@ -17,7 +17,7 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
 
     m_color_encoding = Color_e::TYPE;
     m_size_encoding = Size_e::VOLUME;
-    m_normals_enabled = false;
+    m_normals_enabled = true;
 }
 
 // ----------------------------------------------------------------------------
@@ -124,7 +124,6 @@ void OpenGLManager::write_ssbo_data()
     memcpy(p,   m_ssbo_data.data(),  bufferSize);
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 }
-
 
 // ----------------------------------------------------------------------------
 //
@@ -936,6 +935,8 @@ bool OpenGLManager::initMeshTrianglesShaders()
     mesh->allocateVerticesVBO( m_TMesh.getVBO("MeshVertices") );
     initMeshVertexAttrib();
 
+    GL_Error();
+
     // create normals vbo
     if (m_normals_enabled) {
         m_TMesh.vboCreate("VertexNormals", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
@@ -943,8 +944,12 @@ bool OpenGLManager::initMeshTrianglesShaders()
         // allocate
         mesh->allocateNormalsVBO( m_TMesh.getVBO("VertexNormals") );
 
-        // initVertexPointer for normals ? then I need to initialize indices as well ?
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE,
+                              0 /*sizeof(QVector4D)*/,  0);
+
         m_TMesh.vboBind("VertexNormals");
+        GL_Error();
     }
 
     m_TMesh.vboRelease("MeshVertices");

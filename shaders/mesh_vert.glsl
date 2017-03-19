@@ -9,15 +9,15 @@
 #define smooth  1
 layout(location = 0) in vec4    mesh_vx;
 layout(location = 1) in vec4    skeleton_vx;
-
-//layout(location = 3) in vec4    vertex_normal;
+layout(location = 2) in vec4    vertex_normal;
 
 out int         V_ID;
 out vec4        V_color_val;
 out float       V_alpha;
 out float       V_color_intp;
 out int         V_render;
-out vec4		V_worldPos;
+out vec4	V_worldPos;
+out vec4        V_normal;
 
 uniform int     y_axis;
 uniform int     x_axis;
@@ -69,6 +69,7 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 void main(void)
 {
 
+V_normal = vertex_normal;
 mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
 V_worldPos = mMatrix * vec4(mesh_vx.xyz, 1.0);
 vec4 mesh_vertex =  pvmMatrix * vec4(mesh_vx.xyz , 1.0);

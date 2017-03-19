@@ -4,7 +4,7 @@ in vec3         normal_out;
 in float        alpha;
 in float        color_intp;
 in vec4         color_val;
-in vec3			vposition;
+in vec3		vposition;
 out vec4        outcol;
 
 
