@@ -21,6 +21,7 @@
 #include "glycogen.h"
 #include "octree.h"
 #include "grid3d.h"
+#include "spatialhash3d.h"
 //#include "dbscan.h"
 
 enum class LoadData_t { ALL, ASTRO, NEURITES };
@@ -65,6 +66,8 @@ public:
 
 	SpacePartitioning::Octree* getSpineOctree() { return &m_spineOctree; }
 	SpacePartitioning::Octree* getBoutonOctree() { return &m_boutonOctree; }
+	SpacePartitioning::SpatialHash3D* getSpineHash() { return &m_spineHash; }
+	SpacePartitioning::SpatialHash3D* getBoutonHash() { return &m_boutonHash; }
 	float* getGlycogen3DGridData();
 
     // graph related function
@@ -128,6 +131,8 @@ protected:
     SpacePartitioning::Octree                   m_spineOctree;
     SpacePartitioning::Octree                   m_boutonOctree;
     SpacePartitioning::Octree                   m_glycogenOctree;
+	SpacePartitioning::SpatialHash3D			m_boutonHash;
+	SpacePartitioning::SpatialHash3D			m_spineHash;
 
     // file management
     Normals_t                                   m_normals_t;

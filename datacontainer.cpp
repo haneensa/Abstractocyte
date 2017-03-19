@@ -27,8 +27,8 @@ DataContainer::DataContainer()
 
     m_mesh = new Mesh();
     m_glycogen3DGrid.setSize(1000,1000,1000);
-
-
+	m_boutonHash.setSize(32, 32, 32);
+	m_spineHash.setSize(32, 32, 32);
     /* 1: load all data */
     loadData();
 
@@ -38,8 +38,8 @@ DataContainer::DataContainer()
 
     /* 3 */
     qDebug() << "setting up octrees";
-    m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
-    m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
+    //m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
+    //m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
     m_glycogenOctree.initialize(&m_glycogenList);
     qDebug() << "octrees ready";
 
@@ -85,9 +85,9 @@ void DataContainer::loadData()
     loadParentFromHVGX(hvgxFile);
 
 
-    m_limit = 100;
+    m_limit = 10000;
     m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
-    m_load_data = LoadData_t::NEURITES;
+    m_load_data = LoadData_t::ALL;
     m_normals_t = Normals_t::LOAD_NORMAL;
 
 
@@ -714,6 +714,10 @@ void DataContainer::parseMeshNoVertexnoFace(QXmlStreamReader &xml, Object *obj)
                     float VertexToAstroDist = mesh_vertex->skeleton_vertex.w();
                     obj->updateClosestAstroVertex(VertexToAstroDist, i);
                     m_mesh->addVertex(mesh_vertex, obj->getObjectType());
+					if (obj->getObjectType() == Object_t::BOUTON)
+						m_boutonHash.addNormalizedPoint(mesh_vertex->x(), mesh_vertex->y(), mesh_vertex->z(), mesh_vertex);
+					if (obj->getObjectType() == Object_t::SPINE)
+						m_spineHash.addNormalizedPoint(mesh_vertex->x(), mesh_vertex->y(), mesh_vertex->z(), mesh_vertex);
                 }
 
             } else if (xml.name() == "fc") {

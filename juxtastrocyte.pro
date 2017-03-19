@@ -45,6 +45,7 @@ SOURCES += main.cpp\
     glycogenanalysismanager.cpp \
     dbscan.cpp \
     grid3d.cpp \
+    spatialhash3d.cpp \
     rendervertexdata.cpp
 
 HEADERS  += mainwindow.h \
@@ -72,6 +73,7 @@ HEADERS  += mainwindow.h \
     glycogenanalysismanager.h \
     dbscan.h \
     grid3d.h \
+    spatialhash3d.h \
     rendervertexdata.h
 
 

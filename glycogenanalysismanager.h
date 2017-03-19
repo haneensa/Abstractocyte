@@ -14,6 +14,7 @@ struct VertexData;
 
 namespace SpacePartitioning {
 	class Octree;
+	class SpatialHash3D;
 }
 
 class GlycogenAnalysisManager
@@ -23,7 +24,7 @@ class GlycogenAnalysisManager
 		GlycogenAnalysisManager(std::map<int, Glycogen*>*, std::vector<VertexData*>*, SpacePartitioning::Octree*, std::vector< struct VertexData >*);
 		~GlycogenAnalysisManager();
 
-		void setBoutonAndSpineOctrees(SpacePartitioning::Octree*, SpacePartitioning::Octree*);
+		void setBoutonAndSpineOctrees(SpacePartitioning::SpatialHash3D*, SpacePartitioning::SpatialHash3D*);
 
 		std::map<int, Clustering::GlycogenCluster*>* runDBScan(float eps, int minPts);
 
@@ -52,8 +53,8 @@ class GlycogenAnalysisManager
 		Clustering::DBScan		  m_dbscan; 
 
 		//octrees 
-		SpacePartitioning::Octree*				m_spineOctree;
-		SpacePartitioning::Octree*				m_boutonOctree;
+		SpacePartitioning::SpatialHash3D*				m_spineHash;
+		SpacePartitioning::SpatialHash3D*				m_boutonHash;
 		SpacePartitioning::Octree*				m_glycogenOctree;
 
 		//clustering results list
