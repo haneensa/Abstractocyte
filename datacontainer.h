@@ -35,9 +35,6 @@ public:
 
     void loadData();
 
-    void loadNormals(QString path, const char* filename);
-    void loadObjNormals(QString path);
-
     int importXML(QString path);
     void parseObject(QXmlStreamReader &xml, Object *obj);
     void parseMesh(QXmlStreamReader &xml, Object *obj);
@@ -96,7 +93,6 @@ public:
     void buildMissingSkeletons();
 
 protected:
-    int                                         m_tempCounter; // how many objects with no contacts to ast based on threshold
      // maximum volume from displayed objects
     int                                         max_volume;
     // maximum vertices from neurites covered by astrocyte

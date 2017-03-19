@@ -15,8 +15,7 @@
  *           -> get the skeleton vertices
  */
 DataContainer::DataContainer()
-    :   m_tempCounter(0),
-        m_indices_size(0),
+    :   m_indices_size(0),
         m_skeleton_points_size(0),
         max_volume(2),
         max_astro_coverage(0),
@@ -51,12 +50,12 @@ DataContainer::DataContainer()
 	//qDebug() << "done clustering";
 
     //  test vertex neighbors
-    int v_index = 0;
-    std::set< int > neighs2;
-    m_mesh->getVertexNeighbors(v_index, neighs2);
-    qDebug() << "neighbors of vertex " << v_index << ": ";
-    for (auto iter = neighs2.begin(); iter != neighs2.end(); ++iter)
-        qDebug() <<" " << *iter;
+    //int v_index = 0;
+    //std::set< int > neighs2;
+    //m_mesh->getVertexNeighbors(v_index, neighs2);
+    //qDebug() << "neighbors of vertex " << v_index << ": ";
+    //for (auto iter = neighs2.begin(); iter != neighs2.end(); ++iter)
+    //    qDebug() <<" " << *iter;
 }
 
 //----------------------------------------------------------------------------
@@ -80,23 +79,17 @@ DataContainer::~DataContainer()
 // m_loadType = LoadFile_t::LOAD_MESH_W_VERTEX;
 void DataContainer::loadData()
 {
-    //  28044.8 ms just to read astrocyte without processing
-
-    m_limit = 1000000;
     /* 1: no need for this, I can later construct this from hvgx file */
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
     QString hvgxFile = ":/data/mouse3_metadata_objname_center_astroSyn.hvgx";
     loadParentFromHVGX(hvgxFile);
 
-    m_normals_t = Normals_t::NO_NORMALS;
-    // test for astrocyte
-    if (m_load_data == LoadData_t::ASTRO && m_normals_t != Normals_t::NO_NORMALS) {
-        loadNormals("astro_normal.obj", "astro_normals.dat");
-        // loadNormals("neurites_normals.obj", "neurites_normals.dat");
-    }
 
+    m_limit = 1000000;
     m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
-	m_load_data = LoadData_t::ALL;
+    m_load_data = LoadData_t::ASTRO;
+    m_normals_t = Normals_t::LOAD_NORMAL;
+
 
     if (m_loadType == LoadFile_t::DUMP_ASTRO || m_loadType == LoadFile_t::DUMP_NEURITES) {
         if (m_loadType == LoadFile_t::DUMP_ASTRO) {
@@ -140,62 +133,39 @@ void DataContainer::loadData()
 
     }
 
+
+     if (m_normals_t == Normals_t::DUMP_NORMAL) {
+         auto t1 = std::chrono::high_resolution_clock::now();
+        if (m_load_data == LoadData_t::ASTRO) {
+            m_mesh->computeNormalsPerVertex(); // Normals Computing time:  9440.12
+            m_mesh->dumpNormalsList("astro_normals.dat");
+        } else if (m_load_data == LoadData_t::NEURITES) {
+            m_mesh->computeNormalsPerVertex(); // Normals Computing time:  44305.1
+            m_mesh->dumpNormalsList("neurites_normals.dat");
+        }
+        auto t2 = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> ms = t2 - t1;
+
+        qDebug() << "Normals Computing time: " << ms.count();
+
+    } else if (m_normals_t == Normals_t::LOAD_NORMAL) {
+        if (m_load_data == LoadData_t::ASTRO) {
+            m_mesh->readNormalsBinary("astro_normals.dat");
+        } else if (m_load_data == LoadData_t::NEURITES) {
+            m_mesh->readNormalsBinary("neurites_normals.dat");
+        } else if (m_load_data == LoadData_t::ALL) {
+            m_mesh->readNormalsBinary("astro_normals.dat");
+            m_mesh->readNormalsBinary("neurites_normals.dat");
+        }
+    }
+
+
+
+
     /* 3 */
     loadMetaDataHVGX(hvgxFile);
 }
 
-void DataContainer::loadNormals(QString path, const char* filename)
-{
-    if (m_normals_t == Normals_t::DUMP_NORMAL ) {
-        loadObjNormals(path);               // load all normals
-        m_mesh->dumpNormalsList(filename);  // dump them in binary file
-    } else if ( m_normals_t == Normals_t::LOAD_NORMAL ) {
-        m_mesh->readNormalsBinary(filename);
-    }
-}
-
-void DataContainer::loadObjNormals(QString path)
-{
-    qDebug() <<  "Func: loadObjNormals";
-    QFile file(path);
-    if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        qDebug() << "Could not open the file for reading";
-        return;
-    }
-
-    QTextStream in(&file);
-    QList<QByteArray> wordList;
-
-    // temp containters
-    std::vector< unsigned int > vertexIndices;
-    std::vector< struct VertexData > temp_vertices;
-    bool flag_prev = false;
-    std::string name;
-    auto t1 = std::chrono::high_resolution_clock::now();
-
-    // load all vertices once -> should be fast
-    // for each object "o", go through its faces, and substitute using vertices loaded at the start
-    while (!file.atEnd()) {
-        QByteArray line = file.readLine();
-        wordList = line.split(' ');
-        if (wordList[0]  == "vn") {
-            float x = atof(wordList[1].data());
-            float y = atof(wordList[2].data());
-            float z = atof(wordList[3].data());
-            m_mesh->addVertexNormal(QVector4D(x, y, z, 0));
-        }
-    }
-
-    file.close();
-
-    qDebug() << "Done Func: loadObjNormals";
-    auto t2 = std::chrono::high_resolution_clock::now();
-    qDebug() << "f() took "
-                 << std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count()
-                 << " milliseconds";
-
-    return;
-}
 
 //----------------------------------------------------------------------------
 //
@@ -503,18 +473,15 @@ int DataContainer::importXML(QString path)
                     break;
                 }
                 Object *obj = NULL;
-
-                // make a thread that would read this ?
-                // the astrocyte wast most of the time
-                // so if we can optimize reading one object would be better
-                parseObject(xml, obj); // fills the object with obj info
+                parseObject(xml, obj);
             }
         }
     }
 
     auto t2 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> ms = t2 - t1;
-    qDebug() << "time: " << ms.count() << "ms, m_tempCounter: " << m_tempCounter;
+
+    qDebug() << "importXML time: " << ms.count();
 
     m_faces_offset += m_mesh->getFacesListSize();
     m_vertex_offset += m_mesh->getVerticesSize();
@@ -607,13 +574,6 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
         obj->setParentID(parentID);
 
         if (m_objects.find(parentID) != m_objects.end()) {
-            //if (m_objects[parentID]->hasParent()) {
-               // int parentParentID = m_objects[parentID]->getParentID();
-                // get parent of this parent
-                //if (m_objects.find(parentID) != m_objects.end()) {
-                //    parentID = parentParentID;
-                //}
-            //}
             m_objects[parentID]->addChild(obj);
         } else
             qDebug() << "Object has no parents in m_objects yet " << parentID;

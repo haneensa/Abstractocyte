@@ -74,6 +74,9 @@ public:
     void dumpFaceList(const char* filename);
     bool readFacesBinary(const char* filename);
 
+
+    void computeNormalsPerVertex();
+    QVector3D computeFaceNormal(struct face);
     void dumpNormalsList(const char* filename);
     bool readNormalsBinary(const char* filename);
 

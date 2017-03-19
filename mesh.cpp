@@ -71,6 +71,54 @@ void  Mesh::readVertexData(const char* filename)
     qDebug() << " verticesList: " << verticesList.size() << " m_faces: " << m_faces.size();
 }
 
+void Mesh::computeNormalsPerVertex()
+{
+    qDebug() << "Start Normals Computing Per vertex";
+
+    for (int i = 0; i < verticesList.size(); ++i) {
+        struct VertexData vertex = verticesList[i];
+        QVector3D normal = QVector3D(0, 0, 0);
+
+        // iterate over vertex faces
+        std::vector<int>  faces_list = m_vertexFaces[i];
+        for (int i = 0; i < faces_list.size(); ++i) {
+            int f_idx = faces_list[i];
+            struct face f = m_faces[f_idx];
+            QVector3D face_normal = this->computeFaceNormal(f);
+            normal += face_normal;
+        }
+
+        normal.normalize();
+        m_normalsList.push_back(normal.toVector4D());
+    }
+}
+
+QVector3D Mesh::computeFaceNormal(struct face f)
+{
+    QVector3D face_normal = QVector3D(0, 0, 0);
+    if (f.v[0] >= verticesList.size() || f.v[1] >= verticesList.size() || f.v[2] >= verticesList.size())
+    {
+        qDebug() << "^^^^^^^^^^^^^^ Problem this should not happen!";
+        return face_normal;
+    }
+
+    struct VertexData v1 = verticesList[f.v[0]];
+    struct VertexData v2 = verticesList[f.v[1]];
+    struct VertexData v3 = verticesList[f.v[2]];
+
+    QVector3D A = v1.mesh_vertex.toVector3D();
+    QVector3D B = v2.mesh_vertex.toVector3D();
+    QVector3D C = v3.mesh_vertex.toVector3D();
+
+    QVector3D AB = B - A;
+    QVector3D AC = C - A;
+
+    face_normal = QVector3D::crossProduct(AB, AC );
+
+    float sin_alpha = face_normal.length() / ( AB.length() * AC.length() );
+    return face_normal.normalized() * sin_alpha;
+}
+
 void Mesh::dumpNormalsList(const char* filename)
 {
     std::ofstream outfile(filename, std::ios::binary);
@@ -90,8 +138,12 @@ bool Mesh::readNormalsBinary(const char* filename)
     int size = 0;
     std::ifstream ss(filename, std::ios::binary);
     ss.read((char*)&size, sizeof(int));
-    struct normal  *v = (struct normal*)malloc(size * sizeof(QVector4D));
-    ss.read((char*)&v,  sizeof(QVector4D));
+    for (int i = 0; i < size; ++i) {
+        QVector4D v;
+        ss.read((char*)&v,  sizeof(QVector4D));
+        m_normalsList.push_back(v);
+    }
+
 
     return true;
 }
