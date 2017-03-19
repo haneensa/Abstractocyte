@@ -21,6 +21,7 @@ void Skeleton::addNode(QVector3D coords)
 
 void Skeleton::addPoint(QVector3D coords)
 {
+    // figure out about mito chonderia skeletons with bouton or spine as parents
     QVector4D point = coords.toVector4D();
     point.setW(m_ID); // check if this belongs to a child then add child ID here
     QVector4D knot1, knot2;
@@ -40,7 +41,7 @@ void Skeleton::markPoint(int pIndex, int IDMark)
     // use the index ID to get the index in vector
     std::pair< int, struct SkeletonPoint > datum = m_points[pIndex];
     // update the SkeletonPoint
-    datum.second.vertex.setW(IDMark);
+    datum.second.vertex.setW(IDMark); // maybe add flag that this part belong to a child?
     m_points[pIndex] = datum;
     points_vec[datum.first] = datum.second;
 }
@@ -105,6 +106,8 @@ void Skeleton::addBranch(SkeletonBranch *branch, Skeleton *parentSkeleton)
             m_nodes.push_back(n1);
             m_nodes.push_back(n2);
             m_branches.push_back(branch);
+
+            // add points as well that are marked with this child ID instead of marking the parent
 
         } else {
             if (m_points.size() <= index || m_nodes.size() < knots.x() || m_nodes.size() < knots.y()) {

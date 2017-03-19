@@ -23,8 +23,6 @@ out int         V_ID;
 out float       V_alpha;
 out float       V_color_intp;
 
-layout(location = 8) uniform int   max_volume;
-
 // make common header and add all these shared data together!
 struct SSBO_datum {
     vec4 color;
@@ -80,12 +78,24 @@ void main(void)
     if ( type == spine || type == bouton || type == mito) {
         // if this is a child and parent is not filtered
         int ParentID = int(SSBO_data[ID].info.z);
+        int parentType = int(SSBO_data[ParentID].center.w);
         int isParentFiltered = int(SSBO_data[ParentID].info.w);
+
+        // test this
+        if (parentType == spine || parentType == bouton) {
+            if (isParentFiltered == 1) // if they are filtered but their parent is not, make this as part of the parent
+                ParentID =  int(SSBO_data[ParentID].info.z);
+        }
+
+        isParentFiltered = int(SSBO_data[ParentID].info.w);
+        // end test
+
         if (isParentFiltered == 0 && isFiltered == 1)  // parent not filtered but child is
             ID = ParentID;
-        int parentType = int(SSBO_data[ParentID].center.w);
         if (type == mito && parentType == astrocyte)
             space_properties = space2d.ast;
+
+
     }
 
     V_ID = ID;

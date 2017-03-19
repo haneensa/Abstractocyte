@@ -72,9 +72,9 @@ public:
     // skeleton management
     void addSkeletonNode(QVector3D coords);
     void addSkeletonPoint(QVector3D coords);
-    void addSkeletonBranch(SkeletonBranch *branch, Object *parent);
+    bool addSkeletonBranch(SkeletonBranch *branch, Object *parent);
     Skeleton* getSkeleton()            { return m_skeleton; }
-
+    void fixSkeleton(Object *parent);
     void setSkeletonOffset(int offset) { m_skeleton->setIndexOffset(offset);}
     int  getSkeletonOffset()           { return m_skeleton->getIndexOffset(); }
     void setNodeIdx(int node_index)    { m_nodeIndx = node_index ; }

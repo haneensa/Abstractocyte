@@ -5,6 +5,8 @@
 // check if parent and child has the same center
 // if yes then add offset to one of them
 
+// bouton 510!!!
+
 #include "object.h"
 #include <QDebug>
 #include <algorithm>
@@ -184,31 +186,49 @@ int Object::writeSkeletontoVBO(QOpenGLBuffer vbo, int offset)
 
     return count;
 }
-void Object::addSkeletonBranch(SkeletonBranch *branch, Object *parent)
+
+void Object::fixSkeleton(Object *parent)
 {
-    if ( parent != NULL &&
-         (m_object_t == Object_t::SPINE || m_object_t == Object_t::BOUTON || m_object_t == Object_t::MITO)) {
-        // I have the parent
-        // access the parent
-        // mark the points and nodes in this branch at the parent
-        // with this child ID
-        if (m_object_t == Object_t::MITO) {
-            qDebug() << "MITO with parent  " << parent->getHVGXID() ;
+    // check if the parent is not null again
+    if (parent == NULL)
+        return;
+
+    std::vector<SkeletonBranch *> * branches = m_skeleton->getBufferedBranches();
+    // iterate over this object branches
+    for ( int i = 0; i < branches->size(); ++i ) {
+        this->addSkeletonBranch(branches->at(i), parent);
+    }
+
+    m_skeleton->clearBufferedBranches();
+}
+
+bool Object::addSkeletonBranch(SkeletonBranch *branch, Object *parent)
+{
+    if ( hasParent() ) { // use parent skeleton and mark child there
+        if ( parent == NULL ) {
+            qDebug() << "child has no parent";
+            // add it to list of empty branches to be processed later
+            m_skeleton->addBufferedBranches(branch);
+            return false;
         }
+
+        // I have the parent, access the parent
+        // mark the points and nodes in this branch at the parent with this child ID
+
         if (parent->hasParent()) {
             qDebug() << "parent has parent! ";
-            return;
+            // use parent parent skeleton, but the parent itself id
+            return false;
         }
+
         parent->markChildSubSkeleton(branch, m_ID);
         Skeleton *parentSkeleton = parent->getSkeleton();
         m_skeleton->addBranch(branch, parentSkeleton);
     } else {
-        if (m_object_t == Object_t::MITO) {
-            qDebug() << "MITO ! " << m_parentID;
-        }
         m_skeleton->addBranch(branch, NULL);
     }
 
+    return true;
 }
 
 void Object::markChildSubSkeleton(SkeletonBranch *childBranch, int childID)

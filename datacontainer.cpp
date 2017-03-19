@@ -1,6 +1,7 @@
 // skeletons to take care of : 134, 510
 // 419, 56
 // 422, 59
+// also deal with mito without parent -> the skeleton they map to is the same as the mesh
 #include <chrono>
 #include "datacontainer.h"
 #include <set>
@@ -28,10 +29,15 @@ DataContainer::DataContainer()
     m_mesh = new Mesh();
 	m_glycogen3DGrid.setSize(1000,1000,1000);
 
+
     /* 1: load all data */
     loadData();
+    \
+    /* 2: build missing skeletons due to order of objects in file */
+    buildMissingSkeletons();
 
-    /* 2 */
+
+    /* 3 */
     qDebug() << "setting up octrees";
 	m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
 	m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
@@ -76,7 +82,7 @@ void DataContainer::loadData()
 {
     //  28044.8 ms just to read astrocyte without processing
 
-    m_limit = 10000000;
+    m_limit = 1000000;
     /* 1: no need for this, I can later construct this from hvgx file */
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
     QString hvgxFile = ":/data/mouse3_metadata_objname_center_astroSyn.hvgx";
@@ -605,13 +611,13 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
         obj->setParentID(parentID);
 
         if (m_objects.find(parentID) != m_objects.end()) {
-            if (m_objects[parentID]->hasParent()) {
-                int parentParentID = m_objects[parentID]->getParentID();
+            //if (m_objects[parentID]->hasParent()) {
+               // int parentParentID = m_objects[parentID]->getParentID();
                 // get parent of this parent
-                if (m_objects.find(parentID) != m_objects.end()) {
-                    parentID = parentParentID;
-                }
-            }
+                //if (m_objects.find(parentID) != m_objects.end()) {
+                //    parentID = parentParentID;
+                //}
+            //}
             m_objects[parentID]->addChild(obj);
         } else
             qDebug() << "Object has no parents in m_objects yet " << parentID;
@@ -679,7 +685,7 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
     } // while
 
     if (obj != NULL) {
-        if (hvgxID == 120)
+        if (hvgxID == 120) // cant skip because it has mito 916 as well (skip them both if we didnt fix 120
             return;
 
          m_objects[hvgxID] =  obj;
@@ -1120,11 +1126,64 @@ void DataContainer::parseBranch(QXmlStreamReader &xml, Object *obj)
                 if (m_objects.find(parentID) != m_objects.end()) {
                     parent = m_objects[parentID];
                 }
-                obj->addSkeletonBranch(branch, parent); // pass parent here if exists else null
+
+                if (parent != NULL && parent->hasParent()) {
+                    int parentParentID = parent->getParentID();
+                    if (m_objects.find(parentParentID) == m_objects.end()) {
+                        qDebug() << "No parentParentID Again!!! " << parentParentID << " " << obj->getHVGXID();
+                    } else {
+                        parent = m_objects[parentParentID];
+                    }
+                }
+
+                // pass parent here if exists else null
+                bool branch_added = obj->addSkeletonBranch(branch, parent);
+                if (branch_added == false) {
+                    // add this to the list that would be processed later again
+                    m_missingParentSkeleton.insert(obj);
+                }
             }
         } // if start element
         xml.readNext();
     } // while
+}
+
+//----------------------------------------------------------------------------
+//
+void DataContainer::buildMissingSkeletons()
+{
+    int k = 0;
+
+    // check the missing skeletons due to missing parents
+    for (auto iter = m_missingParentSkeleton.begin(); iter != m_missingParentSkeleton.end(); ++iter) { // 135
+        Object * obj = *iter;
+        // get object parent
+        int parentID = obj->getParentID();
+        if (m_objects.find(parentID) == m_objects.end()) {
+            qDebug() << "No Parent Again!!! " << parentID << " " << obj->getHVGXID();
+            continue;
+        }
+
+        m_objects[parentID]->addChild(obj);
+
+        Object *parent = m_objects[parentID];
+
+        if (parent->hasParent()) {
+            int parentParentID = parent->getParentID();
+            if (m_objects.find(parentParentID) == m_objects.end()) {
+                qDebug() << "No parentParentID Again!!! " << parentParentID << " " << obj->getHVGXID();
+                continue;
+            }
+
+            parent = m_objects[parentParentID];
+            m_objects[parentParentID]->addChild(obj);// and if parent has parent add it to the parent as well
+        }
+        if (m_debug_msg)
+            qDebug() <<  k++ << " " << obj->getHVGXID() << " " << obj->getName().data();
+        obj->fixSkeleton(parent);
+    }
+
+    m_missingParentSkeleton.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -1217,5 +1276,3 @@ void DataContainer::recomputeMaxVolAstro()
     max_volume = temp_max_volume;
     max_astro_coverage = temp_max_astro_coverage;
 }
-
-
