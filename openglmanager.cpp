@@ -772,20 +772,16 @@ void OpenGLManager::load3DTexturesFromRaw(QString path)
 
     char *bufferRGBA = new char[size * 4];
 
-
     // convert to rgba
     for (int i = 0; i < size; ++i) {
-//         if ( (int)rawData[i] == 1)
-//            qDebug() << i << " " << (int) rawData[i];
-
-        bufferRGBA[i*4] = 100;//rawData[i];
-        bufferRGBA[i*4 + 1] = 200;//rawData[i];
-        bufferRGBA[i*4 + 2] = rawData[i];
-        bufferRGBA[i*4 + 3] = 1;//rawData[i];
-
+        bufferRGBA[i*4] =(rawData[i] > 0) ? 255 : 0;
+        bufferRGBA[i*4 + 1] = 0;
+        bufferRGBA[i*4 + 2] = 0 ;
+        bufferRGBA[i*4 + 3] = 255;
     }
 
     glTexImage3D(GL_TEXTURE_3D,0 ,GL_RGBA, 999, 999, 449,0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) bufferRGBA);
+
     delete [] rawData;
     delete [] bufferRGBA;
 }
@@ -856,23 +852,7 @@ bool OpenGLManager::init_Gly2DHeatMapShaders()
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0,  0);
     GL_Error();
 
-    // heatmap texture
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
-    GLint tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tex");
-    glUniform1i(  tex, 0 );
 
-    // transfer function
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
-    GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
-    glUniform1i(  tf, 1 );
-
-    // transfer function
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
-    GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
-    glUniform1i(  astro_tex, 2 );
 
 //    qDebug() << tex ;
     GL_Error();
@@ -1314,13 +1294,13 @@ void OpenGLManager::drawAll()
 {
     write_ssbo_data();
 
-//    renderTexture2D();
+    renderTexture2D();
 
-    renderAbstractions();
+//    renderAbstractions();
 
-    renderSelection();
+//    renderSelection();
 
-//    drawIntoTexture();
+    drawIntoTexture();
 
 }
 
@@ -1332,6 +1312,24 @@ void OpenGLManager::renderTexture2D()
 //    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
         m_GNeurites.vaoBind("2DHeatMap_Quad");
         m_GNeurites.useProgram("2DHeatMap_Texture");
+        // heatmap texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
+        GLint tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tex");
+        glUniform1i(  tex, 0 );
+
+        // transfer function
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
+        GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
+        glUniform1i(  tf, 1 );
+
+        // transfer function
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
+        GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
+        glUniform1i(  astro_tex, 2 );
+
         glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
         m_GNeurites.vaoRelease();
 //    }
