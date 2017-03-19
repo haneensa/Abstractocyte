@@ -1,6 +1,7 @@
 // skeletons to take care of : 134, 510
 // 419, 56
 // 422, 59
+// also deal with mito without parent -> the skeleton they map to is the same as the mesh
 #include <chrono>
 #include "datacontainer.h"
 #include <set>
@@ -21,15 +22,22 @@ DataContainer::DataContainer()
         max_astro_coverage(0),
         m_limit(1),
         m_vertex_offset(0),
-        m_faces_offset(0)
+        m_faces_offset(0),
+        m_debug_msg(false)
 {
+
     m_mesh = new Mesh();
 	m_glycogen3DGrid.setSize(1000,1000,1000);
 
+
     /* 1: load all data */
     loadData();
+    \
+    /* 2: build missing skeletons due to order of objects in file */
+    buildMissingSkeletons();
 
-    /* 2 */
+
+    /* 3 */
     qDebug() << "setting up octrees";
 	m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
 	m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
@@ -74,7 +82,7 @@ void DataContainer::loadData()
 {
     //  28044.8 ms just to read astrocyte without processing
 
-    m_limit = 10000;
+    m_limit = 1000000;
     /* 1: no need for this, I can later construct this from hvgx file */
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
     QString hvgxFile = ":/data/mouse3_metadata_objname_center_astroSyn.hvgx";
@@ -580,7 +588,9 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
         qDebug() << "Called XML parseObejct without attribs";
         return;
     }
-    qDebug() << xml.name();
+
+    if (m_debug_msg)
+        qDebug() << xml.name();
 
     QString nameline  = xml.attributes().value("name").toString();
     QList<QString> nameList = nameline.split('_');
@@ -601,13 +611,13 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
         obj->setParentID(parentID);
 
         if (m_objects.find(parentID) != m_objects.end()) {
-            if (m_objects[parentID]->hasParent()) {
-                int parentParentID = m_objects[parentID]->getParentID();
+            //if (m_objects[parentID]->hasParent()) {
+               // int parentParentID = m_objects[parentID]->getParentID();
                 // get parent of this parent
-                if (m_objects.find(parentID) != m_objects.end()) {
-                    parentID = parentParentID;
-                }
-            }
+                //if (m_objects.find(parentID) != m_objects.end()) {
+                //    parentID = parentParentID;
+                //}
+            //}
             m_objects[parentID]->addChild(obj);
         } else
             qDebug() << "Object has no parents in m_objects yet " << parentID;
@@ -633,14 +643,14 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
                 }
                 auto t2 = std::chrono::high_resolution_clock::now();
                 std::chrono::duration<double, std::milli> ms = t2 - t1;
-                qDebug() << "time: " << ms.count() << "ms ";
+                if (m_debug_msg)
+                    qDebug() << "time: " << ms.count() << "ms ";
             } else if (xml.name() == "skeleton") {
                 parseSkeleton(xml, obj);
             } else if (xml.name() == "volume") {
                 xml.readNext();
                 int volume =  xml.text().toInt();
                 obj->setVolume(volume);
-                qDebug() << "volume: " << volume;
             } else if (xml.name() == "center") {
                 xml.readNext();
                 QString coords = xml.text().toString();
@@ -652,7 +662,6 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
                 float x = stringlist.at(0).toDouble();
                 float y = stringlist.at(1).toDouble();
                 float z = stringlist.at(2).toDouble();
-                qDebug() << "center: " << x << " " << y << " " << z;
                 obj->setCenter(QVector4D(x/MESH_MAX, y/MESH_MAX, z/MESH_MAX, 0));
                 // set ssbo with this center
             }  else if (xml.name() == "ast_point") {
@@ -668,7 +677,6 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
                 float x = stringlist.at(0).toDouble();
                 float y = stringlist.at(1).toDouble();
                 float z = stringlist.at(2).toDouble();
-                qDebug() << "center: " << x << " " << y << " " << z;
                 obj->setAstPoint(QVector4D(x/MESH_MAX, y/MESH_MAX, z/MESH_MAX, 0));
                 // set ssbo with this center
             }
@@ -677,7 +685,7 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
     } // while
 
     if (obj != NULL) {
-        if (hvgxID == 120)
+        if (hvgxID == 120) // cant skip because it has mito 916 as well (skip them both if we didnt fix 120
             return;
 
          m_objects[hvgxID] =  obj;
@@ -709,9 +717,10 @@ void DataContainer::parseMeshNoVertexnoFace(QXmlStreamReader &xml, Object *obj)
         return;
     }
 
-    qDebug() << xml.name();
-    xml.readNext();
+    if (m_debug_msg)
+        qDebug() << xml.name();
 
+    xml.readNext();
 
     // this object structure is not done
     while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "mesh")) {
@@ -771,7 +780,6 @@ void DataContainer::parseMeshNoVertexnoFace(QXmlStreamReader &xml, Object *obj)
                 }
 
                 m_indices_size_byType[obj->getObjectType()] += (faceCount * 3);
-                qDebug() << obj->get_indices_Size();
 
                 // update synapse center
                 if (obj->getObjectType() == Object_t::SYNAPSE) {
@@ -802,7 +810,9 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
         return;
     }
 
-    qDebug() << xml.name();
+    if (m_debug_msg)
+        qDebug() << xml.name();
+
     xml.readNext();
 
     int vertices = 0;
@@ -855,7 +865,7 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 float VertexToAstroDist = 100;
                 if (stringlist.size() > 6) {
                     VertexToAstroDist = stringlist.at(6).toFloat();
-                  //  qDebug() << "### VertexToAstroDist: " << VertexToAstroDist;
+                  //  () << "### VertexToAstroDist: " << VertexToAstroDist;
                 }
 
                 v->skeleton_vertex.setW(VertexToAstroDist); // distance from neurite to astrocyte
@@ -927,8 +937,6 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
         xml.readNext();
     } // while
 
-
-    qDebug() << "vertices count: " << vertices << " faces: " << faces;
 }
 
 //----------------------------------------------------------------------------
@@ -941,9 +949,12 @@ void DataContainer::parseSkeleton(QXmlStreamReader &xml, Object *obj)
         qDebug() << "Called XML parseObejct without attribs";
         return;
     }
-    qDebug() << xml.name();
+
+    if (m_debug_msg)
+        qDebug() << xml.name();
 
     xml.readNext();
+
     if ( obj->getObjectType() == Object_t::SYNAPSE )
         return;
 
@@ -952,10 +963,8 @@ void DataContainer::parseSkeleton(QXmlStreamReader &xml, Object *obj)
         // go to the next child of object node
         if (xml.tokenType() == QXmlStreamReader::StartElement) {
             if (xml.name() == "nodes") { // make it v
-                qDebug() << xml.name();
                 parseSkeletonNodes(xml, obj);
             } else if (xml.name() == "points") {
-                qDebug() << xml.name();
                 parseSkeletonPoints(xml, obj);
             } else if (xml.name() == "branches") { // children has only branches which uses their parents points
               // process branches
@@ -975,7 +984,9 @@ void DataContainer::parseSkeletonNodes(QXmlStreamReader &xml, Object *obj)
         qDebug() << "Called XML parseSkeletonNodes without attribs";
         return;
     }
-    qDebug() << xml.name();
+
+    if (m_debug_msg)
+        qDebug() << xml.name();
 
     xml.readNext();
 
@@ -1005,7 +1016,8 @@ void DataContainer::parseSkeletonNodes(QXmlStreamReader &xml, Object *obj)
     } // while
 
 
-    qDebug() << "nodes count: " << nodes;
+    if (m_debug_msg)
+        qDebug() << "nodes count: " << nodes;
 }
 
 //----------------------------------------------------------------------------
@@ -1017,8 +1029,9 @@ void DataContainer::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
         qDebug() << "Called XML parseSkeletonNodes without attribs";
         return;
     }
-    qDebug() << xml.name();
 
+    if (m_debug_msg)
+        qDebug() << xml.name();
 
     xml.readNext();
 
@@ -1049,7 +1062,8 @@ void DataContainer::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
         xml.readNext();
     } // while
 
-    qDebug() << "nodes count: " << nodes;
+    if (m_debug_msg)
+        qDebug() << "points count: " << nodes;
 }
 
 //----------------------------------------------------------------------------
@@ -1064,7 +1078,9 @@ void DataContainer::parseBranch(QXmlStreamReader &xml, Object *obj)
         return;
     }
 
-    qDebug() << xml.name();
+    if (m_debug_msg)
+        qDebug() << xml.name();
+
     xml.readNext();
 
     if (obj == NULL) {
@@ -1111,11 +1127,64 @@ void DataContainer::parseBranch(QXmlStreamReader &xml, Object *obj)
                 if (m_objects.find(parentID) != m_objects.end()) {
                     parent = m_objects[parentID];
                 }
-                obj->addSkeletonBranch(branch, parent); // pass parent here if exists else null
+
+                if (parent != NULL && parent->hasParent()) {
+                    int parentParentID = parent->getParentID();
+                    if (m_objects.find(parentParentID) == m_objects.end()) {
+                        qDebug() << "No parentParentID Again!!! " << parentParentID << " " << obj->getHVGXID();
+                    } else {
+                        parent = m_objects[parentParentID];
+                    }
+                }
+
+                // pass parent here if exists else null
+                bool branch_added = obj->addSkeletonBranch(branch, parent);
+                if (branch_added == false) {
+                    // add this to the list that would be processed later again
+                    m_missingParentSkeleton.insert(obj);
+                }
             }
         } // if start element
         xml.readNext();
     } // while
+}
+
+//----------------------------------------------------------------------------
+//
+void DataContainer::buildMissingSkeletons()
+{
+    int k = 0;
+
+    // check the missing skeletons due to missing parents
+    for (auto iter = m_missingParentSkeleton.begin(); iter != m_missingParentSkeleton.end(); ++iter) { // 135
+        Object * obj = *iter;
+        // get object parent
+        int parentID = obj->getParentID();
+        if (m_objects.find(parentID) == m_objects.end()) {
+            qDebug() << "No Parent Again!!! " << parentID << " " << obj->getHVGXID();
+            continue;
+        }
+
+        m_objects[parentID]->addChild(obj);
+
+        Object *parent = m_objects[parentID];
+
+        if (parent->hasParent()) {
+            int parentParentID = parent->getParentID();
+            if (m_objects.find(parentParentID) == m_objects.end()) {
+                qDebug() << "No parentParentID Again!!! " << parentParentID << " " << obj->getHVGXID();
+                continue;
+            }
+
+            parent = m_objects[parentParentID];
+            m_objects[parentParentID]->addChild(obj);// and if parent has parent add it to the parent as well
+        }
+        if (m_debug_msg)
+            qDebug() <<  k++ << " " << obj->getHVGXID() << " " << obj->getName().data();
+        obj->fixSkeleton(parent);
+    }
+
+    m_missingParentSkeleton.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -1208,5 +1277,3 @@ void DataContainer::recomputeMaxVolAstro()
     max_volume = temp_max_volume;
     max_astro_coverage = temp_max_astro_coverage;
 }
-
-

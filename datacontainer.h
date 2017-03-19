@@ -92,6 +92,9 @@ public:
     //************ Load Raw Data
     char* loadRawFile(QString path, int size);
 
+
+    void buildMissingSkeletons();
+
 protected:
     int                                         m_tempCounter; // how many objects with no contacts to ast based on threshold
      // maximum volume from displayed objects
@@ -134,6 +137,10 @@ protected:
     Normals_t                                   m_normals_t;
     LoadFile_t                                  m_loadType;
     LoadData_t                                  m_load_data;
+    bool                                        m_debug_msg;
+    std::set<Object*>                        m_missingParentSkeleton;
+
+
 };
 
 #endif // OBJECTMANAGER_H

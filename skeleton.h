@@ -60,6 +60,11 @@ public:
     void setIndexOffset(int offset) { m_idx_offset = offset; }
     int getIndexOffset()            { return m_idx_offset; }
 
+    std::vector<SkeletonBranch *> *getBranchesPtr() { return &m_branches; }
+
+    void addBufferedBranches(SkeletonBranch *branch)    { m_temp_branches.push_back(branch);}
+    std::vector<SkeletonBranch *> * getBufferedBranches()    { return &m_temp_branches; }
+    void clearBufferedBranches()    { m_temp_branches.clear(); }
 protected:
     int                                     m_ID;
 
@@ -75,6 +80,8 @@ protected:
     std::map<int, std::pair< int, struct SkeletonPoint> >     m_points; // ID -> <index in vector , data>
     std::vector<struct SkeletonPoint>       points_vec;
     std::vector<SkeletonBranch *>           m_branches;
+
+    std::vector<SkeletonBranch *>           m_temp_branches;
 };
 
 #endif // SKELETON_H

@@ -236,7 +236,7 @@ void OpenGLManager::fillVBOsData()
     int vbo_skeleton_offset = 0;
 
     std::map<int, Object*> *objects_map = m_dataContainer->getObjectsMapPtr();
-    for ( auto iter = objects_map->begin(); iter != objects_map->end(); iter++) {
+    for ( auto iter = objects_map->rbegin(); iter != objects_map->rend(); iter++) {
         Object *object_p = (*iter).second;
         int ID = object_p->getHVGXID();
 
