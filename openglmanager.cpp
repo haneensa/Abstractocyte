@@ -1294,11 +1294,11 @@ void OpenGLManager::drawAll()
 {
     write_ssbo_data();
 
-    renderTexture2D();
+    //renderTexture2D();
 
-//    renderAbstractions();
+    renderAbstractions();
 
-//    renderSelection();
+    renderSelection();
 
     drawIntoTexture();
 

@@ -71,7 +71,8 @@ namespace Clustering
 	//
 	void GlycogenCluster::addNode(Glycogen* glycogen)
 	{
-		if (!glycogen)
+		//if glycogne is null or glycogen already in cluster.. exit
+		if (!glycogen || m_glycogenMap.find(glycogen->getID()) != m_glycogenMap.end())
 			return;
 
 		m_totalVolume += glycogen->getVolume();

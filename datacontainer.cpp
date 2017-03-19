@@ -74,7 +74,7 @@ void DataContainer::loadData()
 {
     //  28044.8 ms just to read astrocyte without processing
 
-    m_limit = 10000000;
+    m_limit = 10000;
     /* 1: no need for this, I can later construct this from hvgx file */
     loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
     QString hvgxFile = ":/data/mouse3_metadata_objname_center_astroSyn.hvgx";
@@ -88,7 +88,7 @@ void DataContainer::loadData()
     }
 
     m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
-    m_load_data = LoadData_t::ALL;
+	m_load_data = LoadData_t::ALL;
 
     if (m_loadType == LoadFile_t::DUMP_ASTRO || m_loadType == LoadFile_t::DUMP_NEURITES) {
         if (m_loadType == LoadFile_t::DUMP_ASTRO) {
@@ -733,6 +733,7 @@ void DataContainer::parseMeshNoVertexnoFace(QXmlStreamReader &xml, Object *obj)
 
                 for (int i = vertexIdx; i < (vertexIdx + vertexCount); ++i ) {
                     struct VertexData* mesh_vertex = &meshVertexList->at(i);
+					mesh_vertex->index = i;
                     float VertexToAstroDist = mesh_vertex->skeleton_vertex.w();
                     obj->updateClosestAstroVertex(VertexToAstroDist, i);
                     m_mesh->addVertex(mesh_vertex, obj->getObjectType());

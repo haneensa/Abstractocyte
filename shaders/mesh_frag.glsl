@@ -22,13 +22,15 @@ vec3 N = normalize(normal_out);
 vec3 L = normalize(diffuseLightDirection);
 vec3 L2 = normalize(lightDir2);
 
+float ambiance = 0.3;
+
 void main() {
-	
+
 	//N.z = -1 * N.z;
 	float cosTheta = clamp(dot(N, L), 0, 1);
 	float cosTheta2 = clamp(dot(N, L2), 0, 1);
 
-	float ambiance = 0.2;
+	
 	float intensity = clamp(dot(L2, N), 0, 1);
 	vec3 V = normalize(E - vposition);
 	vec3 E = normalize(E);
@@ -37,7 +39,7 @@ void main() {
 	sf = pow(sf, 3.0);
 
 	vec4 color = vec4(color_val.rgb, 1.0);
-    vec4 toon_color = vec4(color.rgb, 1.0);
+	vec4 toon_color = vec4(color.rgb, 1.0);
 	vec4 phong_color = (ambiance *  color) + (color * cosTheta2);//mix(vec4(color.rgb, 1.0) * cosTheta, vec4(color.rgb, 1.0) * cosTheta2, 0.3);
 
 	if (intensity > 0.8)
@@ -49,12 +51,12 @@ void main() {
 	else
 		toon_color = vec4(0.1, 0.1, 0.1, 1.0) *toon_color;
 
-	
+
 	//borders
 	float border_value = abs(dot(V, normal_out));
 	float edgeDetection = (border_value > 0.7) ? 1 : 0;
-    // interpolate between two colors
-    // todo: based on the mesh type (astro, neurite)
+	// interpolate between two colors
+	// todo: based on the mesh type (astro, neurite)
 	outcol = phong_color * color_intp + (1.0 - color_intp) * edgeDetection * toon_color;
 	float al = 0;
 	if (alpha < 1.0 && edgeDetection < 0.5)
@@ -66,6 +68,6 @@ void main() {
 		al = alpha;
 	}
 
-    outcol.a = al;
+	outcol.a = alpha;
 
 }

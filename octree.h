@@ -126,7 +126,7 @@ namespace SpacePartitioning
 		/** nearest neighbor queries. Using minDistance >= 0, we explicitly disallow self-matches.
 		* @return index of nearest neighbor n with Distance::compute(query, n) > minDistance and otherwise -1.
 		**/
-		int32_t findNeighbor(float x, float y, float z, float minDistance = -1, int self_index = -1) const;
+		int32_t findNeighbor(float x, float y, float z, float minDistance = 0, int self_index = -1) const;
 
 		/** radius neighbor queries where radius determines the maximal radius of reported indices of points in
 		* resultIndices **/

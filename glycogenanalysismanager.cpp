@@ -119,7 +119,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 		{
 			VertexData* glycogenVertex = (*iter);
 			//get nearest bouton vertex to this granule
-			int boutonVertexIndex = m_boutonOctree->findNeighbor(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z(), 0.1f);
+			int boutonVertexIndex = m_boutonOctree->findNeighbor(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z());
 			//store mapping
 			m_glycogenIdToObjectVertexIndexMapping[glycogenVertex->id()] = boutonVertexIndex;
 			//get actual VertexData and use Object Id
@@ -155,7 +155,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 		{
 			VertexData* glycogenVertex = (*iter);
 			//get nearest spine vertex to this granule
-			int spineVertexIndex = m_spineOctree->findNeighbor(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z(), 0.1f);
+			int spineVertexIndex = m_spineOctree->findNeighbor(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z());
 			//store mapping
 			m_glycogenIdToObjectVertexIndexMapping[glycogenVertex->id()] = spineVertexIndex;
 			//get actual VertexData and use Object Id
@@ -191,9 +191,9 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 		{
 			VertexData* glycogenVertex = (*iter);
 			//get nearest bouton vertex to this granule
-			int boutonVertexIndex = m_boutonOctree->findNeighbor(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z(), 0.1f);
+			int boutonVertexIndex = m_boutonOctree->findNeighbor(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z());
 			//get nearest spine vertex to this granule
-			int spineVertexIndex = m_spineOctree->findNeighbor(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z(), 0.1f);
+			int spineVertexIndex = m_spineOctree->findNeighbor(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z());
 			
 			//get actual VertexData and use Object Id
 			VertexData* spineVertex = &(m_verticesList->at(spineVertexIndex));
@@ -257,7 +257,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			QVector3D clusterNode =  cluster->getAvgNode();
 
 			//get nearest bouton vertex to this centroid
-			int boutonVertexIndex = m_boutonOctree->findNeighbor(clusterNode.x(), clusterNode.y(), clusterNode.z(), 0.1f);
+			int boutonVertexIndex = m_boutonOctree->findNeighbor(clusterNode.x(), clusterNode.y(), clusterNode.z());
 			//store mapping
 			m_glycogenIdToObjectVertexIndexMapping[cluster->getID()] = boutonVertexIndex;
 			//get actual VertexData and use Object Id
@@ -296,7 +296,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			QVector3D clusterNode = cluster->getAvgNode();
 
 			//get nearest spine vertex to this centroid
-			int spineVertexIndex = m_spineOctree->findNeighbor(clusterNode.x(), clusterNode.y(), clusterNode.z(), 0.1f);
+			int spineVertexIndex = m_spineOctree->findNeighbor(clusterNode.x(), clusterNode.y(), clusterNode.z());
 			//store mapping
 			m_glycogenIdToObjectVertexIndexMapping[cluster->getID()] = spineVertexIndex;
 			//get actual VertexData and use Object Id
@@ -334,9 +334,9 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			QVector3D clusterNode = cluster->getAvgNode();
 
 			//get nearest bouton vertex to this centroid
-			int boutonVertexIndex = m_boutonOctree->findNeighbor(clusterNode.x(), clusterNode.y(), clusterNode.z(), 0.1f);
+			int boutonVertexIndex = m_boutonOctree->findNeighbor(clusterNode.x(), clusterNode.y(), clusterNode.z());
 			//get nearest spine vertex to this centroid
-			int spineVertexIndex = m_spineOctree->findNeighbor(clusterNode.x(), clusterNode.y(), clusterNode.z(), 0.1f);
+			int spineVertexIndex = m_spineOctree->findNeighbor(clusterNode.x(), clusterNode.y(), clusterNode.z());
 			//find which is closer bouton or spine
 			VertexData* boutonVertex = &(m_verticesList->at(boutonVertexIndex));
 			VertexData* spineVertex = &(m_verticesList->at(spineVertexIndex));
