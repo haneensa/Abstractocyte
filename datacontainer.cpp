@@ -140,10 +140,6 @@ void DataContainer::loadData()
 
     }
 
-
-
-    //importXML_DOM("://m3_neurites.xml");
-
     /* 3 */
     loadMetaDataHVGX(hvgxFile);
 }

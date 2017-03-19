@@ -1,35 +1,3 @@
-/*
-Just to make it easier.. this code is copied from HVR_AbstractGraphManager
-
-
-//Render the selection frame
-
-glBindFramebufferEXT(GL_FRAMEBUFFER, m_selectionFramebuffer);
-//clear
-glClear(GL_COLOR_BUFFER_BIT);
-//disable dithering -- important
-glDisable(GL_DITHER);
-//render graph
-m_abstract_graph->drawAbstract(HVR_GRAPH_DRAW_SELECTION_MODE, HVR_ABSTRACT_GRAPH_DRAW_CLUSTERED_EDGES_OPTION);
-//enable dithering again
-glEnable(GL_DITHER);
-//process click
-_processSelection();
-
-glBindFramebufferEXT(GL_FRAMEBUFFER, 0);
-
-
-in process selection:
-
-GLint viewport[4];
-GLubyte pixel[3];
-glGetIntegerv(GL_VIEWPORT, viewport);
-glReadPixels(m_mouse_x, viewport[3] - m_mouse_y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, (void *)pixel);
-
-int id = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
-
- */
-
 #include "openglmanager.h"
 
 OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpace)
@@ -43,9 +11,9 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
     m_display_child = false;
     m_display_parent = false;
     m_display_synapses = false;
-	m_zoom = 1.0f;
+    m_zoom = 1.0f;
     m_depth = 1;
-	m_renderGlycogenGranules = true;
+    m_renderGlycogenGranules = true;
 
     m_color_encoding = Color_e::TYPE;
     m_size_encoding = Size_e::VOLUME;
@@ -63,33 +31,25 @@ OpenGLManager::~OpenGLManager()
     m_vbo_glycogen.destroy();
 }
 
-// ----------------------------------------------------------------------------
+
+// ############## Draw Call ###############################################
 //
-void OpenGLManager::init_Gly3DTex()
+void OpenGLManager::drawAll()
 {
-	m_gly_3D_Tex = 0;
+    write_ssbo_data();
 
-	glGenTextures(1, &m_gly_3D_Tex);
-	glBindTexture(GL_TEXTURE_3D, m_gly_3D_Tex);
-	GL_Error();
+    //renderTexture2D();
 
-	//glTexImage3D(GL_TEXTURE_3D, 0, GL_RED, 1000, 1000, 1000, 0, GL_RED, GL_FLOAT, 0);
+    renderAbstractions();
 
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
-	GL_Error();
+    renderSelection();
+
+    drawIntoTexture();
+
 }
 
-void OpenGLManager::upload_Gly3DTex(void* data, int sizeX, int sizeY, int sizeZ, GLenum type)
-{
-	glBindTexture(GL_TEXTURE_3D, m_gly_3D_Tex);
-
-	glTexImage3D(GL_TEXTURE_3D, 0, GL_RED, sizeX, sizeY, sizeZ, 0, GL_RED, type, data);
-}
-
+// ############## Data Initialization ###############################################
+//
 bool OpenGLManager::initOpenGLFunctions()
 {
     m_glFunctionsSet = true;
@@ -130,45 +90,6 @@ void OpenGLManager::updateCanvasDim(int w, int h, int retianScale)
     }
 
 }
-
-// ----------------------------------------------------------------------------
-//
-void OpenGLManager::initSelectionFrameBuffer()
-{
-    qDebug() << "initSelectionFrameBuffer";
-
-    // create FBO
-    glGenFramebuffers(1, &m_selectionFrameBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
-    glGenRenderbuffers(1, &m_selectionRenderBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_selectionRenderBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, m_canvas_w, m_canvas_h);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_selectionRenderBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-// ----------------------------------------------------------------------------
-//
-int OpenGLManager::processSelection(float x, float y)
-{
-    qDebug() << "Draw Selection!";
-
-    glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
-    glEnable(GL_DEPTH_TEST);
-
-    GLubyte pixel[3];
-
-    qDebug() << x << " " << y;
-    glReadPixels(x, y, 1, 1, GL_RGB,GL_UNSIGNED_BYTE, (void *)pixel);
-    int pickedID = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
-    qDebug() << pixel[0] << " " << pixel[1] << " " << pixel[2];
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    qDebug() << "Picked ID: " << pickedID;
-
-    return pickedID;
- }
 
 // ----------------------------------------------------------------------------
 //
@@ -278,7 +199,7 @@ void OpenGLManager::fillVBOsData()
         Skeleton *skeleton = object_p->getSkeleton();
         // if (spine/bouton) then get their skeleton from their parents
         // get the actual nodes from their parents
-        // only show them if parent is filtered
+        // only show them if parent is filtered/same as mito
 
         // I do want the substructures graph to be present and use them only if their parents was filtered
 
@@ -333,36 +254,266 @@ void OpenGLManager::fillVBOsData()
 
 }
 
-// ----------------------------------------------------------------------------
+// ############## Textures ###############################################
 //
-bool OpenGLManager::initMeshVertexAttrib()
+void OpenGLManager::init_Gly3DTex()
 {
-    if (m_glFunctionsSet == false)
-        return false;
+    m_gly_3D_Tex = 0;
 
-    int offset = 0;
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
-                          sizeof(VertexData),  0);
+    glGenTextures(1, &m_gly_3D_Tex);
+    glBindTexture(GL_TEXTURE_3D, m_gly_3D_Tex);
+    GL_Error();
 
+    //glTexImage3D(GL_TEXTURE_3D, 0, GL_RED, 1000, 1000, 1000, 0, GL_RED, GL_FLOAT, 0);
 
-    offset +=  sizeof(QVector4D);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
-                          sizeof(VertexData), (GLvoid*)offset);
-
-    return true;
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+    GL_Error();
 }
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::initNeuritesVertexAttribPointer()
+void OpenGLManager::upload_Gly3DTex(void* data, int sizeX, int sizeY, int sizeZ, GLenum type)
 {
-    int offset = 0;
-    glEnableVertexAttribArray(0);
-    glVertexAttribIPointer(0, 1, GL_INT, 0, (void*)offset);
+    glBindTexture(GL_TEXTURE_3D, m_gly_3D_Tex);
+
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_RED, sizeX, sizeY, sizeZ, 0, GL_RED, type, data);
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::init_Gly2DHeatMap()
+{
+    m_gly_2D_heatMap_FBO = 0;
+
+    glGenFramebuffers(1, &m_gly_2D_heatMap_FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
+    GL_Error();
+
+    glGenTextures(1, &m_gly_2D_heatMap_Tex);
+    glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
+    GL_Error();
+
+    // create empty image
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_canvas_w, m_canvas_h, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    GL_Error();
+
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_gly_2D_heatMap_Tex, 0);
+    GL_Error();
+
+    // set the list of draw buffers
+    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, DrawBuffers);
+    GL_Error();
+
+    // check if frame buffer is ok
+   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+       qDebug() << "ERROR!!!!";
+       return;
+    }
+   GL_Error();
+
+
+   // init transfer function
+   m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 1.0f));
+   m_tf_2DHeatmap.push_back(QVector4D(1.0f, 1.0f, 1.0f, 1.0f));
+
+
+   glGenTextures( 1, &m_tf_2DHeatMap_tex);
+   GL_Error();
+
+   glBindTexture( GL_TEXTURE_1D, m_tf_2DHeatMap_tex);
+   GL_Error();
+
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+   GL_Error();
+
+    glTexImage1D( GL_TEXTURE_1D, 0, GL_RGBA, 2, 0, GL_RGBA, GL_FLOAT, m_tf_2DHeatmap.data());
+
+    GL_Error();
 
 }
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::load3DTexturesFromRaw(QString path)
+{
+    int size = 999 * 999 * 449;
+    char *rawData = m_dataContainer->loadRawFile(":/data/mask_745_.raw", size);
+    //load data into a 3D texture
+    glGenTextures(1, &m_astro_3DTex);
+    glBindTexture(GL_TEXTURE_3D, m_astro_3DTex);
+
+     // set the texture parameters
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    char *bufferRGBA = new char[size * 4];
+
+    // convert to rgba
+    for (int i = 0; i < size; ++i) {
+        bufferRGBA[i*4] =(rawData[i] > 0) ? 255 : 0;
+        bufferRGBA[i*4 + 1] = 0;
+        bufferRGBA[i*4 + 2] = 0 ;
+        bufferRGBA[i*4 + 3] = 255;
+    }
+
+    glTexImage3D(GL_TEXTURE_3D,0 ,GL_RGBA, 999, 999, 449,0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) bufferRGBA);
+
+    delete [] rawData;
+    delete [] bufferRGBA;
+}
+
+// ----------------------------------------------------------------------------
+//
+bool OpenGLManager::init_Gly2DHeatMapShaders()
+{
+    // init 2D HeatMap
+    m_GNeurites.createProgram("2DHeatMap");
+    bool res = m_GNeurites.compileShader("2DHeatMap",
+                                    ":/shaders/nodes_2DHeatMap_vert.glsl",
+                                    ":/shaders/nodes_2DHeatMap_geom.glsl",
+                                    ":/shaders/nodes_2DHeatMap_frag.glsl");
+    if (res == false)
+        return res;
+    GL_Error();
+
+    m_GNeurites.vaoCreate("2DHeatMap");
+    m_GNeurites.vaoBind("2DHeatMap");
+    GL_Error();
+
+    m_GNeurites.vboBind("nodes");
+
+    GL_Error();
+
+    m_GNeurites.useProgram("2DHeatMap");
+
+    initNeuritesVertexAttribPointer();
+
+    m_GNeurites.vboRelease("nodes");
+
+    m_GNeurites.vaoRelease();
+
+    GL_Error();
+
+    m_GNeurites.createProgram("2DHeatMap_Texture");
+    res = m_GNeurites.compileShader("2DHeatMap_Texture",
+                                    ":/shaders/nodes_2DHeatMap_tex_vert.glsl",
+                                    ":/shaders/nodes_2DHeatMap_tex_geom.glsl",
+                                    ":/shaders/nodes_2DHeatMap_tex_frag.glsl");
+    GL_Error();
+
+    if (res == false)
+        return res;
+
+    // todo: initialize uniforms
+
+    m_GNeurites.vaoCreate("2DHeatMap_Quad");
+    m_GNeurites.vaoBind("2DHeatMap_Quad");
+
+    m_Texquad.push_back(QVector4D(-1.0f, -1.0f,  0.0f, 0));
+    m_Texquad.push_back(QVector4D( 1.0f, -1.0f,  1.0f, 0));
+    m_Texquad.push_back(QVector4D(-1.0f,  1.0f,  0.0f, 1));
+    m_Texquad.push_back(QVector4D(-1.0f,  1.0f,  0.0f, 1));
+    m_Texquad.push_back(QVector4D( 1.0f, -1.0f,  1.0f, 0));
+    m_Texquad.push_back(QVector4D( 1.0f,  1.0f,  1.0f, 1));
+
+
+
+    // allocate skeleton nodes
+    m_GNeurites.vboCreate("quad", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
+    m_GNeurites.vboBind("quad");
+    m_GNeurites.vboAllocate("quad",
+                            m_Texquad.data(),
+                            m_Texquad.size() * sizeof(QVector4D));
+
+    m_GNeurites.useProgram("2DHeatMap_Texture");
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0,  0);
+    GL_Error();
+
+
+
+//    qDebug() << tex ;
+    GL_Error();
+
+
+    m_GNeurites.vboRelease("quad");
+    m_GNeurites.vaoRelease();
+
+
+
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::renderTexture2D()
+{
+    // ********* Debug Texture
+//    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
+        m_GNeurites.vaoBind("2DHeatMap_Quad");
+        m_GNeurites.useProgram("2DHeatMap_Texture");
+        // heatmap texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
+        GLint tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tex");
+        glUniform1i(  tex, 0 );
+
+        // transfer function
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
+        GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
+        glUniform1i(  tf, 1 );
+
+        // transfer function
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
+        GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
+        glUniform1i(  astro_tex, 2 );
+
+        glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
+        m_GNeurites.vaoRelease();
+//    }
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::drawIntoTexture()
+{
+    //****************** Render Nodes Into Texture ***********************
+    glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+    m_GNeurites.vaoBind("2DHeatMap");
+    m_GNeurites.vboBind("nodes");
+
+    m_GNeurites.useProgram("2DHeatMap");
+    updateAbstractUniformsLocation( m_GNeurites.getProgram("2DHeatMap") );
+    glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
+
+    m_GNeurites.vboRelease("nodes");
+    m_GNeurites.vaoRelease();
+
+    glFlush();
+    glFinish();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+// ############## Skeleton Graph ###############################################
 
 void OpenGLManager::initSkeletonsVertexAttribPointer()
 {
@@ -556,10 +707,11 @@ bool OpenGLManager::initAbstractSkeletonShaders()
 
 // ----------------------------------------------------------------------------
 //
-// only the edges, the nodes itself they are not needed to be visible
-// this will collabse into a node for the neurites at the most abstract view
 void OpenGLManager::drawSkeletonsGraph(bool selection )
 {
+    // only the edges, the nodes itself they are not needed to be visible
+    // this will collabse into a node for the neurites at the most abstract view
+
     if (m_glFunctionsSet == false)
         return;
 
@@ -621,10 +773,18 @@ void OpenGLManager::drawSkeletonsGraph(bool selection )
     }
 }
 
+// ############## Neurites Graph ###############################################
+//
+void OpenGLManager::initNeuritesVertexAttribPointer()
+{
+    int offset = 0;
+    glEnableVertexAttribArray(0);
+    glVertexAttribIPointer(0, 1, GL_INT, 0, (void*)offset);
+
+}
 
 // ----------------------------------------------------------------------------
 //
-// we initialize the vbos for drawing
 bool OpenGLManager::initNeuritesGraphShaders()
 {
     qDebug() << "OpenGLManager::initNeuritesGraphShaders()";
@@ -698,178 +858,12 @@ bool OpenGLManager::initNeuritesGraphShaders()
     return true;
 }
 
-
-void OpenGLManager::init_Gly2DHeatMap()
-{
-    m_gly_2D_heatMap_FBO = 0;
-
-    glGenFramebuffers(1, &m_gly_2D_heatMap_FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
-    GL_Error();
-
-    glGenTextures(1, &m_gly_2D_heatMap_Tex);
-    glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
-    GL_Error();
-
-    // create empty image
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_canvas_w, m_canvas_h, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    GL_Error();
-
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_gly_2D_heatMap_Tex, 0);
-    GL_Error();
-
-    // set the list of draw buffers
-    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-    glDrawBuffers(1, DrawBuffers);
-    GL_Error();
-
-    // check if frame buffer is ok
-   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-       qDebug() << "ERROR!!!!";
-       return;
-    }
-   GL_Error();
-
-
-   // init transfer function
-   m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 1.0f));
-   m_tf_2DHeatmap.push_back(QVector4D(1.0f, 1.0f, 1.0f, 1.0f));
-
-
-   glGenTextures( 1, &m_tf_2DHeatMap_tex);
-   GL_Error();
-
-   glBindTexture( GL_TEXTURE_1D, m_tf_2DHeatMap_tex);
-   GL_Error();
-
-   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-   GL_Error();
-
-    glTexImage1D( GL_TEXTURE_1D, 0, GL_RGBA, 2, 0, GL_RGBA, GL_FLOAT, m_tf_2DHeatmap.data());
-
-    GL_Error();
-
-}
-void OpenGLManager::load3DTexturesFromRaw(QString path)
-{
-    int size = 999 * 999 * 449;
-    char *rawData = m_dataContainer->loadRawFile(":/data/mask_745_.raw", size);
-    //load data into a 3D texture
-    glGenTextures(1, &m_astro_3DTex);
-    glBindTexture(GL_TEXTURE_3D, m_astro_3DTex);
-
-     // set the texture parameters
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-    char *bufferRGBA = new char[size * 4];
-
-    // convert to rgba
-    for (int i = 0; i < size; ++i) {
-        bufferRGBA[i*4] =(rawData[i] > 0) ? 255 : 0;
-        bufferRGBA[i*4 + 1] = 0;
-        bufferRGBA[i*4 + 2] = 0 ;
-        bufferRGBA[i*4 + 3] = 255;
-    }
-
-    glTexImage3D(GL_TEXTURE_3D,0 ,GL_RGBA, 999, 999, 449,0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) bufferRGBA);
-
-    delete [] rawData;
-    delete [] bufferRGBA;
-}
-
-bool OpenGLManager::init_Gly2DHeatMapShaders()
-{
-    // init 2D HeatMap
-    m_GNeurites.createProgram("2DHeatMap");
-    bool res = m_GNeurites.compileShader("2DHeatMap",
-                                    ":/shaders/nodes_2DHeatMap_vert.glsl",
-                                    ":/shaders/nodes_2DHeatMap_geom.glsl",
-                                    ":/shaders/nodes_2DHeatMap_frag.glsl");
-    if (res == false)
-        return res;
-    GL_Error();
-
-    m_GNeurites.vaoCreate("2DHeatMap");
-    m_GNeurites.vaoBind("2DHeatMap");
-    GL_Error();
-
-    m_GNeurites.vboBind("nodes");
-
-    GL_Error();
-
-    m_GNeurites.useProgram("2DHeatMap");
-
-    initNeuritesVertexAttribPointer();
-
-    m_GNeurites.vboRelease("nodes");
-
-    m_GNeurites.vaoRelease();
-
-    GL_Error();
-
-    m_GNeurites.createProgram("2DHeatMap_Texture");
-    res = m_GNeurites.compileShader("2DHeatMap_Texture",
-                                    ":/shaders/nodes_2DHeatMap_tex_vert.glsl",
-                                    ":/shaders/nodes_2DHeatMap_tex_geom.glsl",
-                                    ":/shaders/nodes_2DHeatMap_tex_frag.glsl");
-    GL_Error();
-
-    if (res == false)
-        return res;
-
-    // todo: initialize uniforms
-
-    m_GNeurites.vaoCreate("2DHeatMap_Quad");
-    m_GNeurites.vaoBind("2DHeatMap_Quad");
-
-    m_Texquad.push_back(QVector4D(-1.0f, -1.0f,  0.0f, 0));
-    m_Texquad.push_back(QVector4D( 1.0f, -1.0f,  1.0f, 0));
-    m_Texquad.push_back(QVector4D(-1.0f,  1.0f,  0.0f, 1));
-    m_Texquad.push_back(QVector4D(-1.0f,  1.0f,  0.0f, 1));
-    m_Texquad.push_back(QVector4D( 1.0f, -1.0f,  1.0f, 0));
-    m_Texquad.push_back(QVector4D( 1.0f,  1.0f,  1.0f, 1));
-
-
-
-    // allocate skeleton nodes
-    m_GNeurites.vboCreate("quad", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
-    m_GNeurites.vboBind("quad");
-    m_GNeurites.vboAllocate("quad",
-                            m_Texquad.data(),
-                            m_Texquad.size() * sizeof(QVector4D));
-
-    m_GNeurites.useProgram("2DHeatMap_Texture");
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0,  0);
-    GL_Error();
-
-
-
-//    qDebug() << tex ;
-    GL_Error();
-
-
-    m_GNeurites.vboRelease("quad");
-    m_GNeurites.vaoRelease();
-
-
-
-}
-
 // ----------------------------------------------------------------------------
 //
-// only the edges, because the skeleton itself will collabse into a node
 void OpenGLManager::drawNeuritesGraph()
 {
+    // only the edges, because the skeleton itself will collabse into a node
+
     if (m_glFunctionsSet == false)
         return;
 
@@ -888,6 +882,27 @@ void OpenGLManager::drawNeuritesGraph()
 
     m_GNeurites.vboRelease("nodes");
     m_GNeurites.vaoRelease();
+}
+
+// ############## Mesh ###############################################
+//
+bool OpenGLManager::initMeshVertexAttrib()
+{
+    if (m_glFunctionsSet == false)
+        return false;
+
+    int offset = 0;
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexData),  0);
+
+
+    offset +=  sizeof(QVector4D);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexData), (GLvoid*)offset);
+
+    return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -988,7 +1003,7 @@ void OpenGLManager::drawMeshTriangles(bool selection )
    }
 }
 
-// ----------------------------------------------------------------------------
+// ############## Skeleton Points ###############################################
 //
 bool OpenGLManager::initSkeletonShaders()
 {
@@ -1090,7 +1105,7 @@ void OpenGLManager::drawSkeletonPoints(bool selection)
     }
 }
 
-// ----------------------------------------------------------------------------
+// ############## Glycogen Points ###############################################
 //
 bool OpenGLManager::initGlycogenPointsShaders()
 {
@@ -1120,29 +1135,29 @@ bool OpenGLManager::initGlycogenPointsShaders()
     // fill glycogen points
 
     //std::map<int, Glycogen*> glycogenMap = m_dataContainer->getGlycogenMap();
-	std::vector<VertexData*>* glycogenList = m_dataContainer->getGlycogenVertexDataPtr();
+    std::vector<VertexData*>* glycogenList = m_dataContainer->getGlycogenVertexDataPtr();
     //struct glycogen_datum {
     //    int ID;
     //    QVector4D center_diam;
     //};
 
     //std::vector<struct glycogen_datum> glycogen_data;
-	std::vector<VertexData> glycogen_data;
-	//for (auto iter = glycogenMap.begin(); iter != glycogenMap.end(); iter++ ) {
-	for (auto iter = glycogenList->begin(); iter != glycogenList->end(); iter++) {
+    std::vector<VertexData> glycogen_data;
+    //for (auto iter = glycogenMap.begin(); iter != glycogenMap.end(); iter++ ) {
+    for (auto iter = glycogenList->begin(); iter != glycogenList->end(); iter++) {
         //Glycogen*gc = (*iter).second;
-		VertexData* vd = (*iter);
-		//QVector4D center_diam = gc->getCenter();
+        VertexData* vd = (*iter);
+        //QVector4D center_diam = gc->getCenter();
         //center_diam.setW(gc->getRadius());
         //struct glycogen_datum gc_datum = {gc->getID(), center_diam};
         //glycogen_data.push_back(gc_datum);
-		glycogen_data.push_back(*vd);
+        glycogen_data.push_back(*vd);
     }
 
     //m_vbo_glycogen.allocate( glycogen_data.data(),
     //                              glycogen_data.size() * sizeof(struct glycogen_datum) );
 
-	m_vbo_glycogen.allocate(glycogen_data.data(), glycogen_data.size() * sizeof(struct VertexData));
+    m_vbo_glycogen.allocate(glycogen_data.data(), glycogen_data.size() * sizeof(struct VertexData));
 
     GL_Error();
 
@@ -1158,16 +1173,16 @@ bool OpenGLManager::initGlycogenPointsShaders()
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
                           sizeof(glycogen_datum), (GLvoid*)offset);*/
 
-	int offset = 0;
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
-						  sizeof(struct VertexData), 0);
+    int offset = 0;
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+                          sizeof(struct VertexData), 0);
 
 
-	offset += sizeof(QVector4D);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
-						  sizeof(VertexData), (GLvoid*)offset);
+    offset += sizeof(QVector4D);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
+                          sizeof(VertexData), (GLvoid*)offset);
 
     GL_Error();
 
@@ -1197,58 +1212,51 @@ void OpenGLManager::drawGlycogenPoints()
 //
 void OpenGLManager::updateGlycogenPoints()
 {
-	//m_vao_glycogen.bind();
-	m_vbo_glycogen.bind();
+    //m_vao_glycogen.bind();
+    m_vbo_glycogen.bind();
 
 
 
-	// fill glycogen points
-	//std::map<int, Glycogen*> glycogenMap = m_dataContainer->getGlycogenMap();
-	std::vector<VertexData*>* glycogenList = m_dataContainer->getGlycogenVertexDataPtr();
-	//struct glycogen_datum {
-	//    int ID;
-	//    QVector4D center_diam;
-	//};
+    // fill glycogen points
+    //std::map<int, Glycogen*> glycogenMap = m_dataContainer->getGlycogenMap();
+    std::vector<VertexData*>* glycogenList = m_dataContainer->getGlycogenVertexDataPtr();
+    //struct glycogen_datum {
+    //    int ID;
+    //    QVector4D center_diam;
+    //};
 
-	//std::vector<struct glycogen_datum> glycogen_data;
-	std::vector<VertexData> glycogen_data;
-	//for (auto iter = glycogenMap.begin(); iter != glycogenMap.end(); iter++ ) {
-	for (auto iter = glycogenList->begin(); iter != glycogenList->end(); iter++) {
-		//Glycogen*gc = (*iter).second;
-		VertexData* vd = (*iter);
-		//QVector4D center_diam = gc->getCenter();
-		//center_diam.setW(gc->getRadius());
-		//struct glycogen_datum gc_datum = {gc->getID(), center_diam};
-		//glycogen_data.push_back(gc_datum);
-		glycogen_data.push_back(*vd);
-	}
+    //std::vector<struct glycogen_datum> glycogen_data;
+    std::vector<VertexData> glycogen_data;
+    //for (auto iter = glycogenMap.begin(); iter != glycogenMap.end(); iter++ ) {
+    for (auto iter = glycogenList->begin(); iter != glycogenList->end(); iter++) {
+        //Glycogen*gc = (*iter).second;
+        VertexData* vd = (*iter);
+        //QVector4D center_diam = gc->getCenter();
+        //center_diam.setW(gc->getRadius());
+        //struct glycogen_datum gc_datum = {gc->getID(), center_diam};
+        //glycogen_data.push_back(gc_datum);
+        glycogen_data.push_back(*vd);
+    }
 
-	auto buffer_data = m_vbo_glycogen.map(QOpenGLBuffer::WriteOnly);
+    auto buffer_data = m_vbo_glycogen.map(QOpenGLBuffer::WriteOnly);
 
-	memcpy(buffer_data, glycogen_data.data(), glycogen_data.size() * sizeof(struct VertexData));
+    memcpy(buffer_data, glycogen_data.data(), glycogen_data.size() * sizeof(struct VertexData));
 
-	m_vbo_glycogen.unmap();
-	//m_vbo_glycogen.allocate(glycogen_data.data(), glycogen_data.size() * sizeof(struct VertexData));
+    m_vbo_glycogen.unmap();
+    //m_vbo_glycogen.allocate(glycogen_data.data(), glycogen_data.size() * sizeof(struct VertexData));
 
-	/*int offset = 0;
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
-		sizeof(struct VertexData), 0);
+    /*int offset = 0;
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
+        sizeof(struct VertexData), 0);
 
 
-	offset += sizeof(QVector4D);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-		sizeof(VertexData), (GLvoid*)offset);*/
+    offset += sizeof(QVector4D);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
+        sizeof(VertexData), (GLvoid*)offset);*/
 
-	m_vbo_glycogen.release();
-}
-
-// ----------------------------------------------------------------------------
-//
-void OpenGLManager::update2Dflag(bool is2D)
-{
-    m_2D = is2D;
+    m_vbo_glycogen.release();
 }
 
 // ----------------------------------------------------------------------------
@@ -1288,52 +1296,46 @@ void OpenGLManager::renderAbstractions()
         drawMeshTriangles(false);
 }
 
-// ----------------------------------------------------------------------------
+
+
+// ############## Selection ###############################################
 //
-void OpenGLManager::drawAll()
+void OpenGLManager::initSelectionFrameBuffer()
 {
-    write_ssbo_data();
+    qDebug() << "initSelectionFrameBuffer";
 
-    //renderTexture2D();
-
-    renderAbstractions();
-
-    renderSelection();
-
-    drawIntoTexture();
-
+    // create FBO
+    glGenFramebuffers(1, &m_selectionFrameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
+    glGenRenderbuffers(1, &m_selectionRenderBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_selectionRenderBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, m_canvas_w, m_canvas_h);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_selectionRenderBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::renderTexture2D()
+int OpenGLManager::processSelection(float x, float y)
 {
-    // ********* Debug Texture
-//    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
-        m_GNeurites.vaoBind("2DHeatMap_Quad");
-        m_GNeurites.useProgram("2DHeatMap_Texture");
-        // heatmap texture
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
-        GLint tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tex");
-        glUniform1i(  tex, 0 );
+    qDebug() << "Draw Selection!";
 
-        // transfer function
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
-        GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
-        glUniform1i(  tf, 1 );
+    glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
+    glEnable(GL_DEPTH_TEST);
 
-        // transfer function
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
-        GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
-        glUniform1i(  astro_tex, 2 );
+    GLubyte pixel[3];
 
-        glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
-        m_GNeurites.vaoRelease();
-//    }
-}
+    qDebug() << x << " " << y;
+    glReadPixels(x, y, 1, 1, GL_RGB,GL_UNSIGNED_BYTE, (void *)pixel);
+    int pickedID = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
+    qDebug() << pixel[0] << " " << pixel[1] << " " << pixel[2];
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    qDebug() << "Picked ID: " << pickedID;
+
+    return pickedID;
+ }
 
 // ----------------------------------------------------------------------------
 //
@@ -1362,32 +1364,7 @@ void OpenGLManager::renderSelection()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-// ----------------------------------------------------------------------------
-//
-void OpenGLManager::drawIntoTexture()
-{
-    //****************** Render Nodes Into Texture ***********************
-    glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-    m_GNeurites.vaoBind("2DHeatMap");
-    m_GNeurites.vboBind("nodes");
-
-    m_GNeurites.useProgram("2DHeatMap");
-    updateAbstractUniformsLocation( m_GNeurites.getProgram("2DHeatMap") );
-    glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
-
-    m_GNeurites.vboRelease("nodes");
-    m_GNeurites.vaoRelease();
-
-    glFlush();
-    glFinish();
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-// ----------------------------------------------------------------------------
+// ############## Uniforms ###############################################
 //
 void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
 {
@@ -1448,8 +1425,8 @@ void OpenGLManager::updateUniformsLocation(GLuint program)
     GLuint mMatrix = glGetUniformLocation(program, "mMatrix");
     glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
 
-	GLuint m_noRartionMatrix = glGetUniformLocation(program, "m_noRartionMatrix");
-	glUniformMatrix4fv(m_noRartionMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
+    GLuint m_noRartionMatrix = glGetUniformLocation(program, "m_noRartionMatrix");
+    glUniformMatrix4fv(m_noRartionMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
 
     GLuint vMatrix = glGetUniformLocation(program, "vMatrix");
     glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
@@ -1468,118 +1445,21 @@ void OpenGLManager::updateUniformsLocation(GLuint program)
     glUniform1iv(9, 1, &m_uniforms.max_astro_coverage);
 }
 
-
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::update_ssbo_data_layout1(QVector2D layout1, int hvgxID)
+void OpenGLManager::update2Dflag(bool is2D)
 {
-    if (m_ssbo_data.size() < hvgxID)
-        return;
-
-    m_ssbo_data[hvgxID].layout1 = layout1;
+    m_2D = is2D;
 }
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::update_ssbo_data_layout2(QVector2D layout2, int hvgxID)
+void OpenGLManager::setZoom(float zoom)
 {
-    if (m_ssbo_data.size() < hvgxID)
-        return;
-
-    m_ssbo_data[hvgxID].layout2 = layout2;
+    m_zoom = zoom;
 }
 
-// ----------------------------------------------------------------------------
-//
-// Graph_t::ALL_SKELETONS, dont discriminate between types
-void OpenGLManager::update_skeleton_layout1(QVector2D layout1,  long node_index, int hvgxID)
-{
-    // get the object -> get its skeleton -> update the layout
-    std::map<int, Object*> *objects_map = m_dataContainer->getObjectsMapPtr();
-
-    if (objects_map->find(hvgxID) == objects_map->end()) {
-        return;
-    }
-
-    Skeleton *skel = objects_map->at(hvgxID)->getSkeleton();
-    if (skel == NULL) {
-        qDebug() << "No Skeleton " << hvgxID;
-        return;
-    }
-
-    if (node_index  > m_abstract_skel_nodes.size()) {
-        qDebug() << node_index << " out of range " << m_abstract_skel_nodes.size();
-        return;
-    }
-
-    m_abstract_skel_nodes[node_index].layout1 = layout1;
-}
-
-// ----------------------------------------------------------------------------
-//
-void OpenGLManager::update_skeleton_layout2(QVector2D layout2,  long node_index, int hvgxID)
-{
-    // get the object -> get its skeleton -> update the layout
-    // get the object -> get its skeleton -> update the layout
-    std::map<int, Object*> *objects_map = m_dataContainer->getObjectsMapPtr();
-    if (objects_map->find(hvgxID) == objects_map->end()) {
-        qDebug() << "Object not found";
-        return;
-    }
-
-    Skeleton *skel = objects_map->at(hvgxID)->getSkeleton();
-    if (skel == NULL) {
-        qDebug() << "No Skeleton " << hvgxID;
-        return;
-    }
-
-    if (node_index  > m_abstract_skel_nodes.size()) {// since no astrpcyte I should never get here
-        qDebug() <<node_index << " out of range " << m_abstract_skel_nodes.size();
-        return;
-    }
-
-    m_abstract_skel_nodes[node_index].layout2 = layout2;
-}
-
-// ----------------------------------------------------------------------------
-//
-void OpenGLManager::update_skeleton_layout3(QVector2D layout3,  long node_index, int hvgxID)
-{
-    // get the object -> get its skeleton -> update the layout
-    // get the object -> get its skeleton -> update the layout
-    std::map<int, Object*> *objects_map = m_dataContainer->getObjectsMapPtr();
-    if (objects_map->find(hvgxID) == objects_map->end()) {
-        return;
-    }
-
-    Skeleton *skel = objects_map->at(hvgxID)->getSkeleton();
-    if (skel == NULL) {
-        qDebug() << "No Skeleton " << hvgxID;
-        return;
-    }
-
-    if (node_index  > m_abstract_skel_nodes.size()) {
-        qDebug() << node_index << " out of range "<< m_abstract_skel_nodes.size();
-        return;
-    }
-
-    m_abstract_skel_nodes[node_index].layout3 = layout3;
-}
-
-// ----------------------------------------------------------------------------
-//
-void OpenGLManager::multiplyWithRotation(QMatrix4x4 rotationMatrix)
-{
-    for (int i = 0; i < m_abstract_skel_nodes.size(); ++i) {
-        QVector3D rotVertex = rotationMatrix * m_abstract_skel_nodes[i].vertex.toVector3D();
-        m_abstract_skel_nodes[i].layout1 = rotVertex.toVector2D();
-        m_abstract_skel_nodes[i].layout2 = rotVertex.toVector2D();
-        m_abstract_skel_nodes[i].layout3 = rotVertex.toVector2D();
-
-    }
-}
-
-// ----------------------------------------------------------------------------
+// ############## Filtering #########################
 //
 Object_t OpenGLManager::getObjectTypeByID(int hvgxID)
 {
@@ -1668,9 +1548,10 @@ void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
 
 // ----------------------------------------------------------------------------
 //
-// if we filter the object we need to recompute the maximum astrocyte coverage and volume
 void OpenGLManager::FilterObject(int ID, bool isfilterd)
 {
+    // if we filter the object we need to recompute the maximum astrocyte coverage and volume
+
     std::map<int, Object*> *objectMap = m_dataContainer->getObjectsMapPtr();
     if ( ID > m_ssbo_data.size() ||
          objectMap->find(ID) == objectMap->end() ||
@@ -1763,11 +1644,114 @@ void OpenGLManager::showAll()
     updateSSBO();
 }
 
+// ############## Update VBOS and SSBO for Layouting #########################
+//
+void OpenGLManager::update_ssbo_data_layout1(QVector2D layout1, int hvgxID)
+{
+    if (m_ssbo_data.size() < hvgxID)
+        return;
+
+    m_ssbo_data[hvgxID].layout1 = layout1;
+}
+
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::setZoom(float zoom)
+void OpenGLManager::update_ssbo_data_layout2(QVector2D layout2, int hvgxID)
 {
-	m_zoom = zoom;
+    if (m_ssbo_data.size() < hvgxID)
+        return;
+
+    m_ssbo_data[hvgxID].layout2 = layout2;
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::update_skeleton_layout1(QVector2D layout1,  long node_index, int hvgxID)
+{
+    // Graph_t::ALL_SKELETONS, dont discriminate between types
+    // get the object -> get its skeleton -> update the layout
+    std::map<int, Object*> *objects_map = m_dataContainer->getObjectsMapPtr();
+
+    if (objects_map->find(hvgxID) == objects_map->end()) {
+        return;
+    }
+
+    Skeleton *skel = objects_map->at(hvgxID)->getSkeleton();
+    if (skel == NULL) {
+        qDebug() << "No Skeleton " << hvgxID;
+        return;
+    }
+
+    if (node_index  > m_abstract_skel_nodes.size()) {
+        qDebug() << node_index << " out of range " << m_abstract_skel_nodes.size();
+        return;
+    }
+
+    m_abstract_skel_nodes[node_index].layout1 = layout1;
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::update_skeleton_layout2(QVector2D layout2,  long node_index, int hvgxID)
+{
+    // get the object -> get its skeleton -> update the layout
+    // get the object -> get its skeleton -> update the layout
+    std::map<int, Object*> *objects_map = m_dataContainer->getObjectsMapPtr();
+    if (objects_map->find(hvgxID) == objects_map->end()) {
+        qDebug() << "Object not found";
+        return;
+    }
+
+    Skeleton *skel = objects_map->at(hvgxID)->getSkeleton();
+    if (skel == NULL) {
+        qDebug() << "No Skeleton " << hvgxID;
+        return;
+    }
+
+    if (node_index  > m_abstract_skel_nodes.size()) {// since no astrpcyte I should never get here
+        qDebug() <<node_index << " out of range " << m_abstract_skel_nodes.size();
+        return;
+    }
+
+    m_abstract_skel_nodes[node_index].layout2 = layout2;
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::update_skeleton_layout3(QVector2D layout3,  long node_index, int hvgxID)
+{
+    // get the object -> get its skeleton -> update the layout
+    // get the object -> get its skeleton -> update the layout
+    std::map<int, Object*> *objects_map = m_dataContainer->getObjectsMapPtr();
+    if (objects_map->find(hvgxID) == objects_map->end()) {
+        return;
+    }
+
+    Skeleton *skel = objects_map->at(hvgxID)->getSkeleton();
+    if (skel == NULL) {
+        qDebug() << "No Skeleton " << hvgxID;
+        return;
+    }
+
+    if (node_index  > m_abstract_skel_nodes.size()) {
+        qDebug() << node_index << " out of range "<< m_abstract_skel_nodes.size();
+        return;
+    }
+
+    m_abstract_skel_nodes[node_index].layout3 = layout3;
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::multiplyWithRotation(QMatrix4x4 rotationMatrix)
+{
+    for (int i = 0; i < m_abstract_skel_nodes.size(); ++i) {
+        QVector3D rotVertex = rotationMatrix * m_abstract_skel_nodes[i].vertex.toVector3D();
+        m_abstract_skel_nodes[i].layout1 = rotVertex.toVector2D();
+        m_abstract_skel_nodes[i].layout2 = rotVertex.toVector2D();
+        m_abstract_skel_nodes[i].layout3 = rotVertex.toVector2D();
+
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -1887,18 +1871,3 @@ void OpenGLManager::updateColorEncoding(Color_e encoding)
 
     updateSSBO();
 }
-
-/*
- *     float gaussFilterX[7] = { -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0  };
-    float gaussFilterY[7] = { 0.015625, 0.09375, 0.234375, 0.3125, 0.234375, 0.09375,0.015625  };
-
-//    vec4 color = vec4(0.0);
-//    for( int i = 0; i < 7; i++ )
-//    {
-//         vec2 tc = vec2( G_fragTexCoord.x + gaussFilterX[i]  * u_Scale.x, G_fragTexCoord.y+gaussFilterY[i]  * u_Scale.y );
-//         vec4 add_color = texture2D( tex,  tc ) * gaussFilterY[i];
-//         color += add_color;
-//    }
-
-//    outcol = color;
-*/
