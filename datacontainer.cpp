@@ -21,8 +21,10 @@ DataContainer::DataContainer()
         max_astro_coverage(0),
         m_limit(1),
         m_vertex_offset(0),
-        m_faces_offset(0)
+        m_faces_offset(0),
+        m_debug_msg(false)
 {
+
     m_mesh = new Mesh();
 	m_glycogen3DGrid.setSize(1000,1000,1000);
 
@@ -580,7 +582,9 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
         qDebug() << "Called XML parseObejct without attribs";
         return;
     }
-    qDebug() << xml.name();
+
+    if (m_debug_msg)
+        qDebug() << xml.name();
 
     QString nameline  = xml.attributes().value("name").toString();
     QList<QString> nameList = nameline.split('_');
@@ -633,14 +637,14 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
                 }
                 auto t2 = std::chrono::high_resolution_clock::now();
                 std::chrono::duration<double, std::milli> ms = t2 - t1;
-                qDebug() << "time: " << ms.count() << "ms ";
+                if (m_debug_msg)
+                    qDebug() << "time: " << ms.count() << "ms ";
             } else if (xml.name() == "skeleton") {
                 parseSkeleton(xml, obj);
             } else if (xml.name() == "volume") {
                 xml.readNext();
                 int volume =  xml.text().toInt();
                 obj->setVolume(volume);
-                qDebug() << "volume: " << volume;
             } else if (xml.name() == "center") {
                 xml.readNext();
                 QString coords = xml.text().toString();
@@ -652,7 +656,6 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
                 float x = stringlist.at(0).toDouble();
                 float y = stringlist.at(1).toDouble();
                 float z = stringlist.at(2).toDouble();
-                qDebug() << "center: " << x << " " << y << " " << z;
                 obj->setCenter(QVector4D(x/MESH_MAX, y/MESH_MAX, z/MESH_MAX, 0));
                 // set ssbo with this center
             }  else if (xml.name() == "ast_point") {
@@ -668,7 +671,6 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
                 float x = stringlist.at(0).toDouble();
                 float y = stringlist.at(1).toDouble();
                 float z = stringlist.at(2).toDouble();
-                qDebug() << "center: " << x << " " << y << " " << z;
                 obj->setAstPoint(QVector4D(x/MESH_MAX, y/MESH_MAX, z/MESH_MAX, 0));
                 // set ssbo with this center
             }
@@ -709,9 +711,10 @@ void DataContainer::parseMeshNoVertexnoFace(QXmlStreamReader &xml, Object *obj)
         return;
     }
 
-    qDebug() << xml.name();
-    xml.readNext();
+    if (m_debug_msg)
+        qDebug() << xml.name();
 
+    xml.readNext();
 
     // this object structure is not done
     while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "mesh")) {
@@ -770,7 +773,6 @@ void DataContainer::parseMeshNoVertexnoFace(QXmlStreamReader &xml, Object *obj)
                 }
 
                 m_indices_size_byType[obj->getObjectType()] += (faceCount * 3);
-                qDebug() << obj->get_indices_Size();
 
                 // update synapse center
                 if (obj->getObjectType() == Object_t::SYNAPSE) {
@@ -801,7 +803,9 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
         return;
     }
 
-    qDebug() << xml.name();
+    if (m_debug_msg)
+        qDebug() << xml.name();
+
     xml.readNext();
 
     int vertices = 0;
@@ -854,7 +858,7 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 float VertexToAstroDist = 100;
                 if (stringlist.size() > 6) {
                     VertexToAstroDist = stringlist.at(6).toFloat();
-                  //  qDebug() << "### VertexToAstroDist: " << VertexToAstroDist;
+                  //  () << "### VertexToAstroDist: " << VertexToAstroDist;
                 }
 
                 v->skeleton_vertex.setW(VertexToAstroDist); // distance from neurite to astrocyte
@@ -926,8 +930,6 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
         xml.readNext();
     } // while
 
-
-    qDebug() << "vertices count: " << vertices << " faces: " << faces;
 }
 
 //----------------------------------------------------------------------------
@@ -940,9 +942,12 @@ void DataContainer::parseSkeleton(QXmlStreamReader &xml, Object *obj)
         qDebug() << "Called XML parseObejct without attribs";
         return;
     }
-    qDebug() << xml.name();
+
+    if (m_debug_msg)
+        qDebug() << xml.name();
 
     xml.readNext();
+
     if ( obj->getObjectType() == Object_t::SYNAPSE )
         return;
 
@@ -951,10 +956,8 @@ void DataContainer::parseSkeleton(QXmlStreamReader &xml, Object *obj)
         // go to the next child of object node
         if (xml.tokenType() == QXmlStreamReader::StartElement) {
             if (xml.name() == "nodes") { // make it v
-                qDebug() << xml.name();
                 parseSkeletonNodes(xml, obj);
             } else if (xml.name() == "points") {
-                qDebug() << xml.name();
                 parseSkeletonPoints(xml, obj);
             } else if (xml.name() == "branches") { // children has only branches which uses their parents points
               // process branches
@@ -974,7 +977,9 @@ void DataContainer::parseSkeletonNodes(QXmlStreamReader &xml, Object *obj)
         qDebug() << "Called XML parseSkeletonNodes without attribs";
         return;
     }
-    qDebug() << xml.name();
+
+    if (m_debug_msg)
+        qDebug() << xml.name();
 
     xml.readNext();
 
@@ -1004,7 +1009,8 @@ void DataContainer::parseSkeletonNodes(QXmlStreamReader &xml, Object *obj)
     } // while
 
 
-    qDebug() << "nodes count: " << nodes;
+    if (m_debug_msg)
+        qDebug() << "nodes count: " << nodes;
 }
 
 //----------------------------------------------------------------------------
@@ -1016,8 +1022,9 @@ void DataContainer::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
         qDebug() << "Called XML parseSkeletonNodes without attribs";
         return;
     }
-    qDebug() << xml.name();
 
+    if (m_debug_msg)
+        qDebug() << xml.name();
 
     xml.readNext();
 
@@ -1048,7 +1055,8 @@ void DataContainer::parseSkeletonPoints(QXmlStreamReader &xml, Object *obj)
         xml.readNext();
     } // while
 
-    qDebug() << "nodes count: " << nodes;
+    if (m_debug_msg)
+        qDebug() << "points count: " << nodes;
 }
 
 //----------------------------------------------------------------------------
@@ -1063,7 +1071,9 @@ void DataContainer::parseBranch(QXmlStreamReader &xml, Object *obj)
         return;
     }
 
-    qDebug() << xml.name();
+    if (m_debug_msg)
+        qDebug() << xml.name();
+
     xml.readNext();
 
     if (obj == NULL) {

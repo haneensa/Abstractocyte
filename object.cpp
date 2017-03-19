@@ -226,7 +226,7 @@ void Object::markChildSubSkeleton(SkeletonBranch *childBranch, int childID)
 
 void Object::addChild(Object *child)
 {
-    qDebug() << "Adding " << child->getHVGXID() << " as the " << m_children.size() << "th child to " <<  m_ID;
+    // qDebug() << "Adding " << child->getHVGXID() << " as the " << m_children.size() << "th child to " <<  m_ID;
     m_children.push_back(child);
 }
 
@@ -255,7 +255,7 @@ void Object::addSynapse(Object *synapse_object)
 float Object::getAstroCoverage()
 {
     // return m_VertexidxCloseToAstro.size();
-    qDebug() << m_averageDistance << " " <<  m_averageDistance /(float) m_meshIndices.size();
+    // qDebug() << m_averageDistance << " " <<  m_averageDistance /(float) m_meshIndices.size();
     return 1.0/(m_averageDistance /(float) m_meshIndices.size()); // the smaller the better value
 }
 

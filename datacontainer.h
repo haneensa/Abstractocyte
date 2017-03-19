@@ -134,6 +134,7 @@ protected:
     Normals_t                                   m_normals_t;
     LoadFile_t                                  m_loadType;
     LoadData_t                                  m_load_data;
+    bool                                        m_debug_msg;
 };
 
 #endif // OBJECTMANAGER_H
