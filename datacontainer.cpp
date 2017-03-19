@@ -26,28 +26,28 @@ DataContainer::DataContainer()
 {
 
     m_mesh = new Mesh();
-	m_glycogen3DGrid.setSize(1000,1000,1000);
+    m_glycogen3DGrid.setSize(1000,1000,1000);
 
 
     /* 1: load all data */
     loadData();
-    \
+
     /* 2: build missing skeletons due to order of objects in file */
     buildMissingSkeletons();
 
 
     /* 3 */
     qDebug() << "setting up octrees";
-	m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
-	m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
+    m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
+    m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
     m_glycogenOctree.initialize(&m_glycogenList);
-	qDebug() << "octrees ready";
+    qDebug() << "octrees ready";
 
-	//qDebug() << "testing clustering";
-	//testing clustering
-	//m_dbscan.initialize(&m_glycogenList, &m_glycogenMap, &m_glycogenOctree);
-	//m_dbscan.run();
-	//qDebug() << "done clustering";
+    //qDebug() << "testing clustering";
+    //testing clustering
+    //m_dbscan.initialize(&m_glycogenList, &m_glycogenMap, &m_glycogenOctree);
+    //m_dbscan.run();
+    //qDebug() << "done clustering";
 
     //  test vertex neighbors
     //int v_index = 0;
@@ -85,9 +85,9 @@ void DataContainer::loadData()
     loadParentFromHVGX(hvgxFile);
 
 
-    m_limit = 1000000;
+    m_limit = 100;
     m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
-    m_load_data = LoadData_t::ALL;
+    m_load_data = LoadData_t::NEURITES;
     m_normals_t = Normals_t::LOAD_NORMAL;
 
 
@@ -292,12 +292,12 @@ void DataContainer::loadMetaDataHVGX(QString path)
 
     QTextStream in(&file);
     QList<QByteArray> wordList;
-	int glycogenCount = 0;
+    int glycogenCount = 0;
     while (!file.atEnd()) {
         QByteArray line = file.readLine();
         wordList = line.split(',');
 
-		
+
         if (wordList[0] == "gc") {
             if (wordList.size() < 7) {
                 qDebug() << "wordList.size() < 7";
@@ -311,12 +311,12 @@ void DataContainer::loadMetaDataHVGX(QString path)
             std::string name = wordList[6];
 
             Glycogen *gc = new Glycogen(ID, name, QVector3D(x, y, z), diameter);
-			gc->setIndex(glycogenCount);
-			glycogenCount++;
+            gc->setIndex(glycogenCount);
+            glycogenCount++;
             m_glycogenMap[ID] = gc;
-			m_glycogenList.push_back(gc->getVertexData());
+            m_glycogenList.push_back(gc->getVertexData());
 
-			m_glycogen3DGrid.addNormalizedPoint(gc->x(), gc->y(), gc->z(), gc->getVolume());
+            m_glycogen3DGrid.addNormalizedPoint(gc->x(), gc->y(), gc->z(), gc->getVolume());
 
 
         } else if (wordList[0] == "sg") {
@@ -506,50 +506,50 @@ int DataContainer::importXML(QString path)
 // Experimental
 /*bool DataContainer::importXML_DOM(QString path)
 {
-	qDebug() << "Func: importXML";
-	auto t1 = std::chrono::high_resolution_clock::now();
+    qDebug() << "Func: importXML";
+    auto t1 = std::chrono::high_resolution_clock::now();
 
-	QFile  *file = new QFile(path);
-	if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
-		qDebug() << "Could not open the file for reading";
-		return false;
-	}
+    QFile  *file = new QFile(path);
+    if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Could not open the file for reading";
+        return false;
+    }
 
-	QDomDocument doc;
-	if (!doc.setContent(file)) {
-		file->close();
-		return 0;
-	}
-	file->close();
+    QDomDocument doc;
+    if (!doc.setContent(file)) {
+        file->close();
+        return 0;
+    }
+    file->close();
 
-	m_vertex_offset += m_mesh->getVerticesSize();
-	QDomNode n = doc.firstChild();
-	while (!n.isNull()) {
-		//QXmlStreamReader::TokenType token = xml.readNext();
-		//if (token == QXmlStreamReader::StartDocument) {
-		//	continue;
-		//}
+    m_vertex_offset += m_mesh->getVerticesSize();
+    QDomNode n = doc.firstChild();
+    while (!n.isNull()) {
+        //QXmlStreamReader::TokenType token = xml.readNext();
+        //if (token == QXmlStreamReader::StartDocument) {
+        //	continue;
+        //}
 
-		/*if (token == QXmlStreamReader::StartElement) {
-			if (xml.name() == "o") {
-				if (m_objects.size() > m_limit) {
-					qDebug() << "* Reached size limit.";
-					break;
-				}
-				Object *obj = NULL;
+        /*if (token == QXmlStreamReader::StartElement) {
+            if (xml.name() == "o") {
+                if (m_objects.size() > m_limit) {
+                    qDebug() << "* Reached size limit.";
+                    break;
+                }
+                Object *obj = NULL;
 
-				// make a thread that would read this ?
-				// the astrocyte wast most of the time
-				// so if we can optimize reading one object would be better
-				parseObject(xml, obj); // fills the object with obj info
-			}
-		}
-		n = n.firstChild();
-	}
+                // make a thread that would read this ?
+                // the astrocyte wast most of the time
+                // so if we can optimize reading one object would be better
+                parseObject(xml, obj); // fills the object with obj info
+            }
+        }
+        n = n.firstChild();
+    }
 
-	auto t2 = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double, std::milli> ms = t2 - t1;
-	qDebug() << "time: " << ms.count() << "ms, m_tempCounter: " << m_tempCounter;
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> ms = t2 - t1;
+    qDebug() << "time: " << ms.count() << "ms, m_tempCounter: " << m_tempCounter;
 }*/
 
 
@@ -710,7 +710,7 @@ void DataContainer::parseMeshNoVertexnoFace(QXmlStreamReader &xml, Object *obj)
 
                 for (int i = vertexIdx; i < (vertexIdx + vertexCount); ++i ) {
                     struct VertexData* mesh_vertex = &meshVertexList->at(i);
-					mesh_vertex->index = i;
+                    mesh_vertex->index = i;
                     float VertexToAstroDist = mesh_vertex->skeleton_vertex.w();
                     obj->updateClosestAstroVertex(VertexToAstroDist, i);
                     m_mesh->addVertex(mesh_vertex, obj->getObjectType());
@@ -804,22 +804,29 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 float z1 = stringlist.at(2).toDouble()/MESH_MAX;
 
                 QVector4D mesh_vertex(x1, y1, z1,  obj->getHVGXID());
-				std::vector< struct VertexData >* meshVertexList = m_mesh->getVerticesList();
+                std::vector< struct VertexData >* meshVertexList = m_mesh->getVerticesList();
 
-				meshVertexList->emplace_back();
-				int vertexIdx = meshVertexList->size() - 1;
-				struct VertexData* v = &meshVertexList->at(vertexIdx);
-				v->index = vertexIdx;
+                meshVertexList->emplace_back();
+                int vertexIdx = meshVertexList->size() - 1;
+                struct VertexData* v = &meshVertexList->at(vertexIdx);
+                v->index = vertexIdx;
                 //struct VertexData v;
-				//v.isGlycogen = false;
+                //v.isGlycogen = false;
                 v->mesh_vertex = mesh_vertex;
+
+                bool mito_no_parent = false;
+                if (obj->getObjectType() == Object_t::MITO) {
+                    // check if it doesnt have any skeletons
+                    if (obj->getParentID() == 0) {
+                       qDebug() << obj->getName().data(); // mitoa1532b101113, mitoaxxxmyel126, mitoaxxx01154, mitoxxx01001
+                        mito_no_parent = true;
+                    }
+                }
 
                 // todo: get the skeleton vertex from the skeleton itself using an index
                 // get the point branch knots as well
-                if (stringlist.size() < 5 || obj->getObjectType() == Object_t::SYNAPSE) {
+                if (stringlist.size() < 5 || obj->getObjectType() == Object_t::SYNAPSE || mito_no_parent) {
                     // place holder
-                    qDebug() << "Problem!";
-
                     v->skeleton_vertex = mesh_vertex;
                 } else {
                     // I could use index to be able to connect vertices logically
@@ -1180,7 +1187,7 @@ int DataContainer::getMeshIndicesSize()
 //
 float* DataContainer::getGlycogen3DGridData()
 {
-		return m_glycogen3DGrid.getData();
+        return m_glycogen3DGrid.getData();
 }
 
 //----------------------------------------------------------------------------

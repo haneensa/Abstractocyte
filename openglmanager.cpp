@@ -38,14 +38,12 @@ void OpenGLManager::drawAll()
 {
     write_ssbo_data();
 
-    //renderTexture2D();
 
+    render2DHeatMapTexture();
     renderAbstractions();
-
     renderSelection();
 
-    drawIntoTexture();
-
+    drawNodesInto2DTexture();
 }
 
 // ############## Data Initialization ###############################################
@@ -61,7 +59,8 @@ bool OpenGLManager::initOpenGLFunctions()
     m_GNeurites.initOpenGLFunctions();
     m_GlycogenPoints.initOpenGLFunctions();
 
-    load3DTexturesFromRaw(":/data/mask_745_.raw");
+    int size = 999 * 999 * 449;
+    load3DTexturesFromRaw(":/data/mask_745_.raw", size, m_astro_3DTex);
 
     fillVBOsData();
 
@@ -73,6 +72,7 @@ bool OpenGLManager::initOpenGLFunctions()
     initAbstractSkeletonShaders();
     initNeuritesGraphShaders();
     initGlycogenPointsShaders();
+
     return true;
 }
 
@@ -85,7 +85,7 @@ void OpenGLManager::updateCanvasDim(int w, int h, int retianScale)
         m_canvas_w = w * retianScale;
         m_retinaScale = retianScale;
         initSelectionFrameBuffer();
-        init_Gly2DHeatMap();
+        init2DHeatMapTextures();
         GL_Error();
     }
 
@@ -169,6 +169,7 @@ void OpenGLManager::fillVBOsData()
         m_ssbo_data[ID] = object_p->getSSBOData();
         float volume =  object_p->getVolume() / m_dataContainer->getMaxVolume();
         m_ssbo_data[ID].info.setX( 20 *  volume);
+        m_ssbo_data[ID].info.setY( object_p->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage() );
 
         qDebug() << " allocating: " << object_p->getName().data();
 
@@ -284,7 +285,7 @@ void OpenGLManager::upload_Gly3DTex(void* data, int sizeX, int sizeY, int sizeZ,
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::init_Gly2DHeatMap()
+void OpenGLManager::init2DHeatMapTextures()
 {
     m_gly_2D_heatMap_FBO = 0;
 
@@ -316,12 +317,13 @@ void OpenGLManager::init_Gly2DHeatMap()
        qDebug() << "ERROR!!!!";
        return;
     }
+
    GL_Error();
 
 
    // init transfer function
    m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 1.0f));
-   m_tf_2DHeatmap.push_back(QVector4D(1.0f, 1.0f, 1.0f, 1.0f));
+   m_tf_2DHeatmap.push_back(QVector4D(0.0f, 0.0f, 1.0f, 1.0f));
 
 
    glGenTextures( 1, &m_tf_2DHeatMap_tex);
@@ -343,13 +345,12 @@ void OpenGLManager::init_Gly2DHeatMap()
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::load3DTexturesFromRaw(QString path)
+void OpenGLManager::load3DTexturesFromRaw(QString path, int size, GLuint texture)
 {
-    int size = 999 * 999 * 449;
-    char *rawData = m_dataContainer->loadRawFile(":/data/mask_745_.raw", size);
+    char *rawData = m_dataContainer->loadRawFile(path, size);
     //load data into a 3D texture
-    glGenTextures(1, &m_astro_3DTex);
-    glBindTexture(GL_TEXTURE_3D, m_astro_3DTex);
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_3D, texture);
 
      // set the texture parameters
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -376,7 +377,7 @@ void OpenGLManager::load3DTexturesFromRaw(QString path)
 
 // ----------------------------------------------------------------------------
 //
-bool OpenGLManager::init_Gly2DHeatMapShaders()
+bool OpenGLManager::init2DHeatMapShaders()
 {
     // init 2D HeatMap
     m_GNeurites.createProgram("2DHeatMap");
@@ -442,12 +443,6 @@ bool OpenGLManager::init_Gly2DHeatMapShaders()
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0,  0);
     GL_Error();
 
-
-
-//    qDebug() << tex ;
-    GL_Error();
-
-
     m_GNeurites.vboRelease("quad");
     m_GNeurites.vaoRelease();
 
@@ -457,10 +452,10 @@ bool OpenGLManager::init_Gly2DHeatMapShaders()
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::renderTexture2D()
+void OpenGLManager::render2DHeatMapTexture()
 {
     // ********* Debug Texture
-//    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
+    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
         m_GNeurites.vaoBind("2DHeatMap_Quad");
         m_GNeurites.useProgram("2DHeatMap_Texture");
         // heatmap texture
@@ -481,14 +476,24 @@ void OpenGLManager::renderTexture2D()
         GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
         glUniform1i(  astro_tex, 2 );
 
+
+        GLint ResS = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "ResS");
+        float w = 250; //m_canvas_w / m_retinaScale;
+        glUniform1fv(ResS, 1, &w);
+
+        GLint ResT = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "ResT");
+        float h = 250; //m_canvas_h / m_retinaScale;
+        glUniform1fv(ResT, 1, &h);
+
         glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
+
         m_GNeurites.vaoRelease();
-//    }
+    }
 }
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::drawIntoTexture()
+void OpenGLManager::drawNodesInto2DTexture()
 {
     //****************** Render Nodes Into Texture ***********************
     glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
@@ -505,8 +510,8 @@ void OpenGLManager::drawIntoTexture()
     m_GNeurites.vboRelease("nodes");
     m_GNeurites.vaoRelease();
 
-    glFlush();
-    glFinish();
+//    glFlush();
+//    glFinish();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -852,7 +857,7 @@ bool OpenGLManager::initNeuritesGraphShaders()
     m_GNeurites.vaoRelease();
 
 
-    init_Gly2DHeatMapShaders();
+    init2DHeatMapShaders();
 
     return true;
 }
@@ -945,8 +950,7 @@ bool OpenGLManager::initMeshTrianglesShaders()
         mesh->allocateNormalsVBO( m_TMesh.getVBO("VertexNormals") );
 
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE,
-                              0 /*sizeof(QVector4D)*/,  0);
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0,  0);
 
         m_TMesh.vboBind("VertexNormals");
         GL_Error();
@@ -1323,14 +1327,11 @@ void OpenGLManager::initSelectionFrameBuffer()
 //
 int OpenGLManager::processSelection(float x, float y)
 {
-    qDebug() << "Draw Selection!";
-
     glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
     glEnable(GL_DEPTH_TEST);
 
     GLubyte pixel[3];
 
-    qDebug() << x << " " << y;
     glReadPixels(x, y, 1, 1, GL_RGB,GL_UNSIGNED_BYTE, (void *)pixel);
     int pickedID = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
     qDebug() << pixel[0] << " " << pixel[1] << " " << pixel[2];
@@ -1587,7 +1588,6 @@ void OpenGLManager::FilterByType(Object_t type, bool flag)
 
     for (int i = 0; i < objects_list.size(); i++) {
         int hvgxID = objects_list[i]->getHVGXID();
-        qDebug() << "Filtering ID " << hvgxID;
         FilterObject(hvgxID, flag);
 
     }
@@ -1797,7 +1797,10 @@ void OpenGLManager::updateSSBO()
         float coverage = translate( obj->getAstroCoverage(),
                                    0, m_dataContainer->getMaxAstroCoverage(),
                                    0, 0.7);
-        qDebug() << obj->getAstroCoverage() << " " << m_dataContainer->getMaxAstroCoverage();
+
+
+        m_ssbo_data[hvgxID].info.setY( obj->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage() );
+
         switch(m_size_encoding) {
         case Size_e::VOLUME:
             m_ssbo_data[hvgxID].info.setX( 20 *  volume);

@@ -63,5 +63,5 @@ void main(void)
     vec4 node_pos = m_noRotvpMatrix * vec4(SSBO_data[ID].layout1.xy, 0, 1);
     V_ID = ID;
     gl_Position = node_pos;
-    gl_PointSize = 15 + SSBO_data[ID].info.x;
+    gl_PointSize = 15 /*min point size */ + SSBO_data[ID].info.x;
 }

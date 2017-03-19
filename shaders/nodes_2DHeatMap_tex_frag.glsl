@@ -2,19 +2,16 @@
 
 out vec4            outcol;
 
-//layout (location = 1) uniform float       ResS;
-//layout (location = 2) uniform float       ResT;
+uniform float       ResS;
+uniform float       ResT;
+
 uniform sampler2D   tex;
 uniform sampler1D   tf;
-uniform sampler3D   astro_tex;
 
 in vec2             G_fragTexCoord;
 
 void main(void)
 {
-    float ResS = 240.0;
-    float ResT = 240.0;
-
     vec3 irgb = texture2D(tex, G_fragTexCoord).rgb;
     vec2 stp0 = vec2(1./ResS, 0.); // texel offsets
     vec2 st0p = vec2(0., 1./ResT);
@@ -39,12 +36,16 @@ void main(void)
     target += 4.*(i00);
     target /= 16.;
 
-    float t = 0.5;
+    float t = target.r;
     vec4 t_color = texture(tf, t);
 
-    vec3 coord = vec3(G_fragTexCoord, 0);
-    vec4 vol_color = texture(astro_tex, coord);
-//    outcol = vec4( target, 1. );
-    outcol = vec4(vol_color.r);
+    //if (t > 0.5) {
+    //    outcol = vec4(1);
+    //} else {
+        outcol = t_color;
+    //}
+
+    // outcol = vec4(target, 1.0);
+
     outcol.a = 1;
 }

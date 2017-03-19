@@ -113,17 +113,16 @@ public:
 
 	void setZoom(float zoom);
 
-    // ************ Glycogen 2D Abstraction *******
-    void init_Gly2DHeatMap();
-    bool init_Gly2DHeatMapShaders();
-    void drawIntoTexture();
-    void renderTexture2D();
+    // ************ 2D HeatMap  *******
+    void init2DHeatMapTextures();
+    bool init2DHeatMapShaders();
+    void drawNodesInto2DTexture();
+    void render2DHeatMapTexture();
 
+    // ************ 3D HeatMap  *******
 	void init_Gly3DTex();
 	void upload_Gly3DTex(void* data, int sizeX = 1000, int sizeY = 1000, int sizeZ = 1000, GLenum type = GL_FLOAT);
-
-    // ***************************************
-    void load3DTexturesFromRaw(QString path);
+    void load3DTexturesFromRaw(QString path, int size, GLuint texture);
 
 protected:
     DataContainer                           *m_dataContainer;

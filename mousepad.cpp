@@ -413,7 +413,6 @@ void MousePad::renderSelection(void)
 {
     // why I didnt use glRenderMode(GL_SELECT)?
     aboutToCompose();
-    qDebug() << "Draw Selection!";
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDisable(GL_DITHER);
@@ -460,8 +459,8 @@ void MousePad::processSelection(float x, float y)
     glReadPixels(x,  y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &res);
     int pickedID = res[0] + res[1] * 256 + res[2] * 256 * 256;
 
-    qDebug() << x << " " << y;
-    qDebug() <<  res[0] <<  " " << res[1] <<  " " << res[2] << " " << res[3];
+    //qDebug() << x << " " << y;
+    //qDebug() <<  res[0] <<  " " << res[1] <<  " " << res[2] << " " << res[3];
 
     if (pickedID == 255 || pickedID == 0) {
         qDebug() << "Background, Picked ID: " << pickedID;
