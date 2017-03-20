@@ -45,7 +45,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     y_interval = QVector2D(20, 40);
     ast_properites_list["MESH_SKELETON"] = y_interval;
     ast2.pos_alpha = QVector2D(0, 0.6);
-    ast2.trans_alpha = QVector2D(0, 0);
+    ast2.trans_alpha = QVector2D(1, 0);
     ast2.color_alpha = QVector2D(0, 0);
     ast2.point_size = QVector2D(1, skeleton_point_size);
     ast2.interval = QVector2D(y_interval.x(), y_interval.y());
