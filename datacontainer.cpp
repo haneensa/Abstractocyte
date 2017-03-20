@@ -660,15 +660,28 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
          objects_list.push_back(obj);
          m_objectsByType[obj->getObjectType()] = objects_list;
 
+         if (max_volume < obj->getVolume())
+             max_volume = obj->getVolume();
+
          // need to update these info whenever we filter or change the threshold
          if (obj->getObjectType() == Object_t::ASTROCYTE)
              return;
 
+         if (obj->getObjectType() == Object_t::MITO) {
+             // check its parent, if astrocyte it wont be fair to include it
+             int parentID =obj->getParentID();
+             if (m_objects.find(parentID) != m_objects.end()) {
+                 Object *parent = m_objects[parentID];
+                 if (parent->getObjectType()  == Object_t::ASTROCYTE  )
+                     return;
+             }
+         }
+
+
          if (max_astro_coverage < obj->getAstroCoverage())
             max_astro_coverage = obj->getAstroCoverage();
 
-         if (max_volume < obj->getVolume())
-             max_volume = obj->getVolume();
+
     }
 
 }
