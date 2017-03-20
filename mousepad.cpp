@@ -348,7 +348,7 @@ void MousePad::render2D_GridSpace()
     GLuint pMatrix = glGetUniformLocation(m_program_2DSpace_degbug, "pMatrix");
     glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_projection.data());
 
-    glDrawElements(GL_POINTS, m_indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
 
     m_vbo_2DSpaceTrianglesIndix.release();
     m_vao_2DSpace_grid.release();
@@ -369,7 +369,7 @@ void MousePad::paintGL()
 
     render2D_DebugSpace();
 
-//    render2D_GridSpace();
+    render2D_GridSpace();
 
     if (m_updatedPointer == false) // ?
         return;
