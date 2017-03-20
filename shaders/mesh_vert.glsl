@@ -16,8 +16,9 @@ out vec4        V_color_val;
 out float       V_alpha;
 out float       V_color_intp;
 out int         V_render;
-out vec4	V_worldPos;
+out vec4		V_worldPos;
 out vec4        V_normal;
+out	vec3		E_eye;
 
 uniform int     y_axis;
 uniform int     x_axis;
@@ -66,6 +67,8 @@ ast_neu_properties space2d;
 
 float translate(float value, float leftMin, float leftMax, float rightMin, float rightMax);
 
+vec3 eye = vec3(0.5, 0.5, 1.0);
+
 void main(void)
 {
 
@@ -74,6 +77,9 @@ mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
 V_worldPos = mMatrix * vec4(mesh_vx.xyz, 1.0);
 vec4 mesh_vertex =  pvmMatrix * vec4(mesh_vx.xyz , 1.0);
 vec4 Vskeleton_vx = pvmMatrix * vec4(skeleton_vx.xyz, 1.0);
+
+E_eye = (mMatrix * vec4(eye, 1.0)).xyz;
+
 int ID = int(mesh_vx.w);
 
 V_ID = ID;
