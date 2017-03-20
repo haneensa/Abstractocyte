@@ -273,9 +273,9 @@ void OpenGLManager::init_Gly3DTex()
 
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     GL_Error();
 }
 
@@ -308,7 +308,8 @@ void OpenGLManager::init2DHeatMapTextures()
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     GL_Error();
 
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_2D_heatMap_Tex, 0);
@@ -360,13 +361,13 @@ void OpenGLManager::load3DTexturesFromRaw(QString path, int size, GLuint texture
     glBindTexture(GL_TEXTURE_3D, m_astro_3DTex);
 
      // set the texture parameters
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-    char *bufferRGBA = new char[size * 4];
+	unsigned char *bufferRGBA = new unsigned char[size * 4];
 
     // convert to rgba
     for (int i = 0; i < size; ++i) {
@@ -479,10 +480,10 @@ void OpenGLManager::render2DHeatMapTexture()
         glUniform1i(  tf, 1 );
 
         // Astrocyte 3D volume
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
-        GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
-        glUniform1i(  astro_tex, 2 );
+        //glActiveTexture(GL_TEXTURE2);
+        //glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
+        //GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
+        //glUniform1i(  astro_tex, 2 );
 
         GLint resolution = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "resolution");
         float resolution_value = 100;
@@ -1032,10 +1033,10 @@ void OpenGLManager::drawMeshTriangles(bool selection )
        updateUniformsLocation(m_TMesh.getProgram("3Dtriangles"));
 
        // Astrocyte 3D volume
-       glActiveTexture(GL_TEXTURE2);
+       glActiveTexture(GL_TEXTURE0);
        glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
-       GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
-       glUniform1i(  astro_tex, 2 );
+	   GLint astro_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "astro_tex");
+       glUniform1i(  astro_tex, 0 );
 
 
        m_TMesh.vboBind("MeshIndices");

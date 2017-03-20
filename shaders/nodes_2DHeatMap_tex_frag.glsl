@@ -13,6 +13,14 @@ uniform sampler3D   astro_tex;
 
 in vec2             G_fragTexCoord;
 
+const float gaussian_steps[5] = float[5](0.0, 1.0, -1.0, 2.0, -2.0);
+
+const float gaussian_kernel[125] = float[125](0.0598, 0.0379, 0.0379, 0.0102, 0.0102,
+	0.0379, 0.0233, 0.0233, 0.0058, 0.0058,
+	0.0379, 0.0233, 0.0233, 0.0058, 0.0058,
+	0.0102, 0.0058, 0.0058, 0.0014, 0.0014,
+	0.0102, 0.0058, 0.0058, 0.0014, 0.0014);
+
 void main() {
     //this will be our RGBA sum
     vec4 sum = vec4(0.0);
@@ -56,3 +64,30 @@ void main() {
 
 }
 
+float getSplattedTexture(in sampler2D texture_toSplat, in vec2 coord)
+{
+	float step = 0.001; //change later 1/size_x .. 1/size_y
+	// step_x; step_y
+
+	vec2 idx_offset = vec3(0.0, 0.0);
+	float weight = 1;
+	float tex_value = 1.0;
+	float sum = 0;
+	float result = 0;
+
+		for (int j = 0; j < 5; j++)
+		{
+			idx_offset.y = gaussian_steps[j] * step; //step_y
+			for (int i = 0; i < 5; i++)
+			{
+				idx_offset.x = gaussian_steps[i] * step; //step_x
+				weight = gaussian_kernel[i + j * 5];
+				vec2 new_coord = coord.xy + idx_offset.xy;
+				vec4 tex_value4 = texture(texture_toSplat, new_coord);
+				//sum = sum + (0.008 * tex_value);
+				result = result + (weight * tex_value4.r);
+			}
+		}
+	
+	return result;
+}
