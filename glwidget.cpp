@@ -134,7 +134,7 @@ void GLWidget::initializeGL()
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_opengl_mngr->init_Gly3DTex();
-	m_opengl_mngr->upload_Gly3DTex(m_data_containter->getGlycogen3DGridData());
+    m_opengl_mngr->upload_Gly3DTex( m_data_containter->getGlycogen3DGridData() );
 }
 
 void GLWidget::paintGL()

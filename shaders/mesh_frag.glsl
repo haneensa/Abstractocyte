@@ -10,6 +10,9 @@ out vec4        outcol;
 
 // textures
 uniform sampler3D   astro_tex;
+uniform sampler3D   gly_tex;
+uniform sampler3D   mito_tex;
+
 in vec3             G_fragTexCoord;
 
 uniform sampler1D   tf;
@@ -47,10 +50,23 @@ void main() {
 	vec4 color = vec4(color_val.rgb, 1.0);
 
         // mark astrocytes on neurites
-        vec4 astro_volume = texture(astro_tex, G_fragTexCoord);
-        if (astro_volume.r > 0) {
-            float t = astro_volume.r;
-            color = texture(tf, t);
+//        vec4 astro_volume = texture(astro_tex, G_fragTexCoord);
+//        if (astro_volume.r > 0) {
+//            color = texture(tf, astro_volume.r);
+//        }
+
+//        vec4 gly_volume = texture(gly_tex, G_fragTexCoord);
+//        if (gly_volume.r > 0) {
+//            color = texture(tf, gly_volume.r);
+//        } else {
+//            color = vec4(1, 1, 1, 0.5);
+//        }
+
+
+        // mark astrocytes on neurites
+        vec4 mito_volume = texture(mito_tex, G_fragTexCoord);
+        if (mito_volume.r > 0) {
+            color = texture(tf, mito_volume.r);
         }
 
 	vec4 toon_color = vec4(color.rgb, 1.0);
@@ -83,6 +99,9 @@ void main() {
 		al = alpha;
 	}
 
-	outcol.a = alpha;
+//        if (gly_volume.r == 0) {
+//            color.a = 0.5;
+//        } else
+          outcol.a = alpha;
 
 }
