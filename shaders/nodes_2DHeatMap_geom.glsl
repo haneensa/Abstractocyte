@@ -29,6 +29,11 @@ void main()
     int ID =  int(V_ID[0]);
     float intensity = SSBO_data[ID].info.y;
 
+    // if filtered then return
+    int isFiltered = int(SSBO_data[ID].info.w);
+    if (isFiltered == 1)
+        return;
+
     // check: intensity shold be normalied
     if (intensity > 1.0)
         color_val = vec4(0, 0, 1, 1);
