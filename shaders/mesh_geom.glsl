@@ -96,7 +96,6 @@ void main() {
             return;
 
 
-
         eye = E_eye[i];
 
         color_intp = V_color_intp[i];

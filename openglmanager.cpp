@@ -40,7 +40,7 @@ void OpenGLManager::drawAll()
 
 
    // glDisable(GL_BLEND);
-    render2DHeatMapTexture();
+//    render2DHeatMapTexture();
     //glEnable (GL_BLEND);
 
     renderAbstractions();
@@ -65,7 +65,7 @@ bool OpenGLManager::initOpenGLFunctions()
     m_GlycogenPoints.initOpenGLFunctions();
 
     int size = 999 * 999 * 449;
-    load3DTexturesFromRaw(":/data/mask_745_.raw", size, m_astro_3DTex);
+    load3DTexturesFromRaw("mask_745_sigma3.raw", size, m_astro_3DTex);
 
     fillVBOsData();
 
@@ -328,9 +328,9 @@ void OpenGLManager::init2DHeatMapTextures()
     GL_Error();
 
     // init transfer function
-    m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 0.0f)); // 0
-    m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.3f, 0.0f, 1.0f)); // 1
-    m_tf_2DHeatmap.push_back(QVector4D(0.0f, 1.0f, 0.0f, 1.0f)); // 2
+    m_tf_2DHeatmap.push_back(QVector4D(0.8f, 0.0f, 0.8f, 0.0f)); // 0
+    m_tf_2DHeatmap.push_back(QVector4D(0.5f, 0.0f, 0.5f, 0.5f)); // 1
+    m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 1.0f)); // 2
 
 
     glGenTextures( 1, &m_tf_2DHeatMap_tex);
@@ -370,7 +370,7 @@ void OpenGLManager::load3DTexturesFromRaw(QString path, int size, GLuint texture
 
     // convert to rgba
     for (int i = 0; i < size; ++i) {
-        bufferRGBA[i*4] =  (rawData[i] > 0) ? 255 : 0;
+        bufferRGBA[i*4] =   rawData[i];
         bufferRGBA[i*4 + 1] = 0;
         bufferRGBA[i*4 + 2] = 0 ;
         bufferRGBA[i*4 + 3] = 255;
@@ -477,12 +477,6 @@ void OpenGLManager::render2DHeatMapTexture()
         glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
         GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
         glUniform1i(  tf, 1 );
-
-        // Astrocyte 3D volume
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
-        GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
-        glUniform1i(  astro_tex, 2 );
 
         GLint resolution = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "resolution");
         float resolution_value = 100;
@@ -1031,10 +1025,18 @@ void OpenGLManager::drawMeshTriangles(bool selection )
        m_TMesh.useProgram("3Dtriangles");
        updateUniformsLocation(m_TMesh.getProgram("3Dtriangles"));
 
+
+       // transfer function
+       glActiveTexture(GL_TEXTURE1);
+       glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
+       GLint tf = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "tf");
+       glUniform1i(  tf, 1 );
+
+
        // Astrocyte 3D volume
        glActiveTexture(GL_TEXTURE2);
        glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
-       GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
+       GLint astro_tex = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "astro_tex");
        glUniform1i(  astro_tex, 2 );
 
 

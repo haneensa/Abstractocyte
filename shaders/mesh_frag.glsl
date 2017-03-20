@@ -12,6 +12,8 @@ out vec4        outcol;
 uniform sampler3D   astro_tex;
 in vec3             G_fragTexCoord;
 
+uniform sampler1D   tf;
+
 //-------------------- DIFFUSE LIGHT PROPERTIES --------------------
 uniform vec3 diffuseLightDirection; //QVector3D(-2.5f, -2.5f, -0.9f);
 
@@ -44,9 +46,11 @@ void main() {
 
 	vec4 color = vec4(color_val.rgb, 1.0);
 
+        // mark astrocytes on neurites
         vec4 astro_volume = texture(astro_tex, G_fragTexCoord);
-        if (astro_volume.r > 0.5) {
-            color = astro_volume;
+        if (astro_volume.r > 0) {
+            float t = astro_volume.r;
+            color = texture(tf, t);
         }
 
 	vec4 toon_color = vec4(color.rgb, 1.0);
@@ -68,7 +72,7 @@ void main() {
 	float edgeDetection = (border_value > 0.05) ? 1 : 0;
 	// interpolate between two colors
 	// todo: based on the mesh type (astro, neurite)
-	outcol = phong_color * color_intp + (1.0 - color_intp) * edgeDetection * toon_color;
+        outcol = phong_color * color_intp + (1.0 - color_intp) /** edgeDetection*/ * toon_color;
 	float al = 0;
 	if (alpha < 1.0 && edgeDetection < 0.5)
 	{
