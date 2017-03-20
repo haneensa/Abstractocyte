@@ -180,18 +180,19 @@ protected:
     Color_e                                 m_color_encoding;
     Size_e                                  m_size_encoding;
 
-    //*********************************
-    GLuint                                  m_gly_2D_heatMap_FBO;
-    GLuint                                  m_gly_2D_heatMap_Tex;
+    // ************ 2D HeatMap  *******
+    GLuint                                  m_2D_heatMap_FBO_H;
+    GLuint                                  m_2D_heatMap_FBO_V;
+
+    GLuint                                  m_2D_heatMap_Tex;
     int                                     m_quadSize;
     std::vector<QVector4D>                  m_Texquad;
-
-    
-	GLuint									m_gly_3D_Tex;
     GLuint                                  m_tf_2DHeatMap_tex;
-	std::vector<QVector4D>                  m_tf_2DHeatmap;
+    std::vector<QVector4D>                  m_tf_2DHeatmap;
 
-    //**************************************
+    // ************ 3D HeatMap  *******
+	GLuint									m_gly_3D_Tex;
+
     GLuint                                  m_astro_3DTex;
 
  };

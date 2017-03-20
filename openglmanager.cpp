@@ -39,11 +39,16 @@ void OpenGLManager::drawAll()
     write_ssbo_data();
 
 
+   // glDisable(GL_BLEND);
     render2DHeatMapTexture();
+    //glEnable (GL_BLEND);
+
     renderAbstractions();
     renderSelection();
 
+//    glDisable(GL_BLEND);
     drawNodesInto2DTexture();
+//    glEnable (GL_BLEND);
 }
 
 // ############## Data Initialization ###############################################
@@ -287,14 +292,15 @@ void OpenGLManager::upload_Gly3DTex(void* data, int sizeX, int sizeY, int sizeZ,
 //
 void OpenGLManager::init2DHeatMapTextures()
 {
-    m_gly_2D_heatMap_FBO = 0;
+    // init Horizantal FBO
+    m_2D_heatMap_FBO_H = 0;
 
-    glGenFramebuffers(1, &m_gly_2D_heatMap_FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
+    glGenFramebuffers(1, &m_2D_heatMap_FBO_H);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_2D_heatMap_FBO_H);
     GL_Error();
 
-    glGenTextures(1, &m_gly_2D_heatMap_Tex);
-    glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
+    glGenTextures(1, &m_2D_heatMap_Tex);
+    glBindTexture(GL_TEXTURE_2D, m_2D_heatMap_Tex);
     GL_Error();
 
     // create empty image
@@ -302,9 +308,10 @@ void OpenGLManager::init2DHeatMapTextures()
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     GL_Error();
 
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_gly_2D_heatMap_Tex, 0);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_2D_heatMap_Tex, 0);
     GL_Error();
 
     // set the list of draw buffers
@@ -318,26 +325,26 @@ void OpenGLManager::init2DHeatMapTextures()
        return;
     }
 
-   GL_Error();
+    GL_Error();
+
+    // init transfer function
+    m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 0.0f)); // 0
+    m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.3f, 0.0f, 1.0f)); // 1
+    m_tf_2DHeatmap.push_back(QVector4D(0.0f, 1.0f, 0.0f, 1.0f)); // 2
 
 
-   // init transfer function
-   m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 1.0f));
-   m_tf_2DHeatmap.push_back(QVector4D(0.0f, 0.0f, 1.0f, 1.0f));
+    glGenTextures( 1, &m_tf_2DHeatMap_tex);
+    GL_Error();
 
+    glBindTexture( GL_TEXTURE_1D, m_tf_2DHeatMap_tex);
+    GL_Error();
 
-   glGenTextures( 1, &m_tf_2DHeatMap_tex);
-   GL_Error();
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    GL_Error();
 
-   glBindTexture( GL_TEXTURE_1D, m_tf_2DHeatMap_tex);
-   GL_Error();
-
-   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-   GL_Error();
-
-    glTexImage1D( GL_TEXTURE_1D, 0, GL_RGBA, 2, 0, GL_RGBA, GL_FLOAT, m_tf_2DHeatmap.data());
+    glTexImage1D( GL_TEXTURE_1D, 0, GL_RGBA, 3, 0, GL_RGBA, GL_FLOAT, m_tf_2DHeatmap.data());
 
     GL_Error();
 
@@ -455,12 +462,13 @@ bool OpenGLManager::init2DHeatMapShaders()
 void OpenGLManager::render2DHeatMapTexture()
 {
     // ********* Debug Texture
-    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
+//    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
+        qDebug() << "render2DHeatMapTexture";
         m_GNeurites.vaoBind("2DHeatMap_Quad");
         m_GNeurites.useProgram("2DHeatMap_Texture");
         // heatmap texture
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_gly_2D_heatMap_Tex);
+        glBindTexture(GL_TEXTURE_2D, m_2D_heatMap_Tex);
         GLint tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tex");
         glUniform1i(  tex, 0 );
 
@@ -470,25 +478,28 @@ void OpenGLManager::render2DHeatMapTexture()
         GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
         glUniform1i(  tf, 1 );
 
-        // transfer function
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
-        GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
-        glUniform1i(  astro_tex, 2 );
+        GLint resolution = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "resolution");
+        float resolution_value = 100;
+        glUniform1fv(resolution, 1, &resolution_value);
+
+        GLint radius = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "radius");
+        float radius_value = 0.5;
+        glUniform1fv(radius, 1, &radius_value);
+
+        GLint dir = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "dir");
+        float dir_value[2] = {0.0, 1.0};
+        glUniform2fv(dir, 1, dir_value);
 
 
-        GLint ResS = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "ResS");
-        float w = 250; //m_canvas_w / m_retinaScale;
-        glUniform1fv(ResS, 1, &w);
+        GLint Res = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "Res");
+        float res_val[2] = {200.0, 200.0};
+        glUniform2fv(Res, 1, res_val);
 
-        GLint ResT = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "ResT");
-        float h = 250; //m_canvas_h / m_retinaScale;
-        glUniform1fv(ResT, 1, &h);
 
         glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
 
         m_GNeurites.vaoRelease();
-    }
+//    }
 }
 
 // ----------------------------------------------------------------------------
@@ -496,9 +507,9 @@ void OpenGLManager::render2DHeatMapTexture()
 void OpenGLManager::drawNodesInto2DTexture()
 {
     //****************** Render Nodes Into Texture ***********************
-    glBindFramebuffer(GL_FRAMEBUFFER, m_gly_2D_heatMap_FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_2D_heatMap_FBO_H);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
     m_GNeurites.vaoBind("2DHeatMap");
     m_GNeurites.vboBind("nodes");
@@ -510,8 +521,8 @@ void OpenGLManager::drawNodesInto2DTexture()
     m_GNeurites.vboRelease("nodes");
     m_GNeurites.vaoRelease();
 
-//    glFlush();
-//    glFinish();
+    glFlush();
+    glFinish();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
