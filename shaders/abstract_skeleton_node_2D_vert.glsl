@@ -102,6 +102,10 @@ void main(void)
     else
         V_render = 0;
 
+   if (type == mito)
+       V_render = 0;
+
+
    // if we are in the 2D space, then we have two interpolation for the neurites
    // for the nodes and skeletons along the y axis (node layout 1 and node layout 2)
    // for the neurites skeleton as well along the y axis (layout 1 and layout 3)

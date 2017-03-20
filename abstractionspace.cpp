@@ -326,7 +326,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
 
     // interpolate between graph 3D and 2D
     m_IntervalXY.push_back({ast7, neu6});
-    initLine(QVector2D(60, 60), QVector2D(80, 80), ID++);
+    initLine(QVector2D(60, 60), QVector2D(83, 83), ID++);
 
     //****************** 4) (60, 100) <-> (80, 100) **************************
     // interpolate between neurites skeleton 3D and 2D

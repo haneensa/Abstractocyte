@@ -104,17 +104,22 @@ void main(void)
     else
         V_render = 0;
 
-    if ( type == spine || type == bouton || type == mito) {
+    int slider = (extra_info.x == 1) ? y_axis : x_axis;  // need to make this general and not tied to object type
+
+    if ( type == spine || type == bouton) {
         // if this is a child and parent is not filtered
         int ParentID = int(SSBO_data[ID].info.z);
         int isParentFiltered = int(SSBO_data[ParentID].info.w);
-        if (isParentFiltered == 0 && int(positions.y) != 6) // color this special color that would show this is a mix of parent and child
+        if (isParentFiltered == 0 &&  (int(positions.y) != 6)) // color this special color that would show this is a mix of parent and child
             V_render = 0;
     }
 
-    int slider = (extra_info.x == 1) ? y_axis : x_axis;  // need to make this general and not tied to object type
+    if (type == mito) {
+        V_alpha =  translate(slider, interval.x, interval.y, 1, 0);
+    } else {
+        V_alpha =  1;
+    }
 
-    V_alpha =  translate(y_axis, interval.x, interval.y, trans_alpha.x, trans_alpha.y);
 
     float max_point_size = point_size.y;
     float min_point_size = point_size.x;

@@ -64,8 +64,8 @@ bool OpenGLManager::initOpenGLFunctions()
     m_GNeurites.initOpenGLFunctions();
     m_GlycogenPoints.initOpenGLFunctions();
 
-    int size = 999 * 999 * 449;
-    load3DTexturesFromRaw(":/data/mask_745_.raw", size, m_astro_3DTex);
+    load3DTexturesFromRaw("mask_745_sigma3.raw", m_astro_3DTex ); // Astrocytic_mitochondria_b.raw
+    load3DTexturesFromRaw("mask_astro_mito_sig10.raw", m_mito_3DTex ); //
 
     fillVBOsData();
 
@@ -276,6 +276,7 @@ void OpenGLManager::init_Gly3DTex()
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
     GL_Error();
 }
 
@@ -329,9 +330,9 @@ void OpenGLManager::init2DHeatMapTextures()
     GL_Error();
 
     // init transfer function
-    m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 0.0f)); // 0
-    m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.3f, 0.0f, 1.0f)); // 1
-    m_tf_2DHeatmap.push_back(QVector4D(0.0f, 1.0f, 0.0f, 1.0f)); // 2
+    m_tf_2DHeatmap.push_back(QVector4D(0.8f, 0.0f, 0.8f, 0.0f)); // 0
+    m_tf_2DHeatmap.push_back(QVector4D(0.5f, 0.0f, 0.5f, 0.5f)); // 1
+    m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 1.0f)); // 2
 
 
     glGenTextures( 1, &m_tf_2DHeatMap_tex);
@@ -353,12 +354,13 @@ void OpenGLManager::init2DHeatMapTextures()
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::load3DTexturesFromRaw(QString path, int size, GLuint texture)
+void OpenGLManager::load3DTexturesFromRaw(QString path, GLuint &texture, int sizeX, int sizeY, int sizeZ)
 {
+    int size = sizeX * sizeY * sizeZ;
     char *rawData = m_dataContainer->loadRawFile(path, size);
     //load data into a 3D texture
-    glGenTextures(1, &m_astro_3DTex);
-    glBindTexture(GL_TEXTURE_3D, m_astro_3DTex);
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_3D, texture);
 
      // set the texture parameters
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -371,16 +373,17 @@ void OpenGLManager::load3DTexturesFromRaw(QString path, int size, GLuint texture
 
     // convert to rgba
     for (int i = 0; i < size; ++i) {
-        bufferRGBA[i*4] =  (rawData[i] > 0) ? 255 : 0;
+        bufferRGBA[i*4] =   rawData[i];
         bufferRGBA[i*4 + 1] = 0;
         bufferRGBA[i*4 + 2] = 0 ;
         bufferRGBA[i*4 + 3] = 255;
     }
 
-    glTexImage3D(GL_TEXTURE_3D, 0 ,GL_RGBA, 999, 999, 449,0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) bufferRGBA);
+    glTexImage3D(GL_TEXTURE_3D, 0 ,GL_RGBA, sizeX, sizeY, sizeZ,0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) bufferRGBA);
 
     delete [] rawData;
     delete [] bufferRGBA;
+
 }
 
 // ----------------------------------------------------------------------------
@@ -479,12 +482,6 @@ void OpenGLManager::render2DHeatMapTexture()
         GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
         glUniform1i(  tf, 1 );
 
-        // Astrocyte 3D volume
-        //glActiveTexture(GL_TEXTURE2);
-        //glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
-        //GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
-        //glUniform1i(  astro_tex, 2 );
-
         GLint resolution = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "resolution");
         float resolution_value = 100;
         glUniform1fv(resolution, 1, &resolution_value);
@@ -502,7 +499,6 @@ void OpenGLManager::render2DHeatMapTexture()
         float res_val[2] = {200.0, 200.0};
         glUniform2fv(Res, 1, res_val);
 
-
         glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
 
         m_GNeurites.vaoRelease();
@@ -512,7 +508,7 @@ void OpenGLManager::render2DHeatMapTexture()
 
         dir_value[0] = 1;
         dir_value[1] = 0;
-    }
+   }
 
 
 
@@ -1032,12 +1028,32 @@ void OpenGLManager::drawMeshTriangles(bool selection )
        m_TMesh.useProgram("3Dtriangles");
        updateUniformsLocation(m_TMesh.getProgram("3Dtriangles"));
 
+
+       // transfer function
+       glActiveTexture(GL_TEXTURE1);
+       glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
+       GLint tf = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "tf");
+       glUniform1i(  tf, 1 );
+
+
        // Astrocyte 3D volume
        glActiveTexture(GL_TEXTURE0);
        glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
 	   GLint astro_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "astro_tex");
        glUniform1i(  astro_tex, 0 );
 
+       // Glycogen 3D volume
+       glActiveTexture(GL_TEXTURE3);
+       glBindTexture( GL_TEXTURE_3D,  m_gly_3D_Tex);
+       GLint gly_tex = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "gly_tex");
+       glUniform1i(  gly_tex, 3 );
+
+
+       // Astrocyte 3D volume
+       glActiveTexture(GL_TEXTURE4);
+       glBindTexture( GL_TEXTURE_3D,  m_mito_3DTex);
+       GLint mito_tex = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "mito_tex");
+       glUniform1i(  mito_tex, 4 );
 
        m_TMesh.vboBind("MeshIndices");
        glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
@@ -1790,7 +1806,21 @@ void OpenGLManager::multiplyWithRotation(QMatrix4x4 rotationMatrix)
         m_abstract_skel_nodes[i].layout1 = rotVertex.toVector2D();
         m_abstract_skel_nodes[i].layout2 = rotVertex.toVector2D();
         m_abstract_skel_nodes[i].layout3 = rotVertex.toVector2D();
+    }
 
+
+    std::map<int, Object*> *objectMap = m_dataContainer->getObjectsMapPtr();
+    for ( auto iter = objectMap->begin(); iter != objectMap->end(); iter++ ) {
+        Object *obj = (*iter).second;
+
+        int hvgxID = obj->getHVGXID();
+        if (m_ssbo_data.size() <= hvgxID)
+            continue;
+
+        QVector3D center = rotationMatrix * m_ssbo_data[hvgxID].center.toVector3D();
+
+        m_ssbo_data[hvgxID].layout1 = center.toVector2D();
+        m_ssbo_data[hvgxID].layout2 = center.toVector2D();
     }
 }
 

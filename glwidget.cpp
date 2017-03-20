@@ -134,7 +134,7 @@ void GLWidget::initializeGL()
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_opengl_mngr->init_Gly3DTex();
-	m_opengl_mngr->upload_Gly3DTex(m_data_containter->getGlycogen3DGridData());
+    m_opengl_mngr->upload_Gly3DTex( m_data_containter->getGlycogen3DGridData() );
 }
 
 void GLWidget::paintGL()
@@ -446,7 +446,7 @@ void GLWidget::stopForecDirectedLayout()
 {
     // stop force layout
     m_refresh_timer->stop();
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < max_graphs; ++i)
         m_graphManager->stopForceDirectedLayout(i);
 
     m_FDL_running = false;

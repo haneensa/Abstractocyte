@@ -92,12 +92,6 @@ int type = int(SSBO_data[ID].center.w);
 V_color_val = SSBO_data[ID].color;
 
 
-//// if skeleton_vx.w is below a threshold then color it
-//if (skeleton_vx.w <= 0.0001 && type !=  astrocyte )
-//V_color_val.rgb = vec3(1.0, 0.0, 0.0);
-
-
-
 properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
 
 vec2 pos_alpha = space_properties.pos_alpha; // position interpolation (pos1, pos2)

@@ -65,7 +65,8 @@ void SpacePartitioning::Grid3D::addNormalizedPoint(float nX, float nY, float nZ,
 	int gY = (int)(nY * (m_size[Y]-1));
 	int gZ = (int)(nZ * (m_size[Z]-1));
 
-	data[gX + gY * m_size[X] + gZ * m_size[Y] * m_size[Z]] += value;
+    //data[gX + gY * m_size[X] + gZ * m_size[Y] * m_size[Z]] += value;
+    data[gX + gY * m_size[X] + gZ * m_size[Y] * m_size[Z]] = 255;
 
 }
 

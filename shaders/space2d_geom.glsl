@@ -22,7 +22,7 @@ void main() {
         if (is_selection_shader == 1)
              color_val = vec4(b,  0.0,  0.0, 0.0);
         else
-            color_val = SSBO_data[ID-1];
+            color_val = vec4(1, 1, 1, 1);//SSBO_data[ID-1];
 
         gl_Position = gl_in[i].gl_Position;
         alpha = 1.0;

@@ -9,7 +9,12 @@ in vec3			eye;
 out vec4        outcol;
 // textures
 uniform sampler3D   astro_tex;
+uniform sampler3D   gly_tex;
+uniform sampler3D   mito_tex;
+
 in vec3             G_fragTexCoord;
+
+uniform sampler1D   tf;
 
 //-------------------- DIFFUSE LIGHT PROPERTIES --------------------
 uniform vec3 diffuseLightDirection; //QVector3D(-2.5f, -2.5f, -0.9f);
@@ -70,6 +75,19 @@ void main() {
 	vec4 red_color = vec4(1.0, 0.0, 0.0, 1.0);
 	vec4 mix_color = mix(color, red_color, splat);
 
+//        vec4 gly_volume = texture(gly_tex, G_fragTexCoord);
+//        if (gly_volume.r > 0) {
+//            color = texture(tf, gly_volume.r);
+//        } else {
+//            color = vec4(1, 1, 1, 0.5);
+//        }
+
+        // mark mitochodria on neurites
+        vec4 mito_volume = texture(mito_tex, G_fragTexCoord);
+        if (mito_volume.r > 0) {
+            color = texture(tf, mito_volume.r);
+        }
+
 	mix_color.a = 1;
 
 	color = mix_color;
@@ -91,7 +109,7 @@ void main() {
 	float edgeDetection = (border_value > 0.05) ? 1 : 0;
 	// interpolate between two colors
 	// todo: based on the mesh type (astro, neurite)
-	outcol = phong_color * color_intp + (1.0 - color_intp) * edgeDetection * toon_color;
+        outcol = phong_color * color_intp + (1.0 - color_intp) /** edgeDetection*/ * toon_color;
 	float al = 0;
 	if (alpha < 1.0 && edgeDetection < 0.5)
 	{
@@ -102,7 +120,10 @@ void main() {
 		al = alpha;
 	}
 
-	outcol.a = alpha;
+//        if (gly_volume.r == 0) {
+//            color.a = 0.5;
+//        } else
+          outcol.a = alpha;
 
 }
 

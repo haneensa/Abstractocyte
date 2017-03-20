@@ -25,7 +25,7 @@ DataContainer::DataContainer()
 {
 
     m_mesh = new Mesh();
-    m_glycogen3DGrid.setSize(1000,1000,1000);
+    m_glycogen3DGrid.setSize(999, 999, 449);
 	m_boutonHash.setSize(32, 32, 32);
 	m_spineHash.setSize(32, 32, 32);
     /* 1: load all data */

@@ -121,8 +121,8 @@ public:
 
     // ************ 3D HeatMap  *******
 	void init_Gly3DTex();
-	void upload_Gly3DTex(void* data, int sizeX = 1000, int sizeY = 1000, int sizeZ = 1000, GLenum type = GL_FLOAT);
-    void load3DTexturesFromRaw(QString path, int size, GLuint texture);
+    void upload_Gly3DTex(void* data, int sizeX = 999, int sizeY = 999, int sizeZ = 449, GLenum type = GL_FLOAT);
+    void load3DTexturesFromRaw(QString path, GLuint &texture, int sizeX = 999, int sizeY = 999, int sizeZ = 449);
 
 protected:
     DataContainer                           *m_dataContainer;
@@ -192,9 +192,8 @@ protected:
 
     // ************ 3D HeatMap  *******
 	GLuint									m_gly_3D_Tex;
-
     GLuint                                  m_astro_3DTex;
-
+    GLuint                                  m_mito_3DTex;
  };
 
 #endif // OPENGLMANAGER_H
