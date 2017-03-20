@@ -51,6 +51,13 @@ protected:
     void initSelectionPointerGL();
     void init2DSpaceGL();
 
+    void init2D_DebugSpaceGL();
+    void init2D_GridSpaceGL();
+    void init2D_SelectionSpaceGL();
+
+    void render2D_DebugSpace();
+    void render2D_GridSpace();
+
     void initBuffer();
     void initData();
     bool updateBuffer();
@@ -84,13 +91,16 @@ private:
     std::vector<struct abstractionPoint>      m_vertices;
     std::vector<GLuint>                       m_indices;
 
-    QOpenGLVertexArrayObject                m_vao_2DSpace;
+    QOpenGLVertexArrayObject                m_vao_2DSpace_debug;
+    QOpenGLVertexArrayObject                m_vao_2DSpace_grid;
     QOpenGLVertexArrayObject                m_vao_2DSpace_Selection;
 
     QOpenGLBuffer                           m_vbo_2DSpaceVerts;
-    QOpenGLBuffer                           m_vbo_2DSpaceIndix;
+    QOpenGLBuffer                           m_vbo_2DSpaceTrianglesIndix;
+    QOpenGLBuffer                           m_vbo_2DSpaceGridIndix;
 
-    GLuint                                  m_program_2DSpace;
+    GLuint                                  m_program_2DSpace_degbug;
+    GLuint                                  m_program_2DSpace_grid;
     GLuint                                  m_program_2DSpace_Selection;
 
     AbstractionSpace                        *m_2dspace;
