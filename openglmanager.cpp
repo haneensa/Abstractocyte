@@ -356,8 +356,8 @@ void OpenGLManager::load3DTexturesFromRaw(QString path, int size, GLuint texture
 {
     char *rawData = m_dataContainer->loadRawFile(path, size);
     //load data into a 3D texture
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_3D, texture);
+    glGenTextures(1, &m_astro_3DTex);
+    glBindTexture(GL_TEXTURE_3D, m_astro_3DTex);
 
      // set the texture parameters
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -370,13 +370,13 @@ void OpenGLManager::load3DTexturesFromRaw(QString path, int size, GLuint texture
 
     // convert to rgba
     for (int i = 0; i < size; ++i) {
-        bufferRGBA[i*4] =(rawData[i] > 0) ? 255 : 0;
+        bufferRGBA[i*4] =  (rawData[i] > 0) ? 255 : 0;
         bufferRGBA[i*4 + 1] = 0;
         bufferRGBA[i*4 + 2] = 0 ;
         bufferRGBA[i*4 + 3] = 255;
     }
 
-    glTexImage3D(GL_TEXTURE_3D,0 ,GL_RGBA, 999, 999, 449,0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) bufferRGBA);
+    glTexImage3D(GL_TEXTURE_3D, 0 ,GL_RGBA, 999, 999, 449,0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) bufferRGBA);
 
     delete [] rawData;
     delete [] bufferRGBA;
@@ -461,9 +461,9 @@ bool OpenGLManager::init2DHeatMapShaders()
 //
 void OpenGLManager::render2DHeatMapTexture()
 {
+    // 1) render this into fbo 1
     // ********* Debug Texture
-//    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
-        qDebug() << "render2DHeatMapTexture";
+    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
         m_GNeurites.vaoBind("2DHeatMap_Quad");
         m_GNeurites.useProgram("2DHeatMap_Texture");
         // heatmap texture
@@ -477,6 +477,12 @@ void OpenGLManager::render2DHeatMapTexture()
         glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
         GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
         glUniform1i(  tf, 1 );
+
+        // Astrocyte 3D volume
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
+        GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
+        glUniform1i(  astro_tex, 2 );
 
         GLint resolution = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "resolution");
         float resolution_value = 100;
@@ -499,7 +505,16 @@ void OpenGLManager::render2DHeatMapTexture()
         glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
 
         m_GNeurites.vaoRelease();
-//    }
+
+
+        // take the output of fbo1 into our scene
+
+        dir_value[0] = 1;
+        dir_value[1] = 0;
+    }
+
+
+
 }
 
 // ----------------------------------------------------------------------------
@@ -1007,6 +1022,7 @@ void OpenGLManager::drawMeshTriangles(bool selection )
        m_TMesh.useProgram("selection");
        updateUniformsLocation(m_TMesh.getProgram("selection"));
        m_TMesh.vboBind("MeshIndices");
+
        glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
        m_TMesh.vboRelease("MeshIndices");
        m_TMesh.vaoRelease();
@@ -1014,6 +1030,13 @@ void OpenGLManager::drawMeshTriangles(bool selection )
        m_TMesh.vaoBind("Mesh");
        m_TMesh.useProgram("3Dtriangles");
        updateUniformsLocation(m_TMesh.getProgram("3Dtriangles"));
+
+       // Astrocyte 3D volume
+       glActiveTexture(GL_TEXTURE2);
+       glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
+       GLint astro_tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "astro_tex");
+       glUniform1i(  astro_tex, 2 );
+
 
        m_TMesh.vboBind("MeshIndices");
        glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );

@@ -9,6 +9,8 @@ uniform vec2        dir;
 
 uniform sampler2D   tex;
 uniform sampler1D   tf;
+uniform sampler3D   astro_tex;
+
 in vec2             G_fragTexCoord;
 
 void main() {
@@ -46,7 +48,11 @@ void main() {
     //discard alpha for our simple demo, multiply by vertex color and return
     float t = sum.r;
     vec4 t_color = texture(tf, t);
-    outcol = vec4(t_color.rgba);
+
+    vec4 volume_color = texture(astro_tex, vec3(G_fragTexCoord, 0.5));
+  //  outcol = vec4(t_color.rgba);
+    outcol = volume_color;
+    outcol.a = 1;
 
 }
 

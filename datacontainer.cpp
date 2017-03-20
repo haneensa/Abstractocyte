@@ -1,7 +1,6 @@
 // skeletons to take care of : 134, 510
 // 419, 56
 // 422, 59
-// also deal with mito without parent -> the skeleton they map to is the same as the mesh
 #include <chrono>
 #include "datacontainer.h"
 #include <set>

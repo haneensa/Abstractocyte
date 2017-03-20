@@ -18,6 +18,7 @@ out float       V_color_intp;
 out int         V_render;
 out vec4	V_worldPos;
 out vec4        V_normal;
+out vec3        V_fragTexCoord;
 
 uniform int     y_axis;
 uniform int     x_axis;
@@ -72,6 +73,9 @@ void main(void)
 V_normal = vertex_normal;
 mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
 V_worldPos = mMatrix * vec4(mesh_vx.xyz, 1.0);
+
+V_fragTexCoord = vec3(mesh_vx.xyz);
+
 vec4 mesh_vertex =  pvmMatrix * vec4(mesh_vx.xyz , 1.0);
 vec4 Vskeleton_vx = pvmMatrix * vec4(skeleton_vx.xyz, 1.0);
 int ID = int(mesh_vx.w);
@@ -82,9 +86,9 @@ int type = int(SSBO_data[ID].center.w);
 V_color_val = SSBO_data[ID].color;
 
 
-// if skeleton_vx.w is below a threshold then color it
-if (skeleton_vx.w <= 0.0001 && type !=  astrocyte )
-V_color_val.rgb = vec3(1.0, 0.0, 0.0);
+//// if skeleton_vx.w is below a threshold then color it
+//if (skeleton_vx.w <= 0.0001 && type !=  astrocyte )
+//V_color_val.rgb = vec3(1.0, 0.0, 0.0);
 
 
 

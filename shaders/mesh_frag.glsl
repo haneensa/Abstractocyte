@@ -7,6 +7,9 @@ in vec4         color_val;
 in vec3		vposition;
 out vec4        outcol;
 
+// textures
+uniform sampler3D   astro_tex;
+in vec3             G_fragTexCoord;
 
 //-------------------- DIFFUSE LIGHT PROPERTIES --------------------
 uniform vec3 diffuseLightDirection;
@@ -39,6 +42,12 @@ void main() {
 	sf = pow(sf, 3.0);
 
 	vec4 color = vec4(color_val.rgb, 1.0);
+
+        vec4 astro_volume = texture(astro_tex, G_fragTexCoord);
+        if (astro_volume.r > 0.5) {
+            color = astro_volume;
+        }
+
 	vec4 toon_color = vec4(color.rgb, 1.0);
 	vec4 phong_color = (ambiance *  color) + (color * cosTheta2);//mix(vec4(color.rgb, 1.0) * cosTheta, vec4(color.rgb, 1.0) * cosTheta2, 0.3);
 

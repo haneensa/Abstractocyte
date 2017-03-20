@@ -332,7 +332,6 @@ void Graph::update_node_data(Node* node)
             if (node->getNodeType() == Node_t::ASTROCYTE) {
                 // update astrocyte skeleton
                 // layout 2
-                qDebug() << "Update skeleton layout 2 vertex";
                 m_opengl_mngr->update_skeleton_layout2(node->getLayoutedPosition(),
                                                        node->getIdxID(), node->getID() /*hvgx*/);
             } else {
