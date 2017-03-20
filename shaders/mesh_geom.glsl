@@ -67,47 +67,45 @@ void main() {
     vec3 B = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
     normal_out = normalize(cross(A,B));
 
-	for (int i = 0; i < 3; i++) {
-              //  normal_out = V_normal[i].rgb;
-		int ID = V_ID[i];
-		G_ID = float(ID);
-		int isFiltered = int(SSBO_data[ID].info.w);
-		if (isFiltered == 1)
-			return;
+    for (int i = 0; i < 3; i++) {
+        normal_out = V_normal[i].rgb;
+        int ID = V_ID[i];
+        G_ID = float(ID);
+        int isFiltered = int(SSBO_data[ID].info.w);
+        if (isFiltered == 1)
+            return;
 
-		if (ID == 0)
-			return;
+        if (ID == 0)
+            return;
 
-		int type = int(SSBO_data[ID].center.w);
-		color_val = V_color_val[i];
-
-
-		properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
-
-		vec4 render_type = space_properties.render_type; // additional info
-
-		if (render_type.x == 0) {
-			return;
-		}
-
-		alpha = V_alpha[i];
+        int type = int(SSBO_data[ID].center.w);
+        color_val = V_color_val[i];
 
 
-                if (alpha < 0.05) {
-                    return;
-                }
+        properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
+
+        vec4 render_type = space_properties.render_type; // additional info
+
+        if (render_type.x == 0)
+            return;
+
+        alpha = V_alpha[i];
 
 
-		eye = E_eye[i];
+        if (alpha < 0.05)
+            return;
 
-		color_intp = V_color_intp[i];
-		vposition = V_worldPos[i].xyz;
-		gl_Position = gl_in[i].gl_Position;
 
-                G_fragTexCoord = V_fragTexCoord[i];
 
-		EmitVertex();
-	}
+        eye = E_eye[i];
 
-	EndPrimitive();
+        color_intp = V_color_intp[i];
+        vposition = V_worldPos[i].xyz;
+        gl_Position = gl_in[i].gl_Position;
+        G_fragTexCoord = V_fragTexCoord[i];
+
+        EmitVertex();
+    }
+
+    EndPrimitive();
 }
