@@ -1256,6 +1256,18 @@ void DataContainer::recomputeMaxVolAstro()
         Object *obj = (*iter).second;
         if (obj->isFiltered() || obj->getObjectType() == Object_t::ASTROCYTE)
             continue;
+
+        if (obj->getObjectType() == Object_t::MITO) {
+            // check its parent, if astrocyte it wont be fair to include it
+            int parentID =obj->getParentID();
+            if (m_objects.find(parentID) != m_objects.end()) {
+                Object *parent = m_objects[parentID];
+                if (parent->getObjectType()  == Object_t::ASTROCYTE  )
+                    continue;
+            }
+        }
+
+
         // need to update these info whenever we filter or change the threshold
         if (temp_max_astro_coverage < obj->getAstroCoverage())
            temp_max_astro_coverage = obj->getAstroCoverage();
