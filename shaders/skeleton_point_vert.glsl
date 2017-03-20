@@ -81,8 +81,7 @@ void main(void)
         int parentType = int(SSBO_data[ParentID].center.w);
         int isParentFiltered = int(SSBO_data[ParentID].info.w);
 
-        // test this
-        if (parentType == spine || parentType == bouton) {
+        if (parentType == spine || parentType == bouton || parentType == mito) {
             if (isParentFiltered == 1) // if they are filtered but their parent is not, make this as part of the parent
                 ParentID =  int(SSBO_data[ParentID].info.z);
         }

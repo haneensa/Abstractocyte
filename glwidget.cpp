@@ -446,7 +446,7 @@ void GLWidget::stopForecDirectedLayout()
 {
     // stop force layout
     m_refresh_timer->stop();
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < max_graphs; ++i)
         m_graphManager->stopForceDirectedLayout(i);
 
     m_FDL_running = false;

@@ -1791,7 +1791,21 @@ void OpenGLManager::multiplyWithRotation(QMatrix4x4 rotationMatrix)
         m_abstract_skel_nodes[i].layout1 = rotVertex.toVector2D();
         m_abstract_skel_nodes[i].layout2 = rotVertex.toVector2D();
         m_abstract_skel_nodes[i].layout3 = rotVertex.toVector2D();
+    }
 
+
+    std::map<int, Object*> *objectMap = m_dataContainer->getObjectsMapPtr();
+    for ( auto iter = objectMap->begin(); iter != objectMap->end(); iter++ ) {
+        Object *obj = (*iter).second;
+
+        int hvgxID = obj->getHVGXID();
+        if (m_ssbo_data.size() <= hvgxID)
+            continue;
+
+        QVector3D center = rotationMatrix * m_ssbo_data[hvgxID].center.toVector3D();
+
+        m_ssbo_data[hvgxID].layout1 = center.toVector2D();
+        m_ssbo_data[hvgxID].layout2 = center.toVector2D();
     }
 }
 

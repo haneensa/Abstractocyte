@@ -123,7 +123,7 @@ void GraphManager::ExtractGraphFromMesh()
 
      m_graph[1] = new Graph( Graph_t::NODE_SKELETON , m_opengl_mngr, 5 /* grid col */); // neurite-astrocyte skeleton
      m_graph[1]->parseSKELETON(astrocyte_skeleton_nodes, astrocyte_skeleton_edges);
-     m_graph[1]->parseNODE_NODE(neurites_nodes, edges_info);
+//     m_graph[1]->parseNODE_NODE(neurites_nodes, edges_info);
 
      m_graph[2] = new Graph( Graph_t::ALL_SKELETONS, m_opengl_mngr, 5 /* grid col */ ); //  neurites skeletons - astrocyte skeleton
      m_graph[2]->parseSKELETON(astrocyte_skeleton_nodes, astrocyte_skeleton_edges);

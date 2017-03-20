@@ -301,7 +301,8 @@ void Graph::resetCoordinates()
         hashGrid->insert((*iter).second);
     }
 
-     runforceDirectedLayout();
+    if (m_gType == Graph_t::NODE_NODE || m_gType == Graph_t::NODE_SKELETON)
+        runforceDirectedLayout();
    // GEM_run();
 
 
@@ -336,7 +337,7 @@ void Graph::update_node_data(Node* node)
                                                        node->getIdxID(), node->getID() /*hvgx*/);
             } else {
                 m_opengl_mngr->update_ssbo_data_layout2(node->getLayoutedPosition(),
-                                                        node->getID() /*hvgx*/);
+                                                        node->getID() );
             }
 
             break;
