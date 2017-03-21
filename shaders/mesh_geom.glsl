@@ -71,8 +71,11 @@ void main() {
         normal_out = V_normal[i].rgb;
         int ID = V_ID[i];
         G_ID = float(ID);
-        int isFiltered = int(SSBO_data[ID].info.w);
-        if (isFiltered == 1)
+
+        int filter_value = int(SSBO_data[ID].info.w);
+
+        int visibility = (filter_value >> 0) & 1;
+        if (visibility == 1)
             return;
 
         if (ID == 0)

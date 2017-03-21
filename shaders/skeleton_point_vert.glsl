@@ -74,24 +74,28 @@ void main(void)
 
     properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
 
-    int isFiltered = int(SSBO_data[ID].info.w);
+    int filter_value = int(SSBO_data[ID].info.w);
+    int visibility = (filter_value >> 0) & 1;
+
     if ( type == spine || type == bouton || type == mito) {
         // if this is a child and parent is not filtered
         int ParentID = int(SSBO_data[ID].info.z);
         int parentType = int(SSBO_data[ParentID].center.w);
-        int isParentFiltered = int(SSBO_data[ParentID].info.w);
+        int parent_filter_value = int(SSBO_data[ParentID].info.w);
+        int parentVisibility = (parent_filter_value >> 0) & 1;
 
-        if (parentType == spine || parentType == bouton || parentType == mito) {
-            if (isParentFiltered == 1) // if they are filtered but their parent is not, make this as part of the parent
+        if ( parentType == spine || parentType == bouton ) { // if mito has bouton or spine as parents
+            if (parentVisibility == 1) {// if they are filtered but their parent is not, make this as part of the parent
                 ParentID =  int(SSBO_data[ParentID].info.z);
+                parentVisibility = int(SSBO_data[ParentID].info.w);
+                parentType = int(SSBO_data[ParentID].center.w);
+            }
         }
 
-        isParentFiltered = int(SSBO_data[ParentID].info.w);
-        // end test
-
-        if (isParentFiltered == 0 && isFiltered == 1)  // parent not filtered but child is
+        if (parentVisibility == 0 && visibility == 1)  // parent not filtered but child is
             ID = ParentID;
-        if (type == mito && parentType == astrocyte)
+
+        if (type == mito && parentType == astrocyte) // astrocytic mitochonderia
             space_properties = space2d.ast;
 
 

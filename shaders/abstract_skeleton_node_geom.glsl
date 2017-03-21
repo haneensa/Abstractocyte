@@ -38,8 +38,9 @@ void main() {
         return;
     }
 
-    int isFiltered = int(SSBO_data[ID].info.w);
-    if (isFiltered == 1)
+    int filter_value = int(SSBO_data[ID].info.w);
+    int visibility = (filter_value >> 0) & 1;
+    if (visibility == 1)
         return;
 
     gl_PointSize = gl_in[0].gl_PointSize;
