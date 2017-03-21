@@ -17,6 +17,7 @@ out float       G_ID;
 
 uniform int     y_axis;
 uniform int     x_axis;
+uniform int     hoveredID;
 
 layout(location = 8) uniform int   max_volume;
 layout(location = 9) uniform int   max_astro_coverage;
@@ -74,6 +75,9 @@ void main() {
     G_ID = float(ID);
 
     color_val = SSBO_data[ID].color;
+    if (hoveredID == ID) {
+        color_val += vec4(0.2, 0.2, 0.2, 0);
+    }
 
     if (ID == 0) {
         return;

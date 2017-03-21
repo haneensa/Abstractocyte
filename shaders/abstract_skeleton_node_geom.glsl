@@ -11,6 +11,9 @@ in int          V_ID[];
 in float        V_alpha[];
 in int          V_render[];
 
+uniform int     hoveredID;
+
+
 struct SSBO_datum {
     vec4 color;
     vec4 center;
@@ -38,13 +41,17 @@ void main() {
         return;
     }
 
-    int isFiltered = int(SSBO_data[ID].info.w);
-    if (isFiltered == 1)
+    int filter_value = int(SSBO_data[ID].info.w);
+    int visibility = (filter_value >> 0) & 1;
+    if (visibility == 1)
         return;
 
     gl_PointSize = gl_in[0].gl_PointSize;
 
     color_val = SSBO_data[ID].color;
+    if (hoveredID == ID) {
+        color_val += vec4(0.2, 0.2, 0.2, 0);
+    }
 
     gl_Position = gl_in[0].gl_Position;
 

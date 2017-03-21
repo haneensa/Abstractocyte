@@ -111,6 +111,8 @@ public:
     int processSelection(float x, float y);
     void renderSelection();
 
+    void highlightObject(int hvgxID);
+
 	void setZoom(float zoom);
 
     // ************ 2D HeatMap  *******
@@ -121,8 +123,8 @@ public:
 
     // ************ 3D HeatMap  *******
 	void init_Gly3DTex();
-    void upload_Gly3DTex(void* data, int sizeX = 999, int sizeY = 999, int sizeZ = 449, GLenum type = GL_FLOAT);
-    void load3DTexturesFromRaw(QString path, GLuint &texture, int sizeX = 999, int sizeY = 999, int sizeZ = 449);
+    void upload_Gly3DTex(void* data, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z, GLenum type = GL_FLOAT);
+    void load3DTexturesFromRaw(QString path, GLuint &texture, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z);
 
 protected:
     DataContainer                           *m_dataContainer;
@@ -176,6 +178,8 @@ protected:
     bool                                    m_display_parent;
     bool                                    m_display_synapses;
     int                                     m_depth;
+
+    int                                    m_hoveredID;
 
     Color_e                                 m_color_encoding;
     Size_e                                  m_size_encoding;

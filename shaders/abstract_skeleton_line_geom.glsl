@@ -28,7 +28,7 @@ out vec4        color_val;
 out float       alpha;
 out float       G_ID;
 
-layout(location = 9) uniform int   max_astro_coverage;
+uniform int     hoveredID;
 
 struct SSBO_datum {
     vec4 color;
@@ -69,8 +69,14 @@ void main() {
     int ID = V_ID[0] ;
     G_ID = float(ID);
 
-    if ( int(SSBO_data[V_ID[0]].info.w) == 1 || int(SSBO_data[V_ID[1]].info.w) == 1 )
-        return;
+    for (int i = 0; i < 2; ++i) {
+        int filter_value = int(SSBO_data[V_ID[i]].info.w);
+        int visibility = (filter_value >> 0) & 1;
+
+        if ( visibility == 1 )
+            return;
+    }
+
 
     alpha = V_alpha[0];
     if (alpha < 0.01){
@@ -84,7 +90,9 @@ void main() {
     gl_PointSize =  gl_in[0].gl_PointSize;
 
     color_val = SSBO_data[ID].color;
-
+    if (hoveredID == ID) {
+        color_val += vec4(0.2, 0.2, 0.2, 0);
+    }
 
     vec4 start = gl_in[0].gl_Position;
     vec4 end = gl_in[1].gl_Position;

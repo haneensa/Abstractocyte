@@ -30,8 +30,9 @@ void main()
     float intensity = SSBO_data[ID].info.y;
 
     // if filtered then return
-    int isFiltered = int(SSBO_data[ID].info.w);
-    if (isFiltered == 1)
+    int filter_value = int(SSBO_data[ID].info.w);
+    int visibility = (filter_value >> 0) & 1;
+    if (visibility == 1)
         return;
 
     // check: intensity shold be normalied

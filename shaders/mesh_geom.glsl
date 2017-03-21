@@ -10,17 +10,19 @@ in float        V_color_intp[];
 in vec4			V_worldPos[];
 in vec4         V_normal[];
 in vec3         V_fragTexCoord[];
-in vec3			E_eye[];
+in vec3		E_eye[];
 
 out float       color_intp;
 out vec4        color_val;
 out vec3        normal_out;
 out float       alpha;
-out vec3		vposition;
+out vec3	vposition;
 out float       G_ID;
 out vec3        G_fragTexCoord;
-out vec3		eye;
+out vec3	eye;
 flat out int			otype;
+
+uniform int     hoveredID;
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
@@ -71,8 +73,11 @@ void main() {
         normal_out = V_normal[i].rgb;
         int ID = V_ID[i];
         G_ID = float(ID);
-        int isFiltered = int(SSBO_data[ID].info.w);
-        if (isFiltered == 1)
+
+        int filter_value = int(SSBO_data[ID].info.w);
+
+        int visibility = (filter_value >> 0) & 1;
+        if (visibility == 1)
             return;
 
         if (ID == 0)
@@ -81,6 +86,9 @@ void main() {
         int type = int(SSBO_data[ID].center.w);
         color_val = V_color_val[i];
 		otype = type;
+        if (hoveredID == ID) {
+            color_val += vec4(0.2, 0.2, 0.2, 0);
+        }
 
         properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
 

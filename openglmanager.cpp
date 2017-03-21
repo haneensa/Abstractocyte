@@ -18,6 +18,8 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
     m_color_encoding = Color_e::TYPE;
     m_size_encoding = Size_e::VOLUME;
     m_normals_enabled = true;
+
+    m_hoveredID = -1;
 }
 
 // ----------------------------------------------------------------------------
@@ -1461,6 +1463,9 @@ void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
     glUniform1iv(8, 1, &m_uniforms.max_volume);
 
     glUniform1iv(9, 1, &m_uniforms.max_astro_coverage);
+
+    GLint hoveredID = glGetUniformLocation(program, "hoveredID");
+    glUniform1iv(hoveredID, 1, &m_hoveredID);
 }
 
 // ----------------------------------------------------------------------------
@@ -1490,9 +1495,11 @@ void OpenGLManager::updateUniformsLocation(GLuint program)
     GLint x_axis = glGetUniformLocation(program, "x_axis");
     glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
 
-
     glUniform1iv(8, 1, &m_uniforms.max_volume);
     glUniform1iv(9, 1, &m_uniforms.max_astro_coverage);
+
+    GLint hoveredID = glGetUniformLocation(program, "hoveredID");
+    glUniform1iv(hoveredID, 1, &m_hoveredID);
 }
 
 // ----------------------------------------------------------------------------
@@ -1614,12 +1621,16 @@ void OpenGLManager::FilterObject(int ID, bool isfilterd)
     Object *obj = objectMap->at(ID);
     obj->updateFilteredFlag(isfilterd);
 
+    int visibility = m_ssbo_data[ID].info.w();
 
     if (isfilterd) {
-        m_ssbo_data[ID].info.setW(1);
+        visibility |= 1 << 0;
     } else {
-        m_ssbo_data[ID].info.setW(0);
+        visibility &= ~(1 << 0);
     }
+
+    m_ssbo_data[ID].info.setW(visibility);
+
 }
 
 // ----------------------------------------------------------------------------
@@ -1644,8 +1655,11 @@ void OpenGLManager::FilterByType(Object_t type, bool flag)
 //
 void OpenGLManager::FilterByID( QList<QString> tokens_Ids, bool invisibility )
 {
-    for (int i = 0; i < m_ssbo_data.size(); ++i) {
-        FilterObject(i, !invisibility); // why ?
+    if (invisibility == false) { // show only
+        // hide everything else
+        for (int i = 0; i < m_ssbo_data.size(); ++i) {
+            FilterObject(i, !invisibility);
+        }
     }
 
     for (int i = 0; i < tokens_Ids.size(); ++i) {
@@ -1663,9 +1677,11 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids, bool invisibility )
 //
 void OpenGLManager::FilterByID( std::set<int> tokens_Ids, bool invisibility )
 {
-    for (int i = 0; i < m_ssbo_data.size(); ++i) {
-        // recompute max vol and astro coverage
-        FilterObject(i, !invisibility); // why ?
+    if (invisibility == false) { // show only
+        // hide everything else
+        for (int i = 0; i < m_ssbo_data.size(); ++i) {
+            FilterObject(i, !invisibility);
+        }
     }
 
     for (auto iter = tokens_Ids.begin(); iter != tokens_Ids.end(); ++iter) {
@@ -1936,4 +1952,17 @@ void OpenGLManager::updateColorEncoding(Color_e encoding)
     m_color_encoding = encoding;
 
     updateSSBO();
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::highlightObject(int hvgxID)
+{
+    if (m_ssbo_data.size() <= hvgxID) {
+        m_hoveredID = -1;
+        return;
+    }
+
+    qDebug() << "highlight object" << hvgxID;
+    m_hoveredID = hvgxID;
 }

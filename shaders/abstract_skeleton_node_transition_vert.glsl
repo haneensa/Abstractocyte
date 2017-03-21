@@ -109,8 +109,10 @@ void main(void)
     if ( type == spine || type == bouton) {
         // if this is a child and parent is not filtered
         int ParentID = int(SSBO_data[ID].info.z);
-        int isParentFiltered = int(SSBO_data[ParentID].info.w);
-        if (isParentFiltered == 0 &&  (int(positions.y) != 6)) // color this special color that would show this is a mix of parent and child
+
+        int parent_filter_value = int(SSBO_data[ParentID].info.w);
+        int parentVisibility = (parent_filter_value >> 0) & 1;
+        if (parentVisibility == 0 &&  (int(positions.y) != 6)) // color this special color that would show this is a mix of parent and child
             V_render = 0;
     }
 
