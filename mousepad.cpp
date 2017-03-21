@@ -10,6 +10,8 @@ MousePad::MousePad(QWidget *parent)
        m_vbo_circle( QOpenGLBuffer::VertexBuffer ),
        m_vbo_2DSpaceVerts( QOpenGLBuffer::VertexBuffer ),
        m_vbo_2DSpaceTrianglesIndix( QOpenGLBuffer::IndexBuffer ),
+       m_vbo_2DSpaceGridVerts( QOpenGLBuffer::VertexBuffer ),
+       m_vbo_2DSpaceGridIndix( QOpenGLBuffer::IndexBuffer ),
        m_updatedPointer(true)
 {
     m_bindColorIdx = 1;
@@ -105,6 +107,9 @@ void MousePad::initData()
 
     m_vertices = m_2dspace->get2DSpaceVertices();
     m_indices = m_2dspace->get2DSpaceIndices();
+
+    m_grid_vertices = m_2dspace->get2DSpaceGridVertices();
+    m_grid_indices = m_2dspace->get2DSpaceGridIndices();
 }
 
 void MousePad::initBuffer()
@@ -205,8 +210,9 @@ void  MousePad::init2D_GridSpaceGL()
     m_vao_2DSpace_grid.create();
     m_vao_2DSpace_grid.bind();
 
-    m_vbo_2DSpaceVerts.bind();
-    m_vbo_2DSpaceTrianglesIndix.bind();
+    m_vbo_2DSpaceGridVerts.bind();
+    m_vbo_2DSpaceGridIndix.bind();
+    GL_Error();
 
 
     int offset = 0;
@@ -216,9 +222,11 @@ void  MousePad::init2D_GridSpaceGL()
     offset += sizeof(QVector2D);
     glEnableVertexAttribArray(1);
     glVertexAttribIPointer(1, 1, GL_INT, sizeof(struct abstractionPoint), (GLvoid*)offset);
+    GL_Error();
 
-    m_vbo_2DSpaceTrianglesIndix.release();
-    m_vbo_2DSpaceVerts.release();
+    m_vbo_2DSpaceGridIndix.release();
+    m_vbo_2DSpaceGridVerts.release();
+    GL_Error();
 
     m_vao_2DSpace_grid.release();
     GL_Error();
@@ -262,7 +270,7 @@ void  MousePad::init2D_SelectionSpaceGL()
 void MousePad::init2DSpaceGL()
 {
     m_vbo_2DSpaceVerts.create();
-    m_vbo_2DSpaceVerts.setUsagePattern( QOpenGLBuffer::DynamicDraw);
+    m_vbo_2DSpaceVerts.setUsagePattern( QOpenGLBuffer::StaticDraw);
     m_vbo_2DSpaceVerts.bind();
     m_vbo_2DSpaceVerts.allocate( m_vertices.data(), m_vertices.size() * sizeof(QVector3D) );
     m_vbo_2DSpaceVerts.release();
@@ -272,11 +280,19 @@ void MousePad::init2DSpaceGL()
     m_vbo_2DSpaceTrianglesIndix.allocate( m_indices.data(), m_indices.size() * sizeof(GLuint) );
     m_vbo_2DSpaceTrianglesIndix.release();
 
+    m_vbo_2DSpaceGridVerts.create();
+    m_vbo_2DSpaceGridVerts.setUsagePattern( QOpenGLBuffer::StaticDraw);
+    m_vbo_2DSpaceGridVerts.bind();
+    m_vbo_2DSpaceGridVerts.allocate( m_grid_vertices.data(), m_grid_vertices.size() * sizeof(QVector3D) );
+    m_vbo_2DSpaceGridVerts.release();
 
     m_vbo_2DSpaceGridIndix.create();
+    m_vbo_2DSpaceVerts.setUsagePattern( QOpenGLBuffer::StaticDraw);
     m_vbo_2DSpaceGridIndix.bind();
-    m_vbo_2DSpaceGridIndix.allocate( m_indices.data(), m_indices.size() * sizeof(GLuint) );
+    m_vbo_2DSpaceGridIndix.allocate( m_grid_indices.data(), m_grid_indices.size() * sizeof(GLuint) );
     m_vbo_2DSpaceGridIndix.release();
+
+    GL_Error();
 
     init2D_DebugSpaceGL();
     init2D_GridSpaceGL();
@@ -287,7 +303,7 @@ void MousePad::initializeGL()
 {
     qDebug() << "MousePad::initializeGL()";
     initializeOpenGLFunctions();
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     qDebug() << "MousePad::initData()";
@@ -319,7 +335,7 @@ void MousePad::initializeGL()
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void MousePad::render2D_DebugSpace()
@@ -342,22 +358,24 @@ void MousePad::render2D_DebugSpace()
 void MousePad::render2D_GridSpace()
 {
     m_vao_2DSpace_grid.bind();
-    m_vbo_2DSpaceTrianglesIndix.bind();
+    m_vbo_2DSpaceGridIndix.bind();
     glUseProgram(m_program_2DSpace_grid);
 
-    GLuint pMatrix = glGetUniformLocation(m_program_2DSpace_degbug, "pMatrix");
+    GLuint pMatrix = glGetUniformLocation(m_program_2DSpace_grid, "pMatrix");
     glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_projection.data());
 
-    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+    m_vbo_2DSpaceVerts.bind();
+    glDrawElements(GL_LINES, m_grid_indices.size(), GL_UNSIGNED_INT, 0);
+    m_vbo_2DSpaceVerts.release();
 
-    m_vbo_2DSpaceTrianglesIndix.release();
+    m_vbo_2DSpaceGridIndix.release();
     m_vao_2DSpace_grid.release();
 }
 
 void MousePad::paintGL()
 {
     glViewport( 0, 0, m_w, m_h);
-    glClearColor(0.5f,0.5f, 0.5f, 1.0f);
+    glClearColor(0.85f, 0.85f, 0.85f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_vao_circle.bind();
@@ -367,9 +385,10 @@ void MousePad::paintGL()
     m_program_circle->release();
     m_vao_circle.release();
 
+    render2D_GridSpace();
+
     render2D_DebugSpace();
 
-    render2D_GridSpace();
 
     if (m_updatedPointer == false) // ?
         return;

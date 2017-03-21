@@ -33,9 +33,14 @@ public:
     void initLine(QVector2D end1, QVector2D end2, int ID);
     void initTriangle(QVector2D coords1, QVector2D coords2,QVector2D coords3, int ID);
 
+    void iniGridtLine(QVector2D end1, QVector2D end2, int ID);
 
-    std::vector<struct abstractionPoint> get2DSpaceVertices() { return m_vertices; }
-    std::vector<GLuint> get2DSpaceIndices() { return m_indices; }
+
+    std::vector<struct abstractionPoint> get2DSpaceVertices()   { return m_vertices; }
+    std::vector<GLuint> get2DSpaceIndices()                     { return m_indices; }
+
+    std::vector<struct abstractionPoint> get2DSpaceGridVertices()   { return m_grid_vertices; }
+    std::vector<GLuint> get2DSpaceGridIndices()                     { return m_grid_indices; }
 
     struct ast_neu_properties getSpaceProper()  { return m_IntervalXY[m_intervalID]; }
 
@@ -69,6 +74,10 @@ private:
                                                 m_neu_states;
     std::map<std::pair<int, int>, struct properties>
                                                 m_ast_states;
+
+    std::vector<struct abstractionPoint>        m_grid_vertices;
+    std::vector<GLuint>                         m_grid_indices;
+
 };
 
 #endif // ABSTRACTIONSPACE_H

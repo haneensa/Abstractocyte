@@ -88,8 +88,11 @@ private:
     GLuint                                  m_buffer_color;
     GLuint                                  m_bindColorIdx;
 
-    std::vector<struct abstractionPoint>      m_vertices;
-    std::vector<GLuint>                       m_indices;
+    std::vector<struct abstractionPoint>    m_vertices;
+    std::vector<GLuint>                     m_indices;
+
+    std::vector<struct abstractionPoint>    m_grid_vertices;
+    std::vector<GLuint>                     m_grid_indices;
 
     QOpenGLVertexArrayObject                m_vao_2DSpace_debug;
     QOpenGLVertexArrayObject                m_vao_2DSpace_grid;
@@ -97,6 +100,8 @@ private:
 
     QOpenGLBuffer                           m_vbo_2DSpaceVerts;
     QOpenGLBuffer                           m_vbo_2DSpaceTrianglesIndix;
+
+    QOpenGLBuffer                           m_vbo_2DSpaceGridVerts;
     QOpenGLBuffer                           m_vbo_2DSpaceGridIndix;
 
     GLuint                                  m_program_2DSpace_degbug;

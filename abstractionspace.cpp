@@ -286,6 +286,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu_properties = m_neu_states[std::make_pair(x_interval.x(), x_interval.y())];
     m_IntervalXY.push_back({ast_properties, neu_properties});
     initLine(QVector2D(60, 60), QVector2D(60, 100), ID++);
+    iniGridtLine(QVector2D(60, 60), QVector2D(60, 100), 0);
 
     //******************  2) (60, 60) <-> (100, 60) **************************
     // interpolate between 3D neurite skeleton to 3D points
@@ -296,6 +297,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu_properties = m_neu_states[std::make_pair(x_interval.x(), x_interval.y())];
     m_IntervalXY.push_back({ast_properties, neu_properties});
     initLine(QVector2D(60, 60), QVector2D(100, 60), ID++);
+    iniGridtLine(QVector2D(60, 60), QVector2D(100, 60), 0);
 
 
     //******************  3) (60, 60) <-> (80, 80) **************************
@@ -327,6 +329,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     // interpolate between graph 3D and 2D
     m_IntervalXY.push_back({ast7, neu6});
     initLine(QVector2D(60, 60), QVector2D(83, 83), ID++);
+    iniGridtLine(QVector2D(60, 60), QVector2D(80, 80), 0);
 
     //****************** 4) (60, 100) <-> (80, 100) **************************
     // interpolate between neurites skeleton 3D and 2D
@@ -357,6 +360,8 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     // interpolate between graph 3D and 2D
     m_IntervalXY.push_back({ast7, neu6});
     initLine(QVector2D(60, 100), QVector2D(80, 100), ID++);
+    iniGridtLine(QVector2D(60, 100), QVector2D(80, 100), 0);
+
     // interpolate between astrocyte and nodes 3D to 2D
 
     //******************   5) (100, 60) <-> (100, 80) **************************
@@ -387,6 +392,11 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     // interpolate between graph 3D and 2D
     m_IntervalXY.push_back({ast7, neu6});
     initLine(QVector2D(100, 60), QVector2D(100, 80), ID++);
+    iniGridtLine(QVector2D(100, 60), QVector2D(100, 80), 0);
+
+    //border lines
+    iniGridtLine(QVector2D(0.3, 0.3), QVector2D(0.3, 100), 0);
+    iniGridtLine(QVector2D(0.3, 0.3), QVector2D(100, 0.3), 0);
 }
 
 AbstractionSpace::~AbstractionSpace()
@@ -457,19 +467,22 @@ void AbstractionSpace::initRect(QVector2D x_interval, QVector2D y_interval, int 
     int offset = m_vertices.size();
 
     m_vertices.push_back(p);        // p00
+    m_grid_vertices.push_back(p);
 
     p.point.setX(p00.x() + dimX);   // p10
     p.point.setY(p00.y());
     m_vertices.push_back(p);
+    m_grid_vertices.push_back(p);
 
     p.point.setX(p00.x());          // p01
     p.point.setY(p00.y() + dimY);
     m_vertices.push_back(p);
+    m_grid_vertices.push_back(p);
 
     p.point.setX(p00.x() + dimX);   // p11
     p.point.setY(p00.y() + dimY);
     m_vertices.push_back(p);
-
+    m_grid_vertices.push_back(p);
 
     m_indices.push_back(offset + 0);
     m_indices.push_back(offset + 1);
@@ -478,6 +491,38 @@ void AbstractionSpace::initRect(QVector2D x_interval, QVector2D y_interval, int 
     m_indices.push_back(offset + 1);
     m_indices.push_back(offset + 3);
     m_indices.push_back(offset + 2);
+
+
+    // line 1
+    m_grid_indices.push_back(offset + 0);
+    m_grid_indices.push_back(offset + 1);
+
+    // line 2
+    m_grid_indices.push_back(offset + 0);
+    m_grid_indices.push_back(offset + 2);
+
+
+    // line 3
+    m_grid_indices.push_back(offset + 1);
+    m_grid_indices.push_back(offset + 3);
+
+    // line 4
+    m_grid_indices.push_back(offset + 3);
+    m_grid_indices.push_back(offset + 2);
+}
+
+void AbstractionSpace::iniGridtLine(QVector2D end1, QVector2D end2, int ID)
+{
+    // line 1
+    struct abstractionPoint end_point1 = {end1/100.0, ID};
+    struct abstractionPoint end_point2 = {end2/100.0, ID};
+
+    int grid_offset = m_grid_vertices.size();
+    m_grid_vertices.push_back(end_point1);
+    m_grid_vertices.push_back(end_point2);
+
+    m_grid_indices.push_back(grid_offset + 0);
+    m_grid_indices.push_back(grid_offset + 1);
 }
 
 void AbstractionSpace::initLine(QVector2D end1, QVector2D end2, int ID)
@@ -534,4 +579,5 @@ void AbstractionSpace::initTriangle(QVector2D coords1, QVector2D coords2,QVector
     m_indices.push_back(offset + 0);
     m_indices.push_back(offset + 1);
     m_indices.push_back(offset + 2);
+
 }
