@@ -439,7 +439,8 @@ void GLWidget::getFilteredID(QString value)
 
     stopForecDirectedLayout();
 
-    m_opengl_mngr->FilterByID(tokens);
+    bool invisibility = false; // meaning not filtered (visible)
+    m_opengl_mngr->FilterByID(tokens, invisibility);
 
     // start force layout
     m_rotation_timer->start(0);
@@ -586,7 +587,8 @@ void GLWidget::getDeletedHVGXID(int hvgxID)
 //
 void GLWidget::getFitlerButtonClicked(bool)
 {
-    m_opengl_mngr->FilterByID(m_selectedObjects);
+    bool invisibility = false; // meaning not filtered (visible)
+    m_opengl_mngr->FilterByID(m_selectedObjects, invisibility);
     update();
 }
 
@@ -599,3 +601,19 @@ void GLWidget::getResetFitlerButtonClicked(bool)
     update();
 }
 
+//------------------------------------------------------
+//
+void GLWidget::clearSelectedObjectsTable()
+{
+    clearRowsTable();
+    m_selectedObjects.clear();
+}
+
+//------------------------------------------------------
+//
+void GLWidget::hideSelectedObjects()
+{
+    bool invisibility = true; // meaning filtered (invisible)
+    m_opengl_mngr->FilterByID(m_selectedObjects, invisibility);
+    update();
+}

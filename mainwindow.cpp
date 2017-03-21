@@ -98,6 +98,7 @@ void MainWindow::RemoveRowAt(QModelIndex selectedIndex)
     tableView->removeRows(selectedIndex.row(), 1, QModelIndex());
 }
 
+
 //------------------------------------------------------
 //
 void MainWindow::on_glycogenVisibilityCheckBox_toggled(bool checked)

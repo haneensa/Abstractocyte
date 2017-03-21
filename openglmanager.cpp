@@ -1630,10 +1630,10 @@ void OpenGLManager::FilterByType(Object_t type, bool flag)
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
+void OpenGLManager::FilterByID( QList<QString> tokens_Ids, bool invisibility )
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
-        FilterObject(i, true);
+        FilterObject(i, !invisibility); // why ?
     }
 
     for (int i = 0; i < tokens_Ids.size(); ++i) {
@@ -1641,7 +1641,7 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
         if (hvgxID > m_ssbo_data.size())
             continue;
 
-        recursiveFilter(hvgxID, false);
+        recursiveFilter(hvgxID, invisibility);
     }
 
     m_dataContainer->recomputeMaxVolAstro();
@@ -1649,11 +1649,11 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids )
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::FilterByID( std::set<int> tokens_Ids )
+void OpenGLManager::FilterByID( std::set<int> tokens_Ids, bool invisibility )
 {
     for (int i = 0; i < m_ssbo_data.size(); ++i) {
         // recompute max vol and astro coverage
-        FilterObject(i, true);
+        FilterObject(i, !invisibility); // why ?
     }
 
     for (auto iter = tokens_Ids.begin(); iter != tokens_Ids.end(); ++iter) {
@@ -1661,7 +1661,7 @@ void OpenGLManager::FilterByID( std::set<int> tokens_Ids )
         if (hvgxID > m_ssbo_data.size())
             continue;
 
-        recursiveFilter(hvgxID, false);
+        recursiveFilter(hvgxID, invisibility);
 
     }
 

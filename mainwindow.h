@@ -43,6 +43,7 @@ public slots:
     void on_object_clicked(QList<QStandardItem*>);
     void clearTable();
     void RemoveRowAt(QModelIndex);
+
     void checkAllListWidget();
 
 signals:

@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1472</width>
-     <height>31</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -182,7 +182,16 @@
         <enum>QFrame::Raised</enum>
        </property>
        <layout class="QGridLayout" name="gridLayout_6">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <property name="spacing">
@@ -217,7 +226,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
@@ -256,8 +265,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>206</width>
-              <height>257</height>
+              <width>129</width>
+              <height>180</height>
              </rect>
             </property>
             <attribute name="label">
@@ -267,7 +276,16 @@
              <property name="spacing">
               <number>4</number>
              </property>
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item>
@@ -355,8 +373,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>336</width>
-              <height>737</height>
+              <width>344</width>
+              <height>848</height>
              </rect>
             </property>
             <attribute name="label">
@@ -463,28 +481,19 @@
          <string>Filtering</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_10">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
          <item row="0" column="0">
           <widget class="QGroupBox" name="groupBox_2">
            <property name="title">
             <string/>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <property name="margin">
-             <number>0</number>
-            </property>
-            <item>
+           <layout class="QGridLayout" name="gridLayout_9">
+            <item row="0" column="0">
              <widget class="QGroupBox" name="groupBox_8">
               <property name="title">
                <string>Selected Objects</string>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_7">
-               <item>
+              <layout class="QGridLayout" name="gridLayout_2">
+               <item row="0" column="0" colspan="3">
                 <widget class="QTableView" name="tableView">
                  <property name="editTriggers">
                   <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
@@ -500,23 +509,37 @@
                  </property>
                 </widget>
                </item>
-               <item>
+               <item row="1" column="0">
                 <widget class="QPushButton" name="pushButton">
                  <property name="text">
-                  <string>Fitler </string>
+                  <string>Show Only</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QPushButton" name="pushButton_3">
+                 <property name="text">
+                  <string>Hide</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QPushButton" name="pushButton_4">
+                 <property name="text">
+                  <string>Clear</string>
                  </property>
                 </widget>
                </item>
               </layout>
              </widget>
             </item>
-            <item>
+            <item row="1" column="0">
              <widget class="QGroupBox" name="groupBox_5">
               <property name="title">
                <string>Filter By Type:</string>
               </property>
-              <layout class="QGridLayout" name="gridLayout_2">
-               <item row="1" column="0">
+              <layout class="QGridLayout" name="gridLayout_7">
+               <item row="0" column="0">
                 <widget class="QListWidget" name="listWidget">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
@@ -588,7 +611,7 @@
               </layout>
              </widget>
             </item>
-            <item>
+            <item row="2" column="0">
              <widget class="QGroupBox" name="groupBox_7">
               <property name="title">
                <string>Filter By ID:</string>
@@ -600,7 +623,7 @@
               </layout>
              </widget>
             </item>
-            <item>
+            <item row="3" column="0">
              <widget class="QGroupBox" name="groupBox_6">
               <property name="title">
                <string>Preserve</string>
@@ -630,7 +653,7 @@
               </layout>
              </widget>
             </item>
-            <item>
+            <item row="4" column="0">
              <widget class="QPushButton" name="pushButton_2">
               <property name="text">
                <string>Reset Filter</string>
@@ -896,6 +919,8 @@
     <slot>getDoubleClickedTableView(QModelIndex)</slot>
     <slot>getFitlerButtonClicked(bool)</slot>
     <slot>getResetFitlerButtonClicked(bool)</slot>
+    <slot>clearSelectedObjectsTable()</slot>
+    <slot>hideSelectedObjects()</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -1148,8 +1173,8 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>332</x>
-     <y>723</y>
+     <x>715</x>
+     <y>754</y>
     </hint>
     <hint type="destinationlabel">
      <x>30</x>
@@ -1164,8 +1189,8 @@
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>336</x>
-     <y>699</y>
+     <x>719</x>
+     <y>730</y>
     </hint>
     <hint type="destinationlabel">
      <x>168</x>
@@ -1184,8 +1209,8 @@
      <y>472</y>
     </hint>
     <hint type="destinationlabel">
-     <x>315</x>
-     <y>614</y>
+     <x>698</x>
+     <y>645</y>
     </hint>
    </hints>
   </connection>
@@ -1200,8 +1225,8 @@
      <y>498</y>
     </hint>
     <hint type="destinationlabel">
-     <x>317</x>
-     <y>689</y>
+     <x>700</x>
+     <y>720</y>
     </hint>
    </hints>
   </connection>
@@ -1212,12 +1237,12 @@
    <slot>getItemChanged(QListWidgetItem*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>230</x>
-     <y>815</y>
+     <x>261</x>
+     <y>1148</y>
     </hint>
     <hint type="destinationlabel">
-     <x>354</x>
-     <y>810</y>
+     <x>737</x>
+     <y>841</y>
     </hint>
    </hints>
   </connection>
@@ -1228,12 +1253,12 @@
    <slot>getFilteredID(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>172</x>
-     <y>948</y>
+     <x>203</x>
+     <y>1207</y>
     </hint>
     <hint type="destinationlabel">
-     <x>323</x>
-     <y>946</y>
+     <x>706</x>
+     <y>977</y>
     </hint>
    </hints>
   </connection>
@@ -1244,12 +1269,12 @@
    <slot>getFilterWithChildren(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>129</x>
-     <y>999</y>
+     <x>160</x>
+     <y>1263</y>
     </hint>
     <hint type="destinationlabel">
-     <x>316</x>
-     <y>1003</y>
+     <x>699</x>
+     <y>1034</y>
     </hint>
    </hints>
   </connection>
@@ -1260,12 +1285,12 @@
    <slot>getFilterWithParent(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>129</x>
-     <y>1025</y>
+     <x>160</x>
+     <y>1286</y>
     </hint>
     <hint type="destinationlabel">
-     <x>350</x>
-     <y>1026</y>
+     <x>733</x>
+     <y>1057</y>
     </hint>
    </hints>
   </connection>
@@ -1276,12 +1301,12 @@
    <slot>getFilterWithSynapses(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>129</x>
-     <y>1051</y>
+     <x>160</x>
+     <y>1309</y>
     </hint>
     <hint type="destinationlabel">
-     <x>358</x>
-     <y>1054</y>
+     <x>741</x>
+     <y>1085</y>
     </hint>
    </hints>
   </connection>
@@ -1296,8 +1321,8 @@
      <y>556</y>
     </hint>
     <hint type="destinationlabel">
-     <x>372</x>
-     <y>559</y>
+     <x>755</x>
+     <y>590</y>
     </hint>
    </hints>
   </connection>
@@ -1308,12 +1333,12 @@
    <slot>getFitlerButtonClicked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>237</x>
-     <y>655</y>
+     <x>132</x>
+     <y>792</y>
     </hint>
     <hint type="destinationlabel">
-     <x>315</x>
-     <y>656</y>
+     <x>698</x>
+     <y>687</y>
     </hint>
    </hints>
   </connection>
@@ -1324,12 +1349,44 @@
    <slot>getResetFitlerButtonClicked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>258</x>
-     <y>1170</y>
+     <x>279</x>
+     <y>1348</y>
     </hint>
     <hint type="destinationlabel">
-     <x>349</x>
-     <y>1164</y>
+     <x>732</x>
+     <y>1195</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_4</sender>
+   <signal>clicked()</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>clearSelectedObjectsTable()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>301</x>
+     <y>778</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>391</x>
+     <y>780</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_3</sender>
+   <signal>clicked()</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>hideSelectedObjects()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>202</x>
+     <y>787</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>412</x>
+     <y>804</y>
     </hint>
    </hints>
   </connection>
