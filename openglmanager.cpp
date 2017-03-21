@@ -482,36 +482,17 @@ void OpenGLManager::render2DHeatMapTexture()
         GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
         glUniform1i(  tf, 1 );
 
-        GLint resolution = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "resolution");
-        float resolution_value = 100;
-        glUniform1fv(resolution, 1, &resolution_value);
 
-        GLint radius = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "radius");
-        float radius_value = 0.5;
-        glUniform1fv(radius, 1, &radius_value);
-
-        GLint dir = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "dir");
-        float dir_value[2] = {0.0, 1.0};
-        glUniform2fv(dir, 1, dir_value);
-
-
-        GLint Res = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "Res");
-        float res_val[2] = {200.0, 200.0};
-        glUniform2fv(Res, 1, res_val);
+        GLint dim = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "dim");
+        float dim_value[2] = {m_canvas_w, m_canvas_h};
+        glUniform2fv(dim, 1, dim_value);
 
         glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
 
         m_GNeurites.vaoRelease();
 
 
-        // take the output of fbo1 into our scene
-
-        dir_value[0] = 1;
-        dir_value[1] = 0;
    }
-
-
-
 }
 
 // ----------------------------------------------------------------------------

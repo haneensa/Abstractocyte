@@ -42,7 +42,7 @@ void main()
     else
         color_val = vec4(intensity, 0, 0, 1); // get the maximum value for make this normalized
 
-    gl_PointSize = gl_in[0].gl_PointSize;
+    gl_PointSize = gl_in[0].gl_PointSize + 2;
 
     EmitVertex();
     EndPrimitive();
