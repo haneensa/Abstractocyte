@@ -212,7 +212,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
     int hvgxID = pickObject(event);
 
-    qDebug() << event->modifiers();
+    m_opengl_mngr->highlightObject(hvgxID);
+
     if ( event->modifiers() == Qt::ControlModifier) {
 
         if (m_selectedObjects.size() == 0) {
@@ -272,7 +273,10 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     if (event->modifiers() == Qt::ShiftModifier) {
         makeCurrent();
 
-        pickObject(event);
+        int hvgxID = pickObject(event); // hovered object
+
+        // mark it by lighter color
+        m_opengl_mngr->highlightObject(hvgxID);
 
         doneCurrent();
     } else if (m_isRotatable == false) {

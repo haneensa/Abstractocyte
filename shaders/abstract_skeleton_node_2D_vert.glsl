@@ -23,9 +23,7 @@ uniform mat4                vMatrix;
 // Projection transformation
 uniform mat4                pMatrix;
 
-layout(location = 8) uniform int   max_volume;
-layout(location = 9) uniform int   max_astro_coverage;
-
+uniform int                 hoveredID;
 uniform int                 y_axis;
 uniform int                 x_axis;
 uniform vec4                viewport;

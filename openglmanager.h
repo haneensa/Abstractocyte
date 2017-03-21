@@ -111,6 +111,8 @@ public:
     int processSelection(float x, float y);
     void renderSelection();
 
+    void highlightObject(int hvgxID);
+
 	void setZoom(float zoom);
 
     // ************ 2D HeatMap  *******
@@ -176,6 +178,8 @@ protected:
     bool                                    m_display_parent;
     bool                                    m_display_synapses;
     int                                     m_depth;
+
+    int                                    m_hoveredID;
 
     Color_e                                 m_color_encoding;
     Size_e                                  m_size_encoding;

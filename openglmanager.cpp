@@ -18,6 +18,8 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
     m_color_encoding = Color_e::TYPE;
     m_size_encoding = Size_e::VOLUME;
     m_normals_enabled = true;
+
+    m_hoveredID = -1;
 }
 
 // ----------------------------------------------------------------------------
@@ -1449,6 +1451,9 @@ void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
     glUniform1iv(8, 1, &m_uniforms.max_volume);
 
     glUniform1iv(9, 1, &m_uniforms.max_astro_coverage);
+
+    GLint hoveredID = glGetUniformLocation(program, "hoveredID");
+    glUniform1iv(hoveredID, 1, &m_hoveredID);
 }
 
 // ----------------------------------------------------------------------------
@@ -1478,9 +1483,11 @@ void OpenGLManager::updateUniformsLocation(GLuint program)
     GLint x_axis = glGetUniformLocation(program, "x_axis");
     glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
 
-
     glUniform1iv(8, 1, &m_uniforms.max_volume);
     glUniform1iv(9, 1, &m_uniforms.max_astro_coverage);
+
+    GLint hoveredID = glGetUniformLocation(program, "hoveredID");
+    glUniform1iv(hoveredID, 1, &m_hoveredID);
 }
 
 // ----------------------------------------------------------------------------
@@ -1602,12 +1609,16 @@ void OpenGLManager::FilterObject(int ID, bool isfilterd)
     Object *obj = objectMap->at(ID);
     obj->updateFilteredFlag(isfilterd);
 
+    int visibility = m_ssbo_data[ID].info.w();
 
     if (isfilterd) {
-        m_ssbo_data[ID].info.setW(1);
+        visibility |= 1 << 0;
     } else {
-        m_ssbo_data[ID].info.setW(0);
+        visibility &= ~(1 << 0);
     }
+
+    m_ssbo_data[ID].info.setW(visibility);
+
 }
 
 // ----------------------------------------------------------------------------
@@ -1929,4 +1940,17 @@ void OpenGLManager::updateColorEncoding(Color_e encoding)
     m_color_encoding = encoding;
 
     updateSSBO();
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::highlightObject(int hvgxID)
+{
+    if (m_ssbo_data.size() <= hvgxID) {
+        m_hoveredID = -1;
+        return;
+    }
+
+    qDebug() << "highlight object" << hvgxID;
+    m_hoveredID = hvgxID;
 }
