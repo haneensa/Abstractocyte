@@ -45,14 +45,6 @@ DataContainer::DataContainer()
     //m_dbscan.initialize(&m_glycogenList, &m_glycogenMap, &m_glycogenOctree);
     //m_dbscan.run();
     //qDebug() << "done clustering";
-
-    //  test vertex neighbors
-    //int v_index = 0;
-    //std::set< int > neighs2;
-    //m_mesh->getVertexNeighbors(v_index, neighs2);
-    //qDebug() << "neighbors of vertex " << v_index << ": ";
-    //for (auto iter = neighs2.begin(); iter != neighs2.end(); ++iter)
-    //    qDebug() <<" " << *iter;
 }
 
 //----------------------------------------------------------------------------
@@ -109,7 +101,7 @@ void DataContainer::loadData()
         } else if (m_load_data == LoadData_t::NEURITES) {
             const char* filename2 = "neurites_data_fv.dat";
             m_mesh->readVertexData(filename2); //
-            importXML("://pipeline_scripts/output/m3_neurites_noVertex.xml");    // 674046 ~ 12 min -> 118107 ms -> 134884 with vertex type classification
+            importXML("://pipeline_scripts/output/m3_neurites_noVertexNoFace.xml");    // 674046 ~ 12 min -> 118107 ms -> 134884 with vertex type classification
         } else if (m_load_data == LoadData_t::ALL) {
             const char* filename1 = "astro_data_fv.dat";
             m_mesh->readVertexData(filename1);
@@ -117,7 +109,7 @@ void DataContainer::loadData()
 
             const char* filename2 = "neurites_data_fv.dat";
             m_mesh->readVertexData(filename2); //
-            importXML("://pipeline_scripts/output/m3_neurites_noVertex.xml");    // 674046 ~ 12 min -> 118107 ms
+            importXML("://pipeline_scripts/output/m3_neurites_noVertexNoFace.xml");    // 674046 ~ 12 min -> 118107 ms
         }
 
     } else {
