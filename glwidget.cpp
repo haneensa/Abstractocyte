@@ -212,15 +212,18 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
     int hvgxID = pickObject(event);
 
-    if (m_selectedObjects.size() == 0) {
-        clearRowsTable();
-    }
+    if ( event->modifiers() == Qt::ControlModifier) {
 
-    if ( m_selectedObjects.find(hvgxID) == m_selectedObjects.end() ) {
-        m_selectedObjects.insert(hvgxID);
-        insertInTable(hvgxID);
-    }
+        if (m_selectedObjects.size() == 0) {
+            clearRowsTable();
+        }
 
+        if ( m_selectedObjects.find(hvgxID) == m_selectedObjects.end() ) {
+            m_selectedObjects.insert(hvgxID);
+            insertInTable(hvgxID);
+        }
+
+    }
     doneCurrent();
 
     event->accept();
@@ -387,6 +390,8 @@ void GLWidget::getIntervalID(int ID)
     m_2dspace->updateID(ID);
 }
 
+
+// todo: remove this and use list widget
 void GLWidget::getGraphParam1(double value)
 {
     m_graphManager->updateGraphParam1(value);
