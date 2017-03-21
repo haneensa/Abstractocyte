@@ -139,6 +139,11 @@ bool MainOpenGL::initShader(GLuint program, const char *vshader, const char *gsh
     glGetProgramiv(program, GL_LINK_STATUS, &link_ok);
     if (!link_ok) {
         qDebug() << "Error in glLinkProgram";
+		GLint infoLogLength = 0;
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
+		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+		glGetProgramInfoLog(program, infoLogLength, &infoLogLength, strInfoLog);
+		qDebug() << strInfoLog;
         return false;
     }
 

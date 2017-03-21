@@ -26,10 +26,11 @@ namespace SpacePartitioning
 		float* getData();
 	protected:
 
+		float m_maxValue;
 		int m_size[3];
 
-		float* data;
-
+		float* m_data;
+		unsigned char* m_data_8bit;
 
 	};
 }

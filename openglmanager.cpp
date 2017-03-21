@@ -373,7 +373,7 @@ void OpenGLManager::load3DTexturesFromRaw(QString path, GLuint &texture, int siz
 
     // convert to rgba
     for (int i = 0; i < size; ++i) {
-        bufferRGBA[i*4] =   rawData[i];
+        bufferRGBA[i*4] =   (rawData[i] > 0)?255:0; //hack: remove later
         bufferRGBA[i*4 + 1] = 0;
         bufferRGBA[i*4 + 2] = 0 ;
         bufferRGBA[i*4 + 3] = 255;
@@ -937,6 +937,15 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
     glUniform3fv(lightDir_loc, 1, &lightDir[0]);
 
+	GLint astro_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "astro_tex");
+	glUniform1i(astro_tex, 2);
+
+	GLint gly_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "gly_tex");
+	glUniform1i(gly_tex, 3);
+
+	GLint mito_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "mito_tex");
+	glUniform1i(mito_tex, 4);
+
     m_TMesh.vboCreate("MeshVertices", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
     m_TMesh.vboBind("MeshVertices");
 
@@ -1011,30 +1020,33 @@ void OpenGLManager::drawMeshTriangles(bool selection )
 
 
        // transfer function
-       glActiveTexture(GL_TEXTURE1);
-       glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
-       GLint tf = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "tf");
-       glUniform1i(  tf, 1 );
+       //glActiveTexture(GL_TEXTURE1);
+       //glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
+       //GLint tf = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "tf");
+       //glUniform1i(  tf, 1 );
 
 
        // Astrocyte 3D volume
-       glActiveTexture(GL_TEXTURE0);
-       glBindTexture( GL_TEXTURE_3D,  m_astro_3DTex);
-	   GLint astro_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "astro_tex");
-       glUniform1i(  astro_tex, 0 );
+       
+	   //GLint astro_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "astro_tex");
+       //glUniform1i(  astro_tex, 2 );
+	   glActiveTexture(GL_TEXTURE2);
+	   glBindTexture(GL_TEXTURE_3D, m_astro_3DTex);
 
        // Glycogen 3D volume
-       glActiveTexture(GL_TEXTURE3);
-       glBindTexture( GL_TEXTURE_3D,  m_gly_3D_Tex);
-       GLint gly_tex = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "gly_tex");
-       glUniform1i(  gly_tex, 3 );
+       
+       //GLint gly_tex = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "gly_tex");
+       //glUniform1i(  gly_tex, 3 );
+	   glActiveTexture(GL_TEXTURE3);
+	   glBindTexture(GL_TEXTURE_3D, m_gly_3D_Tex);
 
 
        // Astrocyte 3D volume
-       glActiveTexture(GL_TEXTURE4);
-       glBindTexture( GL_TEXTURE_3D,  m_mito_3DTex);
-       GLint mito_tex = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "mito_tex");
-       glUniform1i(  mito_tex, 4 );
+       
+       //GLint mito_tex = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "mito_tex");
+       //glUniform1i(  mito_tex, 4 );
+	   glActiveTexture(GL_TEXTURE4);
+	   glBindTexture(GL_TEXTURE_3D, m_mito_3DTex);
 
        m_TMesh.vboBind("MeshIndices");
        glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );

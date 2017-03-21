@@ -7,7 +7,7 @@ in  int         V_ID[];
 in vec4         V_color_val[];
 in float        V_alpha[];
 in float        V_color_intp[];
-in vec4		V_worldPos[];
+in vec4			V_worldPos[];
 in vec4         V_normal[];
 in vec3         V_fragTexCoord[];
 in vec3			E_eye[];
@@ -20,7 +20,7 @@ out vec3		vposition;
 out float       G_ID;
 out vec3        G_fragTexCoord;
 out vec3		eye;
-
+flat out int			otype;
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
@@ -80,7 +80,7 @@ void main() {
 
         int type = int(SSBO_data[ID].center.w);
         color_val = V_color_val[i];
-
+		otype = type;
 
         properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
 
