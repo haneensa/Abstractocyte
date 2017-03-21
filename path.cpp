@@ -12,12 +12,14 @@ Path::~Path()
 
 }
 
-void Path::addPoint(QVector2D point)
+void Path::addPoint(QVector2D point, QVector2D selection)
 {
     if (m_recording == false)
         return;
 
     m_path.push_back(point);
+    m_selectionPath.push_back(selection);
+
 }
 
 void Path::initPath()
@@ -133,4 +135,26 @@ void Path::tracePath(QMatrix4x4 projection, int x)
     m_vbo.release();
     m_vao.release();
 
+}
+
+QVector2D Path::getXY(int x)
+{
+    QVector2D point;
+
+    if (m_recording == true)
+        return point;
+
+    float percentage = (float)x/100.0;
+    int range = m_selectionPath.size() * percentage;
+
+    qDebug() << "retrace " << x << " " << range << " " << m_selectionPath.size();
+
+    if (m_selectionPath.size() == 0) {
+        qDebug() << "Path has 0 trace records";
+        return point;
+    } else if (m_selectionPath.size() < range) {
+        range = m_selectionPath.size();
+    }
+
+    return m_selectionPath[range];
 }

@@ -450,9 +450,13 @@ void MousePad::mouseMoveEvent(QMouseEvent *event)
     doneCurrent();
     // calculate the offset from press to release, then update the point position
     // get the position were we pressed
-    processSelection(x, y);
+    bool allowed = processSelection(x, y);
+    if (allowed &&  m_tracing == false) {
+        QVector2D path_point = QVector2D((float)x/(float)viewport[2],  (float)y/(float)viewport[3]);
+        QVector2D selection_point = QVector2D(x, y);
+        m_activePath.addPoint(path_point, selection_point);
+    }
 }
-
 
 void MousePad::mousePressEvent(QMouseEvent *event)
 {
@@ -548,8 +552,9 @@ void MousePad::renderSelection(void)
     glClearColor(0.0f,0.0f, 0.0f, 0.0f);
 }
 
-void MousePad::processSelection(float x, float y)
+bool MousePad::processSelection(float x, float y)
 {
+    bool allowedRegion = false;
     makeCurrent();
     renderSelection();
     // wait until all the pending drawing commands are really done.
@@ -570,6 +575,7 @@ void MousePad::processSelection(float x, float y)
     if (pickedID == 255 || pickedID == 0) {
         qDebug() << "Background, Picked ID: " << pickedID;
     } else { 
+        allowedRegion = true;
         GLint viewport[4];
         glGetIntegerv(GL_VIEWPORT, viewport);
 
@@ -581,19 +587,17 @@ void MousePad::processSelection(float x, float y)
         m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
         m_vbo_circle.release();
 
-        m_activePath.addPoint(QVector2D(circle.x,  circle.y));
-
         emit setSliderX(circle.x * 100);
         emit setSliderY(circle.y * 100);
         emit setIntervalID(pickedID - 1);
-        //qDebug() << "Picked ID: " << pickedID << "-> " << circle.x << " " << circle.y;
     }
 
     // update the circle vbo
     update();
     doneCurrent();
-}
 
+    return allowedRegion;
+}
 
 //************ Path Management ****************************
 void MousePad::startPath()
@@ -612,7 +616,13 @@ void MousePad::endPath()
 
 void MousePad::retracePath(int x) // 0 - 100
 {
+    QVector2D currentXY = m_activePath.getXY(x);
+
     m_trace_X = x;
     m_tracing = true;
+
+
+    processSelection(currentXY.x(), currentXY.y());
+
     update();
 }

@@ -14,9 +14,10 @@ public:
 
     void tracePath(QMatrix4x4 projection, int x);
 
-    void addPoint(QVector2D point);
-    void resetPath()                        { m_path.clear(); }
+    void addPoint(QVector2D point, QVector2D selection);
+    void resetPath()                        { m_path.clear();  m_selectionPath.clear();}
     void updateRecordingFlag(bool flag)     { m_recording = flag; }
+    QVector2D getXY(int x);
 
 protected:
     QString                     m_name;
@@ -24,6 +25,7 @@ protected:
     QString                     m_description;
 
     std::vector<QVector2D>      m_path;
+    std::vector<QVector2D>      m_selectionPath;
 
     QOpenGLVertexArrayObject    m_vao;
     QOpenGLBuffer               m_vbo;

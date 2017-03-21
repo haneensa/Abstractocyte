@@ -24,6 +24,8 @@ public:
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
+    void updatePointer(float x, float y);
+
 public slots:
     void getSlotsX(int value);
     void getSlotsY(int value);
@@ -50,7 +52,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
     void renderSelection(void);
-    void processSelection(float dx, float dy);
+    bool processSelection(float dx, float dy);
 
     void initSelectionPointerGL();
     void init2DSpaceGL();
