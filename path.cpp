@@ -94,7 +94,8 @@ void Path::tracePath(QMatrix4x4 projection, int x)
     if (m_recording == true)
         return;
 
-    int range = m_path.size()/(x/100);
+    float percentage = (float)x/100.0;
+    int range = m_path.size() * percentage;
 
     qDebug() << "retrace " << x << " " << range << " " << m_path.size();
 

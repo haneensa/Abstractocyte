@@ -11,14 +11,15 @@ MousePad::MousePad(QWidget *parent)
        m_vbo_2DSpaceVerts( QOpenGLBuffer::VertexBuffer ),
        m_vbo_2DSpaceTrianglesIndix( QOpenGLBuffer::IndexBuffer ),
        m_vbo_2DSpaceGridVerts( QOpenGLBuffer::VertexBuffer ),
-       m_vbo_2DSpaceGridIndix( QOpenGLBuffer::IndexBuffer ),
-       m_updatedPointer(true)
+       m_vbo_2DSpaceGridIndix( QOpenGLBuffer::IndexBuffer )
 {
     m_bindColorIdx = 1;
     qDebug() << "MousePad";
     circle.x = 0.0;
     circle.y = 0.0;
     m_2dspace = NULL;
+    m_tracing = false;
+    m_trace_X = 0;
 }
 
 MousePad::~MousePad()
@@ -340,7 +341,7 @@ void MousePad::initializeGL()
 
     // test one path
 
-    activePath.initPath();
+    m_activePath.initPath();
 }
 
 void MousePad::render2D_DebugSpace()
@@ -390,16 +391,14 @@ void MousePad::paintGL()
     m_program_circle->release();
     m_vao_circle.release();
 
-    activePath.drawPath(m_projection);
+    if (m_tracing) {
+        m_activePath.tracePath(m_projection, m_trace_X);
+    } else {
+        m_activePath.drawPath(m_projection);
+    }
 
     render2D_GridSpace();
     render2D_DebugSpace();
-
-    if (m_updatedPointer == false) // ?
-        return;
-
-    qDebug() << "HERER!";
-    m_updatedPointer = false;
 }
 
 void MousePad::resizeGL(int w, int h)
@@ -582,7 +581,7 @@ void MousePad::processSelection(float x, float y)
         m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
         m_vbo_circle.release();
 
-        activePath.addPoint(QVector2D(circle.x,  circle.y));
+        m_activePath.addPoint(QVector2D(circle.x,  circle.y));
 
         emit setSliderX(circle.x * 100);
         emit setSliderY(circle.y * 100);
@@ -600,17 +599,20 @@ void MousePad::processSelection(float x, float y)
 void MousePad::startPath()
 {
     qDebug() << "start Recording Path";
-    activePath.resetPath();
-    activePath.updateRecordingFlag(true);
+    m_activePath.resetPath();
+    m_activePath.updateRecordingFlag(true);
+    m_tracing = false;
 }
 
 void MousePad::endPath()
 {
   qDebug() << "end path recording";
-  activePath.updateRecordingFlag(false);
+  m_activePath.updateRecordingFlag(false);
 }
 
 void MousePad::retracePath(int x) // 0 - 100
 {
-    activePath.tracePath(m_projection, x);
+    m_trace_X = x;
+    m_tracing = true;
+    update();
 }

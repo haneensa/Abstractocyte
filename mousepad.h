@@ -116,7 +116,9 @@ private:
 
     // Paths Management
     std::vector<Path>                       m_paths_list;
-    Path                                    activePath;
+    Path                                    m_activePath;
+    bool                                    m_tracing;
+    int                                     m_trace_X;
 
 };
 
