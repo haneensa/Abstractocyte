@@ -39,5 +39,8 @@
         <file>data/mask_745_.raw</file>
         <file>data/mouse3_metadata_objname_center_astroSyn.hvgx</file>
         <file>shaders/space2d_grid_geom.glsl</file>
+        <file>shaders/path_frag.glsl</file>
+        <file>shaders/path_geom.glsl</file>
+        <file>shaders/path_vert.glsl</file>
     </qresource>
 </RCC>

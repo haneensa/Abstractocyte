@@ -6,6 +6,7 @@
 
 #include "abstractionspace.h"
 #include "mainopengl.h"
+#include "path.h"
 
 struct point {
     float x;
@@ -27,6 +28,9 @@ public slots:
     void getSlotsX(int value);
     void getSlotsY(int value);
     void getAbstractionData(AbstractionSpace *space_instance);
+    void startPath();
+    void endPath();
+    void retracePath(int x);
 
 signals:
     void setSignalX(int value);
@@ -109,6 +113,10 @@ private:
     GLuint                                  m_program_2DSpace_Selection;
 
     AbstractionSpace                        *m_2dspace;
+
+    // Paths Management
+    std::vector<Path>                       m_paths_list;
+    Path                                    activePath;
 
 };
 

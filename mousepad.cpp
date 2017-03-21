@@ -336,6 +336,11 @@ void MousePad::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+
+    // test one path
+
+    activePath.initPath();
 }
 
 void MousePad::render2D_DebugSpace()
@@ -385,10 +390,10 @@ void MousePad::paintGL()
     m_program_circle->release();
     m_vao_circle.release();
 
+    activePath.drawPath(m_projection);
+
     render2D_GridSpace();
-
     render2D_DebugSpace();
-
 
     if (m_updatedPointer == false) // ?
         return;
@@ -441,6 +446,7 @@ void MousePad::mouseMoveEvent(QMouseEvent *event)
     if (x > width() || x < 0 || y > height() || y < 0) {
         return;
     }
+
 
     doneCurrent();
     // calculate the offset from press to release, then update the point position
@@ -576,6 +582,8 @@ void MousePad::processSelection(float x, float y)
         m_vbo_circle.allocate(points, 1 /*elements*/ * 2 /*corrdinates*/ * sizeof(GLfloat));
         m_vbo_circle.release();
 
+        activePath.addPoint(QVector2D(circle.x,  circle.y));
+
         emit setSliderX(circle.x * 100);
         emit setSliderY(circle.y * 100);
         emit setIntervalID(pickedID - 1);
@@ -585,4 +593,24 @@ void MousePad::processSelection(float x, float y)
     // update the circle vbo
     update();
     doneCurrent();
+}
+
+
+//************ Path Management ****************************
+void MousePad::startPath()
+{
+    qDebug() << "start Recording Path";
+    activePath.resetPath();
+    activePath.updateRecordingFlag(true);
+}
+
+void MousePad::endPath()
+{
+  qDebug() << "end path recording";
+  activePath.updateRecordingFlag(false);
+}
+
+void MousePad::retracePath(int x) // 0 - 100
+{
+    activePath.tracePath(m_projection, x);
 }
