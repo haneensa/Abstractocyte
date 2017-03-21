@@ -921,6 +921,7 @@
     <slot>getResetFitlerButtonClicked(bool)</slot>
     <slot>clearSelectedObjectsTable()</slot>
     <slot>hideSelectedObjects()</slot>
+    <slot>highlightSelected(QModelIndex)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -1387,6 +1388,22 @@
     <hint type="destinationlabel">
      <x>412</x>
      <y>804</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tableView</sender>
+   <signal>pressed(QModelIndex)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>highlightSelected(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>310</x>
+     <y>535</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>439</x>
+     <y>539</y>
     </hint>
    </hints>
   </connection>

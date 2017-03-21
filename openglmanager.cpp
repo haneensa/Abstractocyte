@@ -1963,6 +1963,5 @@ void OpenGLManager::highlightObject(int hvgxID)
         return;
     }
 
-    qDebug() << "highlight object" << hvgxID;
     m_hoveredID = hvgxID;
 }

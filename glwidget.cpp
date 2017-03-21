@@ -637,3 +637,17 @@ void GLWidget::hideSelectedObjects()
     m_opengl_mngr->FilterByID(m_selectedObjects, invisibility);
     update();
 }
+
+void GLWidget::highlightSelected(QModelIndex index)
+{
+    // signal to get the ID of selected object
+    qDebug() << "highlightSelected";
+    GetIDFrom(index);
+}
+
+void GLWidget::getHVGXIDAtSelectedRow(int ID)
+{
+    qDebug() << "** " << ID;
+    m_opengl_mngr->highlightObject(ID);
+
+}

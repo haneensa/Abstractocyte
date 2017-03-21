@@ -54,12 +54,15 @@ public slots:
 
     void getItemChanged(QListWidgetItem*);
     void getDoubleClickedTableView(QModelIndex);
+    void highlightSelected(QModelIndex);
+
     void getDeletedHVGXID(int);
     void getFitlerButtonClicked(bool);
     void getResetFitlerButtonClicked(bool);
     void clearSelectedObjectsTable();
 
     void hideSelectedObjects();
+    void getHVGXIDAtSelectedRow(int);
 
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);
@@ -68,7 +71,7 @@ signals:
     void object_clicked(QList<QStandardItem*>);
     void clearRowsTable();
     void RemoveRowAt_GL(QModelIndex);
-
+    void GetIDFrom(QModelIndex);
     void checkAllListWidget_GL();
 
 protected:
