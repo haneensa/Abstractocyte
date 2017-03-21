@@ -676,6 +676,30 @@
             <string>Record Path</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_12">
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Note</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLineEdit" name="lineEdit_2"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Path Name</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QPushButton" name="pushButton_7">
+              <property name="text">
+               <string>Save</string>
+              </property>
+             </widget>
+            </item>
             <item row="0" column="0">
              <widget class="QFrame" name="frame_3">
               <property name="frameShape">
@@ -702,32 +726,8 @@
               </layout>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>Path Name</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLineEdit" name="lineEdit_2"/>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="label_6">
-              <property name="text">
-               <string>Note</string>
-              </property>
-             </widget>
-            </item>
             <item row="5" column="0">
-             <widget class="QPlainTextEdit" name="plainTextEdit"/>
-            </item>
-            <item row="6" column="0">
-             <widget class="QPushButton" name="pushButton_7">
-              <property name="text">
-               <string>Save</string>
-              </property>
-             </widget>
+             <widget class="QLineEdit" name="lineEdit_3"/>
             </item>
            </layout>
           </widget>
@@ -1001,6 +1001,9 @@
     <slot>startPath()</slot>
     <slot>endPath()</slot>
     <slot>retracePath(int)</slot>
+    <slot>namePath(QString)</slot>
+    <slot>savePath()</slot>
+    <slot>describePath(QString)</slot>
    </slots>
   </customwidget>
   <customwidget>
@@ -1561,11 +1564,59 @@
    <hints>
     <hint type="sourcelabel">
      <x>228</x>
-     <y>905</y>
+     <y>674</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
      <y>240</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEdit_2</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>namePath(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>326</x>
+     <y>545</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>290</x>
+     <y>277</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_7</sender>
+   <signal>clicked()</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>savePath()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>320</x>
+     <y>617</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>290</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEdit_3</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>describePath(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>302</x>
+     <y>591</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>296</x>
+     <y>191</y>
     </hint>
    </hints>
   </connection>

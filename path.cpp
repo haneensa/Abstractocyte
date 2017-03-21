@@ -5,6 +5,9 @@ Path::Path()
 {
     qDebug() << "Create new path";
     m_recording = false;
+    m_ID = -1;
+    m_name = "None";
+    m_note = "None";
 }
 
 Path::~Path()
@@ -108,7 +111,7 @@ void Path::tracePath(QMatrix4x4 projection, int x)
         range = m_path.size();
     }
 
-    qDebug() << "Draw Path";
+    qDebug() << "Draw Path " << m_name;
 
 
     std::vector<QVector2D>::const_iterator first = m_path.begin();

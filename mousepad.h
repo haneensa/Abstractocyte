@@ -33,6 +33,10 @@ public slots:
     void startPath();
     void endPath();
     void retracePath(int x);
+    void namePath(QString name);
+    void describePath(QString name);
+    void savePath();
+
 
 signals:
     void setSignalX(int value);

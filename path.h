@@ -19,10 +19,14 @@ public:
     void updateRecordingFlag(bool flag)     { m_recording = flag; }
     QVector2D getXY(int x);
 
+    void namePath(QString name)             { m_name = name; }
+    void setID(int ID)                      { m_ID = ID; }
+    void addNote(QString note)              { m_note = note; }
+
 protected:
     QString                     m_name;
     int                         m_ID;
-    QString                     m_description;
+    QString                     m_note;
 
     std::vector<QVector2D>      m_path;
     std::vector<QVector2D>      m_selectionPath;

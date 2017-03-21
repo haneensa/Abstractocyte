@@ -340,8 +340,8 @@ void MousePad::initializeGL()
 
 
     // test one path
-
-    m_activePath.initPath();
+     m_activePath.setID(m_paths_list.size()); // later when we create new paths add IDs incrementaly
+     m_activePath.initPath();
 }
 
 void MousePad::render2D_DebugSpace()
@@ -625,4 +625,20 @@ void MousePad::retracePath(int x) // 0 - 100
     processSelection(currentXY.x(), currentXY.y());
 
     update();
+}
+
+
+void MousePad::namePath(QString name)
+{
+    m_activePath.namePath(name);
+}
+
+void MousePad::describePath(QString note)
+{
+    m_activePath.addNote(note);
+}
+
+void MousePad::savePath()
+{
+    qDebug() << "Add path to list and save it somewhere";
 }
