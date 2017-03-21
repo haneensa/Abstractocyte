@@ -135,6 +135,13 @@ void GLWidget::initializeGL()
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_opengl_mngr->init_Gly3DTex();
     m_opengl_mngr->upload_Gly3DTex( m_data_containter->getGlycogen3DGridData() );
+
+    if (m_FDL_running) {
+        stopForecDirectedLayout();
+    }
+
+     m_rotation_timer->start(500);
+
 }
 
 void GLWidget::paintGL()
