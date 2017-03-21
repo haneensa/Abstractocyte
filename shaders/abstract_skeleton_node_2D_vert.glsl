@@ -23,7 +23,6 @@ uniform mat4                vMatrix;
 // Projection transformation
 uniform mat4                pMatrix;
 
-uniform int                 hoveredID;
 uniform int                 y_axis;
 uniform int                 x_axis;
 uniform vec4                viewport;
