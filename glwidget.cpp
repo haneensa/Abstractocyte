@@ -212,6 +212,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
     int hvgxID = pickObject(event);
 
+    qDebug() << event->modifiers();
     if ( event->modifiers() == Qt::ControlModifier) {
 
         if (m_selectedObjects.size() == 0) {
@@ -268,9 +269,21 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     int deltaX = event->x() - m_lastPos.x();
     int deltaY = event->y() - m_lastPos.y();
 
-    if (m_isRotatable == false && m_hover == false) {
-            m_translation = QVector3D( m_translation.x() + deltaX/(float)width(), m_translation.y() +  -1.0 * (deltaY/(float)height()), 0.0);
-    } else if ( (m_xaxis < 60 || m_yaxis < 60) && m_hover == false) {
+    if (event->modifiers() == Qt::ShiftModifier) {
+        makeCurrent();
+
+        pickObject(event);
+
+        doneCurrent();
+    } else if (m_isRotatable == false) {
+            m_translation = QVector3D( m_translation.x() + deltaX/(float)width(),
+                                       m_translation.y() +  -1.0 * (deltaY/(float)height()),
+                                       0.0);
+
+            setMouseTracking(false);
+
+    } else if (  m_xaxis < 60 || m_yaxis < 60  ) {
+        setMouseTracking(false);
         // Mouse release position - mouse press position
         QVector2D diff = QVector2D(deltaX, deltaY);
         // Rotation axis is perpendicular to the mouse position difference
@@ -295,14 +308,12 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
          m_rotation_timer->start(500);
 
-    } else if (m_hover) {
-        makeCurrent();
-
-        pickObject(event);
-
-        doneCurrent();
-
+    } else {
+        setMouseTracking(false);
     }
+
+
+
 
     m_lastPos = event->pos();
     event->accept();
@@ -352,10 +363,10 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         case(Qt::Key_X): // stop layouting algorithm
             stopForecDirectedLayout();
         break;
-        case(Qt::Key_H): // enable hover
-            m_hover = !m_hover;
-            setMouseTracking(m_hover);
-            m_isRotatable = !m_hover;
+        case(Qt::Key_Shift): // enable hover
+
+            setMouseTracking(true);
+
         break;
     }
 }
