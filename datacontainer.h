@@ -24,6 +24,11 @@
 #include "spatialhash3d.h"
 //#include "dbscan.h"
 
+#define MESH_MAX    5.0f
+#define DIM_X       999
+#define DIM_Y       999
+#define DIM_Z       449
+
 enum class LoadData_t { ALL, ASTRO, NEURITES };
 enum class LoadFile_t { DUMP_ASTRO, DUMP_NEURITES, LOAD_MESH_NO_VERTEX, LOAD_MESH_W_VERTEX };
 enum class Normals_t { DUMP_NORMAL, LOAD_NORMAL, NO_NORMALS };

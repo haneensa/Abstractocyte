@@ -6,8 +6,6 @@
 #include <set>
 #include <QDomDocument>
 
-#define MESH_MAX 5.0f
-
 /*
  * m_objects -> object class for each object (astrocyte, dendrite, ..)
  *           -> get from this the indices of the mesh
@@ -25,7 +23,7 @@ DataContainer::DataContainer()
 {
 
     m_mesh = new Mesh();
-    m_glycogen3DGrid.setSize(999, 999, 449);
+    m_glycogen3DGrid.setSize(DIM_X, DIM_Y, DIM_Z);
 	m_boutonHash.setSize(32, 32, 32);
 	m_spineHash.setSize(32, 32, 32);
     /* 1: load all data */

@@ -121,8 +121,8 @@ public:
 
     // ************ 3D HeatMap  *******
 	void init_Gly3DTex();
-    void upload_Gly3DTex(void* data, int sizeX = 999, int sizeY = 999, int sizeZ = 449, GLenum type = GL_FLOAT);
-    void load3DTexturesFromRaw(QString path, GLuint &texture, int sizeX = 999, int sizeY = 999, int sizeZ = 449);
+    void upload_Gly3DTex(void* data, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z, GLenum type = GL_FLOAT);
+    void load3DTexturesFromRaw(QString path, GLuint &texture, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z);
 
 protected:
     DataContainer                           *m_dataContainer;
