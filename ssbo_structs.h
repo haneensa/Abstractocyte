@@ -25,10 +25,29 @@ struct ast_neu_properties {
     struct properties neu;
 };
 
-// mesh_geom.glsl
-// lines_geom.glsl
-// node_geom.glsl
-// skeleton_point_geom.glsl
+/*
+info.w:
+
+values:
+1: visibility
+2: selection
+4: hovered
+
+and then you can play around with combinations based on the bit
+
+000 (0) : visible
+001 (1) : invisible
+
+010 (2) : selected - visible
+011 (3) : selected - invisible  (might not make sense in our case)
+
+100 (4) : hovered - visible
+101 (5) : hovered - invisible (does't make sense)
+
+110 (6) : hovered - visible - selected
+111 (7) : hovered - invisible - selected (doesn't make sense)
+*/
+
 struct ssbo_2DState {
     struct ast_neu_properties  states; // val, alpha, color_intp, point_size, additional infos
 };
@@ -38,7 +57,7 @@ struct ssbo_2DState {
 struct ssbo_mesh {
     QVector4D color;   // w: is astro and neurtie nearest distance
     QVector4D center;  // center.w = type (axon, bouton, spine, dendrite, ..)
-    QVector4D info;    // x: normalized volume, y: how many vertices close by astro , z: parent ID, w: filtered
+    QVector4D info;    // x: normalized volume, y: intensity, z: parent ID, w: filtered
     QVector2D layout1; // layouted position (only neurties)
     QVector2D layout2; // layouted position (with astrocyte)
 };

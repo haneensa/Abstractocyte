@@ -146,7 +146,7 @@ struct ssbo_mesh Object::getSSBOData()
     // make sure it is valid ID?
     ssbo_data.info.setZ(m_parentID);
 
-    ssbo_data.info.setW(0); // filtered? 0: no, 1: yes
+    ssbo_data.info.setW(0); // 1 bit: visibility, 2 bit: marked
     ssbo_data.layout1 = m_center.toVector2D();
     ssbo_data.layout2 = m_center.toVector2D();
     return ssbo_data;
