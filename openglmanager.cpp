@@ -66,14 +66,14 @@ bool OpenGLManager::initOpenGLFunctions()
     m_GNeurites.initOpenGLFunctions();
     m_GlycogenPoints.initOpenGLFunctions();
 
-	load3DTexturesFromRaw_3("mask_745_sigma3.raw", "astrocytic_mitochondria_s5.raw", "Neuronic_mitochondria_binary_s5.raw", m_splat_volume_3DTex, GL_TEXTURE2);
+    load3DTexturesFromRaw_3("mask_745_sigma3.raw", "astrocytic_mitochondria_s5.raw", "Neuronic_mitochondria_binary_s5.raw", m_splat_volume_3DTex, GL_TEXTURE2);
     //load3DTexturesFromRaw("mask_745_sigma3.raw", m_astro_3DTex ); // Astrocytic_mitochondria_b.raw
     //load3DTexturesFromRaw("astrocytic_mitochondria_s5.raw", m_mito_3DTex ); //
-	//load3DTexturesFromRaw("Neuronic_mitochondria_binary_s5.raw", m_nmito_3DTex);
-	load3DTexturesFromRaw("glycogen_volume_s5.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
+    //load3DTexturesFromRaw("Neuronic_mitochondria_binary_s5.raw", m_nmito_3DTex);
+    load3DTexturesFromRaw("glycogen_volume_s5.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
 
-	//init_Gly3DTex();
-	//upload_Gly3DTex(m_dataContainer->getGlycogen3DGridData(), DIM_G, DIM_G, DIM_G);
+    //init_Gly3DTex();
+    //upload_Gly3DTex(m_dataContainer->getGlycogen3DGridData(), DIM_G, DIM_G, DIM_G);
 
     fillVBOsData();
 
@@ -294,7 +294,7 @@ void OpenGLManager::upload_Gly3DTex(void* data, int sizeX, int sizeY, int sizeZ,
 {
     glBindTexture(GL_TEXTURE_3D, m_gly_3D_Tex);
 
-	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, sizeX, sizeY, sizeZ, 0, GL_RGBA, type, (GLvoid*)data);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, sizeX, sizeY, sizeZ, 0, GL_RGBA, type, (GLvoid*)data);
 }
 
 // ----------------------------------------------------------------------------
@@ -318,7 +318,7 @@ void OpenGLManager::init2DHeatMapTextures()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     GL_Error();
 
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_2D_heatMap_Tex, 0);
@@ -365,37 +365,37 @@ void OpenGLManager::init2DHeatMapTextures()
 void OpenGLManager::load3DTexturesFromRaw(QString path, GLuint &texture, GLenum texture_unit, int sizeX, int sizeY, int sizeZ)
 {
     unsigned int size = sizeX * sizeY * sizeZ;
-	unsigned char *rawData = (unsigned char *)m_dataContainer->loadRawFile(path, size);
+    unsigned char *rawData = (unsigned char *)m_dataContainer->loadRawFile(path, size);
     //load data into a 3D texture
     glGenTextures(1, &texture);
-	glActiveTexture(texture_unit);
+    glActiveTexture(texture_unit);
     glBindTexture(GL_TEXTURE_3D, texture);
 
      // set the texture parameters
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	//unsigned int size_4 = size * 4;
+    //unsigned int size_4 = size * 4;
 
-	unsigned char *bufferRGBA = new unsigned char[size];
+    unsigned char *bufferRGBA = new unsigned char[size];
 
     // convert to rgba
     for (int i = 0; i < size; ++i) {
-		//unsigned int idx = i * 4;
-		bufferRGBA[i] = (rawData[i] > 0) ? 255 : 0; //hack: remove later
-		//bufferRGBA[idx + 1] = 0;
-		//bufferRGBA[idx + 2] = 0;
-		//bufferRGBA[idx + 3] = 255;
+        //unsigned int idx = i * 4;
+        bufferRGBA[i] = (rawData[i] > 0) ? 255 : 0; //hack: remove later
+        //bufferRGBA[idx + 1] = 0;
+        //bufferRGBA[idx + 2] = 0;
+        //bufferRGBA[idx + 3] = 255;
     }
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, sizeX, sizeY, sizeZ, 0, GL_RED, GL_UNSIGNED_BYTE, bufferRGBA);
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, sizeX, sizeY, sizeZ, 0, GL_RED, GL_UNSIGNED_BYTE, bufferRGBA);
 
-	GL_Error();
-	//glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, sizeX, sizeY, sizeZ, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
+    GL_Error();
+    //glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, sizeX, sizeY, sizeZ, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
     delete [] rawData;
     delete [] bufferRGBA;
 
@@ -405,45 +405,45 @@ void OpenGLManager::load3DTexturesFromRaw(QString path, GLuint &texture, GLenum 
 //
 void OpenGLManager::load3DTexturesFromRaw_3(QString path1, QString path2, QString path3, GLuint &texture, GLenum texture_unit, int sizeX, int sizeY, int sizeZ)
 {
-	unsigned int size = sizeX * sizeY * sizeZ;
-	unsigned char *rawData1 = (unsigned char *)m_dataContainer->loadRawFile(path1, size);
-	unsigned char *rawData2 = (unsigned char *)m_dataContainer->loadRawFile(path2, size);
-	unsigned char *rawData3 = (unsigned char *)m_dataContainer->loadRawFile(path3, size);
-	//load data into a 3D texture
-	glGenTextures(1, &texture);
-	glActiveTexture(texture_unit);
-	glBindTexture(GL_TEXTURE_3D, texture);
+    unsigned int size = sizeX * sizeY * sizeZ;
+    unsigned char *rawData1 = (unsigned char *)m_dataContainer->loadRawFile(path1, size);
+    unsigned char *rawData2 = (unsigned char *)m_dataContainer->loadRawFile(path2, size);
+    unsigned char *rawData3 = (unsigned char *)m_dataContainer->loadRawFile(path3, size);
+    //load data into a 3D texture
+    glGenTextures(1, &texture);
+    glActiveTexture(texture_unit);
+    glBindTexture(GL_TEXTURE_3D, texture);
 
-	// set the texture parameters
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    // set the texture parameters
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	unsigned int size_3 = size * 3;
+    unsigned int size_3 = size * 3;
 
-	unsigned char *bufferRGBA = new unsigned char[size_3];
+    unsigned char *bufferRGBA = new unsigned char[size_3];
 
-	// convert to rgba
-	for (int i = 0; i < size; ++i) {
-		unsigned int idx = i * 3;
-		bufferRGBA[idx] = (rawData1[i] > 0) ? 255 : 0; //hack: remove later
-		bufferRGBA[idx + 1] = (rawData2[i] > 0) ? 255 : 0;
-		bufferRGBA[idx + 2] = (rawData3[i] > 0) ? 255 : 0;
-		//bufferRGBA[idx + 3] = 255;
-	}
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	//glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, sizeX, sizeY, sizeZ, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
-	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGB8, sizeX, sizeY, sizeZ, 0, GL_RGB, GL_UNSIGNED_BYTE, bufferRGBA);
-	//glTexStorage3D(GL_TEXTURE_3D, 0, GL_RGBA, sizeX, sizeY, sizeZ);// , 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
-	//glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, sizeX, sizeY, sizeZ, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
-	GL_Error();
-	delete[] rawData1;
-	delete[] rawData2;
-	delete[] rawData3;
-	delete[] bufferRGBA;
+    // convert to rgba
+    for (int i = 0; i < size; ++i) {
+        unsigned int idx = i * 3;
+        bufferRGBA[idx] = (rawData1[i] > 0) ? 255 : 0; //hack: remove later
+        bufferRGBA[idx + 1] = (rawData2[i] > 0) ? 255 : 0;
+        bufferRGBA[idx + 2] = (rawData3[i] > 0) ? 255 : 0;
+        //bufferRGBA[idx + 3] = 255;
+    }
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, sizeX, sizeY, sizeZ, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
+    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGB8, sizeX, sizeY, sizeZ, 0, GL_RGB, GL_UNSIGNED_BYTE, bufferRGBA);
+    //glTexStorage3D(GL_TEXTURE_3D, 0, GL_RGBA, sizeX, sizeY, sizeZ);// , 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
+    //glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, sizeX, sizeY, sizeZ, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
+    GL_Error();
+    delete[] rawData1;
+    delete[] rawData2;
+    delete[] rawData3;
+    delete[] bufferRGBA;
 
 }
 
@@ -528,7 +528,7 @@ void OpenGLManager::render2DHeatMapTexture()
 {
     // 1) render this into fbo 1
     // ********* Debug Texture
-    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
+//    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
         m_GNeurites.vaoBind("2DHeatMap_Quad");
         m_GNeurites.useProgram("2DHeatMap_Texture");
         // heatmap texture
@@ -543,7 +543,6 @@ void OpenGLManager::render2DHeatMapTexture()
         GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
         glUniform1i(  tf, 1 );
 
-
         GLint dim = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "dim");
         float dim_value[2] = {m_canvas_w, m_canvas_h};
         glUniform2fv(dim, 1, dim_value);
@@ -553,7 +552,21 @@ void OpenGLManager::render2DHeatMapTexture()
         m_GNeurites.vaoRelease();
 
 
-   }
+//   }
+}
+
+void OpenGLManager::update2DTextureUniforms(GLuint program)
+{
+    // initialize uniforms
+    int m_noRartionMatrix = glGetUniformLocation(program, "m_noRartionMatrix");
+    if (m_noRartionMatrix >= 0) glUniformMatrix4fv(m_noRartionMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
+
+    int vMatrix = glGetUniformLocation(program, "vMatrix");
+    if (vMatrix >= 0) glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    int pMatrix = glGetUniformLocation(program, "pMatrix");
+    if (pMatrix >= 0) glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+    GL_Error();
 }
 
 // ----------------------------------------------------------------------------
@@ -569,7 +582,9 @@ void OpenGLManager::drawNodesInto2DTexture()
     m_GNeurites.vboBind("nodes");
 
     m_GNeurites.useProgram("2DHeatMap");
-    updateAbstractUniformsLocation( m_GNeurites.getProgram("2DHeatMap") );
+
+    update2DTextureUniforms( m_GNeurites.getProgram("2DHeatMap") );
+
     glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
 
     m_GNeurites.vboRelease("nodes");
@@ -774,6 +789,60 @@ bool OpenGLManager::initAbstractSkeletonShaders()
 
 }
 
+void OpenGLManager::updateSkeletonGraphUniforms(GLuint program)
+{
+    int m_noRartionMatrix = glGetUniformLocation(program, "m_noRartionMatrix");
+    if (m_noRartionMatrix >= 0) glUniformMatrix4fv(m_noRartionMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
+
+    int mMatrix = glGetUniformLocation(program, "mMatrix");
+    if (mMatrix >= 0) glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+
+    int vMatrix = glGetUniformLocation(program, "vMatrix");
+    if (vMatrix >= 0) glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    int pMatrix = glGetUniformLocation(program, "pMatrix");
+    if (pMatrix >= 0) glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+    int y_axis = glGetUniformLocation(program, "y_axis");
+    if (y_axis >= 0) glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
+
+    int x_axis = glGetUniformLocation(program, "x_axis");
+    if (x_axis >= 0) glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
+
+
+    int hoveredID = glGetUniformLocation(program, "hoveredID");
+    if (hoveredID >= 0) glUniform1iv(hoveredID, 1, &m_hoveredID);
+    GL_Error();
+}
+
+
+void OpenGLManager::updateSkeletonGraphTransitionUniforms(GLuint program)
+{
+    int m_noRartionMatrix = glGetUniformLocation(program, "m_noRartionMatrix");
+    if (m_noRartionMatrix >= 0) glUniformMatrix4fv(m_noRartionMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
+
+    int mMatrix = glGetUniformLocation(program, "mMatrix");
+    if (mMatrix >= 0) glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+    int vMatrix = glGetUniformLocation(program, "vMatrix");
+    if (vMatrix >= 0) glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    int pMatrix = glGetUniformLocation(program, "pMatrix");
+    if (pMatrix >= 0) glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+    int y_axis = glGetUniformLocation(program, "y_axis");
+    if (y_axis >= 0) glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
+
+    int x_axis = glGetUniformLocation(program, "x_axis");
+    if (x_axis >= 0) glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
+
+
+    int hoveredID = glGetUniformLocation(program, "hoveredID");
+    if (hoveredID >= 0) glUniform1iv(hoveredID, 1, &m_hoveredID);
+    GL_Error();
+}
+
 // ----------------------------------------------------------------------------
 //
 void OpenGLManager::drawSkeletonsGraph(bool selection )
@@ -795,23 +864,21 @@ void OpenGLManager::drawSkeletonsGraph(bool selection )
     if (selection) {
         m_GSkeleton.vaoBind("Selection");
         m_GSkeleton.useProgram("selection_2D_nodes");
-        updateAbstractUniformsLocation(m_GSkeleton.getProgram("selection_2D_nodes"));
+        updateSkeletonGraphUniforms(m_GSkeleton.getProgram("selection_2D_nodes"));
         glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
 
         m_GSkeleton.useProgram("selection_23D_nodes");
-        updateAbstractUniformsLocation(m_GSkeleton.getProgram("selection_23D_nodes"));
+        updateSkeletonGraphUniforms(m_GSkeleton.getProgram("selection_23D_nodes"));
         glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
 
         m_GSkeleton.vboBind("index");
 
         m_GSkeleton.useProgram("selection_2D_index");
-        updateAbstractUniformsLocation(m_GSkeleton.getProgram("selection_2D_index"));
-        glLineWidth(20);
+        updateSkeletonGraphUniforms(m_GSkeleton.getProgram("selection_2D_index"));
         glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
 
         m_GSkeleton.useProgram("selection_23D_index");
-        updateAbstractUniformsLocation(m_GSkeleton.getProgram("selection_23D_index"));
-        glLineWidth(20);
+        updateSkeletonGraphTransitionUniforms(m_GSkeleton.getProgram("selection_23D_index"));
         glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
 
         m_GSkeleton.vboRelease("index");
@@ -819,23 +886,21 @@ void OpenGLManager::drawSkeletonsGraph(bool selection )
     } else {
         m_GSkeleton.vaoBind("SkeletonGraph");
         m_GSkeleton.useProgram("2D_nodes");
-        updateAbstractUniformsLocation( m_GSkeleton.getProgram("2D_nodes") );
+        updateSkeletonGraphUniforms( m_GSkeleton.getProgram("2D_nodes") );
         glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
 
         m_GSkeleton.useProgram("23D_nodes");
-        updateAbstractUniformsLocation( m_GSkeleton.getProgram("23D_nodes") );
+        updateSkeletonGraphTransitionUniforms( m_GSkeleton.getProgram("23D_nodes") );
         glDrawArrays(GL_POINTS, 0,  m_abstract_skel_nodes.size() );
 
         m_GSkeleton.vboBind("index");
 
         m_GSkeleton.useProgram("2D_index");
-        updateAbstractUniformsLocation( m_GSkeleton.getProgram("2D_index"));
-        glLineWidth(20);
+        updateSkeletonGraphUniforms( m_GSkeleton.getProgram("2D_index"));
         glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
 
         m_GSkeleton.useProgram("23D_index");
-        updateAbstractUniformsLocation( m_GSkeleton.getProgram("23D_index"));
-        glLineWidth(20);
+        updateSkeletonGraphUniforms( m_GSkeleton.getProgram("23D_index"));
         glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
         m_GSkeleton.vboRelease("index");
         m_GSkeleton.vaoRelease();
@@ -915,7 +980,9 @@ bool OpenGLManager::initNeuritesGraphShaders()
     m_GNeurites.vboBind("index");
 
     m_GNeurites.useProgram("index");
-    updateAbstractUniformsLocation( m_GNeurites.getProgram("index") );
+
+    updateNeuritesGraphUniforms( m_GNeurites.getProgram("index") );
+
     GL_Error();
 
     m_GNeurites.vboRelease("index");
@@ -925,6 +992,29 @@ bool OpenGLManager::initNeuritesGraphShaders()
     init2DHeatMapShaders();
 
     return true;
+}
+
+void OpenGLManager::updateNeuritesGraphUniforms(GLuint program)
+{
+    int m_noRartionMatrix = glGetUniformLocation(program, "m_noRartionMatrix");
+    if (m_noRartionMatrix >= 0) glUniformMatrix4fv(m_noRartionMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
+
+    int vMatrix = glGetUniformLocation(program, "vMatrix");
+    if (vMatrix >= 0) glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    int pMatrix = glGetUniformLocation(program, "pMatrix");
+    if (pMatrix >= 0) glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+    int y_axis = glGetUniformLocation(program, "y_axis");
+    if (y_axis >= 0) glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
+
+    int x_axis = glGetUniformLocation(program, "x_axis");
+    if (x_axis >= 0) glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
+
+
+    int hoveredID = glGetUniformLocation(program, "hoveredID");
+    if (hoveredID >= 0) glUniform1iv(hoveredID, 1, &m_hoveredID);
+    GL_Error();
 }
 
 // ----------------------------------------------------------------------------
@@ -942,7 +1032,7 @@ void OpenGLManager::drawNeuritesGraph()
     m_GNeurites.vboBind("index");
 
     m_GNeurites.useProgram("index");
-    updateAbstractUniformsLocation( m_GNeurites.getProgram("index") );
+    updateNeuritesGraphUniforms( m_GNeurites.getProgram("index") );
     glLineWidth(20);
 
     glDrawElements(GL_LINES,  m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
@@ -992,23 +1082,19 @@ bool OpenGLManager::initMeshTrianglesShaders()
     m_TMesh.vaoBind("Mesh");
 
     m_TMesh.useProgram("3Dtriangles");
-    QVector3D lightDir = QVector3D(-2.5f, -2.5f, -0.9f);
-    GLuint lightDir_loc = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"),
-                                               "diffuseLightDirection");
+    GLuint mesh_program = m_TMesh.getProgram("3Dtriangles");
 
-    glUniform3fv(lightDir_loc, 1, &lightDir[0]);
+    GLint splat_tex = glGetUniformLocation(mesh_program, "splat_tex");
+    if (splat_tex >= 0) glUniform1i(splat_tex, 2);
 
-	GLint splat_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "splat_tex");
-	glUniform1i(splat_tex, 2);
+    GLint gly_tex = glGetUniformLocation(mesh_program, "gly_tex");
+    if (gly_tex >= 0) glUniform1i(gly_tex, 3);
 
-	GLint gly_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "gly_tex");
-	glUniform1i(gly_tex, 3);
+    //GLint mito_tex = glGetUniformLocation(mesh_program, "mito_tex");
+    //glUniform1i(mito_tex, 4);
 
-	//GLint mito_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "mito_tex");
-	//glUniform1i(mito_tex, 4);
-
-	//GLint nmito_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "nmito_tex");
-	//glUniform1i(nmito_tex, 5);
+    //GLint nmito_tex = glGetUniformLocation(mesh_program, "nmito_tex");
+    //glUniform1i(nmito_tex, 5);
 
     m_TMesh.vboCreate("MeshVertices", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
     m_TMesh.vboBind("MeshVertices");
@@ -1055,6 +1141,7 @@ bool OpenGLManager::initMeshTrianglesShaders()
     m_TMesh.vboBind("MeshVertices");
     initMeshVertexAttrib();
     m_TMesh.vboRelease("MeshVertices");
+    GL_Error();
 
 
     m_TMesh.vaoRelease();
@@ -1062,6 +1149,30 @@ bool OpenGLManager::initMeshTrianglesShaders()
     GL_Error();
     /*  end selection buffer **/
 
+}
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::updateMeshPrograms(GLuint program)
+{
+    int mMatrix = glGetUniformLocation(program, "mMatrix");
+    if (mMatrix >= 0) glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+    int vMatrix = glGetUniformLocation(program, "vMatrix");
+    if (vMatrix >= 0) glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    int pMatrix = glGetUniformLocation(program, "pMatrix");
+    if (pMatrix >= 0) glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+    int y_axis = glGetUniformLocation(program, "y_axis");
+    if (y_axis >= 0) glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
+
+    int x_axis = glGetUniformLocation(program, "x_axis");
+    if (x_axis >= 0) glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
+
+    int hoveredID = glGetUniformLocation(program, "hoveredID");
+    if (hoveredID >= 0) glUniform1iv(hoveredID, 1, &m_hoveredID);
+
+    GL_Error();
 }
 
 // ----------------------------------------------------------------------------
@@ -1071,7 +1182,9 @@ void OpenGLManager::drawMeshTriangles(bool selection )
    if (selection) {
        m_TMesh.vaoBind("Selection");
        m_TMesh.useProgram("selection");
-       updateUniformsLocation(m_TMesh.getProgram("selection"));
+
+      updateMeshPrograms( m_TMesh.getProgram("selection") );
+
        m_TMesh.vboBind("MeshIndices");
 
        glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
@@ -1080,8 +1193,8 @@ void OpenGLManager::drawMeshTriangles(bool selection )
    } else {
        m_TMesh.vaoBind("Mesh");
        m_TMesh.useProgram("3Dtriangles");
-       updateUniformsLocation(m_TMesh.getProgram("3Dtriangles"));
 
+       updateMeshPrograms( m_TMesh.getProgram("3Dtriangles") );
 
        // transfer function
        //glActiveTexture(GL_TEXTURE1);
@@ -1091,29 +1204,32 @@ void OpenGLManager::drawMeshTriangles(bool selection )
 
 
        // Astrocyte 3D volume
-       
-	   GLint splat_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "splat_tex");
-	   glUniform1i(splat_tex, 2);
-	   glActiveTexture(GL_TEXTURE2);
-	   glBindTexture(GL_TEXTURE_3D, m_splat_volume_3DTex);// m_astro_3DTex);
 
+       GLint splat_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "splat_tex");
+
+       if (splat_tex >= 0) {
+           glUniform1i(splat_tex, 2);
+           glActiveTexture(GL_TEXTURE2);
+           glBindTexture(GL_TEXTURE_3D, m_splat_volume_3DTex);// m_astro_3DTex);
+       }
        // Glycogen 3D volume
-       
-       GLint gly_tex = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "gly_tex");
-       glUniform1i(  gly_tex, 3 );
-	   glActiveTexture(GL_TEXTURE3);
-	   glBindTexture(GL_TEXTURE_3D, m_glycogen_3DTex);
 
+       GLint gly_tex = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "gly_tex");
+       if (gly_tex >= 0) {
+           glUniform1i(  gly_tex, 3 );
+           glActiveTexture(GL_TEXTURE3);
+           glBindTexture(GL_TEXTURE_3D, m_glycogen_3DTex);
+        }
 
        // Astrocyte 3D volume
-       
+
        //GLint mito_tex = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "mito_tex");
        //glUniform1i(  mito_tex, 4 );
-	   //glActiveTexture(GL_TEXTURE4);
-	   //glBindTexture(GL_TEXTURE_3D, m_mito_3DTex);
+       //glActiveTexture(GL_TEXTURE4);
+       //glBindTexture(GL_TEXTURE_3D, m_mito_3DTex);
 
-	   //glActiveTexture(GL_TEXTURE5);
-	   //glBindTexture(GL_TEXTURE_3D, m_nmito_3DTex);
+       //glActiveTexture(GL_TEXTURE5);
+       //glBindTexture(GL_TEXTURE_3D, m_nmito_3DTex);
 
        m_TMesh.vboBind("MeshIndices");
        glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
@@ -1204,6 +1320,30 @@ bool OpenGLManager::initSkeletonShaders()
     m_SkeletonPoints.vaoRelease();
 }
 
+void OpenGLManager::updateSkeletonUniforms(GLuint program)
+{
+
+    // initialize uniforms
+    int mMatrix = glGetUniformLocation(program, "mMatrix");
+    if (mMatrix >= 0) glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+    int vMatrix = glGetUniformLocation(program, "vMatrix");
+    if (vMatrix >= 0) glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+    int pMatrix = glGetUniformLocation(program, "pMatrix");
+    if (pMatrix >= 0) glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+    int y_axis = glGetUniformLocation(program, "y_axis");
+    if (y_axis >= 0) glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
+
+    int x_axis = glGetUniformLocation(program, "x_axis");
+    if (x_axis >= 0) glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
+
+    int hoveredID = glGetUniformLocation(program, "hoveredID");
+    if (hoveredID >= 0) glUniform1iv(hoveredID, 1, &m_hoveredID);
+    GL_Error();
+}
+
 // ----------------------------------------------------------------------------
 //
 void OpenGLManager::drawSkeletonPoints(bool selection)
@@ -1213,13 +1353,13 @@ void OpenGLManager::drawSkeletonPoints(bool selection)
     if (selection) {
         m_SkeletonPoints.vaoBind("Selection");
         m_SkeletonPoints.useProgram("selection");
-        updateUniformsLocation(m_SkeletonPoints.getProgram("selection"));
+        updateSkeletonUniforms( m_SkeletonPoints.getProgram("selection") );
         glDrawArrays(GL_POINTS, 0,  m_dataContainer->getSkeletonPointsSize()  );
         m_SkeletonPoints.vaoRelease();
     } else {
         m_SkeletonPoints.vaoBind("SkeletonPoints");
         m_SkeletonPoints.useProgram("3DPoints");
-        updateUniformsLocation(m_SkeletonPoints.getProgram("3DPoints"));
+        updateSkeletonUniforms( m_SkeletonPoints.getProgram("3DPoints") );
         glDrawArrays(GL_POINTS, 0,  m_dataContainer->getSkeletonPointsSize()  );
         m_SkeletonPoints.vaoRelease();
     }
@@ -1312,17 +1452,34 @@ bool OpenGLManager::initGlycogenPointsShaders()
     m_vao_glycogen.bind();
 }
 
+void OpenGLManager::updateGlycogenUniforms(GLuint program)
+{
+     // initialize uniforms
+     int mMatrix = glGetUniformLocation(program, "mMatrix");
+     if (mMatrix >= 0) glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
+
+     int m_noRartionMatrix = glGetUniformLocation(program, "m_noRartionMatrix");
+     if (m_noRartionMatrix >= 0) glUniformMatrix4fv(m_noRartionMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
+
+     int vMatrix = glGetUniformLocation(program, "vMatrix");
+     if (vMatrix >= 0) glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
+
+     int pMatrix = glGetUniformLocation(program, "pMatrix");
+     if (pMatrix >= 0) glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+     GL_Error();
+
+}
+
 // ----------------------------------------------------------------------------
 //
 void OpenGLManager::drawGlycogenPoints()
 {
-
     // I need this because transitioning from mesh to skeleton is not smooth
     m_vao_glycogen.bind();
 
     m_GlycogenPoints.useProgram("3DPoints");
 
-    updateUniformsLocation(m_GlycogenPoints.getProgram("3DPoints"));
+    updateGlycogenUniforms(m_GlycogenPoints.getProgram("3DPoints"));
     glDrawArrays(GL_POINTS, 0,  m_dataContainer->getGlycogenSize() );
 
     m_vao_glycogen.release();
@@ -1334,7 +1491,6 @@ void OpenGLManager::updateGlycogenPoints()
 {
     //m_vao_glycogen.bind();
     m_vbo_glycogen.bind();
-
 
 
     // fill glycogen points
@@ -1489,92 +1645,6 @@ void OpenGLManager::renderSelection()
     glEnable (GL_BLEND);
     glEnable(GL_MULTISAMPLE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-// ############## Uniforms ###############################################
-//
-void OpenGLManager::updateAbstractUniformsLocation(GLuint program)
-{
-    if (m_glFunctionsSet == false)
-        return;
-
-    // initialize uniforms
-    GLuint mMatrix = glGetUniformLocation(program, "mMatrix");
-    GLuint m_noRartionMatrix = glGetUniformLocation(program, "m_noRartionMatrix");
-    GLuint vMatrix = glGetUniformLocation(program, "vMatrix");
-    GLint is2D = glGetUniformLocation(program, "is2D");
-    int is2D_value;
-
-    if (m_2D) { // force directed layout started, them use model without rotation
-        is2D_value = 1;
-    } else {
-        is2D_value = 0;
-    }
-    glUniform1iv(is2D, 1, &is2D_value);
-
-    glUniformMatrix4fv(m_noRartionMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
-    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
-
-    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
-
-    GLuint pMatrix = glGetUniformLocation(program, "pMatrix");
-    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
-
-    GLint y_axis = glGetUniformLocation(program, "y_axis");
-    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
-
-    GLint x_axis = glGetUniformLocation(program, "x_axis");
-    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
-
-    GLint viewport = glGetUniformLocation(program, "viewport");
-    float viewport_values[4];
-    viewport_values[0] = m_uniforms.viewport.x();
-    viewport_values[1] = m_uniforms.viewport.y();
-    viewport_values[2] = m_uniforms.viewport.z();
-    viewport_values[3] = m_uniforms.viewport.w();
-
-    glUniform4fv(viewport, 1,  viewport_values);
-
-    glUniform1iv(8, 1, &m_uniforms.max_volume);
-
-    glUniform1iv(9, 1, &m_uniforms.max_astro_coverage);
-
-    GLint hoveredID = glGetUniformLocation(program, "hoveredID");
-    glUniform1iv(hoveredID, 1, &m_hoveredID);
-}
-
-// ----------------------------------------------------------------------------
-//
-void OpenGLManager::updateUniformsLocation(GLuint program)
-{
-    if (m_glFunctionsSet == false)
-        return;
-
-   // qDebug() << "OpenGLManager::updateUniformsLocation";
-    // initialize uniforms
-    GLuint mMatrix = glGetUniformLocation(program, "mMatrix");
-    glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
-
-    GLuint m_noRartionMatrix = glGetUniformLocation(program, "m_noRartionMatrix");
-    glUniformMatrix4fv(m_noRartionMatrix, 1, GL_FALSE, m_uniforms.modelNoRotMatrix);
-
-    GLuint vMatrix = glGetUniformLocation(program, "vMatrix");
-    glUniformMatrix4fv(vMatrix, 1, GL_FALSE, m_uniforms.vMatrix);
-
-    GLuint pMatrix = glGetUniformLocation(program, "pMatrix");
-    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
-
-    GLint y_axis = glGetUniformLocation(program, "y_axis");
-    glUniform1iv(y_axis, 1, &m_uniforms.y_axis);
-
-    GLint x_axis = glGetUniformLocation(program, "x_axis");
-    glUniform1iv(x_axis, 1, &m_uniforms.x_axis);
-
-    glUniform1iv(8, 1, &m_uniforms.max_volume);
-    glUniform1iv(9, 1, &m_uniforms.max_astro_coverage);
-
-    GLint hoveredID = glGetUniformLocation(program, "hoveredID");
-    glUniform1iv(hoveredID, 1, &m_hoveredID);
 }
 
 // ----------------------------------------------------------------------------

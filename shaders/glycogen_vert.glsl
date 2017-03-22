@@ -14,10 +14,7 @@ out vec2		V_Radius_volume;
 
 uniform mat4 mMatrix;
 uniform mat4 m_noRartionMatrix;
-
-// View Transformation
 uniform mat4 vMatrix;
-// Projection transformation
 uniform mat4 pMatrix;
 
 

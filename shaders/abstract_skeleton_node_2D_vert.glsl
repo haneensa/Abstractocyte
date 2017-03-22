@@ -14,19 +14,12 @@ layout (location = 3) in vec2 layout3;
 out int                     V_ID;
 out float                   V_alpha;
 out int                     V_render;
-// World transformation
-uniform mat4                mMatrix;
+
 uniform mat4                m_noRartionMatrix;
-
-// View Transformation
 uniform mat4                vMatrix;
-// Projection transformation
 uniform mat4                pMatrix;
-
 uniform int                 y_axis;
 uniform int                 x_axis;
-uniform vec4                viewport;
-out vec4                    v_viewport;
 
 struct SSBO_datum {
     vec4 color;
@@ -67,17 +60,14 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 // here I should lock the rotation matrix
 void main(void)
 {
-    v_viewport = viewport;
     int ID = int(vertex.w);
     V_ID = ID;
-    mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
     mat4 m_noRotvpMatrix = pMatrix * vMatrix * m_noRartionMatrix;
 
     // if we switch to 2D I can store the vertex multiplied by only rotation matrix here
     // then use the ssbo to transfer the data there
     // then I can have that information available all th time
 
-    vec4 v_vertex =  mvpMatrix * vec4(vertex.xyz, 1); // original position
     vec4 v_layout1 =  m_noRotvpMatrix * vec4(layout1, 0, 1); // original position
     vec4 v_layout2 =  m_noRotvpMatrix * vec4(layout2, 0, 1); // original position
     vec4 v_layout3 =  m_noRotvpMatrix * vec4(layout3, 0, 1); // original position

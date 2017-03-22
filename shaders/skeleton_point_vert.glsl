@@ -9,13 +9,9 @@ layout(location = 0) in vec4    vertex;
 layout(location = 1) in vec4    knot1;
 layout(location = 2) in vec4    knot2;
 
-// World transformation
-uniform mat4 mMatrix;
-// View Transformation
-uniform mat4 vMatrix;
-// Projection transformation
-uniform mat4 pMatrix;
-
+uniform mat4    mMatrix;
+uniform mat4    vMatrix;
+uniform mat4    pMatrix;
 uniform int     y_axis;
 uniform int     x_axis;
 

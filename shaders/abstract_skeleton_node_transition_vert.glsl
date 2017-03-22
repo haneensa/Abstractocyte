@@ -18,19 +18,12 @@ out int     V_render;
 // World transformation
 uniform mat4 mMatrix;
 uniform mat4 m_noRartionMatrix;
-
-// View Transformation
 uniform mat4 vMatrix;
-// Projection transformation
 uniform mat4 pMatrix;
-
 uniform int  y_axis;
 uniform int  x_axis;
-uniform vec4 viewport;
 
-layout(location = 8) uniform int   max_volume;
 
-out vec4 v_viewport;
 struct SSBO_datum {
     vec4 color;
     vec4 center;
@@ -70,7 +63,6 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 // here I should lock the rotation matrix
 void main(void)
 {
-    v_viewport = viewport;
     // if has parent and parent not filtered, then use it
     // else use child if not filtered as well
     int ID = int(vertex.w);

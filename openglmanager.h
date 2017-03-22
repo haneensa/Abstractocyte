@@ -28,7 +28,6 @@ public:
     ~OpenGLManager();
     void fillVBOsData();
     bool initOpenGLFunctions();
-    void updateUniformsLocation(GLuint program);
     void updateAbstractUniformsLocation(GLuint program);
     void update2Dflag(bool is2D);
 
@@ -43,29 +42,31 @@ public:
     // *********** 1) Mesh Triangles     ***********
     bool initMeshTrianglesShaders();
     bool initMeshVertexAttrib();
-
+    void updateMeshPrograms(GLuint program);
     void drawMeshTriangles(bool selection );
 
     // *********** 3) Skeleton Points    ***********
     bool initSkeletonShaders();
     void drawSkeletonPoints(bool selection );
-
+    void updateSkeletonUniforms(GLuint program);
     // *********** 4) Abstract Skeleton Graph (Nodes and Edges) ***********
     bool initAbstractSkeletonShaders();
     void initSkeletonsVertexAttribPointer();
     void drawSkeletonsGraph(bool selection );
+    void updateSkeletonGraphUniforms(GLuint program);
+    void updateSkeletonGraphTransitionUniforms(GLuint program);
 
     // ***********  5) Neurites Graph (Nodes and Edges) ***********
     bool initNeuritesGraphShaders();
     void initNeuritesVertexAttribPointer();
     void drawNeuritesGraph();
-
+    void updateNeuritesGraphUniforms(GLuint program);
 
     // *********** 6) Mesh Points     ***********
     bool initGlycogenPointsShaders();
     void drawGlycogenPoints();
 	void updateGlycogenPoints();
-
+    void updateGlycogenUniforms(GLuint program);
     //***************************************
     void renderAbstractions();
 
@@ -120,7 +121,7 @@ public:
     bool init2DHeatMapShaders();
     void drawNodesInto2DTexture();
     void render2DHeatMapTexture();
-
+    void update2DTextureUniforms(GLuint program);
     // ************ 3D HeatMap  *******
 	void init_Gly3DTex();
 	void upload_Gly3DTex(void* data, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z, GLenum type = GL_UNSIGNED_BYTE);

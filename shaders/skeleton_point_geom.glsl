@@ -19,10 +19,6 @@ uniform int     y_axis;
 uniform int     x_axis;
 uniform int     hoveredID;
 
-layout(location = 8) uniform int   max_volume;
-layout(location = 9) uniform int   max_astro_coverage;
-
-
 layout (points) in;
 layout (points, max_vertices = 1) out;
 
