@@ -47,6 +47,24 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(this, SIGNAL(getIDAtSelectedRow(int)),
                      getGLWidget(), SLOT(getHVGXIDAtSelectedRow(int)));
 
+    QObject::connect(getMousePad(), SIGNAL(addPathtoList(QString)),
+                     this, SLOT(getPath(QString)));
+
+    QObject::connect(getMousePad(), SIGNAL(signalSelectedPath(QModelIndex)),
+                     this, SLOT(getSelectedPathIndex(QModelIndex)));
+
+    QObject::connect(this, SIGNAL(signalPathLabel(QString)),
+                     getMousePad(), SLOT(getSelectedPathLabel(QString)));
+
+    QObject::connect(getMousePad(), SIGNAL(signalDeletePath(QModelIndex)),
+                     this, SLOT(deleteSelectedPath(QModelIndex)));
+
+    QObject::connect(this, SIGNAL(signalDeletedPathLabel(QString)),
+                     getMousePad(), SLOT(getSelectedPathLabelToDelete(QString)));
+
+
+
+
 }
 
 //------------------------------------------------------
@@ -306,4 +324,30 @@ void MainWindow::on_mapGlycogenClustersButton_clicked()
     {
         //show message saying: No clusters available, calculate clusters first
     }
+}
+
+//------------------------------------------------------
+//
+void MainWindow::getPath(QString pathLabel)
+{
+    mainwindow_ui->listPaths->addItem(pathLabel);
+}
+
+//------------------------------------------------------
+//
+void MainWindow::getSelectedPathIndex(QModelIndex index)
+{
+    QString pathLabel = mainwindow_ui->listPaths->item(index.row())->text();
+    signalPathLabel(pathLabel);
+}
+
+//------------------------------------------------------
+//
+void MainWindow::deleteSelectedPath(QModelIndex index)
+{
+    // return label to mousepad to remove it from paths list
+    QListWidgetItem *item = mainwindow_ui->listPaths->item(index.row());
+    QString pathLabel = item->text();
+    delete mainwindow_ui->listPaths->takeItem(index.row());
+    signalDeletedPathLabel(pathLabel);
 }

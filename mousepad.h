@@ -3,7 +3,7 @@
 
 #include <QOpenGLWidget>
 #include <QWidget>
-
+#include <QModelIndex>
 #include "abstractionspace.h"
 #include "mainopengl.h"
 #include "path.h"
@@ -36,7 +36,11 @@ public slots:
     void namePath(QString name);
     void describePath(QString name);
     void savePath();
-
+    void updateActivePath(QModelIndex);
+    void getSelectedPathLabel(QString);
+    void deleteSelectedPath();
+    void getSelectedPathLabelToDelete(QString);
+    void getActiveTab(int);
 
 signals:
     void setSignalX(int value);
@@ -44,6 +48,14 @@ signals:
     void setSliderX(int value);
     void setSliderY(int value);
     void setIntervalID(int ID);
+
+    // path management
+    void addPathtoList(QString name);
+
+    void signalSelectedPath(QModelIndex);
+    void signalPathName(QString);
+    void signalDeletePath(QModelIndex);
+
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -121,10 +133,13 @@ private:
     AbstractionSpace                        *m_2dspace;
 
     // Paths Management
-    std::vector<Path>                       m_paths_list;
-    Path                                    m_activePath;
+    std::map<QString, Path *>               m_paths_list;
+    Path                                    *m_activePath;
+    QModelIndex                             selectedPathIndex;
     bool                                    m_tracing;
     int                                     m_trace_X;
+    int                                     m_pathsIDs;
+    bool                                    m_path_page_active;
 
 };
 

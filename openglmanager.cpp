@@ -1427,10 +1427,19 @@ void OpenGLManager::initSelectionFrameBuffer()
     // create FBO
     glGenFramebuffers(1, &m_selectionFrameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
+
     glGenRenderbuffers(1, &m_selectionRenderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_selectionRenderBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, m_canvas_w, m_canvas_h);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_selectionRenderBuffer);
+
+    GLuint depthBuffer;
+    glGenRenderbuffers(1, &depthBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, m_canvas_w, m_canvas_h);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -1462,7 +1471,8 @@ void OpenGLManager::renderSelection()
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
     //clear
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //disable dithering -- important
     glDisable(GL_DITHER);
     glDisable(GL_MULTISAMPLE);
