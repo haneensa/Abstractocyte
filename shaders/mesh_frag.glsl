@@ -87,7 +87,7 @@ void main() {
 	if(otype == ASTRO || otype == SPINE || otype == BOUTN) //Comment this else block and it will work
 	{
 		float splat2 = texture(gly_tex, G_fragTexCoord).r;
-		vec4 mix_color = mix(color, red_color, splat);
+		vec4 mix_color = mix(color, pnk_color, splat2);
 		mix_color.a = 1;
 		color = mix_color;
 	}
