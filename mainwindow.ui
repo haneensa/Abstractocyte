@@ -1014,6 +1014,7 @@
     <slot>describePath(QString)</slot>
     <slot>updateActivePath(QModelIndex)</slot>
     <slot>deleteSelectedPath()</slot>
+    <slot>getActiveTab(int)</slot>
    </slots>
   </customwidget>
   <customwidget>
@@ -1675,6 +1676,22 @@
     <hint type="destinationlabel">
      <x>272</x>
      <y>77</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tabWidget</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>getActiveTab(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>197</x>
+     <y>416</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>77</x>
+     <y>263</y>
     </hint>
    </hints>
   </connection>

@@ -40,6 +40,7 @@ public slots:
     void getSelectedPathLabel(QString);
     void deleteSelectedPath();
     void getSelectedPathLabelToDelete(QString);
+    void getActiveTab(int);
 
 signals:
     void setSignalX(int value);
@@ -138,6 +139,7 @@ private:
     bool                                    m_tracing;
     int                                     m_trace_X;
     int                                     m_pathsIDs;
+    bool                                    m_path_page_active;
 
 };
 

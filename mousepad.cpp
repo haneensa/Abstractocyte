@@ -23,6 +23,8 @@ MousePad::MousePad(QWidget *parent)
     m_pathsIDs = 0;
 
     m_activePath = NULL;
+
+    m_path_page_active = true;
 }
 
 MousePad::~MousePad()
@@ -395,10 +397,12 @@ void MousePad::paintGL()
     m_program_circle->release();
     m_vao_circle.release();
 
-    if (m_tracing) {
-        m_activePath->tracePath(m_projection, m_trace_X);
-    } else {
-        m_activePath->drawPath(m_projection);
+    if (m_path_page_active && m_paths_list.size() > 0) {
+        if (m_tracing) {
+            m_activePath->tracePath(m_projection, m_trace_X);
+        } else {
+            m_activePath->drawPath(m_projection);
+        }
     }
 
     render2D_GridSpace();
@@ -606,7 +610,10 @@ bool MousePad::processSelection(float x, float y)
 //************ Path Management ****************************
 void MousePad::startPath()
 {
-
+    if (m_paths_list.size() == 0) {
+        qDebug() << "create path first";
+        return;
+    }
 
     qDebug() << "start Recording Path";
     m_activePath->resetPath();
@@ -616,6 +623,11 @@ void MousePad::startPath()
 
 void MousePad::endPath()
 {
+    if (m_paths_list.size() == 0) {
+        qDebug() << "create path first";
+        return;
+    }
+
   qDebug() << "end path recording";
   m_activePath->updateRecordingFlag(false);
 }
@@ -705,4 +717,17 @@ void MousePad::getSelectedPathLabelToDelete(QString pathlabel)
             m_activePath = m_paths_list[labelFirstPath];
         }
     }
+
+    update();
+}
+
+void MousePad::getActiveTab(int tab)
+{
+    qDebug() << tab;
+    if (tab == 2) // page tab is viewed
+        m_path_page_active = true;
+    else
+        m_path_page_active = false;
+
+    update();
 }
