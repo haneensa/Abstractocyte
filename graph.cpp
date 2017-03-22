@@ -262,7 +262,6 @@ void Graph::resetCoordinates()
     m_FDL_terminate = false;
     std::map<int, Object*>  objectMap = m_opengl_mngr->getObjectsMap();
 
-    qDebug() << "2D";
     hashGrid->clear();
     m_FilteredHVGX.clear();
 
@@ -366,7 +365,6 @@ void Graph::update_node_data(Node* node)
 
 void Graph::runforceDirectedLayout()
 {
-    qDebug() << "run force directed layout";
     std::map<int, Object*>  objectMap = m_opengl_mngr->getObjectsMap();
 
     m_FDL_terminate = false;

@@ -226,7 +226,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>2</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
@@ -373,8 +373,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>349</width>
-              <height>848</height>
+              <width>174</width>
+              <height>188</height>
              </rect>
             </property>
             <attribute name="label">
@@ -519,7 +519,7 @@
                <item row="1" column="1">
                 <widget class="QPushButton" name="pushButton_3">
                  <property name="text">
-                  <string>Hide</string>
+                  <string>Hide/Show</string>
                  </property>
                 </widget>
                </item>
@@ -838,6 +838,16 @@
               <item>
                <property name="text">
                 <string>Astrocyte Coverage</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Glycogen Density</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Synapse Size</string>
                </property>
               </item>
              </widget>

@@ -14,16 +14,11 @@ out float   V_alpha;
 out int     V_ID;
 out int     V_render;
 
-// World transformation
-uniform mat4 mMatrix;
 uniform mat4 m_noRartionMatrix;
-// View Transformation
 uniform mat4 vMatrix;
-// Projection transformation
 uniform mat4 pMatrix;
 uniform int  y_axis;
 uniform int  x_axis;
-uniform vec4 viewport;
 
 struct SSBO_datum {
     vec4 color;

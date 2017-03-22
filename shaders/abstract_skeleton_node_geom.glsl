@@ -13,7 +13,6 @@ in int          V_render[];
 
 uniform int     hoveredID;
 
-
 struct SSBO_datum {
     vec4 color;
     vec4 center;

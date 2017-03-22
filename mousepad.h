@@ -127,7 +127,12 @@ private:
     QOpenGLBuffer                           m_vbo_2DSpaceGridIndix;
 
     GLuint                                  m_program_2DSpace_degbug;
+
     GLuint                                  m_program_2DSpace_grid;
+
+    GLuint                                  m_program_2DSpace_gridPoints;
+    GLuint                                  m_program_2DSpace_gridIlligal;
+
     GLuint                                  m_program_2DSpace_Selection;
 
     AbstractionSpace                        *m_2dspace;

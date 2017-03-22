@@ -414,7 +414,6 @@ void AbstractionSpace::updateID(int ID)
     }
     m_intervalID = ID;
     updateBuffer();
-    qDebug() << "m_intervalID: " << ID;
 }
 
 void AbstractionSpace::initOpenGLFunctions()
@@ -440,8 +439,6 @@ bool AbstractionSpace::initBuffer()
 
 bool AbstractionSpace::updateBuffer()
 {
-    qDebug() << " AbstractionSpace::updateBuffer : " << m_intervalID;
-
     // update buffer data
     m_2DState = (struct ssbo_2DState*)malloc(sizeof(struct ssbo_2DState));
     m_2DState->states =  m_IntervalXY[m_intervalID];

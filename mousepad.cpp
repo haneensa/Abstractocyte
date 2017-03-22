@@ -210,6 +210,13 @@ void  MousePad::init2D_GridSpaceGL()
     if(res == false)
         return;
 
+    m_program_2DSpace_gridPoints = glCreateProgram();
+    res = initShader(m_program_2DSpace_gridPoints, ":/shaders/space2d_vert.glsl", ":/shaders/space2d_grid_points_geom.glsl",
+                          ":/shaders/points_passthrough_frag.glsl");
+    if(res == false)
+        return;
+
+
     glUseProgram(m_program_2DSpace_grid);
     qDebug() << "init buffers";
     // create vbos and vaos
@@ -371,15 +378,28 @@ void MousePad::render2D_GridSpace()
 {
     m_vao_2DSpace_grid.bind();
     m_vbo_2DSpaceGridIndix.bind();
+    m_vbo_2DSpaceVerts.bind();
+
+
+    // grid lines
     glUseProgram(m_program_2DSpace_grid);
 
     GLuint pMatrix = glGetUniformLocation(m_program_2DSpace_grid, "pMatrix");
     glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_projection.data());
 
-    m_vbo_2DSpaceVerts.bind();
     glDrawElements(GL_LINES, m_grid_indices.size(), GL_UNSIGNED_INT, 0);
-    m_vbo_2DSpaceVerts.release();
 
+
+    // grid points
+    glUseProgram(m_program_2DSpace_gridPoints);
+
+    pMatrix = glGetUniformLocation(m_program_2DSpace_gridPoints, "pMatrix");
+    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_projection.data());
+
+    glDrawElements(GL_POINTS, m_grid_indices.size(), GL_UNSIGNED_INT, 0);
+
+
+    m_vbo_2DSpaceVerts.release();
     m_vbo_2DSpaceGridIndix.release();
     m_vao_2DSpace_grid.release();
 }
@@ -387,7 +407,7 @@ void MousePad::render2D_GridSpace()
 void MousePad::paintGL()
 {
     glViewport( 0, 0, m_w, m_h);
-    glClearColor(0.85f, 0.85f, 0.85f, 1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_vao_circle.bind();
@@ -406,7 +426,7 @@ void MousePad::paintGL()
     }
 
     render2D_GridSpace();
-    render2D_DebugSpace();
+   // render2D_DebugSpace();
 }
 
 void MousePad::resizeGL(int w, int h)

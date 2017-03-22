@@ -633,8 +633,8 @@ void GLWidget::clearSelectedObjectsTable()
 //
 void GLWidget::hideSelectedObjects()
 {
-    bool invisibility = true; // meaning filtered (invisible)
-    m_opengl_mngr->FilterByID(m_selectedObjects, invisibility);
+    m_hide_toggle = !m_hide_toggle;
+    m_opengl_mngr->FilterByID(m_selectedObjects, m_hide_toggle);
     update();
 }
 

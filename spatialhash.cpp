@@ -6,12 +6,11 @@ SpatialHash::SpatialHash(int col, float min, float max)
 {
     m_cellSize = m_max / (float)col;
     m_col = (m_min - m_min) / m_cellSize;
-    qDebug() << col << " " << m_col;
+    //qDebug() << col << " " << m_col;
 
-    qDebug() << "m_col: " << m_col;
-
+    //qDebug() << "m_col: " << m_col;
     /* I only need the cell size */
-    qDebug() << "m_cellSize: " << m_cellSize;
+    //qDebug() << "m_cellSize: " << m_cellSize;
 }
 
 

@@ -40,14 +40,11 @@ layout (std430, binding=3) buffer space2d_data
 };
 
 // World transformation
-uniform mat4 mMatrix;
 uniform mat4 m_noRartionMatrix;
 // View Transformation
 uniform mat4 vMatrix;
 // Projection transformation
 uniform mat4 pMatrix;
-uniform int  y_axis;
-uniform int  x_axis;
 
 
 out float   V_alpha;

@@ -22,9 +22,8 @@ uniform sampler3D   splat_tex; //r=astro g=astro-mito b=neurite-mito
 uniform sampler3D   gly_tex;
 
 in vec3             G_fragTexCoord;
-//uniform sampler1D   tf;
 //-------------------- DIFFUSE LIGHT PROPERTIES --------------------
-uniform vec3 diffuseLightDirection; //QVector3D(-2.5f, -2.5f, -0.9f);
+vec3 diffuseLightDirection = vec3(-2.5f, -2.5f, -0.9f);
 vec3 lightDir2 = vec3(2.5f, 2.5f, 1.0f);
 vec3 N = normalize(normal_out);
 vec3 L = normalize(diffuseLightDirection);
