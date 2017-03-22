@@ -66,8 +66,11 @@ bool OpenGLManager::initOpenGLFunctions()
     m_GNeurites.initOpenGLFunctions();
     m_GlycogenPoints.initOpenGLFunctions();
 
+	
     load3DTexturesFromRaw("mask_745_sigma3.raw", m_astro_3DTex ); // Astrocytic_mitochondria_b.raw
     load3DTexturesFromRaw("mask_astro_mito_sig10.raw", m_mito_3DTex ); //
+	init_Gly3DTex();
+	upload_Gly3DTex(m_dataContainer->getGlycogen3DGridData(), DIM_G, DIM_G, DIM_G);
 
     fillVBOsData();
 
@@ -288,7 +291,7 @@ void OpenGLManager::upload_Gly3DTex(void* data, int sizeX, int sizeY, int sizeZ,
 {
     glBindTexture(GL_TEXTURE_3D, m_gly_3D_Tex);
 
-    glTexImage3D(GL_TEXTURE_3D, 0, GL_RED, sizeX, sizeY, sizeZ, 0, GL_RED, type, data);
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, sizeX, sizeY, sizeZ, 0, GL_RGBA, type, (GLvoid*)data);
 }
 
 // ----------------------------------------------------------------------------
@@ -359,7 +362,7 @@ void OpenGLManager::init2DHeatMapTextures()
 void OpenGLManager::load3DTexturesFromRaw(QString path, GLuint &texture, int sizeX, int sizeY, int sizeZ)
 {
     int size = sizeX * sizeY * sizeZ;
-    char *rawData = m_dataContainer->loadRawFile(path, size);
+	unsigned char *rawData = (unsigned char *)m_dataContainer->loadRawFile(path, size);
     //load data into a 3D texture
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_3D, texture);
