@@ -6,6 +6,7 @@
 
 #include "abstractionspace.h"
 #include "mainopengl.h"
+#include "path.h"
 
 struct point {
     float x;
@@ -23,10 +24,19 @@ public:
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
+    void updatePointer(float x, float y);
+
 public slots:
     void getSlotsX(int value);
     void getSlotsY(int value);
     void getAbstractionData(AbstractionSpace *space_instance);
+    void startPath();
+    void endPath();
+    void retracePath(int x);
+    void namePath(QString name);
+    void describePath(QString name);
+    void savePath();
+
 
 signals:
     void setSignalX(int value);
@@ -46,7 +56,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
     void renderSelection(void);
-    void processSelection(float dx, float dy);
+    bool processSelection(float dx, float dy);
 
     void initSelectionPointerGL();
     void init2DSpaceGL();
@@ -88,8 +98,11 @@ private:
     GLuint                                  m_buffer_color;
     GLuint                                  m_bindColorIdx;
 
-    std::vector<struct abstractionPoint>      m_vertices;
-    std::vector<GLuint>                       m_indices;
+    std::vector<struct abstractionPoint>    m_vertices;
+    std::vector<GLuint>                     m_indices;
+
+    std::vector<struct abstractionPoint>    m_grid_vertices;
+    std::vector<GLuint>                     m_grid_indices;
 
     QOpenGLVertexArrayObject                m_vao_2DSpace_debug;
     QOpenGLVertexArrayObject                m_vao_2DSpace_grid;
@@ -97,6 +110,8 @@ private:
 
     QOpenGLBuffer                           m_vbo_2DSpaceVerts;
     QOpenGLBuffer                           m_vbo_2DSpaceTrianglesIndix;
+
+    QOpenGLBuffer                           m_vbo_2DSpaceGridVerts;
     QOpenGLBuffer                           m_vbo_2DSpaceGridIndix;
 
     GLuint                                  m_program_2DSpace_degbug;
@@ -104,6 +119,12 @@ private:
     GLuint                                  m_program_2DSpace_Selection;
 
     AbstractionSpace                        *m_2dspace;
+
+    // Paths Management
+    std::vector<Path>                       m_paths_list;
+    Path                                    m_activePath;
+    bool                                    m_tracing;
+    int                                     m_trace_X;
 
 };
 

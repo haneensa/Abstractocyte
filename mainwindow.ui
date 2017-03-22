@@ -47,7 +47,7 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>372</width>
+     <width>377</width>
      <height>1200</height>
     </size>
    </property>
@@ -226,7 +226,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
@@ -373,7 +373,7 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>344</width>
+              <width>349</width>
               <height>848</height>
              </rect>
             </property>
@@ -665,6 +665,117 @@
          </item>
         </layout>
        </widget>
+       <widget class="QWidget" name="tab_5">
+        <attribute name="title">
+         <string>Path</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_13">
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="groupBox_10">
+           <property name="title">
+            <string>Record Path</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_12">
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Note</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLineEdit" name="lineEdit_2"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Path Name</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QPushButton" name="pushButton_7">
+              <property name="text">
+               <string>Save</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QFrame" name="frame_3">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <item>
+                <widget class="QPushButton" name="pushButton_5">
+                 <property name="text">
+                  <string>Start</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButton_6">
+                 <property name="text">
+                  <string>Stop</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLineEdit" name="lineEdit_3"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="groupBox_11">
+           <property name="title">
+            <string>Active Path</string>
+           </property>
+           <layout class="QFormLayout" name="formLayout_3">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_15">
+              <property name="text">
+               <string>Retrace</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSlider" name="horizontalSlider_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QGroupBox" name="groupBox_9">
+           <property name="title">
+            <string>Paths List</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_11">
+            <item row="0" column="0">
+             <widget class="QListWidget" name="listWidget_2"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QPushButton" name="pushButton_8">
+              <property name="text">
+               <string>Export Paths</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
        <widget class="QWidget" name="tab_3">
         <attribute name="title">
          <string>Encodeing</string>
@@ -829,10 +940,24 @@
              </property>
             </widget>
            </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_12">
+             <property name="text">
+              <string>Max Vertex Movement</string>
+             </property>
+            </widget>
+           </item>
            <item row="5" column="1">
             <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
              <property name="singleStep">
               <double>0.100000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>Max Force</string>
              </property>
             </widget>
            </item>
@@ -843,20 +968,6 @@
              </property>
              <property name="singleStep">
               <double>0.100000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_12">
-             <property name="text">
-              <string>Max Vertex Movement</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_11">
-             <property name="text">
-              <string>Max Force</string>
              </property>
             </widget>
            </item>
@@ -887,6 +998,12 @@
     <slot>getSlotsY(int)</slot>
     <slot>slot1()</slot>
     <slot>getAbstractionData(AbstractionSpace*)</slot>
+    <slot>startPath()</slot>
+    <slot>endPath()</slot>
+    <slot>retracePath(int)</slot>
+    <slot>namePath(QString)</slot>
+    <slot>savePath()</slot>
+    <slot>describePath(QString)</slot>
    </slots>
   </customwidget>
   <customwidget>
@@ -921,6 +1038,7 @@
     <slot>getResetFitlerButtonClicked(bool)</slot>
     <slot>clearSelectedObjectsTable()</slot>
     <slot>hideSelectedObjects()</slot>
+    <slot>highlightSelected(QModelIndex)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -1387,6 +1505,118 @@
     <hint type="destinationlabel">
      <x>412</x>
      <y>804</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tableView</sender>
+   <signal>pressed(QModelIndex)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>highlightSelected(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>310</x>
+     <y>535</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>439</x>
+     <y>539</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_5</sender>
+   <signal>clicked()</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>startPath()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>65</x>
+     <y>487</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>51</x>
+     <y>278</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_6</sender>
+   <signal>clicked()</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>endPath()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>292</x>
+     <y>486</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>267</x>
+     <y>186</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider_2</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>retracePath(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>674</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>240</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEdit_2</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>namePath(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>326</x>
+     <y>545</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>290</x>
+     <y>277</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_7</sender>
+   <signal>clicked()</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>savePath()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>320</x>
+     <y>617</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>290</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEdit_3</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>openGLWidget_2</receiver>
+   <slot>describePath(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>302</x>
+     <y>591</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>296</x>
+     <y>191</y>
     </hint>
    </hints>
   </connection>

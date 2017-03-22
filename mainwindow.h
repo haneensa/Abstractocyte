@@ -43,11 +43,12 @@ public slots:
     void on_object_clicked(QList<QStandardItem*>);
     void clearTable();
     void RemoveRowAt(QModelIndex);
-
+    void getIDAt(QModelIndex);
     void checkAllListWidget();
 
 signals:
     void getDeletedData(int);
+    void getIDAtSelectedRow(int);
 
 private:
     Ui::MainWindow *mainwindow_ui;

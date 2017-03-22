@@ -46,7 +46,8 @@ SOURCES += main.cpp\
     dbscan.cpp \
     grid3d.cpp \
     spatialhash3d.cpp \
-    rendervertexdata.cpp
+    rendervertexdata.cpp \
+    path.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -74,7 +75,8 @@ HEADERS  += mainwindow.h \
     dbscan.h \
     grid3d.h \
     spatialhash3d.h \
-    rendervertexdata.h
+    rendervertexdata.h \
+    path.h
 
 
 FORMS    += mainwindow.ui
