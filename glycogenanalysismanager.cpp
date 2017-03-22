@@ -15,6 +15,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 		m_glycogenOctree = octree;
 		m_boutonHash = 0;
 		m_spineHash = 0;
+		m_current_max_glycogen_volume = 0;
 		m_verticesList = allvertices;
 	}
 
@@ -114,8 +115,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			return;
 
 		//clear previous mappings
-		m_glycogenIdToObjectVertexIndexMapping.clear();
-		m_objectIdToGlycogenMapping.clear();
+		clearMapping();
 		//loop on glycogen granules
 		for (auto iter = m_glycogenVertexDataList->begin(); iter != m_glycogenVertexDataList->end(); iter++)
 		{
@@ -132,12 +132,19 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			{
 				//object id is already in the list - update its list
 				m_objectIdToGlycogenMapping.at(boutonVertex->id())[glycogenVertex->id()] = boutonVertex->index;
+				m_objectIdGlycogenVolumeMapped[boutonVertex->id()] += glycogenVertex->skeleton_vertex.y();
 			}
 			else
 			{
 				//object id is not already in the list - new list for it
 				m_objectIdToGlycogenMapping[boutonVertex->id()] = std::map<int, int>();
 				m_objectIdToGlycogenMapping.at(boutonVertex->id())[glycogenVertex->id()] = boutonVertex->index;
+				m_objectIdGlycogenVolumeMapped[boutonVertex->id()] = glycogenVertex->skeleton_vertex.y();
+			}
+			float currentVolumeValue = m_objectIdGlycogenVolumeMapped.at(boutonVertex->id());
+			if (m_current_max_glycogen_volume < currentVolumeValue)
+			{
+				m_current_max_glycogen_volume = currentVolumeValue;
 			}
 		}
 	}
@@ -151,8 +158,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			return;
 
 		//clear previous mappings
-		m_glycogenIdToObjectVertexIndexMapping.clear();
-		m_objectIdToGlycogenMapping.clear();
+		clearMapping();
 		//loop on glycogen granules
 		for (auto iter = m_glycogenVertexDataList->begin(); iter != m_glycogenVertexDataList->end(); iter++)
 		{
@@ -169,12 +175,19 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			{
 				//object id is already in the list - update its list
 				m_objectIdToGlycogenMapping.at(spineVertex->id())[glycogenVertex->id()] = spineVertex->index;
+				m_objectIdGlycogenVolumeMapped[spineVertex->id()] += glycogenVertex->skeleton_vertex.y();
 			}
 			else
 			{
 				//object id is not already in the list - new list for it
 				m_objectIdToGlycogenMapping[spineVertex->id()] = std::map<int, int>();
 				m_objectIdToGlycogenMapping.at(spineVertex->id())[glycogenVertex->id()] = spineVertex->index;
+				m_objectIdGlycogenVolumeMapped[spineVertex->id()] = glycogenVertex->skeleton_vertex.y();
+			}
+			float currentVolumeValue = m_objectIdGlycogenVolumeMapped.at(spineVertex->id());
+			if (m_current_max_glycogen_volume < currentVolumeValue)
+			{
+				m_current_max_glycogen_volume = currentVolumeValue;
 			}
 		}
 	}
@@ -188,8 +201,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			return;
 
 		//clear previous mappings
-		m_glycogenIdToObjectVertexIndexMapping.clear();
-		m_objectIdToGlycogenMapping.clear();
+		clearMapping();
 		//loop on glycogen granules
 		for (auto iter = m_glycogenVertexDataList->begin(); iter != m_glycogenVertexDataList->end(); iter++)
 		{
@@ -232,12 +244,19 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			{
 				//object id is already in the list - update its list
 				m_objectIdToGlycogenMapping.at(nearestVertex->id())[glycogenVertex->id()] = nearestVertex->index;
+				m_objectIdGlycogenVolumeMapped[nearestVertex->id()] += glycogenVertex->skeleton_vertex.y();
 			}
 			else
 			{
 				//object id is not already in the list - new list for it
 				m_objectIdToGlycogenMapping[nearestVertex->id()] = std::map<int, int>();
 				m_objectIdToGlycogenMapping.at(nearestVertex->id())[glycogenVertex->id()] = nearestVertex->index;
+				m_objectIdGlycogenVolumeMapped[nearestVertex->id()] = glycogenVertex->skeleton_vertex.y();
+			}
+			float currentVolumeValue = m_objectIdGlycogenVolumeMapped.at(nearestVertex->id());
+			if (m_current_max_glycogen_volume < currentVolumeValue)
+			{
+				m_current_max_glycogen_volume = currentVolumeValue;
 			}
 		}
 
@@ -252,8 +271,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			return;
 
 		//clear previous mappings
-		m_glycogenIdToObjectVertexIndexMapping.clear();
-		m_objectIdToGlycogenMapping.clear();
+		clearMapping();
 		//loop on clusters
 		for (auto iter = m_clusterResults.begin(); iter != m_clusterResults.end(); iter++)
 		{
@@ -280,12 +298,19 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			{
 				//object id is already in the list - update its list
 				m_objectIdToGlycogenMapping.at(boutonVertex->id())[cluster->getID()] = boutonVertex->index;
+				m_objectIdGlycogenVolumeMapped[boutonVertex->id()] += cluster->getTotalVolume();
 			}
 			else
 			{
 				//object id is not already in the list - new list for it
 				m_objectIdToGlycogenMapping[boutonVertex->id()] = std::map<int, int>();
 				m_objectIdToGlycogenMapping.at(boutonVertex->id())[cluster->getID()] = boutonVertex->index;
+				m_objectIdGlycogenVolumeMapped[boutonVertex->id()] = cluster->getTotalVolume();
+			}
+			float currentVolumeValue = m_objectIdGlycogenVolumeMapped.at(boutonVertex->id());
+			if (m_current_max_glycogen_volume < currentVolumeValue)
+			{
+				m_current_max_glycogen_volume = currentVolumeValue;
 			}
 		}
 	}
@@ -299,8 +324,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			return;
 
 		//clear previous mappings
-		m_glycogenIdToObjectVertexIndexMapping.clear();
-		m_objectIdToGlycogenMapping.clear();
+		clearMapping();
 		//loop on clusters
 		for (auto iter = m_clusterResults.begin(); iter != m_clusterResults.end(); iter++)
 		{
@@ -326,12 +350,19 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			{
 				//object id is already in the list - update its list
 				m_objectIdToGlycogenMapping.at(spineVertex->id())[cluster->getID()] = spineVertex->index;
+				m_objectIdGlycogenVolumeMapped[spineVertex->id()] += cluster->getTotalVolume();
 			}
 			else
 			{
 				//object id is not already in the list - new list for it
 				m_objectIdToGlycogenMapping[spineVertex->id()] = std::map<int, int>();
 				m_objectIdToGlycogenMapping.at(spineVertex->id())[cluster->getID()] = spineVertex->index;
+				m_objectIdGlycogenVolumeMapped[spineVertex->id()] = cluster->getTotalVolume();
+			}
+			float currentVolumeValue = m_objectIdGlycogenVolumeMapped.at(spineVertex->id());
+			if (m_current_max_glycogen_volume < currentVolumeValue)
+			{
+				m_current_max_glycogen_volume = currentVolumeValue;
 			}
 		}
 	}
@@ -345,7 +376,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			return;
 
 		//clear previous mappings
-		m_glycogenIdToObjectVertexIndexMapping.clear();
+		clearMapping();
 		//loop on clusters
 		for (auto iter = m_clusterResults.begin(); iter != m_clusterResults.end(); iter++)
 		{
@@ -406,12 +437,29 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			{
 				//object id is already in the list - update its list
 				m_objectIdToGlycogenMapping.at(nearestVertex->id())[cluster->getID()] = nearestVertex->index;
+				m_objectIdGlycogenVolumeMapped[nearestVertex->id()] += cluster->getTotalVolume();
 			}
 			else
 			{
 				//object id is not already in the list - new list for it
 				m_objectIdToGlycogenMapping[nearestVertex->id()] = std::map<int, int>();
 				m_objectIdToGlycogenMapping.at(nearestVertex->id())[cluster->getID()] = nearestVertex->index;
+				m_objectIdGlycogenVolumeMapped[nearestVertex->id()] = cluster->getTotalVolume();
+			}
+			float currentVolumeValue = m_objectIdGlycogenVolumeMapped.at(nearestVertex->id());
+			if (m_current_max_glycogen_volume < currentVolumeValue)
+			{
+				m_current_max_glycogen_volume = currentVolumeValue;
 			}
 		}
+	}
+
+	//--------------------------------------------------------------------------------
+	// 
+	void GlycogenAnalysisManager::clearMapping()
+	{
+		m_current_max_glycogen_volume = 0;
+		m_objectIdGlycogenVolumeMapped.clear();
+		m_glycogenIdToObjectVertexIndexMapping.clear();
+		m_objectIdToGlycogenMapping.clear();
 	}

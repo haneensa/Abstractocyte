@@ -64,17 +64,19 @@ public:
     void loadParentFromHVGX(QString path);
 
 	//glycogen
-    int getGlycogenSize()              { return m_glycogenMap.size(); }
-    std::map<int, Glycogen*> getGlycogenMap() { return m_glycogenMap; }
-	std::map<int, Glycogen*>* getGlycogenMapPtr() { return &m_glycogenMap; }
-	std::vector<VertexData*>* getGlycogenVertexDataPtr() { return &m_glycogenList; }
-	SpacePartitioning::Octree* getGlycogenOctree() { return &m_glycogenOctree; }
+    int									getGlycogenSize() { return m_glycogenMap.size(); }
+    std::map<int, Glycogen*>			getGlycogenMap() { return m_glycogenMap; }
+	std::map<int, Glycogen*>*			getGlycogenMapPtr() { return &m_glycogenMap; }
+	std::vector<VertexData*>*			getGlycogenVertexDataPtr() { return &m_glycogenList; }
+	SpacePartitioning::Octree*			getGlycogenOctree() { return &m_glycogenOctree; }
 
-	SpacePartitioning::Octree* getSpineOctree() { return &m_spineOctree; }
-	SpacePartitioning::Octree* getBoutonOctree() { return &m_boutonOctree; }
-	SpacePartitioning::SpatialHash3D* getSpineHash() { return &m_spineHash; }
-	SpacePartitioning::SpatialHash3D* getBoutonHash() { return &m_boutonHash; }
-	unsigned char* getGlycogen3DGridData();
+	//SpacePartitioning::Octree* getSpineOctree() { return &m_spineOctree; }
+	//SpacePartitioning::Octree* getBoutonOctree() { return &m_boutonOctree; }
+	SpacePartitioning::SpatialHash3D*	getSpineHash() { return &m_spineHash; }
+	SpacePartitioning::SpatialHash3D*	getBoutonHash() { return &m_boutonHash; }
+	unsigned char*						getGlycogen3DGridData();
+	void								resetMappingValues();
+
 
     // graph related function
     std::map<int, Object*>  getObjectsMap();
@@ -88,6 +90,7 @@ public:
     Object_t getObjectTypeByID(int hvgxID);
     std::string getObjectName(int hvgxID);
     std::vector<Object*> getObjectsByType(Object_t type);
+	Object* getObject(int hvgxID);
 
     float getMaxAstroCoverage()   { return max_astro_coverage; }
     int getMaxVolume()          { return max_volume; }
@@ -119,6 +122,7 @@ protected:
 
     int                                         m_limit;
 
+	// objects
     std::map<int, int>                          m_parents;
     std::map<int, Object*>                      m_objects;
     std::map<Object_t, std::vector<Object*> >   m_objectsByType;
@@ -134,8 +138,8 @@ protected:
 	SpacePartitioning::Grid3D					m_glycogen3DGrid;
 
 	// octrees
-    SpacePartitioning::Octree                   m_spineOctree;
-    SpacePartitioning::Octree                   m_boutonOctree;
+    //SpacePartitioning::Octree                   m_spineOctree;
+    //SpacePartitioning::Octree                   m_boutonOctree;
     SpacePartitioning::Octree                   m_glycogenOctree;
 	SpacePartitioning::SpatialHash3D			m_boutonHash;
 	SpacePartitioning::SpatialHash3D			m_spineHash;

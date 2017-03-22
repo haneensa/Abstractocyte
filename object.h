@@ -94,6 +94,9 @@ public:
     std::vector<Object*> getSynapses()          { return m_synapses; }
     struct synapse getSynapseData()             { return m_synapse_data; }
 
+	void setMappedValue(float value){ m_mappedValue = value; }
+	float getMappedValue() { return m_mappedValue; }
+
 private:
     std::string                             m_name;
     int                                     m_ID; // hvgx
@@ -127,6 +130,7 @@ private:
 
     std::vector<int>                        m_VertexidxCloseToAstro;  // less than ASTRO_DIST_THRESH ----> we can refine this later
     float                                     m_averageDistance;
+	float									m_mappedValue;
 
     // list of synapses
     std::vector<Object*>                    m_synapses;

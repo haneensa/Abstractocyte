@@ -243,6 +243,8 @@ void MainWindow::on_glycogenClustersTreeWidget_itemSelectionChanged()
 //
 void MainWindow::on_mapGlycogenGranulesButton_clicked()
 {
+	mainwindow_ui->glycogenMappingTreeWidget->clear();
+
     GlycogenAnalysisManager* gam = getGLWidget()->getGlycogenAnalysisManager();
 
     bool boutons = mainwindow_ui->glycogenMapToBoutonsCheckBox->isChecked();
@@ -250,15 +252,19 @@ void MainWindow::on_mapGlycogenGranulesButton_clicked()
     bool clusters = false;
 
     std::map<int, std::map<int, int>>* results = gam->computeGlycogenMapping(boutons, spines, clusters);
+	std::map<int, float>* result_volumes = gam->getCurrentMappingVolumes();
+	float result_max_volume = gam->getCurrentMappedMaxVolume();
 
     DataContainer* dc = getGLWidget()->getDataContainer();
-    std::map<int, Object*>* objects = dc->getObjectsMapPtr();
+	dc->resetMappingValues();
+	std::map<int, Object*>* objects = dc->getObjectsMapPtr();
 
-    mainwindow_ui->glycogenMappingTreeWidget->setColumnCount(3);
+    mainwindow_ui->glycogenMappingTreeWidget->setColumnCount(4);
     QStringList headerLabels;
     headerLabels.push_back(tr("Object ID"));
     headerLabels.push_back(tr("Name"));
     headerLabels.push_back(tr("Granules"));
+	headerLabels.push_back(tr("Total Volume"));
     mainwindow_ui->glycogenMappingTreeWidget->setHeaderLabels(headerLabels);
 
     //fill mapping tree widget
@@ -275,6 +281,12 @@ void MainWindow::on_mapGlycogenGranulesButton_clicked()
 
         map_item->setText(1, QString(current_object->getName().c_str()));
         map_item->setText(2, QString::number(iter->second.size()));
+		float volume = result_volumes->at(object_id);
+		map_item->setText(3, QString::number(volume, 'f', 4));
+
+		//set total volume value to object to color code
+		current_object->setMappedValue(volume / result_max_volume);
+
     }
 }
 
@@ -284,6 +296,8 @@ void MainWindow::on_mapGlycogenClustersButton_clicked()
 {
     if (m_clusters && m_clusters->size() > 0)
     {
+		mainwindow_ui->glycogenMappingTreeWidget->clear();
+
         GlycogenAnalysisManager* gam = getGLWidget()->getGlycogenAnalysisManager();
 
         bool boutons = mainwindow_ui->glycogenMapToBoutonsCheckBox->isChecked();
@@ -291,15 +305,19 @@ void MainWindow::on_mapGlycogenClustersButton_clicked()
         bool clusters = true;
 
         std::map<int, std::map<int, int>>* results = gam->computeGlycogenMapping(boutons, spines, clusters);
+		std::map<int, float>* result_volumes = gam->getCurrentMappingVolumes();
+		float result_max_volume = gam->getCurrentMappedMaxVolume();
 
         DataContainer* dc = getGLWidget()->getDataContainer();
+		dc->resetMappingValues();
         std::map<int, Object*>* objects = dc->getObjectsMapPtr();
 
-        mainwindow_ui->glycogenMappingTreeWidget->setColumnCount(3);
+        mainwindow_ui->glycogenMappingTreeWidget->setColumnCount(4);
         QStringList headerLabels;
         headerLabels.push_back(tr("Object ID"));
         headerLabels.push_back(tr("Name"));
         headerLabels.push_back(tr("Clusters"));
+		headerLabels.push_back(tr("Total Volume"));
         mainwindow_ui->glycogenMappingTreeWidget->setHeaderLabels(headerLabels);
 
         //fill mapping tree widget
@@ -316,9 +334,12 @@ void MainWindow::on_mapGlycogenClustersButton_clicked()
 
             map_item->setText(1, QString(current_object->getName().c_str()));
             map_item->setText(2, QString::number(iter->second.size()));
+			float volume = result_volumes->at(object_id);
+			map_item->setText(3, QString::number(volume, 'f', 4));
+
+			//set total volume value to object to color code
+			current_object->setMappedValue(volume / result_max_volume);
         }
-
-
     }
     else
     {

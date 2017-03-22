@@ -36,6 +36,7 @@ Object::Object(std::string name, int ID)
     m_function = -1;
     qDebug() << "create " << m_name.data() << " hvgxID: " << m_ID;
     m_averageDistance = 0;
+	m_mappedValue = 0;
 }
 
 Object::~Object()

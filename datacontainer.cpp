@@ -1196,6 +1196,14 @@ unsigned char* DataContainer::getGlycogen3DGridData()
         return m_glycogen3DGrid.getData8Bit();
 }
 
+void DataContainer::resetMappingValues()
+{
+	for (auto iter = m_objects.begin(); iter != m_objects.end(); iter++)
+	{
+		iter->second->setMappedValue(0);
+	}
+}
+
 //----------------------------------------------------------------------------
 //
 std::map<int, Object*>  DataContainer::getObjectsMap()
@@ -1228,12 +1236,23 @@ std::vector<Object*> DataContainer::getObjectsByType(Object_t type)
   return m_objectsByType[type];
 }
 
+//----------------------------------------------------------------------------
+//
  std::string DataContainer::getObjectName(int hvgxID)
  {
      if (m_objects.find(hvgxID) == m_objects.end())
          return "Unknown";
 
      return m_objects[hvgxID]->getName();
+ }
+
+ //----------------------------------------------------------------------------
+ //
+ Object* DataContainer::getObject(int hvgxID)
+ {
+	 if (m_objects.find(hvgxID) == m_objects.end())
+		 return 0;
+	 else return m_objects.at(hvgxID);
  }
 
  //----------------------------------------------------------------------------

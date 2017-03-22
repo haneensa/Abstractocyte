@@ -30,10 +30,13 @@ class GlycogenAnalysisManager
 
 		std::map<int, std::map<int, int>>*  computeGlycogenMapping(bool boutons, bool spines, bool clusters);
 		
-		
+		std::map<int, float>* getCurrentMappingVolumes() { return &m_objectIdGlycogenVolumeMapped; };
+
+		float getCurrentMappedMaxVolume() { return m_current_max_glycogen_volume; }
 
 	protected:
 		void clear();
+		void clearMapping();
 
 		void computeGlycogenMappingToBoutons();
 		void computeGlycogenMappingToSpines();
@@ -43,26 +46,32 @@ class GlycogenAnalysisManager
 		void computeGlycogenClusterMappingToBoutonsAndSpines();
 
 		//list of all vertices pointer
-		std::vector< struct VertexData >*		m_verticesList;
+		std::vector< struct VertexData >*			m_verticesList;
 
 		//glycogen data pointers
-		std::map<int, Glycogen*>* m_glycogenMap;
-		std::vector<VertexData*>* m_glycogenVertexDataList;
+		std::map<int, Glycogen*>*					m_glycogenMap;
+		std::vector<VertexData*>*					m_glycogenVertexDataList;
 
 		//dbscan algorithm
-		Clustering::DBScan		  m_dbscan; 
+		Clustering::DBScan							m_dbscan; 
 
 		//octrees 
-		SpacePartitioning::SpatialHash3D*				m_spineHash;
-		SpacePartitioning::SpatialHash3D*				m_boutonHash;
-		SpacePartitioning::Octree*				m_glycogenOctree;
+		SpacePartitioning::SpatialHash3D*			m_spineHash;
+		SpacePartitioning::SpatialHash3D*			m_boutonHash;
+		SpacePartitioning::Octree*					m_glycogenOctree;
 
 		//clustering results list
 		std::map<int, Clustering::GlycogenCluster*> m_clusterResults;
 
-		//mapping results lists
-		std::map<int, int> m_glycogenIdToObjectVertexIndexMapping;
-		std::map<int, std::map<int, int>> m_objectIdToGlycogenMapping;
+		//------mapping results lists------------------------
+		// glycogen id -> vertex index
+		std::map<int, int>							m_glycogenIdToObjectVertexIndexMapping;
+		// object id -> (glycogen/cluster id) -> vertex index
+		std::map<int, std::map<int, int>>			m_objectIdToGlycogenMapping;
+		// object id -> glycogen volume mapped
+		std::map<int, float>						m_objectIdGlycogenVolumeMapped;
+		//current maximum glycogen volume associated with one object (max of above list)
+		float										m_current_max_glycogen_volume;
 };
 
 

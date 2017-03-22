@@ -1933,6 +1933,14 @@ void OpenGLManager::updateSSBO()
 {
     std::map<int, Object*> *objectMap = m_dataContainer->getObjectsMapPtr();
 
+	float glycogen_tf[15] = { 
+		254.0 / 255.0, 235.0 / 255.0, 226.0 / 255.0, 
+		251.0 / 255.0, 180.0 / 255.0, 185.0 / 255.0,
+		247.0 / 255.0, 104.0 / 255.0, 161.0 / 255.0,
+		197.0 / 255.0, 27.0 / 255.0, 138.0 / 255.0,
+		122.0 / 255.0, 1.0 / 255.0, 119.0 / 255.0
+	};
+
     for ( auto iter = objectMap->begin(); iter != objectMap->end(); iter++ ) {
         Object *obj = (*iter).second;
         if (obj->isFiltered() || obj->getObjectType() == Object_t::ASTROCYTE)
@@ -1961,6 +1969,7 @@ void OpenGLManager::updateSSBO()
             m_ssbo_data[hvgxID].info.setX( 20 *  volume);
 
         }
+
 
         switch(m_color_encoding) {
             case Color_e::TYPE:
@@ -2001,6 +2010,79 @@ void OpenGLManager::updateSSBO()
 
               break;
             }
+			case Color_e::GLYCOGEN_MAPPING:
+				
+				if (obj->getObjectType() == Object_t::AXON || obj->getObjectType() == Object_t::DENDRITE)
+				{
+					m_ssbo_data[hvgxID].color.setX(0.7);
+					m_ssbo_data[hvgxID].color.setY(0.7);
+					m_ssbo_data[hvgxID].color.setZ(0.7);
+				}
+				else if (obj->getObjectType() == Object_t::SPINE || obj->getObjectType() == Object_t::BOUTON)
+				{
+					//TODO: Ugly - change later
+					float mappedValue = obj->getMappedValue();
+					float r = 0.0; float r1 = 0.0; float r2 = 0.0;
+					float g = 0.0; float g1 = 0.0; float g2 = 0.0;
+					float b = 0.0; float b1 = 0.0; float b2 = 0.0;
+					float mix = 0.0;
+					if (mappedValue > 0.75)
+					{
+						mix = (mappedValue - 0.75) / 0.25;
+						r1 = glycogen_tf[4 * 3];
+						g1 = glycogen_tf[4 * 3 + 1];
+						b1 = glycogen_tf[4 * 3 + 2];
+						r2 = glycogen_tf[3 * 3];
+						g2 = glycogen_tf[3 * 3 + 1];
+						b2 = glycogen_tf[3 * 3 + 2];
+						r = r1 * mix + r2 * (1 - mix);
+						g = g1 * mix + g2 * (1 - mix);
+						b = b1 * mix + b2 * (1 - mix);
+					}
+					else if (mappedValue > 0.5)
+					{
+						mix = (mappedValue - 0.5) / 0.25;
+						r1 = glycogen_tf[3 * 3];
+						g1 = glycogen_tf[3 * 3 + 1];
+						b1 = glycogen_tf[3 * 3 + 2];
+						r2 = glycogen_tf[2 * 3];
+						g2 = glycogen_tf[2 * 3 + 1];
+						b2 = glycogen_tf[2 * 3 + 2];
+						r = r1 * mix + r2 * (1 - mix);
+						g = g1 * mix + g2 * (1 - mix);
+						b = b1 * mix + b2 * (1 - mix);
+					}
+					else if (mappedValue > 0.25)
+					{
+						mix = (mappedValue - 0.25) / 0.25;
+						r1 = glycogen_tf[2 * 3];
+						g1 = glycogen_tf[2 * 3 + 1];
+						b1 = glycogen_tf[2 * 3 + 2];
+						r2 = glycogen_tf[1 * 3];
+						g2 = glycogen_tf[1 * 3 + 1];
+						b2 = glycogen_tf[1 * 3 + 2];
+						r = r1 * mix + r2 * (1 - mix);
+						g = g1 * mix + g2 * (1 - mix);
+						b = b1 * mix + b2 * (1 - mix);
+					}
+					else
+					{
+						mix = mappedValue / 0.25;
+						r1 = glycogen_tf[1 * 3];
+						g1 = glycogen_tf[1 * 3 + 1];
+						b1 = glycogen_tf[1 * 3 + 2];
+						r2 = glycogen_tf[0 * 3];
+						g2 = glycogen_tf[0 * 3 + 1];
+						b2 = glycogen_tf[0 * 3 + 2];
+						r = r1 * mix + r2 * (1 - mix);
+						g = g1 * mix + g2 * (1 - mix);
+						b = b1 * mix + b2 * (1 - mix);
+					}
+					m_ssbo_data[hvgxID].color.setX(r);
+					m_ssbo_data[hvgxID].color.setY(g);
+					m_ssbo_data[hvgxID].color.setZ(b);
+				}
+				break;
         }
     }
 }

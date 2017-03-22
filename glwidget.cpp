@@ -534,7 +534,8 @@ void GLWidget::getColorEncoding(QString encoding)
         m_opengl_mngr->updateColorEncoding(Color_e::ASTRO_COVERAGE);
     else if (encoding == "Function")
         m_opengl_mngr->updateColorEncoding(Color_e::FUNCTION);
-
+	else if (encoding == "Glycogen Distribution")
+		m_opengl_mngr->updateColorEncoding(Color_e::GLYCOGEN_MAPPING);
     update();
 }
 

@@ -18,7 +18,7 @@
 #include "rendervertexdata.h"
 
 enum class Size_e { VOLUME, ASTRO_COVERAGE };
-enum class Color_e { TYPE, FUNCTION, ASTRO_COVERAGE };
+enum class Color_e { TYPE, FUNCTION, ASTRO_COVERAGE, GLYCOGEN_MAPPING };
 
 
 class OpenGLManager : public MainOpenGL
