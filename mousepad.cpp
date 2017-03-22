@@ -20,6 +20,9 @@ MousePad::MousePad(QWidget *parent)
     m_2dspace = NULL;
     m_tracing = false;
     m_trace_X = 0;
+    m_pathsIDs = 0;
+
+    m_activePath = NULL;
 }
 
 MousePad::~MousePad()
@@ -340,8 +343,9 @@ void MousePad::initializeGL()
 
 
     // test one path
-     m_activePath.setID(m_paths_list.size()); // later when we create new paths add IDs incrementaly
-     m_activePath.initPath();
+    m_activePath = new Path(0); // no path yet
+    m_activePath->initPath();
+    signalPathName(m_activePath->getName());
 }
 
 void MousePad::render2D_DebugSpace()
@@ -392,9 +396,9 @@ void MousePad::paintGL()
     m_vao_circle.release();
 
     if (m_tracing) {
-        m_activePath.tracePath(m_projection, m_trace_X);
+        m_activePath->tracePath(m_projection, m_trace_X);
     } else {
-        m_activePath.drawPath(m_projection);
+        m_activePath->drawPath(m_projection);
     }
 
     render2D_GridSpace();
@@ -454,7 +458,7 @@ void MousePad::mouseMoveEvent(QMouseEvent *event)
     if (allowed &&  m_tracing == false) {
         QVector2D path_point = QVector2D((float)x/(float)viewport[2],  (float)y/(float)viewport[3]);
         QVector2D selection_point = QVector2D(x, y);
-        m_activePath.addPoint(path_point, selection_point);
+        m_activePath->addPoint(path_point, selection_point);
     }
 }
 
@@ -602,21 +606,23 @@ bool MousePad::processSelection(float x, float y)
 //************ Path Management ****************************
 void MousePad::startPath()
 {
+
+
     qDebug() << "start Recording Path";
-    m_activePath.resetPath();
-    m_activePath.updateRecordingFlag(true);
+    m_activePath->resetPath();
+    m_activePath->updateRecordingFlag(true);
     m_tracing = false;
 }
 
 void MousePad::endPath()
 {
   qDebug() << "end path recording";
-  m_activePath.updateRecordingFlag(false);
+  m_activePath->updateRecordingFlag(false);
 }
 
 void MousePad::retracePath(int x) // 0 - 100
 {
-    QVector2D currentXY = m_activePath.getXY(x);
+    QVector2D currentXY = m_activePath->getXY(x);
 
     m_trace_X = x;
     m_tracing = true;
@@ -630,15 +636,73 @@ void MousePad::retracePath(int x) // 0 - 100
 
 void MousePad::namePath(QString name)
 {
-    m_activePath.namePath(name);
+    m_activePath->namePath(name);
 }
 
 void MousePad::describePath(QString note)
 {
-    m_activePath.addNote(note);
+    m_activePath->addNote(note);
 }
 
 void MousePad::savePath()
 {
-    qDebug() << "Add path to list and save it somewhere";
+    // we either create new one or update old one
+    QString pathLabel = m_activePath->getName();
+
+    if (m_paths_list.find( pathLabel ) == m_paths_list.end() ) {
+
+        makeCurrent();
+        m_activePath->setID(m_pathsIDs++);
+        // no path yet, add new with ID starting from 0
+        Path *newPath = new Path(m_activePath);
+        newPath->initPath();
+        doneCurrent();
+        m_paths_list[ pathLabel ] = newPath;
+        m_activePath = newPath;
+
+        addPathtoList( pathLabel );
+    } else {
+         // else update old one, get pointer and update the values there
+        Path *oldPath = m_paths_list[pathLabel];
+        oldPath->updatePath(m_activePath);
+    }
+
+
+
+    update();
+}
+
+void MousePad::updateActivePath(QModelIndex index)
+{
+    selectedPathIndex = index;
+    signalSelectedPath(index);
+}
+
+void MousePad::getSelectedPathLabel(QString pathlabel)
+{
+    if (m_paths_list.find( pathlabel ) != m_paths_list.end() ) {
+        // make this as active path
+        m_activePath = m_paths_list[pathlabel];
+        qDebug() << "Set Active Path to: " << pathlabel << " ID: " << m_activePath->getID();
+    }
+}
+
+void MousePad::deleteSelectedPath()
+{
+    signalDeletePath(selectedPathIndex);
+}
+
+void MousePad::getSelectedPathLabelToDelete(QString pathlabel)
+{
+    if (m_paths_list.find( pathlabel ) != m_paths_list.end() ) {
+        qDebug() << "Delete" << pathlabel;
+        if (m_paths_list.size() == 1) { // the only path in the list
+            m_activePath = m_paths_list[pathlabel];
+        } else {
+            delete m_paths_list[pathlabel];
+            m_paths_list.erase(pathlabel);
+            QString labelFirstPath = m_paths_list.begin()->first;
+            m_activePath = m_paths_list[labelFirstPath];
+        }
+    }
 }

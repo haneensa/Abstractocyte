@@ -46,9 +46,19 @@ public slots:
     void getIDAt(QModelIndex);
     void checkAllListWidget();
 
+
+    // Path Management
+    void getPath(QString);
+    void getSelectedPathIndex(QModelIndex);
+    void deleteSelectedPath(QModelIndex);
+
 signals:
     void getDeletedData(int);
     void getIDAtSelectedRow(int);
+
+    // path
+    void signalPathLabel(QString);
+    void signalDeletedPathLabel(QString);
 
 private:
     Ui::MainWindow *mainwindow_ui;

@@ -1,18 +1,33 @@
 #include "path.h"
 
-Path::Path()
+Path::Path(int ID)
     :   m_vbo( QOpenGLBuffer::VertexBuffer )
 {
     qDebug() << "Create new path";
     m_recording = false;
-    m_ID = -1;
-    m_name = "None";
+    m_ID = ID;
+    m_name = QString("Path_%1").arg(m_ID);
     m_note = "None";
+}
+
+Path::Path(Path *p)
+{
+   updatePath(p);
 }
 
 Path::~Path()
 {
 
+}
+
+void Path::updatePath(Path *p)
+{
+    m_recording = p->getRecordingFlag();
+    m_ID = p->getID();
+    m_name = p->getName();
+    m_note = p->getNote();
+    m_path = p->getPath();
+    m_selectionPath = p->getSelectionPath();
 }
 
 void Path::addPoint(QVector2D point, QVector2D selection)
@@ -160,4 +175,16 @@ QVector2D Path::getXY(int x)
     }
 
     return m_selectionPath[range];
+}
+
+void Path::dumpPath()
+{
+    qDebug() << "write path data to a file to load it again later";
+    // name, note, path, filtered objects IDs
+    // write it to as a text file?
+}
+
+void Path::loadPath()
+{
+    qDebug() << "read path from file to load data";
 }

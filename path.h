@@ -6,8 +6,11 @@
 class Path  : public MainOpenGL
 {
 public:
-    Path();
+    Path(int ID);
+    Path(Path *);
     ~Path();
+
+    void updatePath(Path *);
 
     void initPath();
     void drawPath(QMatrix4x4 projection);
@@ -23,6 +26,18 @@ public:
     void setID(int ID)                      { m_ID = ID; }
     void addNote(QString note)              { m_note = note; }
 
+    QString getName()                       { return m_name; }
+
+    void dumpPath();
+    void loadPath();
+
+    bool getRecordingFlag()                         { return m_recording; }
+    int getID()                                     { return m_ID; }
+    QString getNote()                               { return m_note; }
+    std::vector<QVector2D> getPath()                { return m_path; }
+    std::vector<QVector2D> getSelectionPath()       { return m_selectionPath; }
+
+
 protected:
     QString                     m_name;
     int                         m_ID;
@@ -36,6 +51,8 @@ protected:
     GLuint                      m_program;
 
     bool                        m_recording;
+
+    std::vector<int>            m_objects_list; // list of visible objects ?
 };
 
 #endif // PATH_H
