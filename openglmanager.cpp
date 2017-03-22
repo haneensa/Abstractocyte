@@ -66,11 +66,14 @@ bool OpenGLManager::initOpenGLFunctions()
     m_GNeurites.initOpenGLFunctions();
     m_GlycogenPoints.initOpenGLFunctions();
 
-	
-    load3DTexturesFromRaw("mask_745_sigma3.raw", m_astro_3DTex ); // Astrocytic_mitochondria_b.raw
-    load3DTexturesFromRaw("mask_astro_mito_sig10.raw", m_mito_3DTex ); //
-	init_Gly3DTex();
-	upload_Gly3DTex(m_dataContainer->getGlycogen3DGridData(), DIM_G, DIM_G, DIM_G);
+	load3DTexturesFromRaw_3("mask_745_sigma3.raw", "astrocytic_mitochondria_s5.raw", "Neuronic_mitochondria_binary_s5.raw", m_splat_volume_3DTex, GL_TEXTURE2);
+    //load3DTexturesFromRaw("mask_745_sigma3.raw", m_astro_3DTex ); // Astrocytic_mitochondria_b.raw
+    //load3DTexturesFromRaw("astrocytic_mitochondria_s5.raw", m_mito_3DTex ); //
+	//load3DTexturesFromRaw("Neuronic_mitochondria_binary_s5.raw", m_nmito_3DTex);
+	load3DTexturesFromRaw("glycogen_volume_s5.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
+
+	//init_Gly3DTex();
+	//upload_Gly3DTex(m_dataContainer->getGlycogen3DGridData(), DIM_G, DIM_G, DIM_G);
 
     fillVBOsData();
 
@@ -359,12 +362,13 @@ void OpenGLManager::init2DHeatMapTextures()
 
 // ----------------------------------------------------------------------------
 //
-void OpenGLManager::load3DTexturesFromRaw(QString path, GLuint &texture, int sizeX, int sizeY, int sizeZ)
+void OpenGLManager::load3DTexturesFromRaw(QString path, GLuint &texture, GLenum texture_unit, int sizeX, int sizeY, int sizeZ)
 {
-    int size = sizeX * sizeY * sizeZ;
+    unsigned int size = sizeX * sizeY * sizeZ;
 	unsigned char *rawData = (unsigned char *)m_dataContainer->loadRawFile(path, size);
     //load data into a 3D texture
     glGenTextures(1, &texture);
+	glActiveTexture(texture_unit);
     glBindTexture(GL_TEXTURE_3D, texture);
 
      // set the texture parameters
@@ -374,20 +378,72 @@ void OpenGLManager::load3DTexturesFromRaw(QString path, GLuint &texture, int siz
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	unsigned char *bufferRGBA = new unsigned char[size * 4];
+	//unsigned int size_4 = size * 4;
+
+	unsigned char *bufferRGBA = new unsigned char[size];
 
     // convert to rgba
     for (int i = 0; i < size; ++i) {
-        bufferRGBA[i*4] =   (rawData[i] > 0)?255:0; //hack: remove later
-        bufferRGBA[i*4 + 1] = 0;
-        bufferRGBA[i*4 + 2] = 0 ;
-        bufferRGBA[i*4 + 3] = 255;
+		//unsigned int idx = i * 4;
+		bufferRGBA[i] = (rawData[i] > 0) ? 255 : 0; //hack: remove later
+		//bufferRGBA[idx + 1] = 0;
+		//bufferRGBA[idx + 2] = 0;
+		//bufferRGBA[idx + 3] = 255;
     }
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, sizeX, sizeY, sizeZ, 0, GL_RED, GL_UNSIGNED_BYTE, bufferRGBA);
 
-    glTexImage3D(GL_TEXTURE_3D, 0 ,GL_RGBA, sizeX, sizeY, sizeZ,0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) bufferRGBA);
-
+	GL_Error();
+	//glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, sizeX, sizeY, sizeZ, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
     delete [] rawData;
     delete [] bufferRGBA;
+
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::load3DTexturesFromRaw_3(QString path1, QString path2, QString path3, GLuint &texture, GLenum texture_unit, int sizeX, int sizeY, int sizeZ)
+{
+	unsigned int size = sizeX * sizeY * sizeZ;
+	unsigned char *rawData1 = (unsigned char *)m_dataContainer->loadRawFile(path1, size);
+	unsigned char *rawData2 = (unsigned char *)m_dataContainer->loadRawFile(path2, size);
+	unsigned char *rawData3 = (unsigned char *)m_dataContainer->loadRawFile(path3, size);
+	//load data into a 3D texture
+	glGenTextures(1, &texture);
+	glActiveTexture(texture_unit);
+	glBindTexture(GL_TEXTURE_3D, texture);
+
+	// set the texture parameters
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	unsigned int size_3 = size * 3;
+
+	unsigned char *bufferRGBA = new unsigned char[size_3];
+
+	// convert to rgba
+	for (int i = 0; i < size; ++i) {
+		unsigned int idx = i * 3;
+		bufferRGBA[idx] = (rawData1[i] > 0) ? 255 : 0; //hack: remove later
+		bufferRGBA[idx + 1] = (rawData2[i] > 0) ? 255 : 0;
+		bufferRGBA[idx + 2] = (rawData3[i] > 0) ? 255 : 0;
+		//bufferRGBA[idx + 3] = 255;
+	}
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	//glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, sizeX, sizeY, sizeZ, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGB8, sizeX, sizeY, sizeZ, 0, GL_RGB, GL_UNSIGNED_BYTE, bufferRGBA);
+	//glTexStorage3D(GL_TEXTURE_3D, 0, GL_RGBA, sizeX, sizeY, sizeZ);// , 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
+	//glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, sizeX, sizeY, sizeZ, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
+	GL_Error();
+	delete[] rawData1;
+	delete[] rawData2;
+	delete[] rawData3;
+	delete[] bufferRGBA;
 
 }
 
@@ -942,14 +998,17 @@ bool OpenGLManager::initMeshTrianglesShaders()
 
     glUniform3fv(lightDir_loc, 1, &lightDir[0]);
 
-	GLint astro_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "astro_tex");
-	glUniform1i(astro_tex, 2);
+	GLint splat_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "splat_tex");
+	glUniform1i(splat_tex, 2);
 
 	GLint gly_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "gly_tex");
 	glUniform1i(gly_tex, 3);
 
-	GLint mito_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "mito_tex");
-	glUniform1i(mito_tex, 4);
+	//GLint mito_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "mito_tex");
+	//glUniform1i(mito_tex, 4);
+
+	//GLint nmito_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "nmito_tex");
+	//glUniform1i(nmito_tex, 5);
 
     m_TMesh.vboCreate("MeshVertices", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
     m_TMesh.vboBind("MeshVertices");
@@ -1033,25 +1092,28 @@ void OpenGLManager::drawMeshTriangles(bool selection )
 
        // Astrocyte 3D volume
        
-	   //GLint astro_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "astro_tex");
-       //glUniform1i(  astro_tex, 2 );
+	   GLint splat_tex = glGetUniformLocation(m_TMesh.getProgram("3Dtriangles"), "splat_tex");
+	   glUniform1i(splat_tex, 2);
 	   glActiveTexture(GL_TEXTURE2);
-	   glBindTexture(GL_TEXTURE_3D, m_astro_3DTex);
+	   glBindTexture(GL_TEXTURE_3D, m_splat_volume_3DTex);// m_astro_3DTex);
 
        // Glycogen 3D volume
        
-       //GLint gly_tex = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "gly_tex");
-       //glUniform1i(  gly_tex, 3 );
+       GLint gly_tex = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "gly_tex");
+       glUniform1i(  gly_tex, 3 );
 	   glActiveTexture(GL_TEXTURE3);
-	   glBindTexture(GL_TEXTURE_3D, m_gly_3D_Tex);
+	   glBindTexture(GL_TEXTURE_3D, m_glycogen_3DTex);
 
 
        // Astrocyte 3D volume
        
        //GLint mito_tex = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "mito_tex");
        //glUniform1i(  mito_tex, 4 );
-	   glActiveTexture(GL_TEXTURE4);
-	   glBindTexture(GL_TEXTURE_3D, m_mito_3DTex);
+	   //glActiveTexture(GL_TEXTURE4);
+	   //glBindTexture(GL_TEXTURE_3D, m_mito_3DTex);
+
+	   //glActiveTexture(GL_TEXTURE5);
+	   //glBindTexture(GL_TEXTURE_3D, m_nmito_3DTex);
 
        m_TMesh.vboBind("MeshIndices");
        glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
