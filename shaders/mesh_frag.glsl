@@ -86,10 +86,18 @@ void main() {
 	}
 	if(otype == ASTRO || otype == SPINE || otype == BOUTN) //Comment this else block and it will work
 	{
-		float splat2 = texture(gly_tex, G_fragTexCoord).r;
-		vec4 mix_color = mix(color, pnk_color, splat2);
-		mix_color.a = 1;
-		color = mix_color;
+
+		float splat2 = getSplattedTexture(gly_tex, G_fragTexCoord, vec3(0.001), 0);
+		if (splat2 >= 0.5) {
+			float alpha = (splat2 - 0.5) / 0.5;
+			vec4 mix_color = mix(pnk_color, dpnk_color, alpha);
+			color = mix_color;
+		}
+		else if (splat2 > 0.2) {
+			float alpha = (splat2 - 0.2) / 0.3;
+			vec4 mix_color = mix(lpnk_color, pnk_color, alpha);
+			color = mix_color;
+		}
 	}
 	if (otype != AMITO && otype != NMITO) //add flag2 if enabled too
 	{
