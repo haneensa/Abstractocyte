@@ -1033,8 +1033,6 @@ void OpenGLManager::drawNeuritesGraph()
 
     m_GNeurites.useProgram("index");
     updateNeuritesGraphUniforms( m_GNeurites.getProgram("index") );
-    glLineWidth(20);
-
     glDrawElements(GL_LINES,  m_neurites_edges.size(), GL_UNSIGNED_INT, 0 );
 
     m_GNeurites.vboRelease("index");
