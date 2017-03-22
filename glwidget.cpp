@@ -133,8 +133,7 @@ void GLWidget::initializeGL()
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_opengl_mngr->init_Gly3DTex();
-    m_opengl_mngr->upload_Gly3DTex( m_data_containter->getGlycogen3DGridData() );
+	
 
     if (m_FDL_running) {
         stopForecDirectedLayout();

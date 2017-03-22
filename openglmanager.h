@@ -123,9 +123,9 @@ public:
 
     // ************ 3D HeatMap  *******
 	void init_Gly3DTex();
-    void upload_Gly3DTex(void* data, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z, GLenum type = GL_FLOAT);
-    void load3DTexturesFromRaw(QString path, GLuint &texture, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z);
-
+	void upload_Gly3DTex(void* data, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z, GLenum type = GL_UNSIGNED_BYTE);
+	void load3DTexturesFromRaw(QString path, GLuint &texture, GLenum texture_unit, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z);
+	void load3DTexturesFromRaw_3(QString path1, QString path2, QString path3, GLuint &texture, GLenum texture_unit, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z);
 protected:
     DataContainer                           *m_dataContainer;
     AbstractionSpace                        *m_2dspace;
@@ -195,9 +195,12 @@ protected:
     std::vector<QVector4D>                  m_tf_2DHeatmap;
 
     // ************ 3D HeatMap  *******
+	GLuint									m_splat_volume_3DTex;
 	GLuint									m_gly_3D_Tex;
     GLuint                                  m_astro_3DTex;
     GLuint                                  m_mito_3DTex;
+	GLuint									m_nmito_3DTex;
+	GLuint									m_glycogen_3DTex;
  };
 
 #endif // OPENGLMANAGER_H

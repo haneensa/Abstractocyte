@@ -24,6 +24,7 @@ namespace SpacePartitioning
 		void setSize(int sizeX, int sizeY, int sizeZ);
 		void reset();
 		float* getData();
+		unsigned char* getData8Bit();
 	protected:
 
 		float m_maxValue;

@@ -16,16 +16,13 @@ in vec4         color_val;
 in vec3			vposition;
 in vec3			eye;
 flat in int			otype;
-out vec4        outcol;
+layout (location = 0) out vec4        outcol;
 // textures
-uniform sampler3D   astro_tex;
+uniform sampler3D   splat_tex; //r=astro g=astro-mito b=neurite-mito
 uniform sampler3D   gly_tex;
-uniform sampler3D   mito_tex;
 
 in vec3             G_fragTexCoord;
-
 //uniform sampler1D   tf;
-
 //-------------------- DIFFUSE LIGHT PROPERTIES --------------------
 uniform vec3 diffuseLightDirection; //QVector3D(-2.5f, -2.5f, -0.9f);
 vec3 lightDir2 = vec3(2.5f, 2.5f, 1.0f);
@@ -60,15 +57,15 @@ const float gaussian_kernel[125] = float[125](0.0598, 0.0379, 0.0379, 0.0102, 0.
 	0.0102, 0.0058, 0.0058, 0, 0,
 	0, 0, 0.0014, 0, 0,
 	0, 0, 0.0014, 0, 0);
-float getSplattedTexture(in sampler3D texture_toSplat, in vec3 coord);
+
+float getSplattedTexture(in sampler3D texture_toSplat, in vec3 coord, in vec3 step_size, in int tex_idx);
 vec4 red_color = vec4(1.0, 0.0, 0.0, 1.0); //astro
 vec4 blu_color = vec4(0.21, 0.56, 0.75, 1.0); //mito
-vec4 pnk_color = vec4(0.968, 0.4, 0.63, 1.0);//glyco
-
+vec4 pnk_color = vec4(0.97, 0.4, 0.63, 1.0);//glyco
+vec4 lpnk_color = vec4(0.99, 0.88, 0.86, 1.0);
+vec4 dpnk_color = vec4(0.29, 0.0, 0.42, 1.0);
 // ------------------- TOON SHADER PROPERTIES ----------------------
 //vec3 E = vec3(0.5, 0.5, -1.0);
-
-
 void main() {
 	vec3 E = normalize(eye);
 	float cosTheta = clamp(dot(N, L), 0, 1);
@@ -78,34 +75,42 @@ void main() {
 	vec3 H = normalize(L + E);
 	float sf = max(0.0, dot(N, H));
 	sf = pow(sf, 3.0);
-
 	vec4 color = vec4(color_val.rgb, 1.0);
 	
 	if (otype != ASTRO) //add flag1 if enabled too
 	{
-		float splat = getSplattedTexture(astro_tex, G_fragTexCoord);
+		float splat = getSplattedTexture(splat_tex, G_fragTexCoord, vec3(0.001, 0.001, 0.002), 0);
 		vec4 mix_color = mix(color, red_color, splat);
 		mix_color.a = 1;
 		color = mix_color;
 	}
+	if(otype == ASTRO || otype == SPINE || otype == BOUTN) //Comment this else block and it will work
+	{
 
+		float splat2 = getSplattedTexture(gly_tex, G_fragTexCoord, vec3(0.001), 0);
+		if (splat2 >= 0.5) {
+			float alpha = (splat2 - 0.5) / 0.5;
+			vec4 mix_color = mix(pnk_color, dpnk_color, alpha);
+			color = mix_color;
+		}
+		else if (splat2 > 0.2) {
+			float alpha = (splat2 - 0.2) / 0.3;
+			vec4 mix_color = mix(lpnk_color, pnk_color, alpha);
+			color = mix_color;
+		}
+	}
 	if (otype != AMITO && otype != NMITO) //add flag2 if enabled too
 	{
-		float splat = getSplattedTexture(mito_tex, G_fragTexCoord);
+		float splat = getSplattedTexture(splat_tex, G_fragTexCoord, vec3(0.001, 0.001, 0.002), 1);
 		vec4 mix_color = mix(color, blu_color, splat);
 		mix_color.a = 1;
 		color = mix_color;
 	}
-
-	if (otype == NMITO || otype == SPINE || otype == BOUTN) //add flag3 if enabled too
-	{
-		float splat = getSplattedTexture(gly_tex, G_fragTexCoord);
-		vec4 mix_color = mix(color, pnk_color, splat);
-		mix_color.a = 1;
-		color = mix_color;
-	}
+	float splat2 = texture(gly_tex, G_fragTexCoord).r; //getSplattedTexture(gly_tex, G_fragTexCoord, vec3(0.001), 0);
+	//color.r = 0.0;
+	//color.g = splat2;
+	//color.b = 1.0;
 	
-		
 	vec4 toon_color = vec4(color.rgb, 1.0);
 	vec4 diffuse_color = max((color * cosTheta2), (color * cosTheta));
 	vec4 phong_color = (ambiance *  color) + diffuse_color;// (color * cosTheta2);//mix(vec4(color.rgb, 1.0) * cosTheta, vec4(color.rgb, 1.0) * cosTheta2, 0.3);
@@ -119,28 +124,17 @@ void main() {
 	else
 		toon_color = vec4(0.1, 0.1, 0.1, 1.0) *toon_color;
 	//borders
-	float border_value = abs(dot(V, N));
-	float edgeDetection = (border_value > 0.02) ? 1 : 0;
+	//float border_value = abs(dot(V, N));
+	//float edgeDetection = (border_value > 0.02) ? 1 : 0;
 	// interpolate between two colors
-	// todo: based on the mesh type (astro, neurite)
     outcol = phong_color * color_intp + (1.0 - color_intp) /* edgeDetection*/ * toon_color;
-	//float al = 0;
-	//if (alpha < 1.0 && edgeDetection < 0.5)
-	//{
-	//	al = max(1.0 - border_value, alpha);
-	//}
-	//else
-	//{
-	//	al = alpha;
-	//}
+	
     outcol.a = alpha;
 
 }
 
-float getSplattedTexture(in sampler3D texture_toSplat, in vec3 coord)
+float getSplattedTexture(in sampler3D texture_toSplat, in vec3 coord, in vec3 step_size, in int tex_idx)
 {
-	float step = 0.001; //change later
-
 	vec3 idx_offset = vec3(0.0, 0.0, 0.0);
 	float weight = 1;
 	float tex_value = 1.0;
@@ -148,18 +142,17 @@ float getSplattedTexture(in sampler3D texture_toSplat, in vec3 coord)
 	float result = 0;
 	for (int k = 0; k < 5; k++)
 	{
-		idx_offset.z = gaussian_steps[k] * step;
+		idx_offset.z = gaussian_steps[k] * step_size.z;
 		for (int j = 0; j < 5; j++)
 		{
-			idx_offset.y = gaussian_steps[j] * step;
+			idx_offset.y = gaussian_steps[j] * step_size.y;
 			for (int i = 0; i < 5; i++)
 			{
-				idx_offset.x = gaussian_steps[i] * step;
+				idx_offset.x = gaussian_steps[i] * step_size.x;
 				weight = gaussian_kernel[i + j * 5 + k * 25];
 				vec3 new_coord = coord.xyz + idx_offset.xyz;
 				vec4 tex_value4 = texture(texture_toSplat, new_coord);
-				//sum = sum + (0.008 * tex_value);
-				result = result + (weight * tex_value4.r);
+				result = result + (weight * tex_value4[tex_idx]);
 			}
 		}
 	}

@@ -23,7 +23,7 @@ DataContainer::DataContainer()
 {
 
     m_mesh = new Mesh();
-    m_glycogen3DGrid.setSize(DIM_X, DIM_Y, DIM_Z);
+	m_glycogen3DGrid.setSize(DIM_G, DIM_G, DIM_G);
 	m_boutonHash.setSize(32, 32, 32);
 	m_spineHash.setSize(32, 32, 32);
     /* 1: load all data */
@@ -1191,9 +1191,9 @@ int DataContainer::getMeshIndicesSize()
 
 //----------------------------------------------------------------------------
 //
-float* DataContainer::getGlycogen3DGridData()
+unsigned char* DataContainer::getGlycogen3DGridData()
 {
-        return m_glycogen3DGrid.getData();
+        return m_glycogen3DGrid.getData8Bit();
 }
 
 //----------------------------------------------------------------------------
