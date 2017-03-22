@@ -130,6 +130,8 @@ protected:
     std::set<int>                       m_selectedObjects;
 
     bool                                m_hover;
+
+    bool                                m_hide_toggle;
 };
 
 
