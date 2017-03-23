@@ -90,6 +90,7 @@ public:
     void FilterByType(Object_t type, bool);
     void FilterByID( QList<QString> tokens_Ids, bool );
     void FilterByID(  std::set<int> tokens_Ids, bool );
+    void VisibilityToggleSelectedObjects(  std::set<int> tokens_Ids, bool );
     void showAll();
     void FilterObject(int ID, bool isfilterd);
     void recursiveFilter(int ID, bool isfilterd);

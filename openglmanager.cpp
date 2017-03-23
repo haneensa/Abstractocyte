@@ -1821,11 +1821,11 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids, bool invisibility )
 void OpenGLManager::FilterByID( std::set<int> tokens_Ids, bool invisibility )
 {
     if (invisibility == false) { // show only
-        // hide everything else
-        for (int i = 0; i < m_ssbo_data.size(); ++i) {
-            FilterObject(i, !invisibility);
-        }
-    }
+          // hide everything else
+          for (int i = 0; i < m_ssbo_data.size(); ++i) {
+              FilterObject(i, !invisibility);
+          }
+      }
 
     for (auto iter = tokens_Ids.begin(); iter != tokens_Ids.end(); ++iter) {
         int hvgxID = *iter;
@@ -1837,7 +1837,26 @@ void OpenGLManager::FilterByID( std::set<int> tokens_Ids, bool invisibility )
     }
 
     m_dataContainer->recomputeMaxVolAstro();
+    updateSSBO();
+}
+
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::VisibilityToggleSelectedObjects( std::set<int> tokens_Ids, bool invisibility )
+{
+    for (auto iter = tokens_Ids.begin(); iter != tokens_Ids.end(); ++iter) {
+        int hvgxID = *iter;
+        if (hvgxID > m_ssbo_data.size())
+            continue;
+
+        recursiveFilter(hvgxID, invisibility);
+
+    }
+
+    m_dataContainer->recomputeMaxVolAstro();
     updateSSBO();}
+
 
 // ----------------------------------------------------------------------------
 //
