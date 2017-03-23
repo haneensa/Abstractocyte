@@ -10,7 +10,6 @@
 
 GLWidget::GLWidget(QWidget *parent)
     :   QOpenGLWidget(parent),
-        m_isRotatable(true),
         m_yaxis(0),
         m_xaxis(0),
         m_FDL_running(false),
@@ -357,11 +356,6 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             m_distance = 1.0f;
 			m_opengl_mngr->setZoom(m_distance);
             update();
-        break;
-        case(Qt::Key_T):
-            // if force directed layout running then cant change this
-            if(!m_FDL_running)
-                m_isRotatable = !m_isRotatable;
         break;
         case(Qt::Key_X): // stop layouting algorithm
             stopForecDirectedLayout();

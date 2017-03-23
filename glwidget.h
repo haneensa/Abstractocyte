@@ -112,7 +112,6 @@ protected:
     /* rotation */
     QPoint                              m_lastPos;
     double                              m_distance;
-    bool                                m_isRotatable;
     QQuaternion                         m_rotation;
     QVector3D                           m_rotationAxis;
     QVector3D                           m_translation;
