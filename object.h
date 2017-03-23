@@ -97,6 +97,8 @@ public:
 	void setMappedValue(float value){ m_mappedValue = value; }
 	float getMappedValue() { return m_mappedValue; }
 
+    int getSynapseSize();
+
 private:
     std::string                             m_name;
     int                                     m_ID; // hvgx
