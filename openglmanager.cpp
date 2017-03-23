@@ -1812,7 +1812,7 @@ void OpenGLManager::FilterByType(Object_t type, bool flag)
         FilterObject(hvgxID, flag);
 
     }
-    m_dataContainer->recomputeMaxVolAstro();
+    m_dataContainer->recomputeMaxValues();
     updateSSBO();
 }
 
@@ -1836,7 +1836,7 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids, bool invisibility )
         recursiveFilter(hvgxID, invisibility);
     }
 
-    m_dataContainer->recomputeMaxVolAstro();
+    m_dataContainer->recomputeMaxValues();
     updateSSBO();
 }
 
@@ -1860,7 +1860,7 @@ void OpenGLManager::FilterByID( std::set<int> tokens_Ids, bool invisibility )
 
     }
 
-    m_dataContainer->recomputeMaxVolAstro();
+    m_dataContainer->recomputeMaxValues();
     updateSSBO();
 }
 
@@ -1878,7 +1878,7 @@ void OpenGLManager::VisibilityToggleSelectedObjects( std::set<int> tokens_Ids, b
 
     }
 
-    m_dataContainer->recomputeMaxVolAstro();
+    m_dataContainer->recomputeMaxValues();
     updateSSBO();}
 
 
@@ -1891,7 +1891,7 @@ void OpenGLManager::showAll()
         FilterObject(i, false);
     }
 
-    m_dataContainer->recomputeMaxVolAstro();
+    m_dataContainer->recomputeMaxValues();
     updateSSBO();
 }
 
@@ -2067,7 +2067,6 @@ void OpenGLManager::updateSSBO()
                                    0, 0.7);
 
 
-        qDebug() <<  obj->getAstroCoverage() ;
         m_ssbo_data[hvgxID].info.setY( obj->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage()  );
 
         switch(m_size_encoding) {

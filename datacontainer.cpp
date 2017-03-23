@@ -46,6 +46,8 @@ DataContainer::DataContainer()
     //m_dbscan.initialize(&m_glycogenList, &m_glycogenMap, &m_glycogenOctree);
     //m_dbscan.run();
     //qDebug() << "done clustering";
+
+    this->recomputeMaxValues();
 }
 
 //----------------------------------------------------------------------------
@@ -1260,7 +1262,7 @@ std::vector<Object*> DataContainer::getObjectsByType(Object_t type)
 
  //----------------------------------------------------------------------------
  //
-void DataContainer::recomputeMaxVolAstro()
+void DataContainer::recomputeMaxValues()
 {
     float temp_max_astro_coverage = 0;
     float temp_max_synapse_volume = 0;

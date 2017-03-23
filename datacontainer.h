@@ -99,7 +99,7 @@ public:
 
 
     // iterate over objects and get max volume and astro coverage
-    void recomputeMaxVolAstro();
+    void recomputeMaxValues();
 
     //************ Load Raw Data
     char* loadRawFile(QString path, int size);

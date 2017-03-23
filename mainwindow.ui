@@ -319,7 +319,7 @@
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>3</number>
        </property>
        <widget class="QWidget" name="tab_4">
         <attribute name="title">
@@ -956,6 +956,11 @@
               <item>
                <property name="text">
                 <string>Astrocyte Coverage</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Synapse Size</string>
                </property>
               </item>
              </widget>
