@@ -115,16 +115,19 @@ private:
 
     std::vector<struct abstractionPoint>    m_grid_vertices;
     std::vector<GLuint>                     m_grid_indices;
+    std::vector<struct abstractionPoint>    m_grid_illigal_vertices;
 
     QOpenGLVertexArrayObject                m_vao_2DSpace_debug;
     QOpenGLVertexArrayObject                m_vao_2DSpace_grid;
     QOpenGLVertexArrayObject                m_vao_2DSpace_Selection;
+    QOpenGLVertexArrayObject                m_vao_2DSpace_gridIlligal;
 
     QOpenGLBuffer                           m_vbo_2DSpaceVerts;
     QOpenGLBuffer                           m_vbo_2DSpaceTrianglesIndix;
 
     QOpenGLBuffer                           m_vbo_2DSpaceGridVerts;
     QOpenGLBuffer                           m_vbo_2DSpaceGridIndix;
+    QOpenGLBuffer                           m_vbo_2DSpaceGridIlligalVertix;
 
     GLuint                                  m_program_2DSpace_degbug;
 

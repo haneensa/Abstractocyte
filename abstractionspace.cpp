@@ -275,6 +275,21 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     m_IntervalXY.push_back({ast7, neu6});
 
 
+    initTriangle(QVector2D(60,60), QVector2D(80, 60), QVector2D(80, 80), 0);
+    initTriangle(QVector2D(60,60), QVector2D(80, 80), QVector2D(60, 80), 0);
+
+    initTriangle(QVector2D(80,60), QVector2D(100, 60), QVector2D(100, 80), 0);
+    initTriangle(QVector2D(100,80), QVector2D(80, 80), QVector2D(80, 60), 0);
+
+    initTriangle(QVector2D(100,80), QVector2D(80, 80), QVector2D(80, 60), 0);
+    initTriangle(QVector2D(100,80), QVector2D(80, 80), QVector2D(80, 60), 0);
+
+
+    initTriangle(QVector2D(60,80), QVector2D(80, 80), QVector2D(80, 100), 0);
+    initTriangle(QVector2D(80,100), QVector2D(60, 100), QVector2D(60, 80), 0);
+
+
+
     //****************** 3D <-> 2D Transitional Space **************************
 
     //******************  1) (60, 60) <-> (60, 100)  **************************
@@ -564,17 +579,11 @@ void AbstractionSpace::initLine(QVector2D end1, QVector2D end2, int ID)
 
 void AbstractionSpace::initTriangle(QVector2D coords1, QVector2D coords2,QVector2D coords3, int ID)
 {
-    int offset = m_vertices.size();
     struct abstractionPoint p1 = {coords1/100.0, ID};
     struct abstractionPoint p2 = {coords2/100.0, ID};
     struct abstractionPoint p3 = {coords3/100.0, ID};
 
-    m_vertices.push_back(p1);
-    m_vertices.push_back(p2);
-    m_vertices.push_back(p3);
-
-    m_indices.push_back(offset + 0);
-    m_indices.push_back(offset + 1);
-    m_indices.push_back(offset + 2);
-
+    m_grid_illigal_vertices.push_back(p1);
+    m_grid_illigal_vertices.push_back(p2);
+    m_grid_illigal_vertices.push_back(p3);
 }

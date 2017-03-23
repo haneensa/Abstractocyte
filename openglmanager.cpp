@@ -528,7 +528,7 @@ void OpenGLManager::render2DHeatMapTexture()
 {
     // 1) render this into fbo 1
     // ********* Debug Texture
-//    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
+    if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
         m_GNeurites.vaoBind("2DHeatMap_Quad");
         m_GNeurites.useProgram("2DHeatMap_Texture");
         // heatmap texture
@@ -552,7 +552,7 @@ void OpenGLManager::render2DHeatMapTexture()
         m_GNeurites.vaoRelease();
 
 
-//   }
+   }
 }
 
 void OpenGLManager::update2DTextureUniforms(GLuint program)
