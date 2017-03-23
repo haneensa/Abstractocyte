@@ -10,17 +10,18 @@ in float        V_color_intp[];
 in vec4			V_worldPos[];
 in vec4         V_normal[];
 in vec3         V_fragTexCoord[];
-in vec3		E_eye[];
+in vec3			E_eye[];
 
-out float       color_intp;
 out vec4        color_val;
 out vec3        normal_out;
-out float       alpha;
-out vec3	vposition;
+//out vec2		colorIntp_alpha;
+out float		alpha;
+out float		color_intp;
+out vec3		vposition;
 out float       G_ID;
 out vec3        G_fragTexCoord;
-out vec3	eye;
-flat out int			otype;
+out vec3		eye;
+flat out int	otype;
 
 uniform int     hoveredID;
 
@@ -97,16 +98,16 @@ void main() {
         if (render_type.x == 0)
             return;
 
-        alpha = V_alpha[i];
+		alpha = V_alpha[i];
 
 
-        if (alpha < 0.05)
+		if (alpha < 0.05)
             return;
 
 
         eye = E_eye[i];
 
-        color_intp = V_color_intp[i];
+		color_intp = V_color_intp[i];
         vposition = V_worldPos[i].xyz;
         gl_Position = gl_in[i].gl_Position;
         G_fragTexCoord = V_fragTexCoord[i];

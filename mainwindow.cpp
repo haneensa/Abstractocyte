@@ -372,3 +372,46 @@ void MainWindow::deleteSelectedPath(QModelIndex index)
     delete mainwindow_ui->listPaths->takeItem(index.row());
     signalDeletedPathLabel(pathLabel);
 }
+
+//------------------------------------------------------
+//
+void MainWindow::on_splatAstroCheckBox_toggled(bool checked)
+{
+	//qDebug() << "glycogen visibility toggled";
+
+	getGLWidget()->getOpenGLManager()->setAstroSplat(checked);
+}
+
+//------------------------------------------------------
+//
+void MainWindow::on_splatGlycoCheckBox_toggled(bool checked)
+{
+	//qDebug() << "glycogen visibility toggled";
+
+	getGLWidget()->getOpenGLManager()->setGlycoSplat(checked);
+}
+
+//------------------------------------------------------
+//
+void MainWindow::on_splatNMitoCheckBox_toggled(bool checked)
+{
+	//qDebug() << "glycogen visibility toggled";
+
+	getGLWidget()->getOpenGLManager()->setNMitoSplat(checked);
+}
+
+//------------------------------------------------------
+//
+void MainWindow::on_splatAMitoCheckBox_toggled(bool checked)
+{
+	//qDebug() << "glycogen visibility toggled";
+
+	getGLWidget()->getOpenGLManager()->setAMitoSplat(checked);
+}
+
+//------------------------------------------------------
+//
+void MainWindow::on_specularLightCheckBox_toggled(bool checked)
+{
+	getGLWidget()->getOpenGLManager()->setSpecularLight(checked);
+}

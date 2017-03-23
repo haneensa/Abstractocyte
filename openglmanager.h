@@ -116,6 +116,14 @@ public:
 
 	void setZoom(float zoom);
 
+	// ********** Splatting Enable ************************
+	void setAstroSplat(bool enable) { m_is_astro_splat = enable; }
+	void setGlycoSplat(bool enable) { m_is_glyco_splat = enable; }
+	void setAMitoSplat(bool enable) { m_is_amito_splat = enable; }
+	void setNMitoSplat(bool enable) { m_is_nmito_splat = enable; }
+
+	void setSpecularLight(bool enable) { m_is_specular = enable; }
+
     // ************ 2D HeatMap  *******
     void init2DHeatMapTextures();
     bool init2DHeatMapShaders();
@@ -166,6 +174,15 @@ protected:
 
 	bool								m_renderGlycogenGranules;
     float                                   m_zoom;
+
+	// ********** Splatting ************************
+	bool									m_is_astro_splat;
+	bool									m_is_glyco_splat;
+	bool									m_is_nmito_splat;
+	bool									m_is_amito_splat;
+
+	// ********** lighting ************************
+	bool									m_is_specular;
 
     // ********** Selection ************************
     int                                     m_canvas_w;

@@ -20,6 +20,13 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
     m_normals_enabled = true;
 
     m_hoveredID = -1;
+
+	m_is_astro_splat = true;
+	m_is_glyco_splat = true;
+	m_is_nmito_splat = true;
+	m_is_amito_splat = true;
+
+	m_is_specular = true;
 }
 
 // ----------------------------------------------------------------------------
@@ -1169,6 +1176,15 @@ void OpenGLManager::updateMeshPrograms(GLuint program)
 
     int hoveredID = glGetUniformLocation(program, "hoveredID");
     if (hoveredID >= 0) glUniform1iv(hoveredID, 1, &m_hoveredID);
+
+	int splat_flags = glGetUniformLocation(program, "splat_flags");
+	if (splat_flags >= 0) glUniform4i(splat_flags,	(m_is_astro_splat) ? 1 : 0, 
+													(m_is_glyco_splat) ? 1 : 0, 
+													(m_is_nmito_splat) ? 1 : 0, 
+													(m_is_amito_splat) ? 1 : 0);
+
+	int specular_flag = glGetUniformLocation(program, "specular_flag");
+	if (specular_flag >= 0) glUniform1i(specular_flag, (m_is_specular) ? 1 : 0);
 
     GL_Error();
 }
