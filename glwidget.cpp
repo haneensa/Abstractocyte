@@ -680,7 +680,7 @@ void GLWidget::clearSelectedObjectsTable()
 void GLWidget::hideSelectedObjects()
 {
     m_hide_toggle = !m_hide_toggle;
-    m_opengl_mngr->FilterByID(m_selectedObjects, m_hide_toggle);
+    m_opengl_mngr->VisibilityToggleSelectedObjects(m_selectedObjects, m_hide_toggle);
     update();
 }
 
