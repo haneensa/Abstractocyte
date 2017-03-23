@@ -46,11 +46,18 @@ public slots:
     void getIDAt(QModelIndex);
     void checkAllListWidget();
 
-
     // Path Management
     void getPath(QString);
     void getSelectedPathIndex(QModelIndex);
     void deleteSelectedPath(QModelIndex);
+
+	//------ splatting toggle
+	void on_splatAstroCheckBox_toggled(bool checked);
+	void on_splatGlycoCheckBox_toggled(bool checked);
+	void on_splatNMitoCheckBox_toggled(bool checked);
+	void on_splatAMitoCheckBox_toggled(bool checked);
+
+	void on_specularLightCheckBox_toggled(bool checked);
 
 signals:
     void getDeletedData(int);

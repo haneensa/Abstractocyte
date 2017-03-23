@@ -74,6 +74,7 @@ public:
 	//SpacePartitioning::Octree* getBoutonOctree() { return &m_boutonOctree; }
 	SpacePartitioning::SpatialHash3D*	getSpineHash() { return &m_spineHash; }
 	SpacePartitioning::SpatialHash3D*	getBoutonHash() { return &m_boutonHash; }
+	SpacePartitioning::SpatialHash3D*	getNeuroMitoHash() { return &m_neuroMitoHash; }
 	unsigned char*						getGlycogen3DGridData();
 	void								resetMappingValues();
 
@@ -146,6 +147,7 @@ protected:
     SpacePartitioning::Octree                   m_glycogenOctree;
 	SpacePartitioning::SpatialHash3D			m_boutonHash;
 	SpacePartitioning::SpatialHash3D			m_spineHash;
+	SpacePartitioning::SpatialHash3D			m_neuroMitoHash;
 
     // file management
     Normals_t                                   m_normals_t;
