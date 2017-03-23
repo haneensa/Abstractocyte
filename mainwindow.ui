@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1472</width>
-     <height>21</height>
+     <height>31</height>
     </rect>
    </property>
   </widget>
@@ -48,7 +48,7 @@
    <property name="minimumSize">
     <size>
      <width>400</width>
-     <height>1200</height>
+     <height>1217</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -98,20 +98,10 @@
         <string>Abstraction Space</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_15">
-        <item row="0" column="0">
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>4</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="1" rowspan="3">
+        <property name="verticalSpacing">
+         <number>0</number>
+        </property>
+        <item row="0" column="2" rowspan="3">
          <widget class="QGroupBox" name="groupBox">
           <property name="minimumSize">
            <size>
@@ -147,14 +137,14 @@
            <string>Abstract</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
-           <item row="0" column="0">
+           <item row="0" column="2">
             <widget class="QSlider" name="verticalSlider">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
+           <item row="0" column="3">
             <widget class="MousePad" name="openGLWidget_2" native="true">
              <property name="enabled">
               <bool>true</bool>
@@ -191,7 +181,7 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="1" column="3">
             <widget class="QSlider" name="horizontalSlider">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -204,7 +194,43 @@
           <zorder>verticalSlider</zorder>
          </widget>
         </item>
-        <item row="0" column="2">
+        <item row="0" column="1">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>4</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="2">
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>19</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="3" column="2">
+         <widget class="QLabel" name="label_43">
+          <property name="text">
+           <string>N e u r i t e s</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
          <spacer name="verticalSpacer_2">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -217,14 +243,7 @@
           </property>
          </spacer>
         </item>
-        <item row="1" column="2">
-         <widget class="QLabel" name="label_42">
-          <property name="text">
-           <string>Abstract</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2" rowspan="3">
+        <item row="2" column="3" rowspan="3">
          <spacer name="verticalSpacer_3">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -237,28 +256,25 @@
           </property>
          </spacer>
         </item>
-        <item row="3" column="1">
-         <widget class="QLabel" name="label_43">
+        <item row="1" column="3">
+         <widget class="QLabel" name="label_42">
           <property name="text">
-           <string>Neurites</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <string>Abstract</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
-         <spacer name="verticalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_44">
+          <property name="lineWidth">
+           <number>0</number>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>19</height>
-           </size>
+          <property name="text">
+           <string>A s t r o c y t e</string>
           </property>
-         </spacer>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -272,16 +288,7 @@
         <enum>QFrame::Raised</enum>
        </property>
        <layout class="QGridLayout" name="gridLayout_6">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
+        <property name="margin">
          <number>0</number>
         </property>
         <property name="spacing">
@@ -319,7 +326,7 @@
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_4">
         <attribute name="title">
@@ -332,16 +339,7 @@
             <string/>
            </property>
            <layout class="QGridLayout" name="gridLayout_9">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
+            <property name="margin">
              <number>0</number>
             </property>
             <item row="0" column="0">
@@ -552,15 +550,15 @@
          <item>
           <widget class="QToolBox" name="toolBox">
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="page">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>352</width>
-              <height>782</height>
+              <width>336</width>
+              <height>676</height>
              </rect>
             </property>
             <attribute name="label">
@@ -570,16 +568,7 @@
              <property name="spacing">
               <number>4</number>
              </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
+             <property name="margin">
               <number>0</number>
              </property>
              <item>
@@ -667,8 +656,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>174</width>
-              <height>188</height>
+              <width>336</width>
+              <height>676</height>
              </rect>
             </property>
             <attribute name="label">
@@ -688,16 +677,16 @@
               <widget class="QWidget" name="widget" native="true">
                <layout class="QHBoxLayout" name="horizontalLayout">
                 <item>
-                 <widget class="QPushButton" name="mapGlycogenGranulesButton">
+                 <widget class="QPushButton" name="mapGlycogenClustersButton">
                   <property name="text">
-                   <string>Map Granules</string>
+                   <string>Map Clusters</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="mapGlycogenClustersButton">
+                 <widget class="QPushButton" name="mapGlycogenGranulesButton">
                   <property name="text">
-                   <string>Map Clusters</string>
+                   <string>Map Granules</string>
                   </property>
                  </widget>
                 </item>
@@ -709,11 +698,11 @@
                <property name="title">
                 <string>Map to</string>
                </property>
-               <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <layout class="QVBoxLayout" name="verticalLayout_13">
                 <item>
-                 <widget class="QCheckBox" name="glycogenMapToBoutonsCheckBox">
+                 <widget class="QRadioButton" name="boutonsSpinesRadioButton">
                   <property name="text">
-                   <string>Boutons</string>
+                   <string>Boutons | Spines</string>
                   </property>
                   <property name="checked">
                    <bool>true</bool>
@@ -721,12 +710,38 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="glycogenMapToSpinesCheckBox">
+                 <widget class="QWidget" name="widget_2" native="true">
+                  <layout class="QHBoxLayout" name="horizontalLayout_2">
+                   <item>
+                    <widget class="QCheckBox" name="glycogenMapToBoutonsCheckBox">
+                     <property name="text">
+                      <string>Boutons</string>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="glycogenMapToSpinesCheckBox">
+                     <property name="text">
+                      <string>Spines</string>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                  <zorder>glycogenMapToSpinesCheckBox</zorder>
+                  <zorder>glycogenMapToSpinesCheckBox</zorder>
+                  <zorder>glycogenMapToBoutonsCheckBox</zorder>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="mitoRadioButton">
                   <property name="text">
-                   <string>Spines</string>
-                  </property>
-                  <property name="checked">
-                   <bool>true</bool>
+                   <string>Mitochondria</string>
                   </property>
                  </widget>
                 </item>
@@ -1053,8 +1068,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>245</width>
-              <height>433</height>
+              <width>348</width>
+              <height>606</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1327,8 +1342,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>245</width>
-              <height>433</height>
+              <width>348</width>
+              <height>606</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1604,8 +1619,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>245</width>
-              <height>433</height>
+              <width>348</width>
+              <height>606</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1881,8 +1896,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>338</width>
-              <height>713</height>
+              <width>348</width>
+              <height>606</height>
              </rect>
             </property>
             <attribute name="label">

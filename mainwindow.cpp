@@ -246,7 +246,12 @@ void MainWindow::on_mapGlycogenGranulesButton_clicked()
 
     bool boutons = mainwindow_ui->glycogenMapToBoutonsCheckBox->isChecked();
     bool spines = mainwindow_ui->glycogenMapToSpinesCheckBox->isChecked();
-	bool mito; //TODO
+	bool mito = mainwindow_ui->mitoRadioButton->isChecked();
+	if (mito)
+	{
+		boutons = false;
+		spines = false;
+	}
     bool clusters = false;
 
 	std::map<int, std::map<int, int>>* results = gam->computeGlycogenMapping(boutons, spines, mito, clusters);
@@ -300,7 +305,12 @@ void MainWindow::on_mapGlycogenClustersButton_clicked()
 
         bool boutons = mainwindow_ui->glycogenMapToBoutonsCheckBox->isChecked();
         bool spines = mainwindow_ui->glycogenMapToSpinesCheckBox->isChecked();
-		bool mito; //todo
+		bool mito = mainwindow_ui->mitoRadioButton->isChecked(); 
+		if (mito)
+		{
+			boutons = false;
+			spines = false;
+		}
         bool clusters = true;
 
         std::map<int, std::map<int, int>>* results = gam->computeGlycogenMapping(boutons, spines, mito, clusters);
@@ -344,6 +354,22 @@ void MainWindow::on_mapGlycogenClustersButton_clicked()
     {
         //show message saying: No clusters available, calculate clusters first
     }
+}
+
+//------------------------------------------------------
+//
+void MainWindow::on_mitoRadioButton_toggled(bool checked)
+{
+		mainwindow_ui->glycogenMapToBoutonsCheckBox->setEnabled(!checked);
+		mainwindow_ui->glycogenMapToSpinesCheckBox->setEnabled(!checked);
+}
+
+//------------------------------------------------------
+//
+void MainWindow::on_boutonsSpinesRadioButton_toggled(bool checked)
+{
+		mainwindow_ui->glycogenMapToBoutonsCheckBox->setEnabled(checked);
+		mainwindow_ui->glycogenMapToSpinesCheckBox->setEnabled(checked);
 }
 
 //------------------------------------------------------

@@ -38,6 +38,8 @@ public slots:
 	//------------- glycogen mapping -------------------------------
 	void on_mapGlycogenGranulesButton_clicked();
 	void on_mapGlycogenClustersButton_clicked();
+	void on_mitoRadioButton_toggled(bool);
+	void on_boutonsSpinesRadioButton_toggled(bool);
 
     //----- selected objects
     void on_object_clicked(QList<QStandardItem*>);
