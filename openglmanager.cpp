@@ -41,17 +41,13 @@ void OpenGLManager::drawAll()
     write_ssbo_data();
 
 
-   // glDisable(GL_BLEND);
-    render2DHeatMapTexture();
-    //glEnable (GL_BLEND);
+     render2DHeatMapTexture();
 
     renderAbstractions();
     renderSelection();
 
-//    glDisable(GL_BLEND);
-    drawNodesInto2DTexture();
-//    glEnable (GL_BLEND);
-}
+     drawNodesInto2DTexture();
+ }
 
 // ############## Data Initialization ###############################################
 //
@@ -338,8 +334,8 @@ void OpenGLManager::init2DHeatMapTextures()
     GL_Error();
 
     // init transfer function
-    m_tf_2DHeatmap.push_back(QVector4D(0.8f, 0.0f, 0.8f, 0.0f)); // 0
-    m_tf_2DHeatmap.push_back(QVector4D(0.5f, 0.0f, 0.5f, 0.5f)); // 1
+    m_tf_2DHeatmap.push_back(QVector4D(0.8f, 0.0f, 0.0f, 0.0f)); // 0
+    m_tf_2DHeatmap.push_back(QVector4D(0.5f, 0.0f, 0.5f, 0.9f)); // 1
     m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 1.0f)); // 2
 
 
@@ -529,6 +525,8 @@ void OpenGLManager::render2DHeatMapTexture()
     // 1) render this into fbo 1
     // ********* Debug Texture
     if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
+        glEnable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
         m_GNeurites.vaoBind("2DHeatMap_Quad");
         m_GNeurites.useProgram("2DHeatMap_Texture");
         // heatmap texture
@@ -548,6 +546,7 @@ void OpenGLManager::render2DHeatMapTexture()
         glUniform2fv(dim, 1, dim_value);
 
         glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
+        glEnable(GL_DEPTH_TEST);
 
         m_GNeurites.vaoRelease();
 
