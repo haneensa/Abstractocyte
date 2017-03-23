@@ -31,13 +31,18 @@ public slots:
     void getSliderX(int value);
     void getSliderY(int value);
     void getIntervalID(int ID);
-    void getGraphParam1(double value);
-    void getGraphParam2(double value);
-    void getGraphParam3(double value);
-    void getGraphParam4(double value);
-    void getGraphParam5(double value);
-    void getGraphParam6(double value);
-    void getGraphParam7(double value);
+
+    void getActiveGraphTab(int);
+
+    void getGraphCr(double value);
+    void getGraphCa(double value);
+    void getGraphAABBdim(double value);
+    void getGraphmax_distance(double value);
+    void getGraphmax_vertex_movement(double value);
+    void getGraphslow_factor(double value);
+    void getGraphmax_force(double value);
+    void getGraphoriginalPosAttraction(double value);
+
     void lockRotation2D();
 
     void getFilteredType(QString value, bool);
@@ -131,6 +136,8 @@ protected:
     bool                                m_hover;
 
     bool                                m_hide_toggle;
+
+    int                                 m_active_graph_tab;
 };
 
 

@@ -226,7 +226,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>4</number>
        </property>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
@@ -258,15 +258,15 @@
          <item>
           <widget class="QToolBox" name="toolBox">
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="page">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>372</width>
-              <height>848</height>
+              <width>129</width>
+              <height>180</height>
              </rect>
             </property>
             <attribute name="label">
@@ -373,8 +373,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>174</width>
-              <height>188</height>
+              <width>372</width>
+              <height>848</height>
              </rect>
             </property>
             <attribute name="label">
@@ -881,114 +881,1053 @@
         <attribute name="title">
          <string>Layouting</string>
         </attribute>
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <layout class="QFormLayout" name="formLayout">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>Repulsion Constant</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QDoubleSpinBox" name="doubleSpinBox">
-             <property name="minimum">
-              <double>0.010000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Attraction Constant</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>AABB dim</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_9">
-             <property name="text">
-              <string>Max Distance</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>Slow Factor</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_8">
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_12">
-             <property name="text">
-              <string>Max Vertex Movement</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="1">
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_11">
-             <property name="text">
-              <string>Max Force</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_10">
-             <property name="minimum">
-              <double>0.010000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-            </widget>
-           </item>
-          </layout>
+        <layout class="QGridLayout" name="gridLayout_14">
+         <item row="0" column="1">
+          <widget class="QToolBox" name="toolBox_graphsParam">
+           <property name="currentIndex">
+            <number>1</number>
+           </property>
+           <widget class="QWidget" name="graph1">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>358</width>
+              <height>808</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>Graph 1</string>
+            </attribute>
+            <layout class="QFormLayout" name="formLayout_5">
+             <item row="0" column="0" colspan="2">
+              <widget class="QFrame" name="frame_11">
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QGridLayout" name="gridLayout">
+                <item row="0" column="0">
+                 <widget class="QCheckBox" name="checkBox_4">
+                  <property name="text">
+                   <string>start/stop layouting </string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QGroupBox" name="groupBox_12">
+                  <property name="title">
+                   <string>GroupBox</string>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_7">
+                   <item>
+                    <widget class="QFrame" name="frame_4">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_4">
+                      <item>
+                       <widget class="QLabel" name="label">
+                        <property name="text">
+                         <string>Repulsion Constant</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox">
+                        <property name="minimum">
+                         <double>0.010000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_5">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_5">
+                      <item>
+                       <widget class="QLabel" name="label_2">
+                        <property name="text">
+                         <string>Attraction Constant</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_6">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_6">
+                      <item>
+                       <widget class="QLabel" name="label_3">
+                        <property name="text">
+                         <string>AABB dim</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_7">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_7">
+                      <item>
+                       <widget class="QLabel" name="label_9">
+                        <property name="text">
+                         <string>Max Distance</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_9">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_9">
+                      <item>
+                       <widget class="QLabel" name="label_12">
+                        <property name="text">
+                         <string>Max Vertex Movement</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_8">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_8">
+                      <item>
+                       <widget class="QLabel" name="label_10">
+                        <property name="text">
+                         <string>Slow Factor</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_8">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_10">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_10">
+                      <item>
+                       <widget class="QLabel" name="label_11">
+                        <property name="text">
+                         <string>Max Force</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_10">
+                        <property name="minimum">
+                         <double>0.010000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_36">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_32">
+                      <item>
+                       <widget class="QLabel" name="label_38">
+                        <property name="text">
+                         <string>Origina Attraction</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_29">
+                        <property name="minimum">
+                         <double>0.010000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="graph2">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>358</width>
+              <height>808</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>Graph 2</string>
+            </attribute>
+            <layout class="QFormLayout" name="formLayout_4">
+             <item row="0" column="0" colspan="2">
+              <widget class="QFrame" name="frame_13">
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_18">
+                <item row="0" column="0">
+                 <widget class="QCheckBox" name="checkBox_8">
+                  <property name="text">
+                   <string>start/stop layouting </string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QGroupBox" name="groupBox_13">
+                  <property name="title">
+                   <string>GroupBox</string>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_10">
+                   <item>
+                    <widget class="QFrame" name="frame_14">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_11">
+                      <item>
+                       <widget class="QLabel" name="label_17">
+                        <property name="text">
+                         <string>Repulsion Constant</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
+                        <property name="minimum">
+                         <double>0.010000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_15">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_12">
+                      <item>
+                       <widget class="QLabel" name="label_18">
+                        <property name="text">
+                         <string>Attraction Constant</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_16">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_13">
+                      <item>
+                       <widget class="QLabel" name="label_19">
+                        <property name="text">
+                         <string>AABB dim</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_17">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_14">
+                      <item>
+                       <widget class="QLabel" name="label_20">
+                        <property name="text">
+                         <string>Max Distance</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_11">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_18">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_15">
+                      <item>
+                       <widget class="QLabel" name="label_21">
+                        <property name="text">
+                         <string>Max Vertex Movement</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_12">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_19">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_16">
+                      <item>
+                       <widget class="QLabel" name="label_22">
+                        <property name="text">
+                         <string>Slow Factor</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_13">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_21">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_17">
+                      <item>
+                       <widget class="QLabel" name="label_23">
+                        <property name="text">
+                         <string>Max Force</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_14">
+                        <property name="minimum">
+                         <double>0.010000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_37">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_33">
+                      <item>
+                       <widget class="QLabel" name="label_39">
+                        <property name="text">
+                         <string>Origina Attraction</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_30">
+                        <property name="minimum">
+                         <double>0.010000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="graph3">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>358</width>
+              <height>808</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>Graph 3</string>
+            </attribute>
+            <layout class="QFormLayout" name="formLayout_3">
+             <item row="0" column="0" colspan="2">
+              <widget class="QFrame" name="frame_20">
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_19">
+                <item row="0" column="0">
+                 <widget class="QCheckBox" name="checkBox_9">
+                  <property name="text">
+                   <string>start/stop layouting </string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QGroupBox" name="groupBox_14">
+                  <property name="title">
+                   <string>GroupBox</string>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_11">
+                   <item>
+                    <widget class="QFrame" name="frame_22">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_18">
+                      <item>
+                       <widget class="QLabel" name="label_24">
+                        <property name="text">
+                         <string>Repulsion Constant</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_15">
+                        <property name="minimum">
+                         <double>0.010000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_23">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_19">
+                      <item>
+                       <widget class="QLabel" name="label_25">
+                        <property name="text">
+                         <string>Attraction Constant</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_16">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_24">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_20">
+                      <item>
+                       <widget class="QLabel" name="label_26">
+                        <property name="text">
+                         <string>AABB dim</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_17">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_25">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_21">
+                      <item>
+                       <widget class="QLabel" name="label_27">
+                        <property name="text">
+                         <string>Max Distance</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_18">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_26">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_22">
+                      <item>
+                       <widget class="QLabel" name="label_28">
+                        <property name="text">
+                         <string>Max Vertex Movement</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_19">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_27">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_23">
+                      <item>
+                       <widget class="QLabel" name="label_29">
+                        <property name="text">
+                         <string>Slow Factor</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_20">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_29">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_24">
+                      <item>
+                       <widget class="QLabel" name="label_30">
+                        <property name="text">
+                         <string>Max Force</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_21">
+                        <property name="minimum">
+                         <double>0.010000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_38">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_34">
+                      <item>
+                       <widget class="QLabel" name="label_40">
+                        <property name="text">
+                         <string>Origina Attraction</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_31">
+                        <property name="minimum">
+                         <double>0.010000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="graph4">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>358</width>
+              <height>808</height>
+             </rect>
+            </property>
+            <attribute name="label">
+             <string>Graph 4</string>
+            </attribute>
+            <layout class="QFormLayout" name="formLayout">
+             <item row="0" column="0" colspan="2">
+              <widget class="QFrame" name="frame_28">
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_20">
+                <item row="0" column="0">
+                 <widget class="QCheckBox" name="checkBox_10">
+                  <property name="text">
+                   <string>start/stop layouting </string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QGroupBox" name="groupBox_15">
+                  <property name="title">
+                   <string>GroupBox</string>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_12">
+                   <item>
+                    <widget class="QFrame" name="frame_30">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_25">
+                      <item>
+                       <widget class="QLabel" name="label_31">
+                        <property name="text">
+                         <string>Repulsion Constant</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_22">
+                        <property name="minimum">
+                         <double>0.010000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_31">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_26">
+                      <item>
+                       <widget class="QLabel" name="label_32">
+                        <property name="text">
+                         <string>Attraction Constant</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_23">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_32">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_27">
+                      <item>
+                       <widget class="QLabel" name="label_33">
+                        <property name="text">
+                         <string>AABB dim</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_24">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_33">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_28">
+                      <item>
+                       <widget class="QLabel" name="label_34">
+                        <property name="text">
+                         <string>Max Distance</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_25">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_34">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_29">
+                      <item>
+                       <widget class="QLabel" name="label_35">
+                        <property name="text">
+                         <string>Max Vertex Movement</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_26">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_35">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_30">
+                      <item>
+                       <widget class="QLabel" name="label_36">
+                        <property name="text">
+                         <string>Slow Factor</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_27">
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_39">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_31">
+                      <item>
+                       <widget class="QLabel" name="label_37">
+                        <property name="text">
+                         <string>Max Force</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_28">
+                        <property name="minimum">
+                         <double>0.010000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QFrame" name="frame_40">
+                     <property name="frameShape">
+                      <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout_35">
+                      <item>
+                       <widget class="QLabel" name="label_41">
+                        <property name="text">
+                         <string>Origina Attraction</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_32">
+                        <property name="minimum">
+                         <double>0.010000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -1038,13 +1977,13 @@
     <slot>getSliderX(int)</slot>
     <slot>getSliderY(int)</slot>
     <slot>getIntervalID(int)</slot>
-    <slot>getGraphParam1(double)</slot>
-    <slot>getGraphParam2(double)</slot>
-    <slot>getGraphParam3(double)</slot>
-    <slot>getGraphParam4(double)</slot>
-    <slot>getGraphParam5(double)</slot>
-    <slot>getGraphParam6(double)</slot>
-    <slot>getGraphParam7(double)</slot>
+    <slot>getGraphCr(double)</slot>
+    <slot>getGraphCa(double)</slot>
+    <slot>getGraphAABBdim(double)</slot>
+    <slot>getGraphmax_distance(double)</slot>
+    <slot>getGraphmax_vertex_movement(double)</slot>
+    <slot>getGraphslow_factor(double)</slot>
+    <slot>getGraphmax_force(double)</slot>
     <slot>getFilteredType(QString)</slot>
     <slot>getFilteredID(QString)</slot>
     <slot>getFilterWithChildren(bool)</slot>
@@ -1060,6 +1999,8 @@
     <slot>clearSelectedObjectsTable()</slot>
     <slot>hideSelectedObjects()</slot>
     <slot>highlightSelected(QModelIndex)</slot>
+    <slot>getGraphoriginalPosAttraction(double)</slot>
+    <slot>getActiveGraphTab(int)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -1197,11 +2138,11 @@
    <sender>doubleSpinBox</sender>
    <signal>valueChanged(double)</signal>
    <receiver>openGLWidget</receiver>
-   <slot>getGraphParam1(double)</slot>
+   <slot>getGraphCr(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>276</x>
-     <y>463</y>
+     <x>269</x>
+     <y>564</y>
     </hint>
     <hint type="destinationlabel">
      <x>569</x>
@@ -1213,11 +2154,11 @@
    <sender>doubleSpinBox_2</sender>
    <signal>valueChanged(double)</signal>
    <receiver>openGLWidget</receiver>
-   <slot>getGraphParam2(double)</slot>
+   <slot>getGraphCa(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>276</x>
-     <y>489</y>
+     <x>267</x>
+     <y>610</y>
     </hint>
     <hint type="destinationlabel">
      <x>584</x>
@@ -1229,11 +2170,11 @@
    <sender>doubleSpinBox_3</sender>
    <signal>valueChanged(double)</signal>
    <receiver>openGLWidget</receiver>
-   <slot>getGraphParam3(double)</slot>
+   <slot>getGraphAABBdim(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>276</x>
-     <y>515</y>
+     <x>281</x>
+     <y>656</y>
     </hint>
     <hint type="destinationlabel">
      <x>579</x>
@@ -1245,11 +2186,11 @@
    <sender>doubleSpinBox_7</sender>
    <signal>valueChanged(double)</signal>
    <receiver>openGLWidget</receiver>
-   <slot>getGraphParam4(double)</slot>
+   <slot>getGraphmax_distance(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>276</x>
-     <y>541</y>
+     <x>281</x>
+     <y>702</y>
     </hint>
     <hint type="destinationlabel">
      <x>599</x>
@@ -1261,11 +2202,11 @@
    <sender>doubleSpinBox_8</sender>
    <signal>valueChanged(double)</signal>
    <receiver>openGLWidget</receiver>
-   <slot>getGraphParam5(double)</slot>
+   <slot>getGraphslow_factor(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>276</x>
-     <y>567</y>
+     <x>281</x>
+     <y>794</y>
     </hint>
     <hint type="destinationlabel">
      <x>582</x>
@@ -1277,11 +2218,11 @@
    <sender>doubleSpinBox_9</sender>
    <signal>valueChanged(double)</signal>
    <receiver>openGLWidget</receiver>
-   <slot>getGraphParam6(double)</slot>
+   <slot>getGraphmax_vertex_movement(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>276</x>
-     <y>593</y>
+     <x>254</x>
+     <y>748</y>
     </hint>
     <hint type="destinationlabel">
      <x>576</x>
@@ -1293,11 +2234,11 @@
    <sender>doubleSpinBox_10</sender>
    <signal>valueChanged(double)</signal>
    <receiver>openGLWidget</receiver>
-   <slot>getGraphParam7(double)</slot>
+   <slot>getGraphmax_force(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>276</x>
-     <y>619</y>
+     <x>281</x>
+     <y>840</y>
     </hint>
     <hint type="destinationlabel">
      <x>566</x>
@@ -1344,8 +2285,8 @@
    <slot>getNodeSizeEncoding(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>216</x>
-     <y>472</y>
+     <x>229</x>
+     <y>453</y>
     </hint>
     <hint type="destinationlabel">
      <x>698</x>
@@ -1360,8 +2301,8 @@
    <slot>getColorEncoding(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>216</x>
-     <y>498</y>
+     <x>229</x>
+     <y>479</y>
     </hint>
     <hint type="destinationlabel">
      <x>700</x>
@@ -1376,8 +2317,8 @@
    <slot>getItemChanged(QListWidgetItem*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>261</x>
-     <y>1148</y>
+     <x>81</x>
+     <y>832</y>
     </hint>
     <hint type="destinationlabel">
      <x>737</x>
@@ -1392,8 +2333,8 @@
    <slot>getFilteredID(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>203</x>
-     <y>1207</y>
+     <x>81</x>
+     <y>1188</y>
     </hint>
     <hint type="destinationlabel">
      <x>706</x>
@@ -1408,8 +2349,8 @@
    <slot>getFilterWithChildren(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>160</x>
-     <y>1263</y>
+     <x>81</x>
+     <y>1247</y>
     </hint>
     <hint type="destinationlabel">
      <x>699</x>
@@ -1424,8 +2365,8 @@
    <slot>getFilterWithParent(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>160</x>
-     <y>1286</y>
+     <x>81</x>
+     <y>1270</y>
     </hint>
     <hint type="destinationlabel">
      <x>733</x>
@@ -1440,8 +2381,8 @@
    <slot>getFilterWithSynapses(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>160</x>
-     <y>1309</y>
+     <x>81</x>
+     <y>1293</y>
     </hint>
     <hint type="destinationlabel">
      <x>741</x>
@@ -1456,8 +2397,8 @@
    <slot>getDoubleClickedTableView(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>226</x>
-     <y>556</y>
+     <x>81</x>
+     <y>476</y>
     </hint>
     <hint type="destinationlabel">
      <x>755</x>
@@ -1472,8 +2413,8 @@
    <slot>getFitlerButtonClicked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>132</x>
-     <y>792</y>
+     <x>49</x>
+     <y>770</y>
     </hint>
     <hint type="destinationlabel">
      <x>698</x>
@@ -1488,8 +2429,8 @@
    <slot>getResetFitlerButtonClicked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>279</x>
-     <y>1348</y>
+     <x>91</x>
+     <y>1326</y>
     </hint>
     <hint type="destinationlabel">
      <x>732</x>
@@ -1504,8 +2445,8 @@
    <slot>clearSelectedObjectsTable()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>301</x>
-     <y>778</y>
+     <x>265</x>
+     <y>770</y>
     </hint>
     <hint type="destinationlabel">
      <x>414</x>
@@ -1520,12 +2461,12 @@
    <slot>hideSelectedObjects()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>202</x>
-     <y>787</y>
+     <x>157</x>
+     <y>770</y>
     </hint>
     <hint type="destinationlabel">
-     <x>412</x>
-     <y>804</y>
+     <x>411</x>
+     <y>803</y>
     </hint>
    </hints>
   </connection>
@@ -1536,8 +2477,8 @@
    <slot>highlightSelected(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>310</x>
-     <y>535</y>
+     <x>81</x>
+     <y>476</y>
     </hint>
     <hint type="destinationlabel">
      <x>439</x>
@@ -1552,8 +2493,8 @@
    <slot>startPath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>65</x>
-     <y>639</y>
+     <x>57</x>
+     <y>628</y>
     </hint>
     <hint type="destinationlabel">
      <x>51</x>
@@ -1568,8 +2509,8 @@
    <slot>endPath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>303</x>
-     <y>638</y>
+     <x>219</x>
+     <y>628</y>
     </hint>
     <hint type="destinationlabel">
      <x>267</x>
@@ -1584,8 +2525,8 @@
    <slot>retracePath(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>228</x>
-     <y>674</y>
+     <x>91</x>
+     <y>667</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -1600,8 +2541,8 @@
    <slot>namePath(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>326</x>
-     <y>496</y>
+     <x>91</x>
+     <y>485</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -1616,8 +2557,8 @@
    <slot>savePath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>320</x>
-     <y>568</y>
+     <x>91</x>
+     <y>556</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -1632,8 +2573,8 @@
    <slot>describePath(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>302</x>
-     <y>542</y>
+     <x>91</x>
+     <y>530</y>
     </hint>
     <hint type="destinationlabel">
      <x>296</x>
@@ -1648,8 +2589,8 @@
    <slot>updateActivePath(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>285</x>
-     <y>1178</y>
+     <x>91</x>
+     <y>744</y>
     </hint>
     <hint type="destinationlabel">
      <x>288</x>
@@ -1668,8 +2609,8 @@
      <y>101</y>
     </hint>
     <hint type="destinationlabel">
-     <x>351</x>
-     <y>500</y>
+     <x>91</x>
+     <y>485</y>
     </hint>
    </hints>
   </connection>
@@ -1680,8 +2621,8 @@
    <slot>deleteSelectedPath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>336</x>
-     <y>1340</y>
+     <x>229</x>
+     <y>1326</y>
     </hint>
     <hint type="destinationlabel">
      <x>272</x>
@@ -1702,6 +2643,422 @@
     <hint type="destinationlabel">
      <x>77</x>
      <y>263</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_29</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphoriginalPosAttraction(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>277</x>
+     <y>886</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>424</x>
+     <y>516</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_4</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphCr(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>322</x>
+     <y>586</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>583</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_5</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphCa(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>323</x>
+     <y>633</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>415</x>
+     <y>629</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_11</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphmax_distance(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>325</x>
+     <y>716</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>422</x>
+     <y>716</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_12</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphmax_vertex_movement(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>329</x>
+     <y>768</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>430</x>
+     <y>767</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_13</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphslow_factor(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>312</x>
+     <y>805</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>412</x>
+     <y>805</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_14</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphmax_force(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>324</x>
+     <y>857</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>418</x>
+     <y>852</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_30</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphoriginalPosAttraction(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>332</x>
+     <y>897</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>473</x>
+     <y>894</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_15</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphCr(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>322</x>
+     <y>609</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>416</x>
+     <y>607</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_16</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphCa(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>327</x>
+     <y>658</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>420</x>
+     <y>656</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_17</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphAABBdim(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>327</x>
+     <y>700</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>428</x>
+     <y>701</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_18</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphmax_distance(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>330</x>
+     <y>748</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>415</x>
+     <y>762</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_19</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphmax_vertex_movement(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>274</x>
+     <y>797</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>797</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_20</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphslow_factor(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>327</x>
+     <y>832</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>424</x>
+     <y>843</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_21</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphmax_force(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>303</x>
+     <y>882</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>421</x>
+     <y>888</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_31</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphoriginalPosAttraction(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>287</x>
+     <y>929</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>416</x>
+     <y>930</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_22</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphCr(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>333</x>
+     <y>633</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>489</x>
+     <y>641</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_23</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphCa(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>317</x>
+     <y>684</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>433</x>
+     <y>681</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>toolBox_graphsParam</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getActiveGraphTab(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>315</x>
+     <y>449</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>415</x>
+     <y>435</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_24</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphAABBdim(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>326</x>
+     <y>725</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>428</x>
+     <y>720</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_25</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphmax_distance(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>317</x>
+     <y>768</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>414</x>
+     <y>774</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_26</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphmax_vertex_movement(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>309</x>
+     <y>815</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>424</x>
+     <y>820</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_27</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphslow_factor(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>330</x>
+     <y>863</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>425</x>
+     <y>868</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_28</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphmax_force(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>318</x>
+     <y>910</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>421</x>
+     <y>915</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_32</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphoriginalPosAttraction(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>329</x>
+     <y>955</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>417</x>
+     <y>959</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doubleSpinBox_6</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>getGraphAABBdim(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>331</x>
+     <y>672</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>466</x>
+     <y>676</y>
     </hint>
    </hints>
   </connection>

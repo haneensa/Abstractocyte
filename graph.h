@@ -15,7 +15,7 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-struct force_layout_param {
+struct FDR_param {
     float Cr /*1.5*/;           // repulsion constant
     float Ca /*0.5*/;           // attraction constant
     float AABBdim /*0.15*/;      // the area to include nodes for repulsion
@@ -24,6 +24,7 @@ struct force_layout_param {
     float max_vertex_movement /*0.01*/;  // max movment for vertex after applying the force
     float slow_factor /*0.01*/;          // force slowing factor
     float max_force /*1.0*/;            // max force to appy
+    float originalPosAttraction;
 };
 
 struct GEM_param {
@@ -114,6 +115,8 @@ public:
     Node* getNode(std::pair<int, int> id_tuple);
     Edge* getEdge(int eID);
 
+    struct FDR_param getFDRParams()                 { return m_fdr_params; }
+    void updateFDRParamts(struct FDR_param params)  { m_fdr_params = params; }
 
     std::map<std::pair<int, int>, Node*> getNodes() { return m_nodes; }
     std::map<int, Edge*> getEdges() { return m_edges; }
@@ -195,14 +198,7 @@ protected:
 
 
     // force directed laout
-    float                           m_MAX_DISTANCE;
-    float                           m_AABBdim;
-    float                           m_Cr;
-    float                           m_Ca;
-    int                             m_ITERATIONS;
-    float                           m_MAX_VERTEX_MOVEMENT;
-    float                           m_SLOW_FACTOR;
-    float                           m_MAX_FORCE;
+    struct FDR_param                m_fdr_params;
 
     // GEM constants
     float                           m_nrm;  // normalization factor
