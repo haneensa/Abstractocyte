@@ -278,7 +278,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         m_opengl_mngr->highlightObject(hvgxID);
 
         doneCurrent();
-    } else if (m_isRotatable == false) {
+    } else if ( event->buttons() == Qt::RightButton ) {
             m_translation = QVector3D( m_translation.x() + deltaX/(float)width(),
                                        m_translation.y() +  -1.0 * (deltaY/(float)height()),
                                        0.0);
