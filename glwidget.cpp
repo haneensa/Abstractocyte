@@ -552,6 +552,8 @@ void GLWidget::getNodeSizeEncoding(QString encoding)
         m_opengl_mngr->updateNodeSizeEncoding(Size_e::VOLUME);
     else if (encoding == "Astrocyte Coverage")
         m_opengl_mngr->updateNodeSizeEncoding(Size_e::ASTRO_COVERAGE);
+    else if (encoding == "Synapse Size")
+        m_opengl_mngr->updateNodeSizeEncoding(Size_e::SYNAPSE_SIZE);
     update();
 }
 
