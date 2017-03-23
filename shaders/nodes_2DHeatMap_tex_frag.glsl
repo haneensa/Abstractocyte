@@ -26,11 +26,11 @@ float getSplattedTexture(in sampler2D texture_toSplat, in vec2 coord);
 
 void main() {
     float splat = getSplattedTexture(tex, G_fragTexCoord);
-    vec4 red_color = vec4(1.0, 0.0, 0.0, 1.0);
+    float tex_splat = texture(tex, G_fragTexCoord).r;
+
     vec4 t_color = texture(tf, splat);
-    vec4 mix_color = mix(t_color, red_color, splat);
-    outcol = mix_color;
-}
+    outcol = t_color;
+ }
 
 float getSplattedTexture(in sampler2D texture_toSplat, in vec2 coord)
 {

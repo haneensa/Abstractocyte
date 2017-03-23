@@ -48,17 +48,13 @@ void OpenGLManager::drawAll()
     write_ssbo_data();
 
 
-   // glDisable(GL_BLEND);
-    render2DHeatMapTexture();
-    //glEnable (GL_BLEND);
+     render2DHeatMapTexture();
 
     renderAbstractions();
     renderSelection();
 
-//    glDisable(GL_BLEND);
-    drawNodesInto2DTexture();
-//    glEnable (GL_BLEND);
-}
+     drawNodesInto2DTexture();
+ }
 
 // ############## Data Initialization ###############################################
 //
@@ -345,8 +341,8 @@ void OpenGLManager::init2DHeatMapTextures()
     GL_Error();
 
     // init transfer function
-    m_tf_2DHeatmap.push_back(QVector4D(0.8f, 0.0f, 0.8f, 0.0f)); // 0
-    m_tf_2DHeatmap.push_back(QVector4D(0.5f, 0.0f, 0.5f, 0.5f)); // 1
+    m_tf_2DHeatmap.push_back(QVector4D(0.8f, 0.0f, 0.0f, 0.0f)); // 0
+    m_tf_2DHeatmap.push_back(QVector4D(0.5f, 0.0f, 0.5f, 0.9f)); // 1
     m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 1.0f)); // 2
 
 
@@ -536,6 +532,8 @@ void OpenGLManager::render2DHeatMapTexture()
     // 1) render this into fbo 1
     // ********* Debug Texture
     if (m_uniforms.x_axis == 100 && m_uniforms.y_axis == 100) {
+        glEnable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
         m_GNeurites.vaoBind("2DHeatMap_Quad");
         m_GNeurites.useProgram("2DHeatMap_Texture");
         // heatmap texture
@@ -555,6 +553,7 @@ void OpenGLManager::render2DHeatMapTexture()
         glUniform2fv(dim, 1, dim_value);
 
         glDrawArrays(GL_TRIANGLES, 0, m_Texquad.size() );
+        glEnable(GL_DEPTH_TEST);
 
         m_GNeurites.vaoRelease();
 
@@ -581,8 +580,13 @@ void OpenGLManager::update2DTextureUniforms(GLuint program)
 void OpenGLManager::drawNodesInto2DTexture()
 {
     //****************** Render Nodes Into Texture ***********************
+    glEnable(GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_DST_ALPHA);
+
+    glDisable(GL_DEPTH_TEST);
+
     glBindFramebuffer(GL_FRAMEBUFFER, m_2D_heatMap_FBO_H);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     m_GNeurites.vaoBind("2DHeatMap");
@@ -599,6 +603,9 @@ void OpenGLManager::drawNodesInto2DTexture()
 
     glFlush();
     glFinish();
+
+    glEnable(GL_DEPTH_TEST);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -1805,7 +1812,7 @@ void OpenGLManager::FilterByType(Object_t type, bool flag)
         FilterObject(hvgxID, flag);
 
     }
-    m_dataContainer->recomputeMaxVolAstro();
+    m_dataContainer->recomputeMaxValues();
     updateSSBO();
 }
 
@@ -1829,19 +1836,20 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids, bool invisibility )
         recursiveFilter(hvgxID, invisibility);
     }
 
-    m_dataContainer->recomputeMaxVolAstro();
-    updateSSBO();}
+    m_dataContainer->recomputeMaxValues();
+    updateSSBO();
+}
 
 // ----------------------------------------------------------------------------
 //
 void OpenGLManager::FilterByID( std::set<int> tokens_Ids, bool invisibility )
 {
     if (invisibility == false) { // show only
-        // hide everything else
-        for (int i = 0; i < m_ssbo_data.size(); ++i) {
-            FilterObject(i, !invisibility);
-        }
-    }
+          // hide everything else
+          for (int i = 0; i < m_ssbo_data.size(); ++i) {
+              FilterObject(i, !invisibility);
+          }
+      }
 
     for (auto iter = tokens_Ids.begin(); iter != tokens_Ids.end(); ++iter) {
         int hvgxID = *iter;
@@ -1852,8 +1860,27 @@ void OpenGLManager::FilterByID( std::set<int> tokens_Ids, bool invisibility )
 
     }
 
-    m_dataContainer->recomputeMaxVolAstro();
+    m_dataContainer->recomputeMaxValues();
+    updateSSBO();
+}
+
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::VisibilityToggleSelectedObjects( std::set<int> tokens_Ids, bool invisibility )
+{
+    for (auto iter = tokens_Ids.begin(); iter != tokens_Ids.end(); ++iter) {
+        int hvgxID = *iter;
+        if (hvgxID > m_ssbo_data.size())
+            continue;
+
+        recursiveFilter(hvgxID, invisibility);
+
+    }
+
+    m_dataContainer->recomputeMaxValues();
     updateSSBO();}
+
 
 // ----------------------------------------------------------------------------
 //
@@ -1864,7 +1891,7 @@ void OpenGLManager::showAll()
         FilterObject(i, false);
     }
 
-    m_dataContainer->recomputeMaxVolAstro();
+    m_dataContainer->recomputeMaxValues();
     updateSSBO();
 }
 
@@ -2034,24 +2061,30 @@ void OpenGLManager::updateSSBO()
         if (m_ssbo_data.size() <= hvgxID)
             continue;
 
-        float volume =  translate(obj->getVolume(), 0, m_dataContainer->getMaxVolume(), 0, 1);
+
         float coverage = translate( obj->getAstroCoverage(),
-                                   0, m_dataContainer->getMaxAstroCoverage(),
+                                   0,  m_dataContainer->getMaxAstroCoverage() ,
                                    0, 0.7);
 
 
-        m_ssbo_data[hvgxID].info.setY( obj->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage() );
+        m_ssbo_data[hvgxID].info.setY( obj->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage()  );
 
         switch(m_size_encoding) {
-        case Size_e::VOLUME:
-            m_ssbo_data[hvgxID].info.setX( 20 *  volume);
-            break;
-        case Size_e::ASTRO_COVERAGE:
-            m_ssbo_data[hvgxID].info.setX( 20 *  coverage);
-            break;
-        default:
-            m_ssbo_data[hvgxID].info.setX( 20 *  volume);
-
+            case Size_e::VOLUME: {
+                float volume =  translate(obj->getVolume(), 0,
+                                          m_dataContainer->getMaxVolume(), 0, 1);
+                m_ssbo_data[hvgxID].info.setX( 20 *  volume);
+                break;
+            }
+            case Size_e::ASTRO_COVERAGE:
+                m_ssbo_data[hvgxID].info.setX( 20 *  coverage);
+                break;
+            case Size_e::SYNAPSE_SIZE: {
+                float synapse_volume =  translate(obj->getSynapseSize(), 0,
+                                                  m_dataContainer->getMaxSynapseVolume(), 0, 1);
+                m_ssbo_data[hvgxID].info.setX( 20 * synapse_volume);
+                break;
+            }
         }
 
 

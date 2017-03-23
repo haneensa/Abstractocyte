@@ -29,7 +29,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
 
     // ##################  Y axis
     // 1) Mesh Triangles, Phong Shading -> Toon Shading
-    y_interval = QVector2D(0, 20);
+    y_interval = QVector2D(0, 22);
     ast_properites_list["PHONG_TOON"] = y_interval;
     ast1.pos_alpha = QVector2D(0, 1);
     ast1.trans_alpha = QVector2D(1, 1);
@@ -42,7 +42,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     m_ast_states[std::make_pair(y_interval.x(), y_interval.y())] = ast1;
 
     // 2) Mesh triangles -> point skeleton
-    y_interval = QVector2D(20, 40);
+    y_interval = QVector2D(22, 44);
     ast_properites_list["MESH_SKELETON"] = y_interval;
     ast2.pos_alpha = QVector2D(0, 0.6);
     ast2.trans_alpha = QVector2D(1, 0);
@@ -55,7 +55,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     m_ast_states[std::make_pair(y_interval.x(), y_interval.y())] = ast2;
 
     // 3) curved skeleto <-> simplified skeleton
-    y_interval = QVector2D(40, 60);
+    y_interval = QVector2D(44, 66);
     ast_properites_list["PSKELETON_SIMPSKELETON"] = y_interval;
     ast4.pos_alpha = QVector2D(0, 1);
     ast4.trans_alpha = QVector2D(1, 1);
@@ -68,7 +68,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     m_ast_states[std::make_pair(y_interval.x(), y_interval.y())] = ast4;
 
     // 4) Skeleton -> no skeleton
-    y_interval = QVector2D(60, 100);
+    y_interval = QVector2D(66, 100);
     ast_properites_list["SKELETON_MARKERS"] = y_interval;
     ast5.pos_alpha = QVector2D(0, 1);
     ast5.trans_alpha = QVector2D(1, 0);
@@ -83,7 +83,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
 
     // ################## X axis: Neurites Abstraction
     // 1) Mesh Triangles, Phong Shading -> Toon Shading
-    x_interval = QVector2D(0, 20);
+    x_interval = QVector2D(0, 22);
     neu_properties_list["PHONG_TOON"] = x_interval;
     neu1.pos_alpha  = QVector2D(0, 1); // doesnt matter since both positions chosen would be the same
     neu1.trans_alpha = QVector2D(1, 1); // also doesnt matter
@@ -96,7 +96,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     m_neu_states[std::make_pair(x_interval.x(), x_interval.y())] = neu1;
 
     // 2) Mesh triangles -> point skeleton
-    x_interval = QVector2D(20, 40);
+    x_interval = QVector2D(22, 44);
     neu_properties_list["MESH_SKELETON"] = x_interval;
     neu2.pos_alpha  = QVector2D(0, 0.6);
     neu2.trans_alpha = QVector2D(1, 0);
@@ -109,7 +109,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     m_neu_states[std::make_pair(x_interval.x(), x_interval.y())] = neu2;
 
     // 3) skeleton -> simplified skeleton
-    x_interval = QVector2D(40, 60);
+    x_interval = QVector2D(44, 66);
     neu_properties_list["PSKELETON_SIMPSKELETON"] = x_interval;
     neu3.pos_alpha  = QVector2D(0, 1);
     neu3.trans_alpha = QVector2D(1, 1);
@@ -123,7 +123,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
 
 
     // 4) Skeleton -> Point
-    x_interval = QVector2D(60, 100);
+    x_interval = QVector2D(66, 100);
     neu_properties_list["SIMPSKELETON_POINT"] = x_interval;
     neu4.pos_alpha  = QVector2D(0, 1);
     neu4.trans_alpha = QVector2D(1, 1);
@@ -247,7 +247,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     // no need for position vec
     // 4)   (y axis) Skeleton -> no skeleton
     //      (y axis) layout 1  -> layout 2
-    y_interval = QVector2D(80, 100);
+    y_interval = QVector2D(75, 100);
     ast7.pos_alpha = QVector2D(0, 1);
     ast7.trans_alpha = QVector2D(0.5, 0);
     ast7.color_alpha = QVector2D(1, 1); // skeleto <-> no skeleton
@@ -255,13 +255,13 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast7.interval = QVector2D(y_interval.x(), y_interval.y());
     ast7.positions = QVector2D(1, 1);
     ast7.render_type = QVector4D(0, 0,  0, 1);
-    ast7.extra_info = QVector4D(0, 0, 80, 100);   // x: axis type (0: x_axis, 1: y_axis)
+    ast7.extra_info = QVector4D(0, 0,75, 100);   // x: axis type (0: x_axis, 1: y_axis)
                                                   // y: both x and y axis
                                                   // z: left interval, w: right interval for y axis
 
     // 4)   (x axis) Skeleton -> point layouted
     //      (y axis) Layout <-> Layout
-    x_interval = QVector2D(80, 100);
+    x_interval = QVector2D(75, 100);
     neu6.pos_alpha  = QVector2D(0, 1);
     neu6.trans_alpha = QVector2D(1, 1);
     neu6.color_alpha = QVector2D(1, 1);
@@ -269,24 +269,24 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     neu6.interval = QVector2D(x_interval.x(), x_interval.y());       // alpha limit, div, pos1, pos2
     neu6.positions = QVector2D(1, 1);       // alpha limit, div, pos1, pos2
     neu6.render_type = QVector4D(0, 0, 0, 1);
-    neu6.extra_info = QVector4D(0, 0, 80, 100);   // x: axis type (0: x_axis, 1: y_axis)
+    neu6.extra_info = QVector4D(0, 0, 75, 100);   // x: axis type (0: x_axis, 1: y_axis)
 
     initRect(x_interval, y_interval, ID++);
     m_IntervalXY.push_back({ast7, neu6});
 
 
-    initTriangle(QVector2D(60,60), QVector2D(80, 60), QVector2D(80, 80), 0);
-    initTriangle(QVector2D(60,60), QVector2D(80, 80), QVector2D(60, 80), 0);
+    initTriangle(QVector2D(66,66), QVector2D(75, 66), QVector2D(75, 75), 0);
+    initTriangle(QVector2D(66,66), QVector2D(75, 75), QVector2D(66, 75), 0);
 
-    initTriangle(QVector2D(80,60), QVector2D(100, 60), QVector2D(100, 80), 0);
-    initTriangle(QVector2D(100,80), QVector2D(80, 80), QVector2D(80, 60), 0);
+    initTriangle(QVector2D(75,66), QVector2D(100, 66), QVector2D(100, 75), 0);
+    initTriangle(QVector2D(100,75), QVector2D(75, 75), QVector2D(75, 66), 0);
 
-    initTriangle(QVector2D(100,80), QVector2D(80, 80), QVector2D(80, 60), 0);
-    initTriangle(QVector2D(100,80), QVector2D(80, 80), QVector2D(80, 60), 0);
+    initTriangle(QVector2D(100,75), QVector2D(75, 75), QVector2D(75, 66), 0);
+    initTriangle(QVector2D(100,75), QVector2D(75, 75), QVector2D(75, 66), 0);
 
 
-    initTriangle(QVector2D(60,80), QVector2D(80, 80), QVector2D(80, 100), 0);
-    initTriangle(QVector2D(80,100), QVector2D(60, 100), QVector2D(60, 80), 0);
+    initTriangle(QVector2D(66,75), QVector2D(75, 75), QVector2D(75, 100), 0);
+    initTriangle(QVector2D(75,100), QVector2D(66, 100), QVector2D(66, 75), 0);
 
 
 
@@ -300,8 +300,8 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
     neu_properties = m_neu_states[std::make_pair(x_interval.x(), x_interval.y())];
     m_IntervalXY.push_back({ast_properties, neu_properties});
-    initLine(QVector2D(60, 60), QVector2D(60, 100), ID++);
-    iniGridtLine(QVector2D(60, 60), QVector2D(60, 100), 0);
+    initLine(QVector2D(66, 66), QVector2D(66, 100), ID++);
+    iniGridtLine(QVector2D(66, 66), QVector2D(66, 100), 0);
 
     //******************  2) (60, 60) <-> (100, 60) **************************
     // interpolate between 3D neurite skeleton to 3D points
@@ -311,13 +311,13 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast_properties = m_ast_states[std::make_pair(y_interval.x(), y_interval.y())];
     neu_properties = m_neu_states[std::make_pair(x_interval.x(), x_interval.y())];
     m_IntervalXY.push_back({ast_properties, neu_properties});
-    initLine(QVector2D(60, 60), QVector2D(100, 60), ID++);
-    iniGridtLine(QVector2D(60, 60), QVector2D(100, 60), 0);
+    initLine(QVector2D(66, 66), QVector2D(100, 66), ID++);
+    iniGridtLine(QVector2D(66, 66), QVector2D(100, 66), 0);
 
 
     //******************  3) (60, 60) <-> (80, 80) **************************
     // Skeleton Simplified 3D -> Skeleton Simplified 2D (layouted)
-    y_interval = QVector2D(60, 80);
+    y_interval = QVector2D(66, 75);
     ast7.pos_alpha = QVector2D(0, 1); // 3D to 2D lyout
     ast7.trans_alpha = QVector2D(1, 1); // nothing disappears
     ast7.color_alpha = QVector2D(1, 1); // same color
@@ -329,7 +329,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
 
 
     // Neurite Node 3D -> Neurite Node 2D (layouted) with astrocyte
-    x_interval = QVector2D(60, 80);
+    x_interval = QVector2D(66, 75);
     neu6.pos_alpha = QVector2D(0, 1); // 3D to 2D lyout
     neu6.trans_alpha = QVector2D(1, 1); // nothing disappears
     neu6.color_alpha = QVector2D(1, 1); // same color
@@ -343,14 +343,14 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
 
     // interpolate between graph 3D and 2D
     m_IntervalXY.push_back({ast7, neu6});
-    initLine(QVector2D(60, 60), QVector2D(83, 83), ID++);
-    iniGridtLine(QVector2D(60, 60), QVector2D(80, 80), 0);
+    initLine(QVector2D(66, 66), QVector2D(78, 78), ID++);
+    iniGridtLine(QVector2D(66, 66), QVector2D(75, 75), 0);
 
     //****************** 4) (60, 100) <-> (80, 100) **************************
     // interpolate between neurites skeleton 3D and 2D
     // No skeleton!!
     y_interval = QVector2D(95, 100);
-    ast7.pos_alpha = QVector2D(1, 1); // 3D to 2D lyout
+    ast7.pos_alpha = QVector2D(1, 1); // No need because astroyte is not displayed here
     ast7.trans_alpha = QVector2D(1, 1); // nothing disappears
     ast7.color_alpha = QVector2D(1, 1); // same color
     ast7.point_size = QVector2D(1, 1); // same point size
@@ -360,7 +360,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast7.extra_info = QVector4D(0, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
 
     // Neurite Node 3D -> Neurite Node 2D (layouted) with astrocyte
-    x_interval = QVector2D(60, 80);
+    x_interval = QVector2D(66, 75);
     neu6.pos_alpha = QVector2D(0, 1); // 3D to 2D lyout
     neu6.trans_alpha = QVector2D(0, 1); // nothing disappears
     neu6.color_alpha = QVector2D(1, 1); // same color
@@ -374,14 +374,14 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
 
     // interpolate between graph 3D and 2D
     m_IntervalXY.push_back({ast7, neu6});
-    initLine(QVector2D(60, 100), QVector2D(80, 100), ID++);
-    iniGridtLine(QVector2D(60, 100), QVector2D(80, 100), 0);
+    initLine(QVector2D(66, 100), QVector2D(75, 100), ID++);
+    iniGridtLine(QVector2D(66, 100), QVector2D(75, 100), 0);
 
     // interpolate between astrocyte and nodes 3D to 2D
 
     //******************   5) (100, 60) <-> (100, 80) **************************
     // interpolate between marked nodes and
-    y_interval = QVector2D(60, 80);
+    y_interval = QVector2D(66, 75);
     ast7.pos_alpha = QVector2D(0, 1); // 3D to 2D lyout
     ast7.trans_alpha = QVector2D(1, 1); // nothing disappears
     ast7.color_alpha = QVector2D(1, 1); // same color
@@ -392,7 +392,7 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
     ast7.extra_info = QVector4D(1, 0, 0, 0);   // x: axis type (0: x_axis, 1: y_axis)
 
     // 6) Neurite Node 3D -> Neurite Node 2D (layouted) with astrocyte
-    x_interval = QVector2D(60, 80);
+    x_interval = QVector2D(66, 75);
     neu6.pos_alpha = QVector2D(0, 1); // 3D to 2D lyout
     neu6.trans_alpha = QVector2D(1, 1); // nothing disappears
     neu6.color_alpha = QVector2D(1, 1); // same color
@@ -406,8 +406,8 @@ AbstractionSpace::AbstractionSpace(int xdim, int ydim)
 
     // interpolate between graph 3D and 2D
     m_IntervalXY.push_back({ast7, neu6});
-    initLine(QVector2D(100, 60), QVector2D(100, 80), ID++);
-    iniGridtLine(QVector2D(100, 60), QVector2D(100, 80), 0);
+    initLine(QVector2D(100, 66), QVector2D(100, 75), ID++);
+    iniGridtLine(QVector2D(100, 66), QVector2D(100, 75), 0);
 
     //border lines
     iniGridtLine(QVector2D(0.3, 0.3), QVector2D(0.3, 100), 0);

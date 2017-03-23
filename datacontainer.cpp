@@ -16,6 +16,7 @@ DataContainer::DataContainer()
         m_skeleton_points_size(0),
         max_volume(2),
         max_astro_coverage(0),
+        max_synapse_volume(0),
         m_limit(1),
         m_vertex_offset(0),
         m_faces_offset(0),
@@ -39,6 +40,8 @@ DataContainer::DataContainer()
     m_glycogenOctree.initialize(&m_glycogenList);
     qDebug() << "octree ready";
 
+
+    this->recomputeMaxValues();
 }
 
 //----------------------------------------------------------------------------
@@ -68,9 +71,9 @@ void DataContainer::loadData()
     loadParentFromHVGX(hvgxFile);
 
 
-    m_limit = 2000;
+    m_limit = 10;
     m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
-    m_load_data = LoadData_t::ALL;
+    m_load_data = LoadData_t::NEURITES;
     m_normals_t = Normals_t::LOAD_NORMAL;
 
 
@@ -646,6 +649,8 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
 
          if (max_volume < obj->getVolume())
              max_volume = obj->getVolume();
+
+         max_synapse_volume = max_volume;
 
          // need to update these info whenever we filter or change the threshold
          if (obj->getObjectType() == Object_t::ASTROCYTE)
@@ -1263,9 +1268,10 @@ std::vector<Object*> DataContainer::getObjectsByType(Object_t type)
 
  //----------------------------------------------------------------------------
  //
-void DataContainer::recomputeMaxVolAstro()
+void DataContainer::recomputeMaxValues()
 {
     float temp_max_astro_coverage = 0;
+    float temp_max_synapse_volume = 0;
     int temp_max_volume = 1;
     for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++ ) {
         Object *obj = (*iter).second;
@@ -1282,6 +1288,8 @@ void DataContainer::recomputeMaxVolAstro()
             }
         }
 
+        if (temp_max_synapse_volume < obj->getSynapseSize())
+            temp_max_synapse_volume = obj->getSynapseSize();
 
         // need to update these info whenever we filter or change the threshold
         if (temp_max_astro_coverage < obj->getAstroCoverage())
@@ -1292,6 +1300,7 @@ void DataContainer::recomputeMaxVolAstro()
 
     }
 
+    max_synapse_volume = temp_max_synapse_volume;
     max_volume = temp_max_volume;
     max_astro_coverage = temp_max_astro_coverage;
 }

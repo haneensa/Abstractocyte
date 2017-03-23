@@ -97,6 +97,8 @@ public:
 	void setMappedValue(float value){ m_mappedValue = value; }
 	float getMappedValue() { return m_mappedValue; }
 
+    int getSynapseSize();
+
 private:
     std::string                             m_name;
     int                                     m_ID; // hvgx
@@ -134,7 +136,6 @@ private:
 
     // list of synapses
     std::vector<Object*>                    m_synapses;
-
 
     struct synapse                          m_synapse_data;
 

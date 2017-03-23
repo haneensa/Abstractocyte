@@ -17,7 +17,7 @@
 #include "glsluniform_structs.h"
 #include "rendervertexdata.h"
 
-enum class Size_e { VOLUME, ASTRO_COVERAGE };
+enum class Size_e { VOLUME, ASTRO_COVERAGE, SYNAPSE_SIZE };
 enum class Color_e { TYPE, FUNCTION, ASTRO_COVERAGE, GLYCOGEN_MAPPING };
 
 
@@ -90,6 +90,7 @@ public:
     void FilterByType(Object_t type, bool);
     void FilterByID( QList<QString> tokens_Ids, bool );
     void FilterByID(  std::set<int> tokens_Ids, bool );
+    void VisibilityToggleSelectedObjects(  std::set<int> tokens_Ids, bool );
     void showAll();
     void FilterObject(int ID, bool isfilterd);
     void recursiveFilter(int ID, bool isfilterd);

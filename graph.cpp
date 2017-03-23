@@ -21,14 +21,15 @@ Graph::Graph(Graph_t graphType, OpenGLManager *opengl_mnger, int gridCol)
 void Graph::FDL_initParameters()
 {
     // force directed layout parameters
-    m_Cr = 1.5;
-    m_Ca = 0.5;
-    m_AABBdim = 0.15f; // used for spatial hashing query dim
-    m_MAX_DISTANCE = 0.1f;
-    m_ITERATIONS = 10000;
-    m_MAX_VERTEX_MOVEMENT = 0.01f;
-    m_SLOW_FACTOR = 0.01f;
-    m_MAX_FORCE = 1.0f;
+    m_fdr_params.Cr = 1.5;
+    m_fdr_params.Ca = 0.5;
+    m_fdr_params.AABBdim = 0.15f; // used for spatial hashing query dim
+    m_fdr_params.max_distance = 0.1f;
+    m_fdr_params.iterations = 10000;
+    m_fdr_params.max_vertex_movement = 0.01f;
+    m_fdr_params.slow_factor = 0.01f;
+    m_fdr_params.max_force = 1.0f;
+    m_fdr_params.originalPosAttraction = 0.1;
 }
 
 void Graph::GEM_initParameters()
@@ -47,49 +48,6 @@ void Graph::GEM_initParameters()
     m_Tglobal = m_Tinit * m_nodes.size();      // temperature sum, average of te local temp over all vertices
     m_rounds = 40 * m_nodes.size();       // max number of rounds
     m_barycentric = QVector2D(0, 0);
-}
-
-// later refactor this
-void Graph::updateGraphParam1(double value)
-{
-    qDebug() << "Updating Cr to " << value;
-    m_Cr = value;
-}
-
-void Graph::updateGraphParam2(double value)
-{
-    qDebug() << "Updating Ca to " << value;
-    m_Ca = value;
-}
-
-void Graph::updateGraphParam3(double value)
-{
-    qDebug() << "Updating AABBdim to " << value;
-    m_AABBdim = value;
-}
-
-void Graph::updateGraphParam4(double value)
-{
-    qDebug() << "Updating m_MAX_DISTANCE to " << value;
-    m_MAX_DISTANCE = value;
-}
-
-void Graph::updateGraphParam5(double value)
-{
-    qDebug() << "Updating m_MAX_VERTEX_MOVEMENT to " << value;
-    m_MAX_VERTEX_MOVEMENT = value;
-}
-
-void Graph::updateGraphParam6(double value)
-{
-    qDebug() << "Updating m_SLOW_FACTOR to " << value;
-    m_SLOW_FACTOR = value;
-}
-
-void Graph::updateGraphParam7(double value)
-{
-    qDebug() << "Updating m_MAX_FORCE to " << value;
-    m_MAX_FORCE = value;
 }
 
 Graph::~Graph()
@@ -300,7 +258,7 @@ void Graph::resetCoordinates()
         hashGrid->insert((*iter).second);
     }
 
-    if (m_gType == Graph_t::NODE_NODE || m_gType == Graph_t::NODE_SKELETON)
+    if (m_gType == Graph_t::NODE_NODE  || m_gType == Graph_t::NODE_SKELETON)
         runforceDirectedLayout();
    // GEM_run();
 
@@ -359,10 +317,8 @@ void Graph::update_node_data(Node* node)
 // how to remove filtered objects from graph?????
 // for each node check if it is filtered
 // if yes ignore it and proceed, but this would wast time
-// I need to remove it from graph!!S
-
+// I need to remove it from graph!!
 // dont filter in the connectivity graph??
-
 void Graph::runforceDirectedLayout()
 {
     std::map<int, Object*>  objectMap = m_opengl_mngr->getObjectsMap();
@@ -372,7 +328,7 @@ void Graph::runforceDirectedLayout()
     float k = std::sqrt( area / m_nodes.size() );
     std::vector<Node*> nearNodes;
     // reset layouted coordinates to original values
-    for ( int i = 0; i < m_ITERATIONS; i++ ) {
+    for ( int i = 0; i < m_fdr_params.iterations; i++ ) {
         if (m_FDL_terminate) goto quit;
 
         // forces on nodes due to node-node repulsion
@@ -391,7 +347,7 @@ void Graph::runforceDirectedLayout()
             }
 
             nearNodes.clear();
-            hashGrid->queryAABB(node1, m_AABBdim, nearNodes);
+            hashGrid->queryAABB(node1, m_fdr_params.AABBdim, nearNodes);
             for ( auto iter2 = nearNodes.begin(); iter2 != nearNodes.end(); iter2++ ) {
                 if (m_FDL_terminate) goto quit;
 
@@ -402,10 +358,10 @@ void Graph::runforceDirectedLayout()
                     continue;
                 }
 
-                repulseNodes(node1, node2, m_Cr * k);
+                repulseNodes(node1, node2, m_fdr_params.Cr * k);
             }
 
-           attractToOriginalPosition(node1, 0.5); // the less the more
+           attractToOriginalPosition(node1, m_fdr_params.originalPosAttraction); // the less the more
         }
 
         // forcs due to edge attraction
@@ -413,7 +369,7 @@ void Graph::runforceDirectedLayout()
             if (m_FDL_terminate) goto quit;
 
             Edge *edge = (*iter).second;
-            attractConnectedNodes(edge, m_Ca * k);
+            attractConnectedNodes(edge, m_fdr_params.Ca * k);
         }
 
         float moveAccumlation = 0.0;
@@ -431,9 +387,9 @@ void Graph::runforceDirectedLayout()
             }
 
             // get amount of force on node
-            QVector2D force = m_SLOW_FACTOR * node->getForceSum();
-            if ( force.length() > m_MAX_FORCE ) {
-                force = force.normalized() * m_MAX_FORCE;
+            QVector2D force = m_fdr_params.slow_factor * node->getForceSum();
+            if ( force.length() > m_fdr_params.max_force ) {
+                force = force.normalized() * m_fdr_params.max_force;
             }
             // calculate how much to move
             float xMove = force.x();
@@ -443,17 +399,17 @@ void Graph::runforceDirectedLayout()
             // if yes, then compute the torque, and apply that instead
 
             // limit the movement to the maximum defined
-            if ( xMove > m_MAX_VERTEX_MOVEMENT )   {
-                xMove = m_MAX_VERTEX_MOVEMENT;
+            if ( xMove > m_fdr_params.max_vertex_movement )   {
+                xMove = m_fdr_params.max_vertex_movement;
             }
-            if ( xMove < -m_MAX_VERTEX_MOVEMENT )   {
-                xMove = -m_MAX_VERTEX_MOVEMENT;
+            if ( xMove < -m_fdr_params.max_vertex_movement )   {
+                xMove = -m_fdr_params.max_vertex_movement;
             }
-            if ( yMove > m_MAX_VERTEX_MOVEMENT )    {
-                yMove = m_MAX_VERTEX_MOVEMENT;
+            if ( yMove > m_fdr_params.max_vertex_movement )    {
+                yMove = m_fdr_params.max_vertex_movement;
             }
-            if ( yMove < -m_MAX_VERTEX_MOVEMENT )  {
-                yMove = -m_MAX_VERTEX_MOVEMENT;
+            if ( yMove < -m_fdr_params.max_vertex_movement )  {
+                yMove = -m_fdr_params.max_vertex_movement;
             }
 
             moveAccumlation += std::abs(xMove) + std::abs(yMove);
@@ -536,8 +492,8 @@ QVector2D  Graph::attractionForce(float x1, float y1, float x2, float y2, float 
     }
 
 
-    if (distance > m_MAX_DISTANCE) {
-         distance = m_MAX_DISTANCE;
+    if (distance > m_fdr_params.max_distance) {
+         distance = m_fdr_params.max_distance;
          distanceSquared = distance * distance;
      }
 
@@ -572,7 +528,7 @@ QVector2D Graph::repulsiveForce(float x1, float y1, float x2, float y2, float k)
     // 4) fr(d) = k/d2
     // Coulomb's Law: F = k(Qq/r^2)
 
-    if (distance <= m_AABBdim) {
+    if (distance <= m_fdr_params.AABBdim) {
         repulsion =    (k * k) / distance;
         force =  dxy.normalized() * repulsion;
     }
@@ -656,7 +612,7 @@ QVector2D Graph::GEM_computeImpulse(Node *node)
 
 
      std::vector<Node*> nearNodes;
-     hashGrid->queryAABB(node, m_AABBdim, nearNodes);
+     hashGrid->queryAABB(node, m_fdr_params.AABBdim, nearNodes);
      for ( auto iter2 = nearNodes.begin(); iter2 != nearNodes.end(); iter2++ ) {
 
          Node *node2 = (*iter2);
@@ -683,7 +639,7 @@ QVector2D Graph::GEM_computeImpulse(Node *node)
         Node *node2 = edge->getNode1();;
         if (node2 == node)
             node2 = edge->getNode2();
-        attractConnectedNodes(edge, m_Ca );
+        attractConnectedNodes(edge, m_fdr_params.Ca );
 
         QVector2D vNode2 = node2->getLayoutedPosition();
         // for nodes u connected to v

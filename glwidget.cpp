@@ -48,6 +48,7 @@ GLWidget::GLWidget(QWidget *parent)
     connect(m_rotation_timer, SIGNAL(timeout()), this, SLOT(lockRotation2D()));
 
 
+    m_active_graph_tab = 0;
     setFocusPolicy(Qt::StrongFocus);
 }
 
@@ -248,6 +249,9 @@ void GLWidget::insertInTable(int hvgxID)
 
 void GLWidget::lockRotation2D()
 {
+    if (m_FDL_running == true)
+        return;
+
     m_rotation_timer->stop();
     m_FDL_running = true;   // run force layout
 
@@ -399,45 +403,91 @@ void GLWidget::getIntervalID(int ID)
     m_2dspace->updateID(ID);
 }
 
-
-// todo: remove this and use list widget
-void GLWidget::getGraphParam1(double value)
+void GLWidget::getActiveGraphTab(int tab_graph)
 {
-    m_graphManager->updateGraphParam1(value);
+   m_active_graph_tab = tab_graph;
 }
 
-void GLWidget::getGraphParam2(double value)
+void GLWidget::reset_layouting(bool flag)
 {
-    m_graphManager->updateGraphParam2(value);
+    if (m_FDL_running) {
+        stopForecDirectedLayout();
+    }
+
+     m_rotation_timer->start(10);
 }
 
-void GLWidget::getGraphParam3(double value)
-{
-    m_graphManager->updateGraphParam3(value);
-}
-
-void GLWidget::getGraphParam4(double value)
-{
-    m_graphManager->updateGraphParam4(value);
-}
-
-void GLWidget::getGraphParam5(double value)
-{
-    m_graphManager->updateGraphParam5(value);
-}
-
-//------------------------------------------------------
+//--------------------- Graph  Parameters ---------------------
 //
-void GLWidget::getGraphParam6(double value)
+void GLWidget::getGraphCr(double value)
 {
-    m_graphManager->updateGraphParam6(value);
+    qDebug() << value << " getGraphCr " << m_active_graph_tab;
+    struct FDR_param fdr_params = m_graphManager->getFDRParams(m_active_graph_tab);
+    if (value != 0) fdr_params.Cr = value;
+    m_graphManager->updateFDRParamts(m_active_graph_tab, fdr_params);
 }
 
-//------------------------------------------------------
-//
-void GLWidget::getGraphParam7(double value)
+void GLWidget::getGraphCa(double value)
 {
-    m_graphManager->updateGraphParam7(value);
+    qDebug() << value << " getGraphCa " << m_active_graph_tab;
+
+    struct FDR_param fdr_params = m_graphManager->getFDRParams(m_active_graph_tab);
+    if (value != 0) fdr_params.Ca = value;
+    m_graphManager->updateFDRParamts(m_active_graph_tab, fdr_params);
+}
+
+void GLWidget::getGraphAABBdim(double value)
+{
+    qDebug() << value << " getGraphAABBdim " << m_active_graph_tab;
+
+    struct FDR_param fdr_params = m_graphManager->getFDRParams(m_active_graph_tab);
+    if (value != 0) fdr_params.AABBdim = value;
+    m_graphManager->updateFDRParamts(m_active_graph_tab, fdr_params);
+}
+
+void GLWidget::getGraphmax_distance(double value)
+{
+    qDebug() << value << " getGraphmax_distance " << m_active_graph_tab;
+
+    struct FDR_param fdr_params = m_graphManager->getFDRParams(m_active_graph_tab);
+    if (value != 0) fdr_params.max_distance = value;
+    m_graphManager->updateFDRParamts(m_active_graph_tab, fdr_params);
+}
+
+void GLWidget::getGraphmax_vertex_movement(double value)
+{
+    qDebug() << value << " getGraphmax_vertex_movement " << m_active_graph_tab;
+
+    struct FDR_param fdr_params = m_graphManager->getFDRParams(m_active_graph_tab);
+    if (value != 0) fdr_params.max_vertex_movement = value;
+    m_graphManager->updateFDRParamts(m_active_graph_tab, fdr_params);
+}
+
+void GLWidget::getGraphslow_factor(double value)
+{
+    qDebug() << value << " getGraphslow_factor " << m_active_graph_tab;
+
+    struct FDR_param fdr_params = m_graphManager->getFDRParams(m_active_graph_tab);
+    if (value != 0) fdr_params.slow_factor = value;
+    m_graphManager->updateFDRParamts(m_active_graph_tab, fdr_params);
+}
+
+void GLWidget::getGraphmax_force(double value)
+{
+    qDebug() << value << " getGraphmax_force " << m_active_graph_tab;
+
+    struct FDR_param fdr_params = m_graphManager->getFDRParams(m_active_graph_tab);
+    if (value != 0) fdr_params.max_force = value;
+    m_graphManager->updateFDRParamts(m_active_graph_tab, fdr_params);
+}
+
+void GLWidget::getGraphoriginalPosAttraction(double value)
+{
+    qDebug() << value << " getGraphoriginalPosAttraction " << m_active_graph_tab;
+
+    struct FDR_param fdr_params = m_graphManager->getFDRParams(m_active_graph_tab);
+    if (value != 0) fdr_params.originalPosAttraction = value;
+    m_graphManager->updateFDRParamts(m_active_graph_tab, fdr_params);
 }
 
 //------------------------------------------------------
@@ -515,6 +565,8 @@ void GLWidget::getNodeSizeEncoding(QString encoding)
         m_opengl_mngr->updateNodeSizeEncoding(Size_e::VOLUME);
     else if (encoding == "Astrocyte Coverage")
         m_opengl_mngr->updateNodeSizeEncoding(Size_e::ASTRO_COVERAGE);
+    else if (encoding == "Synapse Size")
+        m_opengl_mngr->updateNodeSizeEncoding(Size_e::SYNAPSE_SIZE);
     update();
 }
 
@@ -629,7 +681,7 @@ void GLWidget::clearSelectedObjectsTable()
 void GLWidget::hideSelectedObjects()
 {
     m_hide_toggle = !m_hide_toggle;
-    m_opengl_mngr->FilterByID(m_selectedObjects, m_hide_toggle);
+    m_opengl_mngr->VisibilityToggleSelectedObjects(m_selectedObjects, m_hide_toggle);
     update();
 }
 

@@ -93,11 +93,13 @@ public:
     std::vector<Object*> getObjectsByType(Object_t type);
 	Object* getObject(int hvgxID);
 
-    float getMaxAstroCoverage()   { return max_astro_coverage; }
-    int getMaxVolume()          { return max_volume; }
+    float getMaxAstroCoverage()     { return max_astro_coverage; }
+    int getMaxVolume()              { return max_volume; }
+    int getMaxSynapseVolume()       { return max_synapse_volume; }
+
 
     // iterate over objects and get max volume and astro coverage
-    void recomputeMaxVolAstro();
+    void recomputeMaxValues();
 
     //************ Load Raw Data
     char* loadRawFile(QString path, int size);
@@ -108,6 +110,7 @@ public:
 protected:
      // maximum volume from displayed objects
     int                                         max_volume;
+    float                                       max_synapse_volume;
     // maximum vertices from neurites covered by astrocyte
     float                                       max_astro_coverage;
 
@@ -151,7 +154,7 @@ protected:
     LoadFile_t                                  m_loadType;
     LoadData_t                                  m_load_data;
     bool                                        m_debug_msg;
-    std::set<Object*>                        m_missingParentSkeleton;
+    std::set<Object*>                           m_missingParentSkeleton;
 
 
 };

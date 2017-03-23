@@ -36,14 +36,9 @@ void main()
         return;
 
     // check: intensity shold be normalied
-    if (intensity > 1.0)
-        color_val = vec4(0, 0, 1, 1);
-    else if (intensity < 0)
-        color_val - vec4(0, 1, 0, 1);
-    else
-        color_val = vec4(intensity, 0, 0, 1); // get the maximum value for make this normalized
+    color_val = vec4(intensity, 0, 0, intensity); // get the maximum value for make this normalized
 
-    gl_PointSize = gl_in[0].gl_PointSize + 25;
+    gl_PointSize = gl_in[0].gl_PointSize + 100;
 
     EmitVertex();
     EndPrimitive();

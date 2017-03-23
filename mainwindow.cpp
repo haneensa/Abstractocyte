@@ -62,10 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(this, SIGNAL(signalDeletedPathLabel(QString)),
                      getMousePad(), SLOT(getSelectedPathLabelToDelete(QString)));
 
-
-
-
-}
+ }
 
 //------------------------------------------------------
 //

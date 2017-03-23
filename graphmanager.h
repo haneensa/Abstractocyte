@@ -35,18 +35,12 @@ public:
     void initSkeletonsVertexAttribPointer();
 
     // force directed layout
-    void startForceDirectedLayout(int graphIdx);
     void stopForceDirectedLayout(int graphIdx);
 
     void update2Dflag(bool is2D, struct GlobalUniforms uniforms);
 
-    void updateGraphParam1(double value);
-    void updateGraphParam2(double value);
-    void updateGraphParam3(double value);
-    void updateGraphParam4(double value);
-    void updateGraphParam5(double value);
-    void updateGraphParam6(double value);
-    void updateGraphParam7(double value);
+    struct FDR_param getFDRParams(int graph_index)                      { return m_graph[graph_index]->getFDRParams(); }
+    void updateFDRParamts(int graph_index, struct FDR_param params)     { m_graph[graph_index]->updateFDRParamts(params);}
 
 protected:
     DataContainer                       *m_data_containter;
@@ -55,9 +49,6 @@ protected:
 
     // thread management
     std::thread                         m_layout_threads[max_graphs];
-
-    bool                                m_FDL_running;
-    bool                                m_2D;
 };
 
 #endif // GRAPHMANAGER_H
