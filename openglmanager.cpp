@@ -574,8 +574,13 @@ void OpenGLManager::update2DTextureUniforms(GLuint program)
 void OpenGLManager::drawNodesInto2DTexture()
 {
     //****************** Render Nodes Into Texture ***********************
+    glEnable(GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_DST_ALPHA);
+
+    glDisable(GL_DEPTH_TEST);
+
     glBindFramebuffer(GL_FRAMEBUFFER, m_2D_heatMap_FBO_H);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     m_GNeurites.vaoBind("2DHeatMap");
@@ -592,6 +597,9 @@ void OpenGLManager::drawNodesInto2DTexture()
 
     glFlush();
     glFinish();
+
+    glEnable(GL_DEPTH_TEST);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -1814,7 +1822,8 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids, bool invisibility )
     }
 
     m_dataContainer->recomputeMaxVolAstro();
-    updateSSBO();}
+    updateSSBO();
+}
 
 // ----------------------------------------------------------------------------
 //
