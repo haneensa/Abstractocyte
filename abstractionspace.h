@@ -41,6 +41,7 @@ public:
 
     std::vector<struct abstractionPoint> get2DSpaceGridVertices()   { return m_grid_vertices; }
     std::vector<GLuint> get2DSpaceGridIndices()                     { return m_grid_indices; }
+    std::vector<struct abstractionPoint> get2DSpaceGridIlligalIndices() { return m_grid_illigal_vertices; }
 
     struct ast_neu_properties getSpaceProper()  { return m_IntervalXY[m_intervalID]; }
 
@@ -77,6 +78,7 @@ private:
 
     std::vector<struct abstractionPoint>        m_grid_vertices;
     std::vector<GLuint>                         m_grid_indices;
+    std::vector<struct abstractionPoint>                         m_grid_illigal_vertices;
 
 };
 

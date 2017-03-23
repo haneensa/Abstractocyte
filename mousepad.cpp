@@ -11,7 +11,8 @@ MousePad::MousePad(QWidget *parent)
        m_vbo_2DSpaceVerts( QOpenGLBuffer::VertexBuffer ),
        m_vbo_2DSpaceTrianglesIndix( QOpenGLBuffer::IndexBuffer ),
        m_vbo_2DSpaceGridVerts( QOpenGLBuffer::VertexBuffer ),
-       m_vbo_2DSpaceGridIndix( QOpenGLBuffer::IndexBuffer )
+       m_vbo_2DSpaceGridIndix( QOpenGLBuffer::IndexBuffer ),
+       m_vbo_2DSpaceGridIlligalVertix( QOpenGLBuffer::VertexBuffer )
 {
     m_bindColorIdx = 1;
     qDebug() << "MousePad";
@@ -116,6 +117,8 @@ void MousePad::initData()
 
     m_grid_vertices = m_2dspace->get2DSpaceGridVertices();
     m_grid_indices = m_2dspace->get2DSpaceGridIndices();
+
+    m_grid_illigal_vertices = m_2dspace->get2DSpaceGridIlligalIndices();
 }
 
 void MousePad::initBuffer()
@@ -217,6 +220,13 @@ void  MousePad::init2D_GridSpaceGL()
         return;
 
 
+    m_program_2DSpace_gridIlligal = glCreateProgram();
+    res = initShader(m_program_2DSpace_gridIlligal, ":/shaders/space2d_vert.glsl", ":/shaders/space2d_grid_triangle_geom.glsl",
+                          ":/shaders/points_passthrough_frag.glsl");
+    if(res == false)
+        return;
+
+
     glUseProgram(m_program_2DSpace_grid);
     qDebug() << "init buffers";
     // create vbos and vaos
@@ -243,6 +253,22 @@ void  MousePad::init2D_GridSpaceGL()
 
     m_vao_2DSpace_grid.release();
     GL_Error();
+
+    m_vao_2DSpace_gridIlligal.create();
+    m_vao_2DSpace_gridIlligal.bind();
+
+    m_vbo_2DSpaceGridIlligalVertix.bind();
+    offset = 0;
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(struct abstractionPoint),  0);
+
+    offset += sizeof(QVector2D);
+    glEnableVertexAttribArray(1);
+    glVertexAttribIPointer(1, 1, GL_INT, sizeof(struct abstractionPoint), (GLvoid*)offset);
+    GL_Error();
+    m_vbo_2DSpaceGridIlligalVertix.release();
+    m_vao_2DSpace_gridIlligal.release();
+
 }
 
 void  MousePad::init2D_SelectionSpaceGL()
@@ -304,6 +330,14 @@ void MousePad::init2DSpaceGL()
     m_vbo_2DSpaceGridIndix.bind();
     m_vbo_2DSpaceGridIndix.allocate( m_grid_indices.data(), m_grid_indices.size() * sizeof(GLuint) );
     m_vbo_2DSpaceGridIndix.release();
+
+    m_vbo_2DSpaceGridIlligalVertix.create();
+    m_vbo_2DSpaceGridIlligalVertix.setUsagePattern( QOpenGLBuffer::StaticDraw);
+    m_vbo_2DSpaceGridIlligalVertix.bind();
+    m_vbo_2DSpaceGridIlligalVertix.allocate( m_grid_illigal_vertices.data(),
+                                            m_grid_illigal_vertices.size() * sizeof(QVector3D) );
+    m_vbo_2DSpaceGridIlligalVertix.release();
+
 
     GL_Error();
 
@@ -376,32 +410,43 @@ void MousePad::render2D_DebugSpace()
 
 void MousePad::render2D_GridSpace()
 {
+
     m_vao_2DSpace_grid.bind();
     m_vbo_2DSpaceGridIndix.bind();
     m_vbo_2DSpaceVerts.bind();
-
-
     // grid lines
     glUseProgram(m_program_2DSpace_grid);
-
     GLuint pMatrix = glGetUniformLocation(m_program_2DSpace_grid, "pMatrix");
     glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_projection.data());
-
     glDrawElements(GL_LINES, m_grid_indices.size(), GL_UNSIGNED_INT, 0);
-
 
     // grid points
     glUseProgram(m_program_2DSpace_gridPoints);
-
     pMatrix = glGetUniformLocation(m_program_2DSpace_gridPoints, "pMatrix");
     glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_projection.data());
-
     glDrawElements(GL_POINTS, m_grid_indices.size(), GL_UNSIGNED_INT, 0);
-
 
     m_vbo_2DSpaceVerts.release();
     m_vbo_2DSpaceGridIndix.release();
+
     m_vao_2DSpace_grid.release();
+
+
+    // grid illigal space
+    m_vao_2DSpace_gridIlligal.bind();
+    m_vbo_2DSpaceGridIlligalVertix.bind();
+    glUseProgram(m_program_2DSpace_gridIlligal);
+     pMatrix = glGetUniformLocation(m_program_2DSpace_gridIlligal, "pMatrix");
+    glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_projection.data());
+    glDrawArrays(GL_TRIANGLES, 0,  m_grid_illigal_vertices.size() );
+    m_vbo_2DSpaceGridIlligalVertix.release();
+    m_vao_2DSpace_grid.release();
+
+
+
+
+
+
 }
 
 void MousePad::paintGL()
