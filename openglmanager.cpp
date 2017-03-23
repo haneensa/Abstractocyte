@@ -2037,24 +2037,31 @@ void OpenGLManager::updateSSBO()
         if (m_ssbo_data.size() <= hvgxID)
             continue;
 
-        float volume =  translate(obj->getVolume(), 0, m_dataContainer->getMaxVolume(), 0, 1);
+
         float coverage = translate( obj->getAstroCoverage(),
-                                   0, m_dataContainer->getMaxAstroCoverage(),
+                                   0,  m_dataContainer->getMaxAstroCoverage() ,
                                    0, 0.7);
 
 
-        m_ssbo_data[hvgxID].info.setY( obj->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage() );
+        qDebug() <<  obj->getAstroCoverage() ;
+        m_ssbo_data[hvgxID].info.setY( obj->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage()  );
 
         switch(m_size_encoding) {
-        case Size_e::VOLUME:
-            m_ssbo_data[hvgxID].info.setX( 20 *  volume);
-            break;
-        case Size_e::ASTRO_COVERAGE:
-            m_ssbo_data[hvgxID].info.setX( 20 *  coverage);
-            break;
-        default:
-            m_ssbo_data[hvgxID].info.setX( 20 *  volume);
-
+            case Size_e::VOLUME: {
+                float volume =  translate(obj->getVolume(), 0,
+                                          m_dataContainer->getMaxVolume(), 0, 1);
+                m_ssbo_data[hvgxID].info.setX( 20 *  volume);
+                break;
+            }
+            case Size_e::ASTRO_COVERAGE:
+                m_ssbo_data[hvgxID].info.setX( 20 *  coverage);
+                break;
+            case Size_e::SYNAPSE_SIZE: {
+                float synapse_volume =  translate(obj->getSynapseSize(), 0,
+                                                  m_dataContainer->getMaxSynapseVolume(), 0, 1);
+                m_ssbo_data[hvgxID].info.setX( 20 * synapse_volume);
+                break;
+            }
         }
 
 

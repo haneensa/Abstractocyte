@@ -135,7 +135,6 @@ private:
     // list of synapses
     std::vector<Object*>                    m_synapses;
 
-
     struct synapse                          m_synapse_data;
 
     std::map<Object_t, void*>               m_dataByType; // use this to store info based on data type

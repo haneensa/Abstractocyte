@@ -286,3 +286,30 @@ bool Object::hasParent()
 
    return false;
 }
+
+int Object::getSynapseSize()
+{
+    // loop over list of synapses this object has (spine , bouton)
+    // loop over children and get their size if (dendrite, axon )
+    int synapse_size = 0;
+    if ( m_synapses.size() > 0 && (m_object_t == Object_t::SPINE || m_object_t == Object_t::BOUTON) ) {
+        // or get the maximum?
+         for (int i = 0; i < m_synapses.size(); ++i) {
+             Object *synapse = m_synapses[i];
+             if (synapse_size <  synapse->getVolume())
+                synapse_size  = synapse->getVolume();
+         }
+
+    } else if ( m_children.size() > 0 && (m_object_t == Object_t::DENDRITE || m_object_t == Object_t::AXON)) {
+        for (int i = 0; i < m_children.size(); ++i) {
+            Object *child = m_children[i];
+            synapse_size +=child->getSynapseSize();
+        }
+
+        synapse_size /= m_children.size();
+    } else {
+        synapse_size = 5;
+    }
+
+    return synapse_size;
+}

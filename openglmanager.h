@@ -17,7 +17,7 @@
 #include "glsluniform_structs.h"
 #include "rendervertexdata.h"
 
-enum class Size_e { VOLUME, ASTRO_COVERAGE };
+enum class Size_e { VOLUME, ASTRO_COVERAGE, SYNAPSE_SIZE };
 enum class Color_e { TYPE, FUNCTION, ASTRO_COVERAGE, GLYCOGEN_MAPPING };
 
 
