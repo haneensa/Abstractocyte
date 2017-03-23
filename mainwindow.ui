@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1472</width>
-     <height>21</height>
+     <height>31</height>
     </rect>
    </property>
   </widget>
@@ -182,16 +182,7 @@
         <enum>QFrame::Raised</enum>
        </property>
        <layout class="QGridLayout" name="gridLayout_6">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
+        <property name="margin">
          <number>0</number>
         </property>
         <property name="spacing">
@@ -226,7 +217,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>3</number>
        </property>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
@@ -258,15 +249,15 @@
          <item>
           <widget class="QToolBox" name="toolBox">
            <property name="currentIndex">
-            <number>0</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="page">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>372</width>
-              <height>848</height>
+              <width>206</width>
+              <height>257</height>
              </rect>
             </property>
             <attribute name="label">
@@ -276,16 +267,7 @@
              <property name="spacing">
               <number>4</number>
              </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
+             <property name="margin">
               <number>0</number>
              </property>
              <item>
@@ -373,8 +355,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>174</width>
-              <height>188</height>
+              <width>364</width>
+              <height>737</height>
              </rect>
             </property>
             <attribute name="label">
@@ -519,7 +501,7 @@
                <item row="1" column="1">
                 <widget class="QPushButton" name="pushButton_3">
                  <property name="text">
-                  <string>Hide/Show</string>
+                  <string>Hide</string>
                  </property>
                 </widget>
                </item>
@@ -673,7 +655,7 @@
          <item row="0" column="0">
           <widget class="QGroupBox" name="groupBox_10">
            <property name="title">
-            <string>Create Path</string>
+            <string>Record Path</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_12">
             <item row="4" column="0">
@@ -696,49 +678,11 @@
             <item row="6" column="0">
              <widget class="QPushButton" name="pushButton_7">
               <property name="text">
-               <string>Create/Update</string>
+               <string>Save</string>
               </property>
              </widget>
             </item>
-            <item row="5" column="0">
-             <widget class="QLineEdit" name="lineEdit_3"/>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QGroupBox" name="groupBox_9">
-           <property name="title">
-            <string>Paths List</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_11">
-            <item row="1" column="0">
-             <widget class="QPushButton" name="pushButton_8">
-              <property name="text">
-               <string>Export Paths</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0" colspan="2">
-             <widget class="QListWidget" name="listPaths"/>
-            </item>
-            <item row="1" column="1">
-             <widget class="QPushButton" name="pushButton_9">
-              <property name="text">
-               <string>Delete</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QGroupBox" name="groupBox_11">
-           <property name="title">
-            <string>Active Path</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <item>
+            <item row="0" column="0">
              <widget class="QFrame" name="frame_3">
               <property name="frameShape">
                <enum>QFrame::StyledPanel</enum>
@@ -764,17 +708,48 @@
               </layout>
              </widget>
             </item>
-            <item>
+            <item row="5" column="0">
+             <widget class="QLineEdit" name="lineEdit_3"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="groupBox_11">
+           <property name="title">
+            <string>Active Path</string>
+           </property>
+           <layout class="QFormLayout" name="formLayout_3">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_15">
+              <property name="text">
+               <string>Retrace</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
              <widget class="QSlider" name="horizontalSlider_2">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QLabel" name="label_15">
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QGroupBox" name="groupBox_9">
+           <property name="title">
+            <string>Paths List</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_11">
+            <item row="0" column="0">
+             <widget class="QListWidget" name="listWidget_2"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QPushButton" name="pushButton_8">
               <property name="text">
-               <string>Retrace</string>
+               <string>Export Paths</string>
               </property>
              </widget>
             </item>
@@ -785,7 +760,7 @@
        </widget>
        <widget class="QWidget" name="tab_3">
         <attribute name="title">
-         <string>Encodeing</string>
+         <string>Encoding</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_8">
          <item>
@@ -838,16 +813,6 @@
               <item>
                <property name="text">
                 <string>Astrocyte Coverage</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Glycogen Density</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Synapse Size</string>
                </property>
               </item>
              </widget>
@@ -1011,7 +976,6 @@
     <signal>setSignalX(int)</signal>
     <signal>setIntervalID(int)</signal>
     <signal>signal2()</signal>
-    <signal>signalPathName(QString)</signal>
     <slot>getSlotsX(int)</slot>
     <slot>getSlotsY(int)</slot>
     <slot>slot1()</slot>
@@ -1022,9 +986,6 @@
     <slot>namePath(QString)</slot>
     <slot>savePath()</slot>
     <slot>describePath(QString)</slot>
-    <slot>updateActivePath(QModelIndex)</slot>
-    <slot>deleteSelectedPath()</slot>
-    <slot>getActiveTab(int)</slot>
    </slots>
   </customwidget>
   <customwidget>
@@ -1508,7 +1469,7 @@
      <y>778</y>
     </hint>
     <hint type="destinationlabel">
-     <x>414</x>
+     <x>391</x>
      <y>780</y>
     </hint>
    </hints>
@@ -1553,7 +1514,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>65</x>
-     <y>639</y>
+     <y>487</y>
     </hint>
     <hint type="destinationlabel">
      <x>51</x>
@@ -1568,8 +1529,8 @@
    <slot>endPath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>303</x>
-     <y>638</y>
+     <x>292</x>
+     <y>486</y>
     </hint>
     <hint type="destinationlabel">
      <x>267</x>
@@ -1601,7 +1562,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>326</x>
-     <y>496</y>
+     <y>545</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -1617,7 +1578,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>320</x>
-     <y>568</y>
+     <y>617</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -1633,75 +1594,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>302</x>
-     <y>542</y>
+     <y>591</y>
     </hint>
     <hint type="destinationlabel">
      <x>296</x>
      <y>191</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>listPaths</sender>
-   <signal>clicked(QModelIndex)</signal>
-   <receiver>openGLWidget_2</receiver>
-   <slot>updateActivePath(QModelIndex)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>285</x>
-     <y>1178</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>288</x>
-     <y>204</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>openGLWidget_2</sender>
-   <signal>signalPathName(QString)</signal>
-   <receiver>lineEdit_2</receiver>
-   <slot>setText(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>279</x>
-     <y>101</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>351</x>
-     <y>500</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_9</sender>
-   <signal>clicked()</signal>
-   <receiver>openGLWidget_2</receiver>
-   <slot>deleteSelectedPath()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>336</x>
-     <y>1340</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>272</x>
-     <y>77</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tabWidget</sender>
-   <signal>currentChanged(int)</signal>
-   <receiver>openGLWidget_2</receiver>
-   <slot>getActiveTab(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>197</x>
-     <y>416</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>77</x>
-     <y>263</y>
     </hint>
    </hints>
   </connection>
