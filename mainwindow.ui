@@ -81,63 +81,42 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_9">
      <item>
-      <widget class="QGroupBox" name="groupBox">
+      <widget class="QGroupBox" name="groupBox_16">
        <property name="minimumSize">
         <size>
-         <width>300</width>
-         <height>300</height>
+         <width>380</width>
+         <height>380</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>300</width>
-         <height>300</height>
+         <width>380</width>
+         <height>380</height>
         </size>
-       </property>
-       <property name="sizeIncrement">
-        <size>
-         <width>1</width>
-         <height>1</height>
-        </size>
-       </property>
-       <property name="baseSize">
-        <size>
-         <width>1</width>
-         <height>1</height>
-        </size>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="autoFillBackground">
-        <bool>true</bool>
        </property>
        <property name="title">
         <string>Abstraction Space</string>
        </property>
-       <layout class="QGridLayout" name="gridLayout_3">
+       <layout class="QGridLayout" name="gridLayout_15">
         <item row="0" column="0">
-         <widget class="QSlider" name="verticalSlider">
+         <spacer name="horizontalSpacer">
           <property name="orientation">
-           <enum>Qt::Vertical</enum>
+           <enum>Qt::Horizontal</enum>
           </property>
-         </widget>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>4</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
-        <item row="0" column="1">
-         <widget class="MousePad" name="openGLWidget_2" native="true">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
+        <item row="0" column="1" rowspan="3">
+         <widget class="QGroupBox" name="groupBox">
           <property name="minimumSize">
            <size>
-            <width>100</width>
-            <height>100</height>
+            <width>300</width>
+            <height>300</height>
            </size>
           </property>
           <property name="maximumSize">
@@ -158,19 +137,130 @@
             <height>1</height>
            </size>
           </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="autoFillBackground">
+           <bool>true</bool>
+          </property>
+          <property name="title">
+           <string>Abstract</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="0">
+            <widget class="QSlider" name="verticalSlider">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="MousePad" name="openGLWidget_2" native="true">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>100</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>300</width>
+               <height>300</height>
+              </size>
+             </property>
+             <property name="sizeIncrement">
+              <size>
+               <width>1</width>
+               <height>1</height>
+              </size>
+             </property>
+             <property name="baseSize">
+              <size>
+               <width>1</width>
+               <height>1</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QSlider" name="horizontalSlider">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+          <zorder>openGLWidget_2</zorder>
+          <zorder>horizontalSlider</zorder>
+          <zorder>verticalSlider</zorder>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QSlider" name="horizontalSlider">
+        <item row="0" column="2">
+         <spacer name="verticalSpacer_2">
           <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>272</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="label_42">
+          <property name="text">
+           <string>Abstract</string>
           </property>
          </widget>
         </item>
+        <item row="2" column="2" rowspan="3">
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>44</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLabel" name="label_43">
+          <property name="text">
+           <string>Neurites</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>19</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
-       <zorder>openGLWidget_2</zorder>
-       <zorder>horizontalSlider</zorder>
-       <zorder>verticalSlider</zorder>
       </widget>
      </item>
      <item>
@@ -197,27 +287,27 @@
         <property name="spacing">
          <number>4</number>
         </property>
-        <item row="2" column="0">
-         <widget class="QGroupBox" name="groupBox_3">
-          <property name="title">
-           <string>Selected</string>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBox_3">
+       <property name="title">
+        <string>Selected</string>
+       </property>
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>ID</string>
           </property>
-          <layout class="QFormLayout" name="formLayout_2">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_7">
-             <property name="text">
-              <string>ID</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="label_8">
-             <property name="text">
-              <string>Name</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Name</string>
+          </property>
          </widget>
         </item>
        </layout>
@@ -226,7 +316,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
@@ -265,8 +355,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>129</width>
-              <height>180</height>
+              <width>372</width>
+              <height>798</height>
              </rect>
             </property>
             <attribute name="label">
@@ -374,7 +464,7 @@
               <x>0</x>
               <y>0</y>
               <width>372</width>
-              <height>848</height>
+              <height>762</height>
              </rect>
             </property>
             <attribute name="label">
@@ -493,22 +583,6 @@
                <string>Selected Objects</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_2">
-               <item row="0" column="0" colspan="3">
-                <widget class="QTableView" name="tableView">
-                 <property name="editTriggers">
-                  <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
-                 </property>
-                 <property name="dragDropOverwriteMode">
-                  <bool>false</bool>
-                 </property>
-                 <property name="selectionBehavior">
-                  <enum>QAbstractItemView::SelectRows</enum>
-                 </property>
-                 <property name="textElideMode">
-                  <enum>Qt::ElideNone</enum>
-                 </property>
-                </widget>
-               </item>
                <item row="1" column="0">
                 <widget class="QPushButton" name="pushButton">
                  <property name="text">
@@ -527,6 +601,22 @@
                 <widget class="QPushButton" name="pushButton_4">
                  <property name="text">
                   <string>Clear</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0" colspan="3">
+                <widget class="QTableView" name="tableView">
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
+                 </property>
+                 <property name="dragDropOverwriteMode">
+                  <bool>false</bool>
+                 </property>
+                 <property name="selectionBehavior">
+                  <enum>QAbstractItemView::SelectRows</enum>
+                 </property>
+                 <property name="textElideMode">
+                  <enum>Qt::ElideNone</enum>
                  </property>
                 </widget>
                </item>
@@ -892,8 +982,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>358</width>
-              <height>779</height>
+              <width>245</width>
+              <height>433</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1166,8 +1256,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>358</width>
-              <height>779</height>
+              <width>245</width>
+              <height>433</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1443,8 +1533,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>358</width>
-              <height>779</height>
+              <width>245</width>
+              <height>433</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1721,7 +1811,7 @@
               <x>0</x>
               <y>0</y>
               <width>358</width>
-              <height>779</height>
+              <height>693</height>
              </rect>
             </property>
             <attribute name="label">
@@ -2006,6 +2096,11 @@
       </widget>
      </item>
     </layout>
+    <zorder>frame_2</zorder>
+    <zorder>tabWidget</zorder>
+    <zorder>groupBox_16</zorder>
+    <zorder>groupBox_3</zorder>
+    <zorder>groupBox_3</zorder>
    </widget>
   </widget>
  </widget>
@@ -2091,8 +2186,8 @@
      <y>172</y>
     </hint>
     <hint type="destinationlabel">
-     <x>56</x>
-     <y>109</y>
+     <x>107</x>
+     <y>163</y>
     </hint>
    </hints>
   </connection>
@@ -2215,8 +2310,8 @@
    <slot>getGraphCr(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>269</x>
-     <y>541</y>
+     <x>225</x>
+     <y>564</y>
     </hint>
     <hint type="destinationlabel">
      <x>569</x>
@@ -2231,8 +2326,8 @@
    <slot>getGraphCa(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>267</x>
-     <y>587</y>
+     <x>225</x>
+     <y>610</y>
     </hint>
     <hint type="destinationlabel">
      <x>584</x>
@@ -2247,8 +2342,8 @@
    <slot>getGraphAABBdim(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>281</x>
-     <y>633</y>
+     <x>225</x>
+     <y>656</y>
     </hint>
     <hint type="destinationlabel">
      <x>579</x>
@@ -2263,8 +2358,8 @@
    <slot>getGraphmax_distance(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>281</x>
-     <y>679</y>
+     <x>225</x>
+     <y>702</y>
     </hint>
     <hint type="destinationlabel">
      <x>599</x>
@@ -2279,8 +2374,8 @@
    <slot>getGraphslow_factor(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>281</x>
-     <y>771</y>
+     <x>225</x>
+     <y>794</y>
     </hint>
     <hint type="destinationlabel">
      <x>582</x>
@@ -2295,8 +2390,8 @@
    <slot>getGraphmax_vertex_movement(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>254</x>
-     <y>725</y>
+     <x>225</x>
+     <y>748</y>
     </hint>
     <hint type="destinationlabel">
      <x>576</x>
@@ -2311,8 +2406,8 @@
    <slot>getGraphmax_force(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>281</x>
-     <y>817</y>
+     <x>225</x>
+     <y>840</y>
     </hint>
     <hint type="destinationlabel">
      <x>566</x>
@@ -2332,7 +2427,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>30</x>
-     <y>394</y>
+     <y>444</y>
     </hint>
    </hints>
   </connection>
@@ -2347,8 +2442,8 @@
      <y>730</y>
     </hint>
     <hint type="destinationlabel">
-     <x>168</x>
-     <y>394</y>
+     <x>196</x>
+     <y>444</y>
     </hint>
    </hints>
   </connection>
@@ -2359,8 +2454,8 @@
    <slot>getNodeSizeEncoding(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>229</x>
-     <y>453</y>
+     <x>367</x>
+     <y>522</y>
     </hint>
     <hint type="destinationlabel">
      <x>698</x>
@@ -2375,8 +2470,8 @@
    <slot>getColorEncoding(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>229</x>
-     <y>479</y>
+     <x>367</x>
+     <y>548</y>
     </hint>
     <hint type="destinationlabel">
      <x>700</x>
@@ -2391,8 +2486,8 @@
    <slot>getItemChanged(QListWidgetItem*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>81</x>
-     <y>832</y>
+     <x>103</x>
+     <y>1148</y>
     </hint>
     <hint type="destinationlabel">
      <x>737</x>
@@ -2471,8 +2566,8 @@
    <slot>getDoubleClickedTableView(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>81</x>
-     <y>476</y>
+     <x>103</x>
+     <y>788</y>
     </hint>
     <hint type="destinationlabel">
      <x>755</x>
@@ -2487,8 +2582,8 @@
    <slot>getFitlerButtonClicked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>49</x>
-     <y>770</y>
+     <x>71</x>
+     <y>817</y>
     </hint>
     <hint type="destinationlabel">
      <x>698</x>
@@ -2519,8 +2614,8 @@
    <slot>clearSelectedObjectsTable()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>265</x>
-     <y>770</y>
+     <x>357</x>
+     <y>817</y>
     </hint>
     <hint type="destinationlabel">
      <x>414</x>
@@ -2535,8 +2630,8 @@
    <slot>hideSelectedObjects()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>157</x>
-     <y>770</y>
+     <x>249</x>
+     <y>817</y>
     </hint>
     <hint type="destinationlabel">
      <x>411</x>
@@ -2551,8 +2646,8 @@
    <slot>highlightSelected(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>81</x>
-     <y>476</y>
+     <x>103</x>
+     <y>788</y>
     </hint>
     <hint type="destinationlabel">
      <x>439</x>
@@ -2567,12 +2662,12 @@
    <slot>startPath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>57</x>
-     <y>628</y>
+     <x>79</x>
+     <y>700</y>
     </hint>
     <hint type="destinationlabel">
-     <x>51</x>
-     <y>278</y>
+     <x>102</x>
+     <y>284</y>
     </hint>
    </hints>
   </connection>
@@ -2583,8 +2678,8 @@
    <slot>endPath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>219</x>
-     <y>628</y>
+     <x>357</x>
+     <y>700</y>
     </hint>
     <hint type="destinationlabel">
      <x>267</x>
@@ -2599,8 +2694,8 @@
    <slot>retracePath(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>91</x>
-     <y>667</y>
+     <x>103</x>
+     <y>735</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -2615,8 +2710,8 @@
    <slot>namePath(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>91</x>
-     <y>485</y>
+     <x>103</x>
+     <y>554</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -2631,8 +2726,8 @@
    <slot>savePath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>91</x>
-     <y>556</y>
+     <x>103</x>
+     <y>628</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -2647,8 +2742,8 @@
    <slot>describePath(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>91</x>
-     <y>530</y>
+     <x>103</x>
+     <y>599</y>
     </hint>
     <hint type="destinationlabel">
      <x>296</x>
@@ -2663,8 +2758,8 @@
    <slot>updateActivePath(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>91</x>
-     <y>744</y>
+     <x>103</x>
+     <y>1319</y>
     </hint>
     <hint type="destinationlabel">
      <x>288</x>
@@ -2683,8 +2778,8 @@
      <y>101</y>
     </hint>
     <hint type="destinationlabel">
-     <x>91</x>
-     <y>485</y>
+     <x>103</x>
+     <y>554</y>
     </hint>
    </hints>
   </connection>
@@ -2699,8 +2794,8 @@
      <y>1326</y>
     </hint>
     <hint type="destinationlabel">
-     <x>272</x>
-     <y>77</y>
+     <x>323</x>
+     <y>131</y>
     </hint>
    </hints>
   </connection>
@@ -2712,7 +2807,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>197</x>
-     <y>416</y>
+     <y>835</y>
     </hint>
     <hint type="destinationlabel">
      <x>77</x>
@@ -2727,8 +2822,8 @@
    <slot>getGraphoriginalPosAttraction(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>277</x>
-     <y>863</y>
+     <x>225</x>
+     <y>886</y>
     </hint>
     <hint type="destinationlabel">
      <x>424</x>
@@ -2743,8 +2838,8 @@
    <slot>getGraphCr(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>322</x>
-     <y>563</y>
+     <x>225</x>
+     <y>564</y>
     </hint>
     <hint type="destinationlabel">
      <x>448</x>
@@ -2759,7 +2854,7 @@
    <slot>getGraphCa(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>323</x>
+     <x>225</x>
      <y>610</y>
     </hint>
     <hint type="destinationlabel">
@@ -2775,8 +2870,8 @@
    <slot>getGraphmax_distance(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>693</y>
+     <x>225</x>
+     <y>702</y>
     </hint>
     <hint type="destinationlabel">
      <x>422</x>
@@ -2791,8 +2886,8 @@
    <slot>getGraphmax_vertex_movement(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>329</x>
-     <y>745</y>
+     <x>225</x>
+     <y>748</y>
     </hint>
     <hint type="destinationlabel">
      <x>430</x>
@@ -2807,8 +2902,8 @@
    <slot>getGraphslow_factor(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>312</x>
-     <y>782</y>
+     <x>225</x>
+     <y>794</y>
     </hint>
     <hint type="destinationlabel">
      <x>412</x>
@@ -2823,8 +2918,8 @@
    <slot>getGraphmax_force(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>324</x>
-     <y>834</y>
+     <x>225</x>
+     <y>840</y>
     </hint>
     <hint type="destinationlabel">
      <x>418</x>
@@ -2839,8 +2934,8 @@
    <slot>getGraphoriginalPosAttraction(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>332</x>
-     <y>874</y>
+     <x>225</x>
+     <y>886</y>
     </hint>
     <hint type="destinationlabel">
      <x>473</x>
@@ -2855,8 +2950,8 @@
    <slot>getGraphCr(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>322</x>
-     <y>586</y>
+     <x>225</x>
+     <y>564</y>
     </hint>
     <hint type="destinationlabel">
      <x>416</x>
@@ -2871,8 +2966,8 @@
    <slot>getGraphCa(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>327</x>
-     <y>635</y>
+     <x>225</x>
+     <y>610</y>
     </hint>
     <hint type="destinationlabel">
      <x>420</x>
@@ -2887,8 +2982,8 @@
    <slot>getGraphAABBdim(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>327</x>
-     <y>677</y>
+     <x>225</x>
+     <y>656</y>
     </hint>
     <hint type="destinationlabel">
      <x>428</x>
@@ -2903,8 +2998,8 @@
    <slot>getGraphmax_distance(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>330</x>
-     <y>725</y>
+     <x>225</x>
+     <y>702</y>
     </hint>
     <hint type="destinationlabel">
      <x>415</x>
@@ -2919,8 +3014,8 @@
    <slot>getGraphmax_vertex_movement(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>274</x>
-     <y>774</y>
+     <x>225</x>
+     <y>748</y>
     </hint>
     <hint type="destinationlabel">
      <x>433</x>
@@ -2935,8 +3030,8 @@
    <slot>getGraphslow_factor(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>327</x>
-     <y>809</y>
+     <x>225</x>
+     <y>794</y>
     </hint>
     <hint type="destinationlabel">
      <x>424</x>
@@ -2951,8 +3046,8 @@
    <slot>getGraphmax_force(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>303</x>
-     <y>859</y>
+     <x>225</x>
+     <y>840</y>
     </hint>
     <hint type="destinationlabel">
      <x>421</x>
@@ -2967,8 +3062,8 @@
    <slot>getGraphoriginalPosAttraction(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>287</x>
-     <y>906</y>
+     <x>225</x>
+     <y>886</y>
     </hint>
     <hint type="destinationlabel">
      <x>416</x>
@@ -2983,8 +3078,8 @@
    <slot>getGraphCr(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>333</x>
-     <y>610</y>
+     <x>338</x>
+     <y>672</y>
     </hint>
     <hint type="destinationlabel">
      <x>489</x>
@@ -2999,8 +3094,8 @@
    <slot>getGraphCa(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>317</x>
-     <y>661</y>
+     <x>338</x>
+     <y>718</y>
     </hint>
     <hint type="destinationlabel">
      <x>433</x>
@@ -3015,8 +3110,8 @@
    <slot>getActiveGraphTab(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>315</x>
-     <y>449</y>
+     <x>317</x>
+     <y>890</y>
     </hint>
     <hint type="destinationlabel">
      <x>415</x>
@@ -3031,8 +3126,8 @@
    <slot>getGraphAABBdim(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>326</x>
-     <y>702</y>
+     <x>338</x>
+     <y>764</y>
     </hint>
     <hint type="destinationlabel">
      <x>428</x>
@@ -3047,8 +3142,8 @@
    <slot>getGraphmax_distance(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>317</x>
-     <y>745</y>
+     <x>338</x>
+     <y>810</y>
     </hint>
     <hint type="destinationlabel">
      <x>414</x>
@@ -3063,8 +3158,8 @@
    <slot>getGraphmax_vertex_movement(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>309</x>
-     <y>792</y>
+     <x>338</x>
+     <y>856</y>
     </hint>
     <hint type="destinationlabel">
      <x>424</x>
@@ -3079,8 +3174,8 @@
    <slot>getGraphslow_factor(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>330</x>
-     <y>840</y>
+     <x>338</x>
+     <y>902</y>
     </hint>
     <hint type="destinationlabel">
      <x>425</x>
@@ -3095,8 +3190,8 @@
    <slot>getGraphmax_force(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>318</x>
-     <y>887</y>
+     <x>338</x>
+     <y>948</y>
     </hint>
     <hint type="destinationlabel">
      <x>421</x>
@@ -3111,8 +3206,8 @@
    <slot>getGraphoriginalPosAttraction(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>329</x>
-     <y>932</y>
+     <x>338</x>
+     <y>994</y>
     </hint>
     <hint type="destinationlabel">
      <x>417</x>
@@ -3127,8 +3222,8 @@
    <slot>getGraphAABBdim(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>331</x>
-     <y>649</y>
+     <x>225</x>
+     <y>656</y>
     </hint>
     <hint type="destinationlabel">
      <x>466</x>
