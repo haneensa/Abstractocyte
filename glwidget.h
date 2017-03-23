@@ -33,7 +33,7 @@ public slots:
     void getIntervalID(int ID);
 
     void getActiveGraphTab(int);
-
+    void reset_layouting(bool);
     void getGraphCr(double value);
     void getGraphCa(double value);
     void getGraphAABBdim(double value);

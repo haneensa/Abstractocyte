@@ -258,8 +258,8 @@ void Graph::resetCoordinates()
         hashGrid->insert((*iter).second);
     }
 
-
-    runforceDirectedLayout();
+    if (m_gType == Graph_t::NODE_NODE  || m_gType == Graph_t::NODE_SKELETON)
+        runforceDirectedLayout();
    // GEM_run();
 
 
@@ -358,7 +358,7 @@ void Graph::runforceDirectedLayout()
                     continue;
                 }
 
-                repulseNodes(node1, node2, m_fdr_params.Ca * k);
+                repulseNodes(node1, node2, m_fdr_params.Cr * k);
             }
 
            attractToOriginalPosition(node1, m_fdr_params.originalPosAttraction); // the less the more

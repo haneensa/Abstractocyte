@@ -248,6 +248,9 @@ void GLWidget::insertInTable(int hvgxID)
 
 void GLWidget::lockRotation2D()
 {
+    if (m_FDL_running == true)
+        return;
+
     m_rotation_timer->stop();
     m_FDL_running = true;   // run force layout
 
@@ -399,12 +402,21 @@ void GLWidget::getIntervalID(int ID)
     m_2dspace->updateID(ID);
 }
 
-void  GLWidget::getActiveGraphTab(int tab_graph)
+void GLWidget::getActiveGraphTab(int tab_graph)
 {
    m_active_graph_tab = tab_graph;
 }
 
-//--------------------- Graph 1 Parameters ---------------------
+void GLWidget::reset_layouting(bool flag)
+{
+    if (m_FDL_running) {
+        stopForecDirectedLayout();
+    }
+
+     m_rotation_timer->start(10);
+}
+
+//--------------------- Graph  Parameters ---------------------
 //
 void GLWidget::getGraphCr(double value)
 {

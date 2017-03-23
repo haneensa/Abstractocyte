@@ -226,7 +226,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>4</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
@@ -882,10 +882,10 @@
          <string>Layouting</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_14">
-         <item row="0" column="1">
+         <item row="0" column="0">
           <widget class="QToolBox" name="toolBox_graphsParam">
            <property name="currentIndex">
-            <number>1</number>
+            <number>3</number>
            </property>
            <widget class="QWidget" name="graph1">
             <property name="geometry">
@@ -893,7 +893,7 @@
               <x>0</x>
               <y>0</y>
               <width>358</width>
-              <height>808</height>
+              <height>779</height>
              </rect>
             </property>
             <attribute name="label">
@@ -910,13 +910,6 @@
                </property>
                <layout class="QGridLayout" name="gridLayout">
                 <item row="0" column="0">
-                 <widget class="QCheckBox" name="checkBox_4">
-                  <property name="text">
-                   <string>start/stop layouting </string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
                  <widget class="QGroupBox" name="groupBox_12">
                   <property name="title">
                    <string>GroupBox</string>
@@ -946,6 +939,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>1.500000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -971,6 +967,9 @@
                        <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
                         <property name="singleStep">
                          <double>0.100000000000000</double>
+                        </property>
+                        <property name="value">
+                         <double>0.500000000000000</double>
                         </property>
                        </widget>
                       </item>
@@ -998,6 +997,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>0.150000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1022,6 +1024,9 @@
                       <item>
                        <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
                         <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                        <property name="value">
                          <double>0.100000000000000</double>
                         </property>
                        </widget>
@@ -1049,6 +1054,9 @@
                        <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
                         <property name="singleStep">
                          <double>0.100000000000000</double>
+                        </property>
+                        <property name="value">
+                         <double>0.010000000000000</double>
                         </property>
                        </widget>
                       </item>
@@ -1105,6 +1113,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>1.000000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1134,6 +1145,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>0.100000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1153,7 +1167,7 @@
               <x>0</x>
               <y>0</y>
               <width>358</width>
-              <height>808</height>
+              <height>779</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1170,13 +1184,6 @@
                </property>
                <layout class="QGridLayout" name="gridLayout_18">
                 <item row="0" column="0">
-                 <widget class="QCheckBox" name="checkBox_8">
-                  <property name="text">
-                   <string>start/stop layouting </string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
                  <widget class="QGroupBox" name="groupBox_13">
                   <property name="title">
                    <string>GroupBox</string>
@@ -1206,6 +1213,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>1.500000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1231,6 +1241,9 @@
                        <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
                         <property name="singleStep">
                          <double>0.100000000000000</double>
+                        </property>
+                        <property name="value">
+                         <double>0.500000000000000</double>
                         </property>
                        </widget>
                       </item>
@@ -1258,6 +1271,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>0.150000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1282,6 +1298,9 @@
                       <item>
                        <widget class="QDoubleSpinBox" name="doubleSpinBox_11">
                         <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                        <property name="value">
                          <double>0.100000000000000</double>
                         </property>
                        </widget>
@@ -1310,6 +1329,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>0.010000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1335,6 +1357,9 @@
                        <widget class="QDoubleSpinBox" name="doubleSpinBox_13">
                         <property name="singleStep">
                          <double>0.100000000000000</double>
+                        </property>
+                        <property name="value">
+                         <double>0.010000000000000</double>
                         </property>
                        </widget>
                       </item>
@@ -1365,6 +1390,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>1.000000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1394,6 +1422,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>0.100000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1413,7 +1444,7 @@
               <x>0</x>
               <y>0</y>
               <width>358</width>
-              <height>808</height>
+              <height>779</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1430,13 +1461,6 @@
                </property>
                <layout class="QGridLayout" name="gridLayout_19">
                 <item row="0" column="0">
-                 <widget class="QCheckBox" name="checkBox_9">
-                  <property name="text">
-                   <string>start/stop layouting </string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
                  <widget class="QGroupBox" name="groupBox_14">
                   <property name="title">
                    <string>GroupBox</string>
@@ -1466,6 +1490,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>1.500000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1491,6 +1518,9 @@
                        <widget class="QDoubleSpinBox" name="doubleSpinBox_16">
                         <property name="singleStep">
                          <double>0.100000000000000</double>
+                        </property>
+                        <property name="value">
+                         <double>0.500000000000000</double>
                         </property>
                        </widget>
                       </item>
@@ -1518,6 +1548,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>0.150000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1542,6 +1575,9 @@
                       <item>
                        <widget class="QDoubleSpinBox" name="doubleSpinBox_18">
                         <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                        <property name="value">
                          <double>0.100000000000000</double>
                         </property>
                        </widget>
@@ -1570,6 +1606,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>0.010000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1595,6 +1634,9 @@
                        <widget class="QDoubleSpinBox" name="doubleSpinBox_20">
                         <property name="singleStep">
                          <double>0.100000000000000</double>
+                        </property>
+                        <property name="value">
+                         <double>0.010000000000000</double>
                         </property>
                        </widget>
                       </item>
@@ -1625,6 +1667,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>1.000000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1654,6 +1699,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>0.100000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1673,7 +1721,7 @@
               <x>0</x>
               <y>0</y>
               <width>358</width>
-              <height>808</height>
+              <height>779</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1690,13 +1738,6 @@
                </property>
                <layout class="QGridLayout" name="gridLayout_20">
                 <item row="0" column="0">
-                 <widget class="QCheckBox" name="checkBox_10">
-                  <property name="text">
-                   <string>start/stop layouting </string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
                  <widget class="QGroupBox" name="groupBox_15">
                   <property name="title">
                    <string>GroupBox</string>
@@ -1726,6 +1767,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>1.500000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1751,6 +1795,9 @@
                        <widget class="QDoubleSpinBox" name="doubleSpinBox_23">
                         <property name="singleStep">
                          <double>0.100000000000000</double>
+                        </property>
+                        <property name="value">
+                         <double>0.500000000000000</double>
                         </property>
                        </widget>
                       </item>
@@ -1778,6 +1825,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>0.150000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1802,6 +1852,9 @@
                       <item>
                        <widget class="QDoubleSpinBox" name="doubleSpinBox_25">
                         <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                        <property name="value">
                          <double>0.100000000000000</double>
                         </property>
                        </widget>
@@ -1830,6 +1883,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>0.010000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1855,6 +1911,9 @@
                        <widget class="QDoubleSpinBox" name="doubleSpinBox_27">
                         <property name="singleStep">
                          <double>0.100000000000000</double>
+                        </property>
+                        <property name="value">
+                         <double>0.010000000000000</double>
                         </property>
                        </widget>
                       </item>
@@ -1885,6 +1944,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>1.000000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1914,6 +1976,9 @@
                         <property name="singleStep">
                          <double>0.100000000000000</double>
                         </property>
+                        <property name="value">
+                         <double>0.100000000000000</double>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -1927,6 +1992,13 @@
              </item>
             </layout>
            </widget>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QPushButton" name="pushButton_10">
+           <property name="text">
+            <string>Reset</string>
+           </property>
           </widget>
          </item>
         </layout>
@@ -2001,6 +2073,8 @@
     <slot>highlightSelected(QModelIndex)</slot>
     <slot>getGraphoriginalPosAttraction(double)</slot>
     <slot>getActiveGraphTab(int)</slot>
+    <slot>reset_layouting(bool)</slot>
+    <slot>slot1()</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -2142,7 +2216,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>269</x>
-     <y>564</y>
+     <y>541</y>
     </hint>
     <hint type="destinationlabel">
      <x>569</x>
@@ -2158,7 +2232,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>267</x>
-     <y>610</y>
+     <y>587</y>
     </hint>
     <hint type="destinationlabel">
      <x>584</x>
@@ -2174,7 +2248,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>281</x>
-     <y>656</y>
+     <y>633</y>
     </hint>
     <hint type="destinationlabel">
      <x>579</x>
@@ -2190,7 +2264,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>281</x>
-     <y>702</y>
+     <y>679</y>
     </hint>
     <hint type="destinationlabel">
      <x>599</x>
@@ -2206,7 +2280,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>281</x>
-     <y>794</y>
+     <y>771</y>
     </hint>
     <hint type="destinationlabel">
      <x>582</x>
@@ -2222,7 +2296,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>254</x>
-     <y>748</y>
+     <y>725</y>
     </hint>
     <hint type="destinationlabel">
      <x>576</x>
@@ -2238,7 +2312,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>281</x>
-     <y>840</y>
+     <y>817</y>
     </hint>
     <hint type="destinationlabel">
      <x>566</x>
@@ -2654,7 +2728,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>277</x>
-     <y>886</y>
+     <y>863</y>
     </hint>
     <hint type="destinationlabel">
      <x>424</x>
@@ -2670,7 +2744,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>322</x>
-     <y>586</y>
+     <y>563</y>
     </hint>
     <hint type="destinationlabel">
      <x>448</x>
@@ -2686,7 +2760,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>323</x>
-     <y>633</y>
+     <y>610</y>
     </hint>
     <hint type="destinationlabel">
      <x>415</x>
@@ -2702,7 +2776,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>325</x>
-     <y>716</y>
+     <y>693</y>
     </hint>
     <hint type="destinationlabel">
      <x>422</x>
@@ -2718,7 +2792,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>329</x>
-     <y>768</y>
+     <y>745</y>
     </hint>
     <hint type="destinationlabel">
      <x>430</x>
@@ -2734,7 +2808,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>312</x>
-     <y>805</y>
+     <y>782</y>
     </hint>
     <hint type="destinationlabel">
      <x>412</x>
@@ -2750,7 +2824,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>324</x>
-     <y>857</y>
+     <y>834</y>
     </hint>
     <hint type="destinationlabel">
      <x>418</x>
@@ -2766,7 +2840,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>332</x>
-     <y>897</y>
+     <y>874</y>
     </hint>
     <hint type="destinationlabel">
      <x>473</x>
@@ -2782,7 +2856,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>322</x>
-     <y>609</y>
+     <y>586</y>
     </hint>
     <hint type="destinationlabel">
      <x>416</x>
@@ -2798,7 +2872,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>327</x>
-     <y>658</y>
+     <y>635</y>
     </hint>
     <hint type="destinationlabel">
      <x>420</x>
@@ -2814,7 +2888,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>327</x>
-     <y>700</y>
+     <y>677</y>
     </hint>
     <hint type="destinationlabel">
      <x>428</x>
@@ -2830,7 +2904,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>330</x>
-     <y>748</y>
+     <y>725</y>
     </hint>
     <hint type="destinationlabel">
      <x>415</x>
@@ -2846,7 +2920,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>274</x>
-     <y>797</y>
+     <y>774</y>
     </hint>
     <hint type="destinationlabel">
      <x>433</x>
@@ -2862,7 +2936,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>327</x>
-     <y>832</y>
+     <y>809</y>
     </hint>
     <hint type="destinationlabel">
      <x>424</x>
@@ -2878,7 +2952,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>303</x>
-     <y>882</y>
+     <y>859</y>
     </hint>
     <hint type="destinationlabel">
      <x>421</x>
@@ -2894,7 +2968,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>287</x>
-     <y>929</y>
+     <y>906</y>
     </hint>
     <hint type="destinationlabel">
      <x>416</x>
@@ -2910,7 +2984,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>333</x>
-     <y>633</y>
+     <y>610</y>
     </hint>
     <hint type="destinationlabel">
      <x>489</x>
@@ -2926,7 +3000,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>317</x>
-     <y>684</y>
+     <y>661</y>
     </hint>
     <hint type="destinationlabel">
      <x>433</x>
@@ -2958,7 +3032,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>326</x>
-     <y>725</y>
+     <y>702</y>
     </hint>
     <hint type="destinationlabel">
      <x>428</x>
@@ -2974,7 +3048,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>317</x>
-     <y>768</y>
+     <y>745</y>
     </hint>
     <hint type="destinationlabel">
      <x>414</x>
@@ -2990,7 +3064,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>309</x>
-     <y>815</y>
+     <y>792</y>
     </hint>
     <hint type="destinationlabel">
      <x>424</x>
@@ -3006,7 +3080,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>330</x>
-     <y>863</y>
+     <y>840</y>
     </hint>
     <hint type="destinationlabel">
      <x>425</x>
@@ -3022,7 +3096,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>318</x>
-     <y>910</y>
+     <y>887</y>
     </hint>
     <hint type="destinationlabel">
      <x>421</x>
@@ -3038,7 +3112,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>329</x>
-     <y>955</y>
+     <y>932</y>
     </hint>
     <hint type="destinationlabel">
      <x>417</x>
@@ -3054,11 +3128,27 @@
    <hints>
     <hint type="sourcelabel">
      <x>331</x>
-     <y>672</y>
+     <y>649</y>
     </hint>
     <hint type="destinationlabel">
      <x>466</x>
      <y>676</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_10</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>reset_layouting(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>296</x>
+     <y>1341</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>434</x>
+     <y>1342</y>
     </hint>
    </hints>
   </connection>
