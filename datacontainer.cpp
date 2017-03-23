@@ -26,6 +26,7 @@ DataContainer::DataContainer()
 	m_glycogen3DGrid.setSize(DIM_G, DIM_G, DIM_G);
 	m_boutonHash.setSize(32, 32, 32);
 	m_spineHash.setSize(32, 32, 32);
+	m_neuroMitoHash.setSize(32, 32, 32);
     /* 1: load all data */
     loadData();
 
@@ -34,17 +35,10 @@ DataContainer::DataContainer()
 
 
     /* 3 */
-    qDebug() << "setting up octrees";
-    //m_boutonOctree.initialize(m_mesh->getVerticesListByType(Object_t::BOUTON));
-    //m_spineOctree.initialize(m_mesh->getVerticesListByType(Object_t::SPINE));
+    qDebug() << "setting up glycogen octree";
     m_glycogenOctree.initialize(&m_glycogenList);
-    qDebug() << "octrees ready";
+    qDebug() << "octree ready";
 
-    //qDebug() << "testing clustering";
-    //testing clustering
-    //m_dbscan.initialize(&m_glycogenList, &m_glycogenMap, &m_glycogenOctree);
-    //m_dbscan.run();
-    //qDebug() << "done clustering";
 }
 
 //----------------------------------------------------------------------------
@@ -720,6 +714,18 @@ void DataContainer::parseMeshNoVertexnoFace(QXmlStreamReader &xml, Object *obj)
 						m_boutonHash.addNormalizedPoint(mesh_vertex->x(), mesh_vertex->y(), mesh_vertex->z(), mesh_vertex);
 					if (obj->getObjectType() == Object_t::SPINE)
 						m_spineHash.addNormalizedPoint(mesh_vertex->x(), mesh_vertex->y(), mesh_vertex->z(), mesh_vertex);
+					if (obj->getObjectType() == Object_t::MITO)
+					{
+						//check if neuronal mito
+						if (obj->getParent() && obj->getParent()->getObjectType() == Object_t::ASTROCYTE)
+						{
+							m_neuroMitoHash.addNormalizedPoint(mesh_vertex->x(), mesh_vertex->y(), mesh_vertex->z(), mesh_vertex);
+						}
+						else if (!obj->getParent())
+						{
+							qDebug() << "Mitochondria does not have parent yet - missed from spatial hash";
+						}
+					}
                 }
 
             } else if (xml.name() == "fc") {

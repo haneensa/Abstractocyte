@@ -15,6 +15,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 		m_glycogenOctree = octree;
 		m_boutonHash = 0;
 		m_spineHash = 0;
+		m_mitoHash = 0;
 		m_current_max_glycogen_volume = 0;
 		m_verticesList = allvertices;
 	}
@@ -32,6 +33,13 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 	{
 		m_boutonHash = boutonOct;
 		m_spineHash = spineOct;
+	}
+
+	//--------------------------------------------------------------------------------
+	//
+	void GlycogenAnalysisManager::setMitochondriaSpatialHash(SpacePartitioning::SpatialHash3D* mitoHash)
+	{
+		m_mitoHash = mitoHash;
 	}
 
 	//--------------------------------------------------------------------------------
@@ -67,7 +75,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 
 	//--------------------------------------------------------------------------------
 	//
-	std::map<int, std::map<int, int>>*  GlycogenAnalysisManager::computeGlycogenMapping(bool boutons, bool spines, bool clusters)
+	std::map<int, std::map<int, int>>*  GlycogenAnalysisManager::computeGlycogenMapping(bool boutons, bool spines, bool mito, bool clusters)
 	{
 		if (clusters)
 		{
@@ -84,7 +92,10 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			{
 				computeGlycogenClusterMappingToSpines();
 			}
-
+			else if (mito)
+			{
+				computeGlycogenClusterMappingToMitochondria();
+			}
 		}
 		else
 		{
@@ -99,6 +110,10 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			else if (spines)
 			{
 				computeGlycogenMappingToSpines();
+			}
+			else if (mito)
+			{
+				computeGlycogenMappingToMitochondria();
 			}
 		}
 
@@ -185,6 +200,49 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 				m_objectIdGlycogenVolumeMapped[spineVertex->id()] = glycogenVertex->skeleton_vertex.y();
 			}
 			float currentVolumeValue = m_objectIdGlycogenVolumeMapped.at(spineVertex->id());
+			if (m_current_max_glycogen_volume < currentVolumeValue)
+			{
+				m_current_max_glycogen_volume = currentVolumeValue;
+			}
+		}
+	}
+
+	//--------------------------------------------------------------------------------
+	//
+	void GlycogenAnalysisManager::computeGlycogenMappingToMitochondria()
+	{
+		//if we have an octree and glycogen list
+		if (!m_mitoHash || !m_glycogenVertexDataList)
+			return;
+
+		//clear previous mappings
+		clearMapping();
+		//loop on glycogen granules
+		for (auto iter = m_glycogenVertexDataList->begin(); iter != m_glycogenVertexDataList->end(); iter++)
+		{
+			VertexData* glycogenVertex = (*iter);
+			//get nearest spine vertex to this granule
+			//int spineVertexIndex = m_spineOctree->findNeighbor(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z());
+			VertexData* mitoVertex = m_mitoHash->getNeighbor(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z());
+			//store mapping
+			m_glycogenIdToObjectVertexIndexMapping[glycogenVertex->id()] = mitoVertex->index;
+			//get actual VertexData and use Object Id
+			//VertexData* spineVertex = &(m_verticesList->at(spineVertexIndex));
+			//store mapping
+			if (m_objectIdToGlycogenMapping.find(mitoVertex->id()) != m_objectIdToGlycogenMapping.end())
+			{
+				//object id is already in the list - update its list
+				m_objectIdToGlycogenMapping.at(mitoVertex->id())[glycogenVertex->id()] = mitoVertex->index;
+				m_objectIdGlycogenVolumeMapped[mitoVertex->id()] += glycogenVertex->skeleton_vertex.y();
+			}
+			else
+			{
+				//object id is not already in the list - new list for it
+				m_objectIdToGlycogenMapping[mitoVertex->id()] = std::map<int, int>();
+				m_objectIdToGlycogenMapping.at(mitoVertex->id())[glycogenVertex->id()] = mitoVertex->index;
+				m_objectIdGlycogenVolumeMapped[mitoVertex->id()] = glycogenVertex->skeleton_vertex.y();
+			}
+			float currentVolumeValue = m_objectIdGlycogenVolumeMapped.at(mitoVertex->id());
 			if (m_current_max_glycogen_volume < currentVolumeValue)
 			{
 				m_current_max_glycogen_volume = currentVolumeValue;
@@ -360,6 +418,58 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 				m_objectIdGlycogenVolumeMapped[spineVertex->id()] = cluster->getTotalVolume();
 			}
 			float currentVolumeValue = m_objectIdGlycogenVolumeMapped.at(spineVertex->id());
+			if (m_current_max_glycogen_volume < currentVolumeValue)
+			{
+				m_current_max_glycogen_volume = currentVolumeValue;
+			}
+		}
+	}
+
+	//--------------------------------------------------------------------------------
+	//
+	void GlycogenAnalysisManager::computeGlycogenClusterMappingToMitochondria()
+	{
+		//if we have an octree and clusters
+		if (!m_mitoHash || m_clusterResults.size() == 0)
+			return;
+
+		//clear previous mappings
+		clearMapping();
+		//loop on clusters
+		for (auto iter = m_clusterResults.begin(); iter != m_clusterResults.end(); iter++)
+		{
+			//get cluster centroid
+			Clustering::GlycogenCluster* cluster = iter->second;
+			QVector3D clusterNode = cluster->getAvgNode();
+
+			//get nearest spine vertex to this centroid
+			//int spineVertexIndex = m_spineOctree->findNeighbor(clusterNode.x(), clusterNode.y(), clusterNode.z());
+			VertexData* mitoVertex = m_mitoHash->getNeighbor(clusterNode.x(), clusterNode.y(), clusterNode.z());
+
+			if (!mitoVertex) //TODO: get nearest no matter what
+			{
+				qDebug() << "Cluster didn't find closest mito. Cluster ID: " << cluster->getID();
+				continue;
+			}
+			//store mapping
+			m_glycogenIdToObjectVertexIndexMapping[cluster->getID()] = mitoVertex->index;
+			//get actual VertexData and use Object Id
+			//VertexData* spineVertex = &(m_verticesList->at(spineVertex->index));
+			//store mapping
+			if (m_objectIdToGlycogenMapping.find(mitoVertex->id()) != m_objectIdToGlycogenMapping.end())
+			{
+				//object id is already in the list - update its list
+				m_objectIdToGlycogenMapping.at(mitoVertex->id())[cluster->getID()] = mitoVertex->index;
+				m_objectIdGlycogenVolumeMapped[mitoVertex->id()] += cluster->getTotalVolume();
+			}
+			else
+			{
+				//object id is not already in the list - new list for it
+				m_objectIdToGlycogenMapping[mitoVertex->id()] = std::map<int, int>();
+				m_objectIdToGlycogenMapping.at(mitoVertex->id())[cluster->getID()] = mitoVertex->index;
+				m_objectIdGlycogenVolumeMapped[mitoVertex->id()] = cluster->getTotalVolume();
+			}
+			float currentVolumeValue = m_objectIdGlycogenVolumeMapped.at(mitoVertex->id());
 			if (m_current_max_glycogen_volume < currentVolumeValue)
 			{
 				m_current_max_glycogen_volume = currentVolumeValue;

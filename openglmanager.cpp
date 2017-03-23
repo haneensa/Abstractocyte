@@ -2102,8 +2102,16 @@ void OpenGLManager::updateSSBO()
 					m_ssbo_data[hvgxID].color.setY(0.7);
 					m_ssbo_data[hvgxID].color.setZ(0.7);
 				}
-				else if (obj->getObjectType() == Object_t::SPINE || obj->getObjectType() == Object_t::BOUTON)
+				else if (obj->getObjectType() == Object_t::SPINE || obj->getObjectType() == Object_t::BOUTON || obj->getObjectType() == Object_t::MITO)
 				{
+					if (obj->getObjectType() == Object_t::MITO && (!obj->getParent() || (obj->getParent()->getObjectType() == Object_t::ASTROCYTE)) )
+					{
+						m_ssbo_data[hvgxID].color.setX(0.7);
+						m_ssbo_data[hvgxID].color.setY(0.7);
+						m_ssbo_data[hvgxID].color.setZ(0.7);
+						continue;
+					}
+
 					//TODO: Ugly - change later
 					float mappedValue = obj->getMappedValue();
 					float r = 0.0; float r1 = 0.0; float r2 = 0.0;

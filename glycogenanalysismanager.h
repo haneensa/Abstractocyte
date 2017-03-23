@@ -25,10 +25,11 @@ class GlycogenAnalysisManager
 		~GlycogenAnalysisManager();
 
 		void setBoutonAndSpineOctrees(SpacePartitioning::SpatialHash3D*, SpacePartitioning::SpatialHash3D*);
+		void setMitochondriaSpatialHash(SpacePartitioning::SpatialHash3D*);
 
 		std::map<int, Clustering::GlycogenCluster*>* runDBScan(float eps, int minPts);
 
-		std::map<int, std::map<int, int>>*  computeGlycogenMapping(bool boutons, bool spines, bool clusters);
+		std::map<int, std::map<int, int>>*  computeGlycogenMapping(bool boutons, bool spines, bool mito, bool clusters);
 		
 		std::map<int, float>* getCurrentMappingVolumes() { return &m_objectIdGlycogenVolumeMapped; };
 
@@ -41,9 +42,11 @@ class GlycogenAnalysisManager
 		void computeGlycogenMappingToBoutons();
 		void computeGlycogenMappingToSpines();
 		void computeGlycogenMappingToBoutonsAndSpines();
+		void computeGlycogenMappingToMitochondria();
 		void computeGlycogenClusterMappingToBoutons();
 		void computeGlycogenClusterMappingToSpines();
 		void computeGlycogenClusterMappingToBoutonsAndSpines();
+		void computeGlycogenClusterMappingToMitochondria();
 
 		//list of all vertices pointer
 		std::vector< struct VertexData >*			m_verticesList;
@@ -58,6 +61,7 @@ class GlycogenAnalysisManager
 		//octrees 
 		SpacePartitioning::SpatialHash3D*			m_spineHash;
 		SpacePartitioning::SpatialHash3D*			m_boutonHash;
+		SpacePartitioning::SpatialHash3D*			m_mitoHash;
 		SpacePartitioning::Octree*					m_glycogenOctree;
 
 		//clustering results list

@@ -249,9 +249,10 @@ void MainWindow::on_mapGlycogenGranulesButton_clicked()
 
     bool boutons = mainwindow_ui->glycogenMapToBoutonsCheckBox->isChecked();
     bool spines = mainwindow_ui->glycogenMapToSpinesCheckBox->isChecked();
+	bool mito; //TODO
     bool clusters = false;
 
-    std::map<int, std::map<int, int>>* results = gam->computeGlycogenMapping(boutons, spines, clusters);
+	std::map<int, std::map<int, int>>* results = gam->computeGlycogenMapping(boutons, spines, mito, clusters);
 	std::map<int, float>* result_volumes = gam->getCurrentMappingVolumes();
 	float result_max_volume = gam->getCurrentMappedMaxVolume();
 
@@ -302,9 +303,10 @@ void MainWindow::on_mapGlycogenClustersButton_clicked()
 
         bool boutons = mainwindow_ui->glycogenMapToBoutonsCheckBox->isChecked();
         bool spines = mainwindow_ui->glycogenMapToSpinesCheckBox->isChecked();
+		bool mito; //todo
         bool clusters = true;
 
-        std::map<int, std::map<int, int>>* results = gam->computeGlycogenMapping(boutons, spines, clusters);
+        std::map<int, std::map<int, int>>* results = gam->computeGlycogenMapping(boutons, spines, mito, clusters);
 		std::map<int, float>* result_volumes = gam->getCurrentMappingVolumes();
 		float result_max_volume = gam->getCurrentMappedMaxVolume();
 
