@@ -1292,6 +1292,7 @@ void DataContainer::recomputeMaxVolAstro()
 
     }
 
+    max_synapse_volume = temp_max_synapse_volume;
     max_volume = temp_max_volume;
     max_astro_coverage = temp_max_astro_coverage;
 }
