@@ -28,6 +28,7 @@ public:
     void fillSSBO(Object*);
     int fillMeshVBO(Object *object_p, int offset, std::string vboLabel);
     int fillSkeletonPoints(Object *object_p, int offset);
+    void fillGraphData(Object *object_p);
     void fillVBOsData();
     bool initOpenGLFunctions();
     void updateAbstractUniformsLocation(GLuint program);

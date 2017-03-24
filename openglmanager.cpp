@@ -183,6 +183,50 @@ int OpenGLManager::fillSkeletonPoints(Object *object_p, int offset)
     return vbo_skeleton_count;
 }
 
+void OpenGLManager::fillGraphData(Object *object_p)
+{
+    int ID = object_p->getHVGXID();
+    // allocate neurites nodes place holders
+    if (object_p->getObjectType() != Object_t::ASTROCYTE
+            && object_p->getObjectType() != Object_t::MITO
+            && object_p->getObjectType()  != Object_t::SYNAPSE) {
+        object_p->setNodeIdx(m_neurites_nodes.size());
+        m_neurites_nodes.push_back(ID);
+    }
+
+    // get skeleton of the object
+    // if no skeleton, this will be skipped, thus no graph for this object
+    Skeleton *skeleton = object_p->getSkeleton();
+    // if (spine/bouton) then get their skeleton from their parents
+    // get the actual nodes from their parents
+    // only show them if parent is filtered/same as mito
+
+    // I do want the substructures graph to be present and use them only if their parents was filtered
+
+    // add all and in the view check if the parent not filtered then dont show it
+    std::vector<QVector3D> nodes3D = skeleton->getGraphNodes(); // if child these would be 0
+    std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
+    qDebug() << "set offset: " << m_abstract_skel_nodes.size();
+    object_p->setSkeletonOffset(m_abstract_skel_nodes.size());
+    // each skeleton node has local index within its list of nodes
+    // and an offset within list of abstract skel nodes
+    for ( int i = 0; i < nodes3D.size(); i++) {
+        QVector4D vertex = nodes3D[i];
+        vertex.setW(ID);
+        struct AbstractSkelNode skel_node = {vertex, vertex.toVector2D(), vertex.toVector2D(), vertex.toVector2D() };
+        m_abstract_skel_nodes.push_back(skel_node);
+    }
+
+    int skeleton_offset = object_p->getSkeletonOffset();
+    // add edges
+    for (int i = 0; i < edges2D.size(); ++i) {
+        int nID1 = edges2D[i].x() + skeleton_offset;
+        int nID2 = edges2D[i].y() + skeleton_offset;
+        m_abstract_skel_edges.push_back(nID1);
+        m_abstract_skel_edges.push_back(nID2);
+    }
+}
+
 // ----------------------------------------------------------------------------
 /*
  * allocates: m_vbo_skeleton with skeleton points
@@ -227,7 +271,6 @@ void OpenGLManager::fillVBOsData()
     for ( auto iter = objects_map->rbegin(); iter != objects_map->rend(); iter++) {
         Object *object_p = (*iter).second;
         qDebug() << " allocating: " << object_p->getName().data();
-        int ID = object_p->getHVGXID();
 
         this->fillSSBO(object_p);
 
@@ -242,48 +285,11 @@ void OpenGLManager::fillVBOsData()
 
         vbo_skeleton_offset += this->fillSkeletonPoints(object_p, vbo_skeleton_offset);
 
-        // allocate neurites nodes place holders
-        if (object_p->getObjectType() != Object_t::ASTROCYTE
-                && object_p->getObjectType() != Object_t::MITO
-                && object_p->getObjectType()  != Object_t::SYNAPSE) {
-            object_p->setNodeIdx(m_neurites_nodes.size());
-            m_neurites_nodes.push_back(ID);
-        }
+        this->fillGraphData(object_p);
 
-        // get skeleton of the object
-        // if no skeleton, this will be skipped, thus no graph for this object
-        Skeleton *skeleton = object_p->getSkeleton();
-        // if (spine/bouton) then get their skeleton from their parents
-        // get the actual nodes from their parents
-        // only show them if parent is filtered/same as mito
-
-        // I do want the substructures graph to be present and use them only if their parents was filtered
-
-        // add all and in the view check if the parent not filtered then dont show it
-        std::vector<QVector3D> nodes3D = skeleton->getGraphNodes(); // if child these would be 0
-        std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
-        qDebug() << "set offset: " << m_abstract_skel_nodes.size();
-        object_p->setSkeletonOffset(m_abstract_skel_nodes.size());
-        // each skeleton node has local index within its list of nodes
-        // and an offset within list of abstract skel nodes
-        for ( int i = 0; i < nodes3D.size(); i++) {
-            QVector4D vertex = nodes3D[i];
-            vertex.setW(ID);
-            struct AbstractSkelNode skel_node = {vertex, vertex.toVector2D(), vertex.toVector2D(), vertex.toVector2D() };
-            m_abstract_skel_nodes.push_back(skel_node);
-        }
-
-        int skeleton_offset = object_p->getSkeletonOffset();
-        // add edges
-        for (int i = 0; i < edges2D.size(); ++i) {
-            int nID1 = edges2D[i].x() + skeleton_offset;
-            int nID2 = edges2D[i].y() + skeleton_offset;
-            m_abstract_skel_edges.push_back(nID1);
-            m_abstract_skel_edges.push_back(nID2);
-        }
    }
 
-    // allocate neurites nodes edges
+    // allocate neurites edges
     std::vector<QVector2D> edges_info = m_dataContainer->getNeuritesEdges();
     for (int i = 0; i < edges_info.size(); ++i) {
         int nID1 = edges_info[i].x();
