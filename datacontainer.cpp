@@ -845,7 +845,15 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
 
                 // todo: get the skeleton vertex from the skeleton itself using an index
                 // get the point branch knots as well
-                if (stringlist.size() < 5 || obj->getObjectType() == Object_t::SYNAPSE || mito_no_parent) {
+                int hvgxID = obj->getHVGXID();
+                std::map<int, bool> missing_skeletons;
+                missing_skeletons[134] = true;
+                missing_skeletons[510] = true;
+                missing_skeletons[718] = true;
+                missing_skeletons[542] = true;
+                missing_skeletons[565] = true;
+
+                if (stringlist.size() < 5 || obj->getObjectType() == Object_t::SYNAPSE || mito_no_parent || missing_skeletons.find(hvgxID) != missing_skeletons.end() ) {
                     // place holder
                     v->skeleton_vertex = mesh_vertex;
                 } else {
