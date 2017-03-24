@@ -26,8 +26,11 @@ namespace SpacePartitioning
 		std::vector<std::vector<VertexData*>>* getData();
 		std::vector<VertexData*>* getClosestNeighbors(float nX, float nY, float nZ);
 		VertexData* getNeighbor(float nX, float nY, float nZ);
+		VertexData* getNeighbor2(float nX, float nY, float nZ);
 
 	protected:
+
+		float findClosesVertexInCell(int x, int y, int z, VertexData* out, float nX, float nY, float nZ);
 
 		int m_size[3];
 		int m_totalSize;

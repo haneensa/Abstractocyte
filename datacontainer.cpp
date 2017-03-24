@@ -73,7 +73,7 @@ void DataContainer::loadData()
 
     m_limit = 2000;
     m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
-    m_load_data = LoadData_t::NEURITES;
+    m_load_data = LoadData_t::ALL;
     m_normals_t = Normals_t::LOAD_NORMAL;
 
 
@@ -722,11 +722,14 @@ void DataContainer::parseMeshNoVertexnoFace(QXmlStreamReader &xml, Object *obj)
 					if (obj->getObjectType() == Object_t::MITO)
 					{
 						//check if neuronal mito
-						if (obj->getParent() && obj->getParent()->getObjectType() == Object_t::ASTROCYTE)
+						//if (obj->getParent() && obj->getParent()->getObjectType() == Object_t::ASTROCYTE)
+						//FIXME: apparently we don't have parents assigned yet so im using the parent ID to check.. currently hardcoded
+						//the astrocyte ID (this needs to be fixed later)
+						if (obj->getParentID() > 0 && obj->getParentID() != 745)
 						{
 							m_neuroMitoHash.addNormalizedPoint(mesh_vertex->x(), mesh_vertex->y(), mesh_vertex->z(), mesh_vertex);
 						}
-						else if (!obj->getParent())
+						else// if (!obj->getParent())
 						{
 							qDebug() << "Mitochondria does not have parent yet - missed from spatial hash";
 						}

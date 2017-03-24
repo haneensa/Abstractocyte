@@ -2,7 +2,7 @@
 #include "octree.h"
 #include "spatialhash3d.h"
 
-
+#define MAX_RING_SIZE 10
 
 //----------------------------------------------------------------------------
 //
@@ -82,7 +82,7 @@ void SpacePartitioning::SpatialHash3D::addNormalizedPoint(float nX, float nY, fl
 	int gY = (int)(nY * (m_size[Y] - 1));
 	int gZ = (int)(nZ * (m_size[Z] - 1));
 
-	int idx = gX + gY * m_size[X] + gZ * m_size[Y] * m_size[Z];
+	int idx = gX + gY * m_size[X] + gZ * m_size[Y] * m_size[X];
 
 	//if (!m_vectorList[idx]) 
 	//{
@@ -112,7 +112,7 @@ std::vector<VertexData*>* SpacePartitioning::SpatialHash3D::getClosestNeighbors(
 	int gY = (int)(nY * (m_size[Y] - 1));
 	int gZ = (int)(nZ * (m_size[Z] - 1));
 
-	int idx = gX + gY * m_size[X] + gZ * m_size[Y] * m_size[Z];
+	int idx = gX + gY * m_size[X] + gZ * m_size[Y] * m_size[X];
 
 	//TODO get neighboring cells as well
 	//int gx_1 = gX + 1; int gx__1 = gX - 1;
@@ -129,7 +129,7 @@ std::vector<VertexData*>* SpacePartitioning::SpatialHash3D::getClosestNeighbors(
 
 //-----------------------------------------------------------------------------
 //
-VertexData* SpacePartitioning::SpatialHash3D::getNeighbor(float nX, float nY, float nZ)
+VertexData* SpacePartitioning::SpatialHash3D::getNeighbor2(float nX, float nY, float nZ)
 {
 	int X = 0;
 	int Y = 1;
@@ -167,7 +167,7 @@ VertexData* SpacePartitioning::SpatialHash3D::getNeighbor(float nX, float nY, fl
 					continue;
 
 				//get index of cell
-				int idx = gx_1[x] + gy_1[y] * m_size[X] + gz_1[z] * m_size[Y] * m_size[Z];
+				int idx = gx_1[x] + gy_1[y] * m_size[X] + gz_1[z] * m_size[Y] * m_size[X];
 				//if (!m_vectorList[idx])
 				//	continue;
 				//for (auto iter = m_vectorList[idx]->begin(); iter != m_vectorList[idx]->end(); iter++)
@@ -205,7 +205,7 @@ VertexData* SpacePartitioning::SpatialHash3D::getNeighbor(float nX, float nY, fl
 					if (gy_1[y] < 0 || gy_1[y] >= m_size[Y]) //exceeds boundaries ->skip
 						continue;
 
-					int idx = gx_2[x] + gy_1[y] * m_size[X] + gz_1[z] * m_size[Y] * m_size[Z];
+					int idx = gx_2[x] + gy_1[y] * m_size[X] + gz_1[z] * m_size[Y] * m_size[X];
 
 					for (auto iter = m_vectorList[idx].begin(); iter != m_vectorList[idx].end(); iter++)
 					{
@@ -235,7 +235,7 @@ VertexData* SpacePartitioning::SpatialHash3D::getNeighbor(float nX, float nY, fl
 					if (gx_1[x] < 0 || gy_1[x] >= m_size[X]) //exceeds boundaries ->skip
 						continue;
 
-					int idx = gx_1[x] + gy_2[y] * m_size[X] + gz_1[z] * m_size[Y] * m_size[Z];
+					int idx = gx_1[x] + gy_2[y] * m_size[X] + gz_1[z] * m_size[Y] * m_size[X];
 
 					for (auto iter = m_vectorList[idx].begin(); iter != m_vectorList[idx].end(); iter++)
 					{
@@ -266,7 +266,7 @@ VertexData* SpacePartitioning::SpatialHash3D::getNeighbor(float nX, float nY, fl
 					if (gy_1[y] < 0 || gy_1[y] >= m_size[Y]) //exceeds boundaries ->skip
 						continue;
 
-					int idx = gx_1[x] + gy_1[y] * m_size[X] + gz_2[z] * m_size[Y] * m_size[Z];
+					int idx = gx_1[x] + gy_1[y] * m_size[X] + gz_2[z] * m_size[Y] * m_size[X];
 
 					for (auto iter = m_vectorList[idx].begin(); iter != m_vectorList[idx].end(); iter++)
 					{
@@ -285,3 +285,223 @@ VertexData* SpacePartitioning::SpatialHash3D::getNeighbor(float nX, float nY, fl
 	return closest;
 }
 
+//-----------------------------------------------------------------------------
+//
+VertexData* SpacePartitioning::SpatialHash3D::getNeighbor(float nX, float nY, float nZ)
+{
+	int X = 0;
+	int Y = 1;
+	int Z = 2;
+
+	//grid indices
+	int gX = (int)(nX * (m_size[X] - 1));
+	int gY = (int)(nY * (m_size[Y] - 1));
+	int gZ = (int)(nZ * (m_size[Z] - 1));
+
+	//int idx = gX + gY * m_size[X] + gZ * m_size[Y] * m_size[Z];
+
+	float distance2 = 99999999; // will hold the shortest distance squared
+	VertexData* closest = 0;
+
+	int idx = gX + gY * m_size[X] + gZ * m_size[Y] * m_size[X];
+
+	//check current cells first
+	for (auto iter = m_vectorList[idx].begin(); iter != m_vectorList[idx].end(); iter++)
+	{
+		float currentDistance = L2Distance::compute(nX, nY, nZ, (*iter)->x(), (*iter)->y(), (*iter)->z());
+		if (currentDistance < distance2)
+		{
+			closest = (*iter);
+			distance2 = currentDistance;
+		}
+	}
+
+	//loop on 3d rings 
+	for (int r = 1; r < MAX_RING_SIZE; r++)
+	{
+
+		//scan x
+		for (int x = gX - r; x < gX + r + 1; x++)
+		{
+			int y1 = gY - r;
+			int y2 = gY + r;
+
+			//go through  z+r <-- z --> z-r (scan z)
+			for (int z = gZ - r; z < gZ + r + 1; z++)
+			{
+				VertexData* result = 0;
+				float currentDistance = findClosesVertexInCell(x, y1, z, result, nX, nY, nZ);
+				VertexData* result2 = 0;
+				float currentDistance2 = 99999999;
+				if (y1 != y2)
+					currentDistance2 = findClosesVertexInCell(x, y2, z, result2, nX, nY, nZ);
+				//update shortest distance vertex
+				if (currentDistance > currentDistance2)
+				{
+					currentDistance = currentDistance2;
+					result = result2;
+				}
+				if (currentDistance < distance2)
+				{
+					closest = result;
+					distance2 = currentDistance;
+				}
+			}
+
+		}
+
+		//scan y
+		for (int y = gY - r; y < gY + r; y++)
+		{
+			int x1 = gX - r;
+			int x2 = gX + r;
+
+			//go through  z+r <-- z --> z-r (scan z)
+			for (int z = gZ - r; z < gZ + r + 1; z++)
+			{
+				VertexData* result = 0;
+				float currentDistance = findClosesVertexInCell(x1, y, z, result, nX, nY, nZ);
+				VertexData* result2 = 0;
+				float currentDistance2 = findClosesVertexInCell(x2, y, z, result2, nX, nY, nZ);
+				//update shortest distance vertex
+				if (currentDistance > currentDistance2)
+				{
+					currentDistance = currentDistance2;
+					result = result2;
+				}
+				if (currentDistance < distance2)
+				{
+					closest = result;
+					distance2 = currentDistance;
+				}
+			}
+		}
+
+		//xy-faces on front and back remains
+		int z1 = gZ - r;
+		int z2 = gZ + r;
+		for (int r2 = 0; r2 < r; r2++)
+		{
+			//scan x
+			for (int x = gX - r2; x < gX + r2 + 1; x++)
+			{
+				int y1 = gY - r2;
+				int y2 = gY + r2;
+
+				VertexData* result = 0;
+				float currentDistance = findClosesVertexInCell(x, y1, z1, result, nX, nY, nZ);
+				VertexData* result2 = 0;
+				float currentDistance2 = findClosesVertexInCell(x, y1, z2, result2, nX, nY, nZ);
+				VertexData* result3 = 0;
+				float currentDistance3 = findClosesVertexInCell(x, y2, z1, result3, nX, nY, nZ);
+				VertexData* result4 = 0;
+				float currentDistance4 = findClosesVertexInCell(x, y2, z2, result4, nX, nY, nZ);
+				//update shortest distance vertex
+				if (currentDistance > currentDistance2)
+				{
+					currentDistance = currentDistance2;
+					result = result2;
+				}
+				if (currentDistance3 > currentDistance4)
+				{
+					currentDistance3 = currentDistance4;
+					result3 = result4;
+				}
+				if (currentDistance > currentDistance3)
+				{
+					currentDistance = currentDistance3;
+					result = result3;
+				}
+
+				if (currentDistance < distance2)
+				{
+					closest = result;
+					distance2 = currentDistance;
+				}
+			}
+
+			//scan y
+			for (int y = gY - r2; y < gY + r2; y++)
+			{
+				int x1 = gX - r2;
+				int x2 = gX + r2;
+
+
+					VertexData* result = 0;
+					float currentDistance = findClosesVertexInCell(x1, y, z1, result, nX, nY, nZ);
+					VertexData* result2 = 0;
+					float currentDistance2 = findClosesVertexInCell(x1, y, z2, result2, nX, nY, nZ);
+					VertexData* result3 = 0;
+					float currentDistance3 = findClosesVertexInCell(x2, y, z1, result3, nX, nY, nZ);
+					VertexData* result4 = 0;
+					float currentDistance4 = findClosesVertexInCell(x2, y, z2, result4, nX, nY, nZ);
+					//update shortest distance vertex
+					if (currentDistance > currentDistance2)
+					{
+						currentDistance = currentDistance2;
+						result = result2;
+					}
+					if (currentDistance3 > currentDistance4)
+					{
+						currentDistance3 = currentDistance4;
+						result3 = result4;
+					}
+					if (currentDistance > currentDistance3)
+					{
+						currentDistance = currentDistance3;
+						result = result3;
+					}
+
+					if (currentDistance < distance2)
+					{
+						closest = result;
+						distance2 = currentDistance;
+					}
+				
+			}
+		}
+
+
+		//end of ring
+		if (closest)
+		{
+			//result found return
+			return closest;
+		}
+	}
+
+	//result not found return null
+	return closest;
+
+}
+
+
+//-----------------------------------------------------------------------------
+//
+float SpacePartitioning::SpatialHash3D::findClosesVertexInCell(int x, int y, int z, VertexData* out, float nX, float nY, float nZ)
+{
+	if (z < 0 || z >= m_size[2]) //exceeds boundaries ->skip
+		return 99999999;
+
+	if (y < 0 || y >= m_size[1]) //exceeds boundaries ->skip
+		return 99999999;
+
+	if (x < 0 || x >= m_size[0]) //exceeds boundaries ->skip
+		return 99999999;
+
+	int idx = x + y * m_size[0] + z * m_size[0] * m_size[1];
+
+	float distance2 = 99999999;
+
+	for (auto iter = m_vectorList[idx].begin(); iter != m_vectorList[idx].end(); iter++)
+	{
+		float currentDistance = L2Distance::compute(nX, nY, nZ, (*iter)->x(), (*iter)->y(), (*iter)->z());
+		if (currentDistance < distance2)
+		{
+			out = (*iter);
+			distance2 = currentDistance;
+		}
+	}
+
+	return distance2;
+}
