@@ -74,7 +74,7 @@ bool OpenGLManager::initOpenGLFunctions()
     //load3DTexturesFromRaw("astrocytic_mitochondria_s5.raw", m_mito_3DTex ); //
     //load3DTexturesFromRaw("Neuronic_mitochondria_binary_s5.raw", m_nmito_3DTex);
     load3DTexturesFromRaw("glycogen_volume_s5.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
-
+	//load3DTexturesFromRaw("mask_gly_blur5_contrast_filtersize_15.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
     //init_Gly3DTex();
     //upload_Gly3DTex(m_dataContainer->getGlycogen3DGridData(), DIM_G, DIM_G, DIM_G);
 
@@ -388,7 +388,7 @@ void OpenGLManager::load3DTexturesFromRaw(QString path, GLuint &texture, GLenum 
     // convert to rgba
     for (int i = 0; i < size; ++i) {
         //unsigned int idx = i * 4;
-        bufferRGBA[i] = (rawData[i] > 0) ? 255 : 0; //hack: remove later
+		bufferRGBA[i] = rawData[i];// (rawData[i] > 0) ? 255 : 0; //hack: remove later
         //bufferRGBA[idx + 1] = 0;
         //bufferRGBA[idx + 2] = 0;
         //bufferRGBA[idx + 3] = 255;
@@ -1746,9 +1746,9 @@ void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
 
     if (m_display_synapses) {
         // get all objects that are connected to this directly or indirectly
-        std::vector<Object*> synapses_list= obj->getSynapses();
-        if (synapses_list.size() == 0)
-            return;
+        std::vector<Object*> synapses_list = obj->getSynapses();
+        //if (synapses_list.size() == 0)
+        //    return;
 
         for (int i = 0; i < synapses_list.size(); ++i) {
             Object *synapse_obj = synapses_list[i];
@@ -1776,7 +1776,37 @@ void OpenGLManager::recursiveFilter(int hvgxID, bool isfilterd)
                 && objectMap->find(synapse_data.bouton) != objectMap->end()) {
                 FilterObject(synapse_data.bouton, isfilterd);
             }
+			FilterObject(synapse_obj->getHVGXID(), isfilterd);
         }
+
+		if (obj->getObjectType() == Object_t::SYNAPSE)
+		{
+			struct synapse synapse_data = obj->getSynapseData();
+			if (synapse_data.axon != hvgxID
+				&& synapse_data.axon
+				&& objectMap->find(synapse_data.axon) != objectMap->end()) {
+				FilterObject(synapse_data.axon, isfilterd);
+			}
+
+			if (synapse_data.dendrite != hvgxID
+				&& synapse_data.dendrite
+				&& objectMap->find(synapse_data.dendrite) != objectMap->end()) {
+				FilterObject(synapse_data.dendrite, isfilterd);
+			}
+
+			if (synapse_data.spine != hvgxID
+				&& synapse_data.spine
+				&& objectMap->find(synapse_data.spine) != objectMap->end()) {
+				FilterObject(synapse_data.spine, isfilterd);
+			}
+
+			if (synapse_data.bouton != hvgxID
+				&& synapse_data.bouton
+				&& objectMap->find(synapse_data.bouton) != objectMap->end()) {
+				FilterObject(synapse_data.bouton, isfilterd);
+			}
+			FilterObject(obj->getHVGXID(), isfilterd);
+		}
     }
 
 }
@@ -2149,7 +2179,8 @@ void OpenGLManager::updateSSBO()
 				}
 				else if (obj->getObjectType() == Object_t::SPINE || obj->getObjectType() == Object_t::BOUTON || obj->getObjectType() == Object_t::MITO)
 				{
-					if (obj->getObjectType() == Object_t::MITO && (!obj->getParent() || (obj->getParent()->getObjectType() == Object_t::ASTROCYTE)) )
+					int parent_id = obj->getParentID();
+					if (obj->getObjectType() == Object_t::MITO && objectMap->find(parent_id) != objectMap->end() && objectMap->at(parent_id)->getObjectType() == Object_t::ASTROCYTE)
 					{
 						m_ssbo_data[hvgxID].color.setX(0.7);
 						m_ssbo_data[hvgxID].color.setY(0.7);

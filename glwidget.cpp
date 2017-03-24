@@ -205,11 +205,14 @@ int GLWidget::pickObject(QMouseEvent *event)
     int x = event->x() * retinaScale;
     int y = viewport[3] - event->y() * retinaScale;
     int hvgxID = m_opengl_mngr->processSelection(x, y);
-    setHoveredID(hvgxID);
-    std::string name = m_data_containter->getObjectName(hvgxID);
-    QString oname = QString::fromUtf8(name.c_str());
-    setHoveredName(oname);
-
+	if (hvgxID == 16777215)
+	{
+		hvgxID = 0;
+	}
+	setHoveredID(hvgxID);
+	std::string name = m_data_containter->getObjectName(hvgxID);
+	QString oname = QString::fromUtf8(name.c_str());
+	setHoveredName(oname);
     return hvgxID;
 }
 
@@ -379,7 +382,23 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             setMouseTracking(true);
 
         break;
+		case(Qt::Key_P) :
+			saveScreenshot();
+		break;
     }
+}
+
+void GLWidget::saveScreenshot()
+{
+	QString fileName = QFileDialog::getSaveFileName(this,
+		tr("Save Screenshot"), "",
+		tr("PNG Images (*.png);;All Files (*)"));
+
+	if (!fileName.isEmpty())
+	{
+		QImage screenshot = grabFramebuffer();
+		screenshot.save(fileName, "png");
+	}
 }
 
 void GLWidget::getSliderX(int value)

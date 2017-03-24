@@ -18,7 +18,7 @@ Object::Object(std::string name, int ID)
     if (name[name.size()-1] == '\n') {
         name.erase(name.size()-1, name.size()-1);
     }
-
+	m_parentID = -1;
     m_name  = name; // obj name
     m_ID    = ID;   // hvgx ID
     m_object_t = getObjectType(); // obect type
@@ -100,13 +100,13 @@ QVector4D Object::getColor()
         m_color = orange;
         break;
     case Object_t::BOUTON:
-        m_color = green;
+		m_color = lightseagreen2;
         break;
     case Object_t::MITO:
         m_color = mediumslateblue;
         break;
     case Object_t::SYNAPSE:
-        m_color = lightgoldenrodyellow;
+		m_color = darknavy;// lightgoldenrodyellow;
         break;
     case Object_t::GLYCOGEN:
         m_color = red;

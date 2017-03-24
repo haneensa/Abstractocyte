@@ -98,6 +98,8 @@ protected:
 
     void stopForecDirectedLayout();
 
+	void saveScreenshot();
+
     AbstractionSpace                    *m_2dspace;
     bool                                m_2D;
 

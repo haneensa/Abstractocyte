@@ -723,15 +723,18 @@ void DataContainer::parseMeshNoVertexnoFace(QXmlStreamReader &xml, Object *obj)
 					{
 						//check if neuronal mito
 						//if (obj->getParent() && obj->getParent()->getObjectType() == Object_t::ASTROCYTE)
-						//FIXME: apparently we don't have parents assigned yet so im using the parent ID to check.. currently hardcoded
-						//the astrocyte ID (this needs to be fixed later)
-						if (obj->getParentID() > 0 && obj->getParentID() != 745)
+						Object* parent = NULL;
+						int parent_id = obj->getParentID();
+						if (obj->getParentID() > 0 && m_objects.find(parent_id) != m_objects.end())
+						{
+							parent = m_objects.at(obj->getParentID());
+							obj->setParent(parent);
+						}
+						
+						//only add mitochondria with no parent or not astrocytic
+						if (!parent || parent->getObjectType() != Object_t::ASTROCYTE)
 						{
 							m_neuroMitoHash.addNormalizedPoint(mesh_vertex->x(), mesh_vertex->y(), mesh_vertex->z(), mesh_vertex);
-						}
-						else// if (!obj->getParent())
-						{
-							qDebug() << "Mitochondria does not have parent yet - missed from spatial hash";
 						}
 					}
                 }
@@ -1262,6 +1265,8 @@ std::vector<Object*> DataContainer::getObjectsByType(Object_t type)
 //
  std::string DataContainer::getObjectName(int hvgxID)
  {
+	 if (hvgxID == 0)
+		 return "";//background
      if (m_objects.find(hvgxID) == m_objects.end())
          return "Unknown";
 

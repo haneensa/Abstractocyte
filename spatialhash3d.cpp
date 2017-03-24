@@ -129,7 +129,7 @@ std::vector<VertexData*>* SpacePartitioning::SpatialHash3D::getClosestNeighbors(
 
 //-----------------------------------------------------------------------------
 //
-VertexData* SpacePartitioning::SpatialHash3D::getNeighbor2(float nX, float nY, float nZ)
+VertexData* SpacePartitioning::SpatialHash3D::getNeighbor(float nX, float nY, float nZ)
 {
 	int X = 0;
 	int Y = 1;
@@ -287,7 +287,7 @@ VertexData* SpacePartitioning::SpatialHash3D::getNeighbor2(float nX, float nY, f
 
 //-----------------------------------------------------------------------------
 //
-VertexData* SpacePartitioning::SpatialHash3D::getNeighbor(float nX, float nY, float nZ)
+VertexData* SpacePartitioning::SpatialHash3D::getNeighbor2(float nX, float nY, float nZ)
 {
 	int X = 0;
 	int Y = 1;

@@ -71,7 +71,7 @@ void main() {
 	switch (otype)
 	{
 	case ASTRO:
-		mix_color = mix(color, pnk_color, splat2.r * splat_flags.y);
+		mix_color = mix(color, pnk_color, splat2.r * splat_flags.y * 8.0);
 		color = mix_color;
 		mix_color = mix(color, pur_color, splat.b * splat_flags.z);
 		color = mix_color;
@@ -79,7 +79,7 @@ void main() {
 	case SPINE:
 	case BOUTN:
 	case SYNPS:
-		mix_color = mix(color, pnk_color, splat2.r * splat_flags.y);
+		mix_color = mix(color, pnk_color, splat2.r * splat_flags.y * 12.0);
 		color = mix_color;
 	case AXONS:
 	case DENDS:

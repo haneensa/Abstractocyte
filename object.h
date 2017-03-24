@@ -67,6 +67,7 @@ public:
     void setVolume(int volume)          { m_volume = volume; }
 
     void setParentID(int parentID)      { m_parentID = parentID; }
+	void setParent(Object* parent)		{ m_parent = parent; }
 
     void addChild(Object *child);
     // skeleton management
