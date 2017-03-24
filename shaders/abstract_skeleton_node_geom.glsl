@@ -6,10 +6,12 @@ layout (points, max_vertices = 1) out;
 out float       alpha;
 out vec4        color_val;
 out float       G_ID;
+out float       node2D_alpha; /*1 -> 3D, 0 -> 2D*/
 
 in int          V_ID[];
 in float        V_alpha[];
 in int          V_render[];
+in float        V_node2D_alpha[];
 
 uniform int     hoveredID;
 
@@ -28,6 +30,9 @@ layout (std430, binding=2) buffer mesh_data
 
 
 void main() {
+
+    node2D_alpha = V_node2D_alpha[0];
+
     int ID = V_ID[0];
     G_ID = float(ID);
 

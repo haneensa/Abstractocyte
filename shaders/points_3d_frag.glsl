@@ -1,5 +1,6 @@
 #version 430
 
+in float        node2D_alpha; /*1 -> 3D, 0 -> 2D*/
 in float        alpha;
 in vec4         color_val;
 
@@ -22,8 +23,15 @@ void main() {
         vec3 halfVector = normalize( eye + lightDir );
         float spec = max( pow( dot(normal, halfVector), Ns ), 0. );
         vec4 S = light_specular * mat_specular * spec;
-        outcol = vec4(color_val.rgb, alpha) * diffuse + S;
+        vec4 node3d = vec4(color_val.rgb, alpha) * diffuse + S;
+        vec4 node2d = vec4(color_val.rgb, alpha);
 
+        if (dot(gl_PointCoord-0.5,gl_PointCoord-0.5)>0.20)
+        {
+           node2d -= vec4( 0.3, 0.3, 0.3, 1.0 );
+        }
+
+
+        outcol = mix( node2d, node3d, node2D_alpha);
         outcol.a = alpha;
-
 }

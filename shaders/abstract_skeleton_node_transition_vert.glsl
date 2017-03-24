@@ -14,6 +14,8 @@ layout (location = 3) in vec2 layout3;
 out int     V_ID;
 out float   V_alpha;
 out int     V_render;
+out float   V_node2D_alpha;
+out int     V_connectivity;
 
 // World transformation
 uniform mat4 mMatrix;
@@ -63,6 +65,7 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 // here I should lock the rotation matrix
 void main(void)
 {
+    V_connectivity = 0;
     // if has parent and parent not filtered, then use it
     // else use child if not filtered as well
     int ID = int(vertex.w);
@@ -113,7 +116,9 @@ void main(void)
         pos_flag2 = 5;
     }
 
-    V_alpha =  1;
+    V_node2D_alpha = translate(slider, interval.x, interval.y, 1, 0); ;
+
+    V_alpha =  0.5;
 
     float max_point_size = point_size.y;
     float min_point_size = point_size.x;
