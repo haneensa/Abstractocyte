@@ -1658,11 +1658,10 @@ void OpenGLManager::renderAbstractions()
 
     if ( space_properties.ast.render_type.z() == 1 ||  space_properties.neu.render_type.z() == 1)
         drawSkeletonsGraph(false);
-
-    if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
+    else if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
         glDisable(GL_DEPTH_TEST);
-        drawSkeletonsGraph(false);
         drawNeuritesGraph();
+        drawSkeletonsGraph(false);
         glEnable(GL_DEPTH_TEST);
     }
 
