@@ -627,7 +627,7 @@ void OpenGLManager::update2DTextureUniforms(GLuint program)
 void OpenGLManager::drawNodesInto2DTexture()
 {
     //****************** Render Nodes Into Texture ***********************
-    if (m_uniforms.x_axis == 90 && m_uniforms.y_axis == 90) {
+   if (m_uniforms.x_axis > 90 && m_uniforms.y_axis > 90) {
         glEnable(GL_BLEND);
         glBlendFunc (GL_SRC_ALPHA, GL_DST_ALPHA);
 
