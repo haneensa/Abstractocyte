@@ -107,6 +107,8 @@ public:
 
     void buildMissingSkeletons();
 
+    int getIndicesSizeByObjectType(Object_t type)   { return m_indices_size_byType[type]; }
+
 protected:
      // maximum volume from displayed objects
     int                                         max_volume;

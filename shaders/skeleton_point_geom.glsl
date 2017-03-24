@@ -13,6 +13,7 @@ out float       color_intp;
 out vec4        color_val;
 out float       alpha;
 out float       G_ID;
+out float        node2D_alpha; /*1 -> 3D, 0 -> 2D*/
 
 
 uniform int     y_axis;
@@ -60,6 +61,9 @@ layout (std430, binding=3) buffer space2d_data
 
 
 void main() {
+
+    node2D_alpha = 1;
+
     int ID = V_ID[0];
     int type = int(SSBO_data[ID].center.w);
 

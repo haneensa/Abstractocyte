@@ -13,6 +13,7 @@ layout (location = 0) in int ID;
 out float   V_alpha;
 out int     V_ID;
 out int     V_render;
+out int     V_connectivity;
 
 uniform mat4 m_noRartionMatrix;
 uniform mat4 vMatrix;
@@ -74,6 +75,7 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 
 void main(void)
 {
+    V_connectivity = 1;
 
     V_ID = ID;
     // two positions to interpolate between:

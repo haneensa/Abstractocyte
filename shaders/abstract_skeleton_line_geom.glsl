@@ -23,12 +23,13 @@ layout(points, max_vertices = 100) out;
 in int          V_ID[];
 in float        V_alpha[];
 in int          V_render[];
-in vec4         v_viewport[];
+in int          V_connectivity[];
+
 out vec4        color_val;
 out float       alpha;
 out float       G_ID;
 
-uniform int     hoveredID;
+uniform int                 hoveredID;
 
 struct SSBO_datum {
     vec4 color;
@@ -89,7 +90,11 @@ void main() {
 
     gl_PointSize =  gl_in[0].gl_PointSize;
 
-    color_val = SSBO_data[ID].color;
+    if (V_connectivity[0] == 1)
+        color_val = vec4(0.8, 0.8, 0.8, 1);
+    else
+        color_val = SSBO_data[ID].color;
+
     if (hoveredID == ID) {
         color_val += vec4(0.2, 0.2, 0.2, 0);
     }

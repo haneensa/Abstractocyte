@@ -14,6 +14,8 @@ layout (location = 3) in vec2 layout3;
 out int                     V_ID;
 out float                   V_alpha;
 out int                     V_render;
+out float                   V_node2D_alpha;
+out int                     V_connectivity;
 
 uniform mat4                m_noRartionMatrix;
 uniform mat4                vMatrix;
@@ -60,6 +62,8 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 // here I should lock the rotation matrix
 void main(void)
 {
+    V_connectivity = 0;
+    V_node2D_alpha = 0;
     int ID = int(vertex.w);
     V_ID = ID;
     mat4 m_noRotvpMatrix = pMatrix * vMatrix * m_noRartionMatrix;

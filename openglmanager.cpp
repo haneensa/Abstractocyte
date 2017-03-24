@@ -27,6 +27,10 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
 	m_is_amito_splat = true;
 
 	m_is_specular = true;
+
+
+    m_neurites_VBO_label = "NeuritesIndices";
+    m_astro_VBO_label = "AstroIndices";
 }
 
 // ----------------------------------------------------------------------------
@@ -48,12 +52,12 @@ void OpenGLManager::drawAll()
     write_ssbo_data();
 
 
-     render2DHeatMapTexture();
+    render2DHeatMapTexture();
 
     renderAbstractions();
     renderSelection();
 
-     drawNodesInto2DTexture();
+    drawNodesInto2DTexture();
  }
 
 // ############## Data Initialization ###############################################
@@ -143,6 +147,87 @@ void OpenGLManager::write_ssbo_data()
 
 // ----------------------------------------------------------------------------
 //
+void OpenGLManager::fillSSBO(Object *object_p)
+{
+    int ID = object_p->getHVGXID();
+
+    /* fill ssbo data per object */
+    if (m_ssbo_data.size() <= ID) {
+        qDebug() << "resizing m_ssbo_data.";
+        m_ssbo_data.resize(ID + 100);
+    }
+
+    m_ssbo_data[ID] = object_p->getSSBOData();
+    float volume =  object_p->getVolume() / m_dataContainer->getMaxVolume();
+    m_ssbo_data[ID].info.setX( 20 *  volume);
+    m_ssbo_data[ID].info.setY( object_p->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage() );
+
+}
+
+// ----------------------------------------------------------------------------
+int OpenGLManager::fillMeshVBO(Object *object_p, int offset, std::string vboLabel)
+{
+    m_TMesh.vboBind(vboLabel);
+
+    int vbo_IndexMesh_count = object_p->get_indices_Size() * sizeof(GLuint);
+    m_TMesh.vboWrite(vboLabel, offset, object_p->get_indices(), vbo_IndexMesh_count);
+
+    return vbo_IndexMesh_count;
+}
+
+// ----------------------------------------------------------------------------
+int OpenGLManager::fillSkeletonPoints(Object *object_p, int offset)
+{
+    // allocating skeleton vertices, if this object hash no skeleton, then this will return and wont write anything
+    int vbo_skeleton_count = object_p->writeSkeletontoVBO(m_SkeletonPoints.getVBO("SkeletonPoints"), offset);
+    return vbo_skeleton_count;
+}
+
+void OpenGLManager::fillGraphData(Object *object_p)
+{
+    int ID = object_p->getHVGXID();
+    // allocate neurites nodes place holders
+    if (object_p->getObjectType() != Object_t::ASTROCYTE
+            && object_p->getObjectType() != Object_t::MITO
+            && object_p->getObjectType()  != Object_t::SYNAPSE) {
+        object_p->setNodeIdx(m_neurites_nodes.size());
+        m_neurites_nodes.push_back(ID);
+    }
+
+    // get skeleton of the object
+    // if no skeleton, this will be skipped, thus no graph for this object
+    Skeleton *skeleton = object_p->getSkeleton();
+    // if (spine/bouton) then get their skeleton from their parents
+    // get the actual nodes from their parents
+    // only show them if parent is filtered/same as mito
+
+    // I do want the substructures graph to be present and use them only if their parents was filtered
+
+    // add all and in the view check if the parent not filtered then dont show it
+    std::vector<QVector3D> nodes3D = skeleton->getGraphNodes(); // if child these would be 0
+    std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
+    qDebug() << "set offset: " << m_abstract_skel_nodes.size();
+    object_p->setSkeletonOffset(m_abstract_skel_nodes.size());
+    // each skeleton node has local index within its list of nodes
+    // and an offset within list of abstract skel nodes
+    for ( int i = 0; i < nodes3D.size(); i++) {
+        QVector4D vertex = nodes3D[i];
+        vertex.setW(ID);
+        struct AbstractSkelNode skel_node = {vertex, vertex.toVector2D(), vertex.toVector2D(), vertex.toVector2D() };
+        m_abstract_skel_nodes.push_back(skel_node);
+    }
+
+    int skeleton_offset = object_p->getSkeletonOffset();
+    // add edges
+    for (int i = 0; i < edges2D.size(); ++i) {
+        int nID1 = edges2D[i].x() + skeleton_offset;
+        int nID2 = edges2D[i].y() + skeleton_offset;
+        m_abstract_skel_edges.push_back(nID1);
+        m_abstract_skel_edges.push_back(nID2);
+    }
+}
+
+// ----------------------------------------------------------------------------
 /*
  * allocates: m_vbo_skeleton with skeleton points
  * allocates: m_vbo_IndexMesh with mesh indices
@@ -156,94 +241,55 @@ void OpenGLManager::fillVBOsData()
 {
     m_ssbo_data.resize(1000);
 
+    int vbo_skeleton_offset = 0;
     m_SkeletonPoints.vboCreate("SkeletonPoints", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
     m_SkeletonPoints.vboBind("SkeletonPoints");
     m_SkeletonPoints.vboAllocate("SkeletonPoints", NULL,
                             m_dataContainer->getSkeletonPointsSize()  * sizeof(SkeletonPoint));
 
-    int neurtite_vbo_IndexMesh_offset = 0;
 
     // initialize index buffers
-    m_TMesh.vboCreate("MeshIndices", Buffer_t::INDEX, Buffer_USAGE_t::STATIC);
-    m_TMesh.vboBind("MeshIndices");
-    m_TMesh.vboAllocate("MeshIndices", NULL, m_dataContainer->getMeshIndicesSize() * sizeof(GLuint) );
+    std::map<std::string, int> meshVBO_idx_offset;
 
+    int astrocyte_indices = m_dataContainer->getIndicesSizeByObjectType(Object_t::ASTROCYTE);
+    int neurites_indices =  m_dataContainer->getMeshIndicesSize() - astrocyte_indices;
 
-    int vbo_skeleton_offset = 0;
+    // Neurites VBO
+    meshVBO_idx_offset[m_neurites_VBO_label] = 0;
+    m_TMesh.vboCreate(m_neurites_VBO_label, Buffer_t::INDEX, Buffer_USAGE_t::STATIC);
+    m_TMesh.vboBind(m_neurites_VBO_label);
+    m_TMesh.vboAllocate(m_neurites_VBO_label, NULL, neurites_indices * sizeof(GLuint) );
+
+    // Astrocyte VBO
+    meshVBO_idx_offset[m_astro_VBO_label] = 0;
+    m_TMesh.vboCreate(m_astro_VBO_label, Buffer_t::INDEX, Buffer_USAGE_t::STATIC);
+    m_TMesh.vboBind(m_astro_VBO_label);
+    m_TMesh.vboAllocate(m_astro_VBO_label, NULL, astrocyte_indices * sizeof(GLuint) );
+
 
     std::map<int, Object*> *objects_map = m_dataContainer->getObjectsMapPtr();
     for ( auto iter = objects_map->rbegin(); iter != objects_map->rend(); iter++) {
         Object *object_p = (*iter).second;
-        int ID = object_p->getHVGXID();
-
-        /* fill ssbo data per object */
-        if (m_ssbo_data.size() <= ID) {
-            qDebug() << "resizing m_ssbo_data.";
-            m_ssbo_data.resize(ID + 100);
-        }
-
-        m_ssbo_data[ID] = object_p->getSSBOData();
-        float volume =  object_p->getVolume() / m_dataContainer->getMaxVolume();
-        m_ssbo_data[ID].info.setX( 20 *  volume);
-        m_ssbo_data[ID].info.setY( object_p->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage() );
-
         qDebug() << " allocating: " << object_p->getName().data();
 
-
-        // allocating mesh indices
-        int vbo_IndexMesh_count = object_p->get_indices_Size() * sizeof(GLuint);
-        // write only neurites, if astrocyte then write in m_Astro_vbo_IndexMesh
-        m_TMesh.vboWrite("MeshIndices", neurtite_vbo_IndexMesh_offset, object_p->get_indices(), vbo_IndexMesh_count);
-
-        neurtite_vbo_IndexMesh_offset += vbo_IndexMesh_count;
+        this->fillSSBO(object_p);
 
 
-        // allocating skeleton vertices, if this object hash no skeleton, then this will return and wont write anything
-        int vbo_skeleton_count = object_p->writeSkeletontoVBO(m_SkeletonPoints.getVBO("SkeletonPoints"), vbo_skeleton_offset);
-        vbo_skeleton_offset += vbo_skeleton_count;
-
-        // allocate neurites nodes place holders
-        if (object_p->getObjectType() != Object_t::ASTROCYTE
-                && object_p->getObjectType() != Object_t::MITO
-                && object_p->getObjectType()  != Object_t::SYNAPSE) {
-            object_p->setNodeIdx(m_neurites_nodes.size());
-            m_neurites_nodes.push_back(ID);
+        if (object_p->getObjectType() == Object_t::ASTROCYTE) {
+            int offset = meshVBO_idx_offset[m_astro_VBO_label];
+            meshVBO_idx_offset[m_astro_VBO_label] += this->fillMeshVBO(object_p, offset, m_astro_VBO_label);
+        } else {
+            int offset = meshVBO_idx_offset[m_neurites_VBO_label];
+            meshVBO_idx_offset[m_neurites_VBO_label] += this->fillMeshVBO(object_p, offset, m_neurites_VBO_label);
         }
 
-        // get skeleton of the object
-        // if no skeleton, this will be skipped, thus no graph for this object
-        Skeleton *skeleton = object_p->getSkeleton();
-        // if (spine/bouton) then get their skeleton from their parents
-        // get the actual nodes from their parents
-        // only show them if parent is filtered/same as mito
+        vbo_skeleton_offset += this->fillSkeletonPoints(object_p, vbo_skeleton_offset);
 
-        // I do want the substructures graph to be present and use them only if their parents was filtered
+        this->fillGraphData(object_p);
 
-        // add all and in the view check if the parent not filtered then dont show it
-        std::vector<QVector3D> nodes3D = skeleton->getGraphNodes(); // if child these would be 0
-        std::vector<QVector2D> edges2D = skeleton->getGraphEdges();
-        qDebug() << "set offset: " << m_abstract_skel_nodes.size();
-        object_p->setSkeletonOffset(m_abstract_skel_nodes.size());
-        // each skeleton node has local index within its list of nodes
-        // and an offset within list of abstract skel nodes
-        for ( int i = 0; i < nodes3D.size(); i++) {
-            QVector4D vertex = nodes3D[i];
-            vertex.setW(ID);
-            struct AbstractSkelNode skel_node = {vertex, vertex.toVector2D(), vertex.toVector2D(), vertex.toVector2D() };
-            m_abstract_skel_nodes.push_back(skel_node);
-        }
-
-        int skeleton_offset = object_p->getSkeletonOffset();
-        // add edges
-        for (int i = 0; i < edges2D.size(); ++i) {
-            int nID1 = edges2D[i].x() + skeleton_offset;
-            int nID2 = edges2D[i].y() + skeleton_offset;
-            m_abstract_skel_edges.push_back(nID1);
-            m_abstract_skel_edges.push_back(nID2);
-        }
    }
 
-    // allocate neurites nodes edges
+    // allocate neurites edges
     std::vector<QVector2D> edges_info = m_dataContainer->getNeuritesEdges();
     for (int i = 0; i < edges_info.size(); ++i) {
         int nID1 = edges_info[i].x();
@@ -256,7 +302,8 @@ void OpenGLManager::fillVBOsData()
         m_neurites_edges.push_back(objects_map->at(nID2)->getNodeIdx());
     }
 
-    m_TMesh.vboRelease("MeshIndices");
+    m_TMesh.vboRelease(m_neurites_VBO_label);
+    m_TMesh.vboRelease(m_astro_VBO_label);
     m_SkeletonPoints.vboRelease("SkeletonPoints");
 
     // allocate neurites nodes
@@ -580,7 +627,7 @@ void OpenGLManager::update2DTextureUniforms(GLuint program)
 void OpenGLManager::drawNodesInto2DTexture()
 {
     //****************** Render Nodes Into Texture ***********************
-    if (m_uniforms.x_axis == 90 && m_uniforms.y_axis == 90) {
+   if (m_uniforms.x_axis > 90 && m_uniforms.y_axis > 90) {
         glEnable(GL_BLEND);
         glBlendFunc (GL_SRC_ALPHA, GL_DST_ALPHA);
 
@@ -1198,6 +1245,18 @@ void OpenGLManager::updateMeshPrograms(GLuint program)
     GL_Error();
 }
 
+void OpenGLManager::renderOrderToggle()
+{
+    m_transparent_astro = !m_transparent_astro;
+}
+
+void OpenGLManager::renderVBOMesh(std::string vbolabel, int indices)
+{
+    m_TMesh.vboBind(vbolabel);
+    glDrawElements(GL_TRIANGLES,  indices,  GL_UNSIGNED_INT, 0 );
+    m_TMesh.vboRelease(vbolabel);
+}
+
 // ----------------------------------------------------------------------------
 //
 void OpenGLManager::drawMeshTriangles(bool selection )
@@ -1208,11 +1267,19 @@ void OpenGLManager::drawMeshTriangles(bool selection )
 
       updateMeshPrograms( m_TMesh.getProgram("selection") );
 
-       m_TMesh.vboBind("MeshIndices");
+      int astrocyte_indices = m_dataContainer->getIndicesSizeByObjectType(Object_t::ASTROCYTE);
+      int neurites_indices =  m_dataContainer->getMeshIndicesSize() - astrocyte_indices;
 
-       glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
-       m_TMesh.vboRelease("MeshIndices");
-       m_TMesh.vaoRelease();
+      if (m_transparent_astro) {
+          this->renderVBOMesh(m_neurites_VBO_label, neurites_indices);
+          this->renderVBOMesh(m_astro_VBO_label, astrocyte_indices);
+      } else {
+          this->renderVBOMesh(m_astro_VBO_label, astrocyte_indices);
+          this->renderVBOMesh(m_neurites_VBO_label, neurites_indices);
+      }
+
+
+      m_TMesh.vaoRelease();
    } else {
        m_TMesh.vaoBind("Mesh");
        m_TMesh.useProgram("3Dtriangles");
@@ -1254,9 +1321,17 @@ void OpenGLManager::drawMeshTriangles(bool selection )
        //glActiveTexture(GL_TEXTURE5);
        //glBindTexture(GL_TEXTURE_3D, m_nmito_3DTex);
 
-       m_TMesh.vboBind("MeshIndices");
-       glDrawElements(GL_TRIANGLES,  m_dataContainer->getMeshIndicesSize(),  GL_UNSIGNED_INT, 0 );
-       m_TMesh.vboRelease("MeshIndices");
+       int astrocyte_indices = m_dataContainer->getIndicesSizeByObjectType(Object_t::ASTROCYTE);
+       int neurites_indices =  m_dataContainer->getMeshIndicesSize() - astrocyte_indices;
+
+       if (m_transparent_astro) {
+           this->renderVBOMesh(m_neurites_VBO_label, neurites_indices);
+           this->renderVBOMesh(m_astro_VBO_label, astrocyte_indices);
+       } else {
+           this->renderVBOMesh(m_astro_VBO_label, astrocyte_indices);
+           this->renderVBOMesh(m_neurites_VBO_label, neurites_indices);
+       }
+
 
        m_TMesh.vaoRelease();
    }
@@ -1583,11 +1658,10 @@ void OpenGLManager::renderAbstractions()
 
     if ( space_properties.ast.render_type.z() == 1 ||  space_properties.neu.render_type.z() == 1)
         drawSkeletonsGraph(false);
-
-    if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
+    else if ( space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1) {
         glDisable(GL_DEPTH_TEST);
-        drawSkeletonsGraph(false);
         drawNeuritesGraph();
+        drawSkeletonsGraph(false);
         glEnable(GL_DEPTH_TEST);
     }
 

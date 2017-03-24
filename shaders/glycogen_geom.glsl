@@ -11,6 +11,7 @@ layout (points, max_vertices = 1) out;
 
 out float        alpha;
 out vec4         color_val;
+out float        node2D_alpha; /*1 -> 3D, 0 -> 2D*/
 
 struct properties {
     vec2 pos_alpha;
@@ -54,6 +55,9 @@ const vec3 selection_color = vec3(221.0 / 255, 52.0 / 255, 151.0 / 255);
 
 
 void main() {
+
+    node2D_alpha = 1;
+
     vec4 render_type = space2d.ast.render_type; // additional info
 
 

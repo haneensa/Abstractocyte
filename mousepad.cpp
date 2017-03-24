@@ -645,9 +645,7 @@ bool MousePad::processSelection(float x, float y)
     //qDebug() << x << " " << y;
     //qDebug() <<  res[0] <<  " " << res[1] <<  " " << res[2] << " " << res[3];
 
-    if (pickedID == 255 || pickedID == 0) {
-        qDebug() << "Background, Picked ID: " << pickedID;
-    } else { 
+    if (pickedID != 255 /* why? */ && pickedID != 0) {
         allowedRegion = true;
         GLint viewport[4];
         glGetIntegerv(GL_VIEWPORT, viewport);

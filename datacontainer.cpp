@@ -71,7 +71,7 @@ void DataContainer::loadData()
     loadParentFromHVGX(hvgxFile);
 
 
-    m_limit = 2000;
+    m_limit = 10;
     m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
     m_load_data = LoadData_t::ALL;
     m_normals_t = Normals_t::LOAD_NORMAL;
@@ -481,8 +481,8 @@ int DataContainer::importXML(QString path)
 
     qDebug() << "importXML time: " << ms.count();
 
-    m_faces_offset += m_mesh->getFacesListSize();
-    m_vertex_offset += m_mesh->getVerticesSize();
+    m_faces_offset += (int)m_mesh->getFacesListSize();
+    m_vertex_offset += (int)m_mesh->getVerticesSize();
 
     return 0;
 }
@@ -830,7 +830,7 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 std::vector< struct VertexData >* meshVertexList = m_mesh->getVerticesList();
 
                 meshVertexList->emplace_back();
-                int vertexIdx = meshVertexList->size() - 1;
+                int vertexIdx = (int)meshVertexList->size() - 1;
                 struct VertexData* v = &meshVertexList->at(vertexIdx);
                 v->index = vertexIdx;
                 //struct VertexData v;
