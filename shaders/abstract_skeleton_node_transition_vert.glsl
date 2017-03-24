@@ -108,12 +108,12 @@ void main(void)
             V_render = 0;
     }
 
+    int pos_flag2 = int(positions.y);
     if (type == mito) {
-        V_alpha =  translate(slider, interval.x, interval.y, 1, 0);
-    } else {
-        V_alpha =  1;
+        pos_flag2 = 5;
     }
 
+    V_alpha =  1;
 
     float max_point_size = point_size.y;
     float min_point_size = point_size.x;
@@ -138,7 +138,7 @@ void main(void)
     case 6: pos1 = node_layout2; break;
     }
 
-    switch( int(positions.y) )
+    switch( pos_flag2 )
     {
     case 1: pos2 = v_vertex; break;
     case 2: pos2 = v_layout1; break;
