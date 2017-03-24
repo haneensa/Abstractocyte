@@ -580,34 +580,36 @@ void OpenGLManager::update2DTextureUniforms(GLuint program)
 void OpenGLManager::drawNodesInto2DTexture()
 {
     //****************** Render Nodes Into Texture ***********************
-    glEnable(GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_DST_ALPHA);
+    if (m_uniforms.x_axis == 90 && m_uniforms.y_axis == 90) {
+        glEnable(GL_BLEND);
+        glBlendFunc (GL_SRC_ALPHA, GL_DST_ALPHA);
 
-    glDisable(GL_DEPTH_TEST);
+        glDisable(GL_DEPTH_TEST);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_2D_heatMap_FBO_H);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_2D_heatMap_FBO_H);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-    m_GNeurites.vaoBind("2DHeatMap");
-    m_GNeurites.vboBind("nodes");
+        m_GNeurites.vaoBind("2DHeatMap");
+        m_GNeurites.vboBind("nodes");
 
-    m_GNeurites.useProgram("2DHeatMap");
+        m_GNeurites.useProgram("2DHeatMap");
 
-    update2DTextureUniforms( m_GNeurites.getProgram("2DHeatMap") );
+        update2DTextureUniforms( m_GNeurites.getProgram("2DHeatMap") );
 
-    glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
+        glDrawArrays(GL_POINTS, 0,  m_neurites_nodes.size() );
 
-    m_GNeurites.vboRelease("nodes");
-    m_GNeurites.vaoRelease();
+        m_GNeurites.vboRelease("nodes");
+        m_GNeurites.vaoRelease();
 
-    glFlush();
-    glFinish();
+        glFlush();
+        glFinish();
 
-    glEnable(GL_DEPTH_TEST);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_DEPTH_TEST);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 }
 
 
@@ -1635,8 +1637,6 @@ int OpenGLManager::processSelection(float x, float y)
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    qDebug() << "Picked ID: " << pickedID;
-
     return pickedID;
  }
 
@@ -1656,10 +1656,22 @@ void OpenGLManager::renderSelection()
     glEnable(GL_DEPTH_TEST);
     glDisable (GL_BLEND);
 
+    struct ast_neu_properties space_properties = m_2dspace->getSpaceProper();
+
     //render graph
-    drawMeshTriangles(true);
-    drawSkeletonPoints(true);
-    drawSkeletonsGraph(true);
+    if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1)
+        drawMeshTriangles(true);
+
+    if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1)
+         ||  (space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x() == 0)
+         || (space_properties.neu.render_type.y() == 1 ) )
+        drawSkeletonPoints(true);
+
+    if ( (space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1)
+         || (space_properties.ast.render_type.z() == 1 ||  space_properties.neu.render_type.z() == 1) ) {
+
+        drawSkeletonsGraph(true);
+    }
 
     //enable dithering again
     glEnable(GL_DITHER);
