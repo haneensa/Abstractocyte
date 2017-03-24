@@ -10,6 +10,7 @@
 #include "abstractionspace.h"
 #include "openglmanager.h"
 #include "glycogenanalysismanager.h"
+#include "performancerate.h"
 
 class GLWidget : public QOpenGLWidget, MainOpenGL
 {
@@ -78,6 +79,9 @@ signals:
     void RemoveRowAt_GL(QModelIndex);
     void GetIDFrom(QModelIndex);
     void checkAllListWidget_GL();
+    void updateFPS(QString);
+    void updateFrameTime(QString);
+
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -138,6 +142,9 @@ protected:
     bool                                m_hide_toggle;
 
     int                                 m_active_graph_tab;
+
+    PerformanceRate                     m_performaceMeasure;
+
 };
 
 

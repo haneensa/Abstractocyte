@@ -47,7 +47,8 @@ SOURCES += main.cpp\
     grid3d.cpp \
     spatialhash3d.cpp \
     rendervertexdata.cpp \
-    path.cpp
+    path.cpp \
+    performancerate.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -76,7 +77,8 @@ HEADERS  += mainwindow.h \
     grid3d.h \
     spatialhash3d.h \
     rendervertexdata.h \
-    path.h
+    path.h \
+    performancerate.h
 
 
 FORMS    += mainwindow.ui

@@ -103,6 +103,8 @@ void GLWidget::updateMVPAttrib()
 void GLWidget::initializeGL()
 {
     qDebug() << "initializeGL";
+    m_performaceMeasure.startTimer();
+
     initializeOpenGLFunctions();
 
     updateMVPAttrib();
@@ -146,6 +148,13 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
+    float fps = m_performaceMeasure.getFPS();
+    if (fps > 0) {
+        updateFPS(QString::number(fps));
+        updateFrameTime(QString::number(1000.0/fps));
+
+    }
+
     // paint the text here
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

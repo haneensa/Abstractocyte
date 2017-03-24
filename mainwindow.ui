@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1472</width>
-     <height>31</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -79,8 +79,8 @@
     <property name="cursor">
      <cursorShape>ArrowCursor</cursorShape>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout_9">
-     <item>
+    <layout class="QGridLayout" name="gridLayout_16">
+     <item row="0" column="0">
       <widget class="QGroupBox" name="groupBox_16">
        <property name="minimumSize">
         <size>
@@ -279,7 +279,7 @@
        </layout>
       </widget>
      </item>
-     <item>
+     <item row="1" column="0">
       <widget class="QFrame" name="frame_2">
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
@@ -288,7 +288,16 @@
         <enum>QFrame::Raised</enum>
        </property>
        <layout class="QGridLayout" name="gridLayout_6">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <property name="spacing">
@@ -297,7 +306,7 @@
        </layout>
       </widget>
      </item>
-     <item>
+     <item row="2" column="0">
       <widget class="QGroupBox" name="groupBox_3">
        <property name="title">
         <string>Selected</string>
@@ -320,7 +329,7 @@
        </layout>
       </widget>
      </item>
-     <item>
+     <item row="3" column="0">
       <widget class="QTabWidget" name="tabWidget">
        <property name="tabPosition">
         <enum>QTabWidget::West</enum>
@@ -339,7 +348,16 @@
             <string/>
            </property>
            <layout class="QGridLayout" name="gridLayout_9">
-            <property name="margin">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <item row="0" column="0">
@@ -557,8 +575,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>336</width>
-              <height>676</height>
+              <width>129</width>
+              <height>180</height>
              </rect>
             </property>
             <attribute name="label">
@@ -568,7 +586,16 @@
              <property name="spacing">
               <number>4</number>
              </property>
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item>
@@ -656,8 +683,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>336</width>
-              <height>676</height>
+              <width>352</width>
+              <height>730</height>
              </rect>
             </property>
             <attribute name="label">
@@ -733,7 +760,6 @@
                     </widget>
                    </item>
                   </layout>
-                  <zorder>glycogenMapToSpinesCheckBox</zorder>
                   <zorder>glycogenMapToSpinesCheckBox</zorder>
                   <zorder>glycogenMapToBoutonsCheckBox</zorder>
                  </widget>
@@ -1068,8 +1094,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>348</width>
-              <height>606</height>
+              <width>245</width>
+              <height>433</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1342,8 +1368,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>348</width>
-              <height>606</height>
+              <width>245</width>
+              <height>433</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1619,8 +1645,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>348</width>
-              <height>606</height>
+              <width>245</width>
+              <height>433</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1896,8 +1922,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>348</width>
-              <height>606</height>
+              <width>338</width>
+              <height>661</height>
              </rect>
             </property>
             <attribute name="label">
@@ -2181,11 +2207,56 @@
        </widget>
       </widget>
      </item>
+     <item row="4" column="0">
+      <widget class="QGroupBox" name="groupBox_17">
+       <property name="title">
+        <string>FPS</string>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_36">
+        <item>
+         <widget class="QLabel" name="label_47">
+          <property name="text">
+           <string>FPS:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_45">
+          <property name="text">
+           <string>fps</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_46">
+          <property name="text">
+           <string>Frame Time:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_48">
+          <property name="text">
+           <string>ftime</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_49">
+          <property name="text">
+           <string>ms</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
     </layout>
     <zorder>frame_2</zorder>
     <zorder>tabWidget</zorder>
     <zorder>groupBox_16</zorder>
     <zorder>groupBox_3</zorder>
+    <zorder>groupBox_17</zorder>
    </widget>
   </widget>
  </widget>
@@ -2222,6 +2293,8 @@
     <signal>setAbstractionData(AbstractionSpace*)</signal>
     <signal>setHoveredID(int)</signal>
     <signal>setHoveredName(QString)</signal>
+    <signal>updateFPS(QString)</signal>
+    <signal>updateFrameTime(QString)</signal>
     <slot>getSliderX(int)</slot>
     <slot>getSliderY(int)</slot>
     <slot>getIntervalID(int)</slot>
@@ -2263,8 +2336,8 @@
    <slot>getSlotsY(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>29</x>
-     <y>172</y>
+     <x>66</x>
+     <y>239</y>
     </hint>
     <hint type="destinationlabel">
      <x>107</x>
@@ -2279,8 +2352,8 @@
    <slot>getSlotsX(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>214</x>
-     <y>336</y>
+     <x>278</x>
+     <y>364</y>
     </hint>
     <hint type="destinationlabel">
      <x>108</x>
@@ -2299,8 +2372,8 @@
      <y>121</y>
     </hint>
     <hint type="destinationlabel">
-     <x>169</x>
-     <y>336</y>
+     <x>233</x>
+     <y>364</y>
     </hint>
    </hints>
   </connection>
@@ -2359,8 +2432,8 @@
    <slot>getSliderY(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>138</x>
-     <y>96</y>
+     <x>202</x>
+     <y>163</y>
     </hint>
     <hint type="destinationlabel">
      <x>553</x>
@@ -2379,8 +2452,8 @@
      <y>145</y>
     </hint>
     <hint type="destinationlabel">
-     <x>33</x>
-     <y>114</y>
+     <x>66</x>
+     <y>181</y>
     </hint>
    </hints>
   </connection>
@@ -2507,8 +2580,8 @@
      <y>754</y>
     </hint>
     <hint type="destinationlabel">
-     <x>30</x>
-     <y>444</y>
+     <x>29</x>
+     <y>481</y>
     </hint>
    </hints>
   </connection>
@@ -2523,8 +2596,8 @@
      <y>730</y>
     </hint>
     <hint type="destinationlabel">
-     <x>196</x>
-     <y>444</y>
+     <x>223</x>
+     <y>481</y>
     </hint>
    </hints>
   </connection>
@@ -2567,8 +2640,8 @@
    <slot>getItemChanged(QListWidgetItem*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>103</x>
-     <y>1148</y>
+     <x>136</x>
+     <y>1105</y>
     </hint>
     <hint type="destinationlabel">
      <x>737</x>
@@ -2583,8 +2656,8 @@
    <slot>getFilteredID(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>81</x>
-     <y>1188</y>
+     <x>114</x>
+     <y>1164</y>
     </hint>
     <hint type="destinationlabel">
      <x>706</x>
@@ -2599,8 +2672,8 @@
    <slot>getFilterWithChildren(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>81</x>
-     <y>1247</y>
+     <x>114</x>
+     <y>1220</y>
     </hint>
     <hint type="destinationlabel">
      <x>699</x>
@@ -2615,8 +2688,8 @@
    <slot>getFilterWithParent(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>81</x>
-     <y>1270</y>
+     <x>114</x>
+     <y>1243</y>
     </hint>
     <hint type="destinationlabel">
      <x>733</x>
@@ -2631,8 +2704,8 @@
    <slot>getFilterWithSynapses(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>81</x>
-     <y>1293</y>
+     <x>114</x>
+     <y>1266</y>
     </hint>
     <hint type="destinationlabel">
      <x>741</x>
@@ -2647,8 +2720,8 @@
    <slot>getDoubleClickedTableView(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>103</x>
-     <y>788</y>
+     <x>136</x>
+     <y>770</y>
     </hint>
     <hint type="destinationlabel">
      <x>755</x>
@@ -2663,8 +2736,8 @@
    <slot>getFitlerButtonClicked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>71</x>
-     <y>817</y>
+     <x>104</x>
+     <y>799</y>
     </hint>
     <hint type="destinationlabel">
      <x>698</x>
@@ -2679,8 +2752,8 @@
    <slot>getResetFitlerButtonClicked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>91</x>
-     <y>1326</y>
+     <x>114</x>
+     <y>1305</y>
     </hint>
     <hint type="destinationlabel">
      <x>732</x>
@@ -2695,12 +2768,12 @@
    <slot>clearSelectedObjectsTable()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>357</x>
-     <y>817</y>
+     <x>366</x>
+     <y>799</y>
     </hint>
     <hint type="destinationlabel">
-     <x>391</x>
-     <y>780</y>
+     <x>802</x>
+     <y>811</y>
     </hint>
    </hints>
   </connection>
@@ -2711,8 +2784,8 @@
    <slot>hideSelectedObjects()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>249</x>
-     <y>817</y>
+     <x>259</x>
+     <y>799</y>
     </hint>
     <hint type="destinationlabel">
      <x>411</x>
@@ -2727,8 +2800,8 @@
    <slot>highlightSelected(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>103</x>
-     <y>788</y>
+     <x>136</x>
+     <y>770</y>
     </hint>
     <hint type="destinationlabel">
      <x>439</x>
@@ -2743,8 +2816,8 @@
    <slot>startPath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>65</x>
-     <y>487</y>
+     <x>107</x>
+     <y>564</y>
     </hint>
     <hint type="destinationlabel">
      <x>102</x>
@@ -2759,8 +2832,8 @@
    <slot>endPath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>292</x>
-     <y>486</y>
+     <x>357</x>
+     <y>564</y>
     </hint>
     <hint type="destinationlabel">
      <x>267</x>
@@ -2791,8 +2864,8 @@
    <slot>namePath(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>326</x>
-     <y>545</y>
+     <x>358</x>
+     <y>619</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -2807,8 +2880,8 @@
    <slot>savePath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>320</x>
-     <y>617</y>
+     <x>352</x>
+     <y>693</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -2823,8 +2896,8 @@
    <slot>describePath(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>302</x>
-     <y>591</y>
+     <x>334</x>
+     <y>664</y>
     </hint>
     <hint type="destinationlabel">
      <x>296</x>
@@ -2839,8 +2912,8 @@
    <slot>updateActivePath(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>103</x>
-     <y>1319</y>
+     <x>135</x>
+     <y>1267</y>
     </hint>
     <hint type="destinationlabel">
      <x>288</x>
@@ -2859,8 +2932,8 @@
      <y>101</y>
     </hint>
     <hint type="destinationlabel">
-     <x>103</x>
-     <y>554</y>
+     <x>135</x>
+     <y>619</y>
     </hint>
    </hints>
   </connection>
@@ -3303,12 +3376,44 @@
    <slot>reset_layouting(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>296</x>
-     <y>1341</y>
+     <x>318</x>
+     <y>1306</y>
     </hint>
     <hint type="destinationlabel">
      <x>434</x>
      <y>1342</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget</sender>
+   <signal>updateFPS(QString)</signal>
+   <receiver>label_45</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>431</x>
+     <y>1348</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>159</x>
+     <y>1357</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openGLWidget</sender>
+   <signal>updateFrameTime(QString)</signal>
+   <receiver>label_48</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>435</x>
+     <y>1285</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>266</x>
+     <y>1349</y>
     </hint>
    </hints>
   </connection>
