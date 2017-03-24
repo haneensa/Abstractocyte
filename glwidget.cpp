@@ -41,8 +41,10 @@ GLWidget::GLWidget(QWidget *parent)
     //reset translation
     m_translation = QVector3D(0.0, 0.0, 0.0);
 
+
     m_refresh_timer = new QTimer(this);
     connect(m_refresh_timer, SIGNAL(timeout()), this, SLOT(update()));
+    m_refresh_timer->start(0);
 
     m_rotation_timer = new QTimer(this);
     connect(m_rotation_timer, SIGNAL(timeout()), this, SLOT(lockRotation2D()));
@@ -152,7 +154,6 @@ void GLWidget::paintGL()
     if (fps > 0) {
         updateFPS(QString::number(fps));
         updateFrameTime(QString::number(1000.0/fps));
-
     }
 
     // paint the text here
@@ -269,8 +270,7 @@ void GLWidget::lockRotation2D()
     // once we exceed threshold start force layouted
     // if we are below x < 50 and y < 50
 
-    // 2) reset graph nodes coordinates
-    m_refresh_timer->start(0);
+
     updateMVPAttrib();      // update uniforms
     m_graphManager->update2Dflag(true, m_uniforms);
     m_opengl_mngr->update2Dflag(true);
@@ -392,6 +392,7 @@ void GLWidget::getSliderX(int value)
         value = 100;
 
     m_xaxis = value;
+
     update();
 }
 
@@ -404,6 +405,7 @@ void GLWidget::getSliderY(int value)
     if (value > 98)
         value = 100;
     m_yaxis = value;
+
     update();
 }
 
@@ -526,7 +528,7 @@ void GLWidget::getFilteredID(QString value)
 void GLWidget::stopForecDirectedLayout()
 {
     // stop force layout
-    m_refresh_timer->stop();
+//    m_refresh_timer->stop();
     for (int i = 0; i < max_graphs; ++i)
         m_graphManager->stopForceDirectedLayout(i);
 

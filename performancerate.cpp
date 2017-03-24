@@ -27,7 +27,6 @@ float PerformanceRate::getFPS()
 
    if (m_time.elapsed() - m_starttime > 1000 && m_frameCount > 10) {
        m_fps = ((double) m_frameCount * 1000.0)/ (double)(m_time.elapsed() - m_starttime );
-       qDebug() << "FPS: " << m_fps;
        m_starttime = m_time.elapsed();
        m_frameCount = 0;
        return m_fps;
