@@ -89,7 +89,7 @@ void main() {
 
     gl_PointSize =  gl_in[0].gl_PointSize;
 
-    color_val = SSBO_data[ID].color;
+    color_val = vec4(0.8, 0.8, 0.8, 1);//SSBO_data[ID].color;
     if (hoveredID == ID) {
         color_val += vec4(0.2, 0.2, 0.2, 0);
     }
