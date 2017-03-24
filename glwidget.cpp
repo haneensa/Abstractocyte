@@ -375,9 +375,10 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             stopForecDirectedLayout();
         break;
         case(Qt::Key_Shift): // enable hover
-
             setMouseTracking(true);
-
+        case(Qt::Key_0): // switch vbo mesh rendering order
+            m_opengl_mngr->renderOrderToggle();
+            update();
         break;
     }
 }

@@ -20,12 +20,14 @@
 enum class Size_e { VOLUME, ASTRO_COVERAGE, SYNAPSE_SIZE };
 enum class Color_e { TYPE, FUNCTION, ASTRO_COVERAGE, GLYCOGEN_MAPPING };
 
-
 class OpenGLManager : public MainOpenGL
 {
 public:
     OpenGLManager(DataContainer * obj_mnger, AbstractionSpace  *absSpace);
     ~OpenGLManager();
+    void fillSSBO(Object*);
+    int fillMeshVBO(Object *object_p, int offset, std::string vboLabel);
+    int fillSkeletonPoints(Object *object_p, int offset);
     void fillVBOsData();
     bool initOpenGLFunctions();
     void updateAbstractUniformsLocation(GLuint program);
@@ -45,6 +47,9 @@ public:
     void updateMeshPrograms(GLuint program);
     void drawMeshTriangles(bool selection );
 
+    void renderVBOMesh(std::string vbolabel, int indices);
+    void renderOrderToggle();
+
     // *********** 3) Skeleton Points    ***********
     bool initSkeletonShaders();
     void drawSkeletonPoints(bool selection );
@@ -62,7 +67,7 @@ public:
     void drawNeuritesGraph();
     void updateNeuritesGraphUniforms(GLuint program);
 
-    // *********** 6) Mesh Points     ***********
+    // *********** 6)Glycogen     ***********
     bool initGlycogenPointsShaders();
     void drawGlycogenPoints();
 	void updateGlycogenPoints();
@@ -152,6 +157,9 @@ protected:
     // *********** 1) Mesh Triangles     ***********
     RenderVertexData                        m_TMesh;
     bool                                    m_normals_enabled;
+    std::string                             m_neurites_VBO_label;
+    std::string                             m_astro_VBO_label;
+    bool                                    m_transparent_astro;
 
     // *********** 3) Skeleton Points    ***********
     RenderVertexData                        m_SkeletonPoints;
