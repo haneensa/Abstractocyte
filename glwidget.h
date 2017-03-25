@@ -57,6 +57,7 @@ public slots:
 
     void getNodeSizeEncoding(QString);
     void getColorEncoding(QString);
+    void get2DtextureEncoding(QString);
 
     void getItemChanged(QListWidgetItem*);
     void getDoubleClickedTableView(QModelIndex);
