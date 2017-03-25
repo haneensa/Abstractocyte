@@ -29,7 +29,7 @@ uniform mat4 mMatrix;
 uniform mat4 vMatrix;
 // Projection transformation
 uniform mat4 pMatrix;
-
+uniform mat4 rMatrix;
 
 struct SSBO_datum {
 vec4 color;
@@ -74,7 +74,7 @@ void main(void)
 {
 
 	V_normal = vertex_normal;
-	mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
+        mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
 	V_worldPos = vec4(mesh_vx.xyz, 1.0);
 
 	V_fragTexCoord = vec3(mesh_vx.xyz);

@@ -1226,6 +1226,9 @@ bool OpenGLManager::initMeshTrianglesShaders()
 //
 void OpenGLManager::updateMeshPrograms(GLuint program)
 {
+    int rMatrix = glGetUniformLocation(program, "rMatrix");
+    if (rMatrix >= 0) glUniformMatrix4fv(rMatrix, 1, GL_FALSE, m_uniforms.rMatrix.data());
+
     int mMatrix = glGetUniformLocation(program, "mMatrix");
     if (mMatrix >= 0) glUniformMatrix4fv(mMatrix, 1, GL_FALSE, m_uniforms.mMatrix);
 
