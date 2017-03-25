@@ -302,11 +302,18 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
             setMouseTracking(false);
 
     } else if (  m_xaxis < 60 || m_yaxis < 60  ) {
+
         setMouseTracking(false);
         // Mouse release position - mouse press position
         QVector2D diff = QVector2D(deltaX, deltaY);
         // Rotation axis is perpendicular to the mouse position difference
-        QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
+        qDebug() << width() << " " <<height() << " " << event->x() << " " << event->y();
+        QVector3D n;
+        if (( width() - event->x()) < 100 || event->x() < 100 )
+            n = QVector3D( 0.0, diff.x(), diff.y()).normalized();
+        else
+            n = QVector3D( diff.y() , diff.x(), 0).normalized();
+
         // Accelerate angular speed relative to the length of the mouse sweep
         qreal acc = diff.length()/2.0;;
 
