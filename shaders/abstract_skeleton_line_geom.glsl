@@ -1,5 +1,10 @@
 #version 430
 
+#define astrocyte   6
+#define spine       5
+#define bouton      3
+#define mito      1
+
 /* todo: draw thick lines with 3D effects
 1) get 4 vertices
     1.a) start of previous segment
@@ -18,16 +23,18 @@
 */
 
 layout (lines) in;
-layout(points, max_vertices = 100) out;
+layout(points, max_vertices = 93) out;
 
 in int          V_ID[];
 in float        V_alpha[];
 in int          V_render[];
 in int          V_connectivity[];
+in float        V_node2D_alpha[];
 
 out vec4        color_val;
 out float       alpha;
 out float       G_ID;
+out float       node2D_alpha; /*1 -> 3D, 0 -> 2D*/
 
 uniform int                 hoveredID;
 
@@ -43,28 +50,6 @@ layout (std430, binding=2) buffer mesh_data
 {
     SSBO_datum SSBO_data[];
 };
-
-struct properties {
-    vec2 pos_alpha;
-    vec2 trans_alpha;
-    vec2 color_alpha;
-    vec2 point_size;
-    vec2 interval;
-    vec2 positions;
-    vec4 render_type; // mesh triangles, mesh points, points skeleton, graph (points, edges)
-    vec4 extra_info;  // x: axis type, y, z, w: empty slots
-};
-
-struct ast_neu_properties {
-    properties ast;
-    properties neu;
-};
-
-layout (std430, binding=3) buffer space2d_data
-{
-    ast_neu_properties space2d;
-};
-
 
 void main() {
     int ID = V_ID[0] ;
@@ -88,6 +73,8 @@ void main() {
         return;
     }
 
+    node2D_alpha = V_node2D_alpha[0];
+
     gl_PointSize =  gl_in[0].gl_PointSize;
 
     if (V_connectivity[0] == 1)
@@ -102,8 +89,8 @@ void main() {
     vec4 start = gl_in[0].gl_Position;
     vec4 end = gl_in[1].gl_Position;
 
-    for (int i = 0; i < 100; i++ ) {
-         float u = float(i) / float(100);
+    for (int i = 0; i < 93; i++ ) {
+         float u = float(i) / float(93);
          float x = (end.x - start.x) * u + start.x;
          float y = (start.y - end.y) / (start.x - end.x) * (x - start.x) + start.y;
          gl_Position = vec4(x, y, 0, 1.0);
