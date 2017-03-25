@@ -16,8 +16,8 @@ const float gaussian_kernel15[49] = float[49](
             0.020773, 0.020727, 0.020727,  0.020589, 0.020589, 0.020362, 0.020362,
             0.020727, 0.020681, 0.020681,  0.020543, 0.020543, 0.020316, 0.020316,
             0.020727, 0.020681, 0.020681,  0.020543, 0.020543, 0.020316, 0.020316,
-            0.020589	, 0.020543, 0.020543,  0.020407, 0.020407, 0.020182, 0.020182,
-            0.020589	, 0.020543, 0.020543,  0.020407, 0.020407, 0.020182, 0.020182,
+            0.020589, 0.020543, 0.020543,  0.020407, 0.020407, 0.020182, 0.020182,
+            0.020589, 0.020543, 0.020543,  0.020407, 0.020407, 0.020182, 0.020182,
             0.020362, 0.020316, 0.020316,  0.020182, 0.020182, 0.019959, 0.019959,
             0.020362, 0.020316, 0.020316,  0.020182, 0.020182, 0.019959, 0.019959
  );
@@ -25,11 +25,11 @@ const float gaussian_kernel15[49] = float[49](
 float getSplattedTexture(in sampler2D texture_toSplat, in vec2 coord);
 
 void main() {
-    float splat = getSplattedTexture(tex, G_fragTexCoord);
+    //float splat = getSplattedTexture(tex, G_fragTexCoord);
     float tex_splat = texture(tex, G_fragTexCoord).r;
-
-    vec4 t_color = texture(tf, splat);
-    outcol = t_color;
+	tex_splat = clamp(tex_splat, 0, 1);
+	vec4 t_color = texture(tf, tex_splat);
+	outcol = t_color;
  }
 
 float getSplattedTexture(in sampler2D texture_toSplat, in vec2 coord)

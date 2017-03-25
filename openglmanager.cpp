@@ -388,9 +388,20 @@ void OpenGLManager::init2DHeatMapTextures()
     GL_Error();
 
     // init transfer function
-    m_tf_2DHeatmap.push_back(QVector4D(0.8f, 0.0f, 0.0f, 0.0f)); // 0
-    m_tf_2DHeatmap.push_back(QVector4D(0.5f, 0.0f, 0.5f, 0.9f)); // 1
-    m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 1.0f)); // 2
+   // m_tf_2DHeatmap.push_back(QVector4D(0.8f, 0.0f, 0.0f, 0.0f)); // 0
+    //m_tf_2DHeatmap.push_back(QVector4D(0.5f, 0.0f, 0.5f, 0.9f)); // 1
+    //m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 1.0f)); // 2
+	m_tf_2DHeatmap.clear();
+	m_tf_2DHeatmap.push_back(QVector4D(1.00f, 1.00f, 0.80f, 0.0f)); // 0
+	m_tf_2DHeatmap.push_back(QVector4D(1.00f, 0.93f, 0.63f, 0.7f)); // 1
+	m_tf_2DHeatmap.push_back(QVector4D(1.00f, 0.85f, 0.46f, 0.7f)); // 2
+	m_tf_2DHeatmap.push_back(QVector4D(1.00f, 0.70f, 0.30f, 0.7f)); // 3
+	m_tf_2DHeatmap.push_back(QVector4D(0.99f, 0.55f, 0.24f, 0.8f)); // 4
+	m_tf_2DHeatmap.push_back(QVector4D(0.99f, 0.31f, 0.16f, 0.8f)); // 5
+	m_tf_2DHeatmap.push_back(QVector4D(0.89f, 0.10f, 0.11f, 0.9f)); // 6
+	m_tf_2DHeatmap.push_back(QVector4D(0.74f, 0.00f, 0.15f, 0.9f)); // 7
+	m_tf_2DHeatmap.push_back(QVector4D(0.50f, 0.00f, 0.15f, 1.0f)); // 8
+
 
 
     glGenTextures( 1, &m_tf_2DHeatMap_tex);
@@ -401,10 +412,10 @@ void OpenGLManager::init2DHeatMapTextures()
 
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     GL_Error();
 
-    glTexImage1D( GL_TEXTURE_1D, 0, GL_RGBA, 3, 0, GL_RGBA, GL_FLOAT, m_tf_2DHeatmap.data());
+	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, m_tf_2DHeatmap.size(), 0, GL_RGBA, GL_FLOAT, m_tf_2DHeatmap.data());
 
     GL_Error();
 
