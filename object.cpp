@@ -134,7 +134,17 @@ struct ssbo_mesh Object::getSSBOData()
 {
     struct ssbo_mesh ssbo_data;
     ssbo_data.color = m_color;
-    ssbo_data.color.setW(m_closest_astro_vertex.second);
+
+    int hasMito = 0;
+    for (int i = 0; i < m_children.size(); ++i) {
+        Object *child = m_children[i];
+        if (child->getObjectType() == Object_t::MITO) {
+            hasMito = 1;
+            break;
+        }
+    }
+
+    ssbo_data.color.setW(hasMito);
 
     ssbo_data.center = m_center;
     int type = (int) m_object_t;
@@ -156,8 +166,6 @@ struct ssbo_mesh Object::getSSBOData()
 // skeleton management
 void Object::addSkeletonNode(QVector3D coords)
 {
-
-
     // also ID to be used for the vertex (parent or child)
     // how would I know this node belongs to a child
     // and which child it would be?
