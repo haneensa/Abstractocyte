@@ -31,6 +31,8 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
 
     m_neurites_VBO_label = "NeuritesIndices";
     m_astro_VBO_label = "AstroIndices";
+
+    m_2DHeatMap_encoding = HeatMap2D_e::ASTRO_COVERAGE;
 }
 
 // ----------------------------------------------------------------------------
@@ -387,10 +389,6 @@ void OpenGLManager::init2DHeatMapTextures()
 
     GL_Error();
 
-    // init transfer function
-   // m_tf_2DHeatmap.push_back(QVector4D(0.8f, 0.0f, 0.0f, 0.0f)); // 0
-    //m_tf_2DHeatmap.push_back(QVector4D(0.5f, 0.0f, 0.5f, 0.9f)); // 1
-    //m_tf_2DHeatmap.push_back(QVector4D(1.0f, 0.0f, 0.0f, 1.0f)); // 2
 	m_tf_2DHeatmap.clear();
 	m_tf_2DHeatmap.push_back(QVector4D(1.00f, 1.00f, 0.80f, 0.0f)); // 0
 	m_tf_2DHeatmap.push_back(QVector4D(1.00f, 0.93f, 0.63f, 0.7f)); // 1
@@ -416,6 +414,30 @@ void OpenGLManager::init2DHeatMapTextures()
     GL_Error();
 
 	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, m_tf_2DHeatmap.size(), 0, GL_RGBA, GL_FLOAT, m_tf_2DHeatmap.data());
+
+    GL_Error();
+    //****************** 2nd transfer function *************************************
+
+    m_tf_2DHeatmap2.clear();
+    m_tf_2DHeatmap2.push_back(QVector4D(254.0 / 255.0, 235.0 / 255.0, 226.0 / 255.0,  0.0f)); // 0
+    m_tf_2DHeatmap2.push_back(QVector4D(251.0 / 255.0, 180.0 / 255.0, 185.0 / 255.0, 0.7f)); // 1
+    m_tf_2DHeatmap2.push_back(QVector4D(247.0 / 255.0, 104.0 / 255.0, 161.0 / 255.0, 0.7f)); // 2
+    m_tf_2DHeatmap2.push_back(QVector4D(197.0 / 255.0, 27.0 / 255.0, 138.0 / 255.0, 0.8f)); // 3
+    m_tf_2DHeatmap2.push_back(QVector4D(122.0 / 255.0, 1.0 / 255.0, 119.0 / 255.0, 0.8f)); // 4
+
+
+    glGenTextures( 1, &m_tf_2DHeatMap2_tex);
+    GL_Error();
+
+    glBindTexture( GL_TEXTURE_1D, m_tf_2DHeatMap2_tex);
+    GL_Error();
+
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    GL_Error();
+
+    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, m_tf_2DHeatmap2.size(), 0, GL_RGBA, GL_FLOAT, m_tf_2DHeatmap2.data());
 
     GL_Error();
 
@@ -600,11 +622,18 @@ void OpenGLManager::render2DHeatMapTexture()
         GLint tex = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tex");
         glUniform1i(  tex, 0 );
 
-        // transfer function
+        // transfer function 1
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
+
+        if (m_2DHeatMap_encoding == HeatMap2D_e::ASTRO_COVERAGE)
+            glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap_tex);
+        else
+            glBindTexture( GL_TEXTURE_1D,  m_tf_2DHeatMap2_tex);
+
+
         GLint tf = glGetUniformLocation( m_GNeurites.getProgram("2DHeatMap_Texture"), "tf");
         glUniform1i(  tf, 1 );
+
 
         GLint dim = glGetUniformLocation(m_GNeurites.getProgram("2DHeatMap_Texture"), "dim");
         float dim_value[2] = {m_canvas_w, m_canvas_h};
