@@ -20,27 +20,13 @@ float triangleArea(vec2 p1, vec2 p2, vec2 p3)
 
 void main() {
 
-    if (   hasMito == 1 && node2D_alpha == 0  )  {
+    if (  hasMito == 1 && node2D_alpha == 0 )  {
         vec4 node2d = vec4(color_val.rgb, alpha);
-
-        vec2 p0 = vec2(0.5, 1.0);
-        vec2 p1 = vec2(1.0, 0.5);
-        vec2 p2 = vec2(0.5, 0.0);
-        vec2 p3 = vec2(0.0, 0.5);
-
-        float halfRect1 = triangleArea(p0, p1, p2);
-        float halfRect2 = triangleArea(p0, p2, p3);
-        float sumArea = halfRect1 + halfRect2;
-        // 1) get the sum
-        float p0Xp1 = triangleArea(p0, gl_PointCoord, p1);
-        float p1Xp2 = triangleArea(p1, gl_PointCoord, p2);
-        float p2Xp3 = triangleArea(p2, gl_PointCoord, p3);
-        float p3Xp0 = triangleArea(p3, gl_PointCoord, p0);
-        float allsum = p0Xp1 + p1Xp2 + p2Xp3 + p3Xp0;
-
-        if (  allsum >  sumArea ) {
-             discard;
-        }
+        vec3 normal;
+        normal.xy = gl_PointCoord * 2.0 - vec2(1.0);
+        float mag = abs(normal.x) + abs(normal.y);
+        if (mag > 1.0) discard;
+        if (mag > 0.8) node2d -= vec4( 0.3, 0.3, 0.3, 1.0 );
 
         outcol = node2d;
     } else {
