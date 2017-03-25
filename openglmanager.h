@@ -19,6 +19,7 @@
 
 enum class Size_e { VOLUME, ASTRO_COVERAGE, SYNAPSE_SIZE };
 enum class Color_e { TYPE, FUNCTION, ASTRO_COVERAGE, GLYCOGEN_MAPPING };
+enum class HeatMap2D_e { ASTRO_COVERAGE, GLYCOGEN_MAPPING };
 
 class OpenGLManager : public MainOpenGL
 {
@@ -110,6 +111,7 @@ public:
 
     void updateNodeSizeEncoding(Size_e encoding);
     void updateColorEncoding(Color_e encoding);
+    void update2DTextureEncoding(HeatMap2D_e encoding);
 
     void updateSSBO();
 
@@ -211,6 +213,7 @@ protected:
 
     Color_e                                 m_color_encoding;
     Size_e                                  m_size_encoding;
+    HeatMap2D_e                             m_2DHeatMap_encoding;
 
     // ************ 2D HeatMap  *******
     GLuint                                  m_2D_heatMap_FBO_H;

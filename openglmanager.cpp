@@ -2183,7 +2183,10 @@ void OpenGLManager::updateSSBO()
                                    0, 0.7);
 
 
-        m_ssbo_data[hvgxID].info.setY( obj->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage()  );
+        if (m_2DHeatMap_encoding == HeatMap2D_e::ASTRO_COVERAGE)
+            m_ssbo_data[hvgxID].info.setY( obj->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage()  );
+        else if (m_2DHeatMap_encoding == HeatMap2D_e::GLYCOGEN_MAPPING)
+            m_ssbo_data[hvgxID].info.setY( obj->getMappedValue() );
 
         switch(m_size_encoding) {
             case Size_e::VOLUME: {
@@ -2353,6 +2356,17 @@ void OpenGLManager::updateColorEncoding(Color_e encoding)
     updateSSBO();
 }
 
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::update2DTextureEncoding(HeatMap2D_e encoding)
+{
+    if (m_2DHeatMap_encoding == encoding)
+        return;
+
+    m_2DHeatMap_encoding = encoding;
+
+    updateSSBO();
+}
 // ----------------------------------------------------------------------------
 //
 void OpenGLManager::highlightObject(int hvgxID)

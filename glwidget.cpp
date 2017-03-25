@@ -619,6 +619,19 @@ void GLWidget::getColorEncoding(QString encoding)
 
 //------------------------------------------------------
 //
+void GLWidget::get2DtextureEncoding(QString encoding)
+{
+    qDebug() << encoding;
+    if (encoding == "Astrocyte Coverage")
+        m_opengl_mngr->update2DTextureEncoding(HeatMap2D_e::ASTRO_COVERAGE);
+    else if (encoding == "Glycogen Distribution")
+        m_opengl_mngr->update2DTextureEncoding(HeatMap2D_e::GLYCOGEN_MAPPING);
+    update();
+}
+
+
+//------------------------------------------------------
+//
 void GLWidget::getItemChanged(QListWidgetItem* item)
 {
     Qt::CheckState state =  item->checkState();
