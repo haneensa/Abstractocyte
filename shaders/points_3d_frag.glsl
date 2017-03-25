@@ -31,6 +31,7 @@ void main() {
            node2d -= vec4( 0.3, 0.3, 0.3, 1.0 );
         }
 
+        // if has mitochondria then render it with special symbol
 
         outcol = mix( node2d, node3d, node2D_alpha);
         outcol.a = alpha;
