@@ -941,212 +941,209 @@
            <property name="frameShadow">
             <enum>QFrame::Raised</enum>
            </property>
-           <widget class="QCheckBox" name="specularLightCheckBox">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>340</y>
-              <width>104</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Specular Lighting</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-           <widget class="QGroupBox" name="groupBox_12">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>200</y>
-              <width>200</width>
-              <height>119</height>
-             </rect>
-            </property>
-            <property name="title">
-             <string>Visual Proximity</string>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_6">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QCheckBox" name="splatAstroCheckBox">
-               <property name="text">
-                <string>Show Astrocyte Proximity</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="splatGlycoCheckBox">
-               <property name="text">
-                <string>Show Glycogen Proximity</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="splatAMitoCheckBox">
-               <property name="text">
-                <string>Show Astro-Mitochondria Proximity</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="splatNMitoCheckBox">
-               <property name="text">
-                <string>Show Neuro-Mito Proximity to Astro.</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QGroupBox" name="groupBox_18">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>291</width>
-              <height>165</height>
-             </rect>
-            </property>
-            <property name="title">
-             <string/>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_9">
-             <item>
-              <widget class="QFrame" name="frame_12">
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Raised</enum>
-               </property>
-               <layout class="QHBoxLayout" name="horizontalLayout_37">
-                <item>
-                 <widget class="QLabel" name="label_14">
-                  <property name="text">
-                   <string>Node Size: </string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="comboBox">
+           <layout class="QVBoxLayout" name="verticalLayout_14">
+            <item>
+             <widget class="QGroupBox" name="groupBox_18">
+              <property name="title">
+               <string/>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_9">
+               <item>
+                <widget class="QFrame" name="frame_12">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_37">
                   <item>
-                   <property name="text">
-                    <string>Volume</string>
-                   </property>
+                   <widget class="QLabel" name="label_14">
+                    <property name="text">
+                     <string>Node Size: </string>
+                    </property>
+                   </widget>
                   </item>
                   <item>
-                   <property name="text">
-                    <string>Astrocyte Coverage</string>
-                   </property>
+                   <widget class="QComboBox" name="comboBox">
+                    <item>
+                     <property name="text">
+                      <string>Volume</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Astrocyte Coverage</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Synapse Size</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QFrame" name="frame_41">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_38">
+                  <item>
+                   <widget class="QLabel" name="label_16">
+                    <property name="text">
+                     <string>Color</string>
+                    </property>
+                   </widget>
                   </item>
                   <item>
-                   <property name="text">
-                    <string>Synapse Size</string>
-                   </property>
+                   <widget class="QComboBox" name="comboBox_4">
+                    <item>
+                     <property name="text">
+                      <string>Type</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Function</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Astrocyte Coverage</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Glycogen Distribution</string>
+                     </property>
+                    </item>
+                   </widget>
                   </item>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item>
-              <widget class="QFrame" name="frame_41">
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QFrame" name="frame_42">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_39">
+                  <item>
+                   <widget class="QLabel" name="label_50">
+                    <property name="text">
+                     <string>Graph Heatmap</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_5">
+                    <item>
+                     <property name="text">
+                      <string>Astrocyte Coverage</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Glycogen Distribution</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_12">
+              <property name="title">
+               <string>Visual Proximity</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_6">
+               <property name="leftMargin">
+                <number>0</number>
                </property>
-               <property name="frameShadow">
-                <enum>QFrame::Raised</enum>
+               <property name="rightMargin">
+                <number>0</number>
                </property>
-               <layout class="QHBoxLayout" name="horizontalLayout_38">
-                <item>
-                 <widget class="QLabel" name="label_16">
-                  <property name="text">
-                   <string>Color</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="comboBox_4">
-                  <item>
-                   <property name="text">
-                    <string>Type</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Function</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Astrocyte Coverage</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Glycogen Distribution</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item>
-              <widget class="QFrame" name="frame_42">
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Raised</enum>
-               </property>
-               <layout class="QHBoxLayout" name="horizontalLayout_39">
-                <item>
-                 <widget class="QLabel" name="label_50">
-                  <property name="text">
-                   <string>2D HeatMap</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="comboBox_5">
-                  <item>
-                   <property name="text">
-                    <string>Astrocyte Coverage</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Glycogen Distribution</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
-            </layout>
-           </widget>
+               <item>
+                <widget class="QCheckBox" name="splatAstroCheckBox">
+                 <property name="text">
+                  <string>Show Astrocyte Proximity</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="splatGlycoCheckBox">
+                 <property name="text">
+                  <string>Show Glycogen Proximity</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="splatAMitoCheckBox">
+                 <property name="text">
+                  <string>Show Astro-Mitochondria Proximity</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="splatNMitoCheckBox">
+                 <property name="text">
+                  <string>Show Neuro-Mito Proximity to Astro.</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="specularLightCheckBox">
+              <property name="text">
+               <string>Specular Lighting</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
