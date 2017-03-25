@@ -7,6 +7,7 @@ out float       alpha;
 out vec4        color_val;
 out float       G_ID;
 out float       node2D_alpha; /*1 -> 3D, 0 -> 2D*/
+flat out int    hasMito;
 
 in int          V_ID[];
 in float        V_alpha[];
@@ -53,6 +54,12 @@ void main() {
     gl_PointSize = gl_in[0].gl_PointSize;
 
     color_val = SSBO_data[ID].color;
+
+    if (SSBO_data[ID].color.w == 1.0)
+        hasMito = 1;
+    else
+        hasMito = 0;
+
     if (hoveredID == ID) {
         color_val += vec4(0.2, 0.2, 0.2, 0);
     }

@@ -14,6 +14,7 @@ out vec4        color_val;
 out float       alpha;
 out float       G_ID;
 out float        node2D_alpha; /*1 -> 3D, 0 -> 2D*/
+flat out int    hasMito;
 
 
 uniform int     y_axis;
@@ -97,6 +98,8 @@ void main() {
     if (alpha < 0.01){
         return;
     }
+
+    hasMito = 0;
 
     color_intp = V_color_intp[0];
     gl_Position = gl_in[0].gl_Position;

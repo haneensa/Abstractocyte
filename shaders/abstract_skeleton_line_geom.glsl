@@ -23,13 +23,14 @@
 */
 
 layout (lines) in;
-layout(points, max_vertices = 93) out;
+layout(points, max_vertices = 85) out;
 
 in int          V_ID[];
 in float        V_alpha[];
 in int          V_render[];
 in int          V_connectivity[];
 in float        V_node2D_alpha[];
+flat out int    hasMito;
 
 out vec4        color_val;
 out float       alpha;
@@ -37,6 +38,7 @@ out float       G_ID;
 out float       node2D_alpha; /*1 -> 3D, 0 -> 2D*/
 
 uniform int                 hoveredID;
+uniform int                 x_axis;
 
 struct SSBO_datum {
     vec4 color;
@@ -73,6 +75,11 @@ void main() {
         return;
     }
 
+    if (SSBO_data[ID].color.w == 1.0 && x_axis >= 99)
+        hasMito = 1;
+    else
+        hasMito = 0;
+
     node2D_alpha = V_node2D_alpha[0];
 
     gl_PointSize =  gl_in[0].gl_PointSize;
@@ -89,8 +96,8 @@ void main() {
     vec4 start = gl_in[0].gl_Position;
     vec4 end = gl_in[1].gl_Position;
 
-    for (int i = 0; i < 93; i++ ) {
-         float u = float(i) / float(93);
+    for (int i = 0; i < 85; i++ ) {
+         float u = float(i) / float(85);
          float x = (end.x - start.x) * u + start.x;
          float y = (start.y - end.y) / (start.x - end.x) * (x - start.x) + start.y;
          gl_Position = vec4(x, y, 0, 1.0);

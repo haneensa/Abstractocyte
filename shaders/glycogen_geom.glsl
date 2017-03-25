@@ -12,6 +12,7 @@ layout (points, max_vertices = 1) out;
 out float        alpha;
 out vec4         color_val;
 out float        node2D_alpha; /*1 -> 3D, 0 -> 2D*/
+flat out int    hasMito;
 
 struct properties {
     vec2 pos_alpha;
@@ -77,6 +78,7 @@ void main() {
 	else
 		color_val = vec4(0.7, 0.7, 0.7, 1);
 
+    hasMito = 0;
 
     EmitVertex();
     EndPrimitive();
