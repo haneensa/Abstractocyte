@@ -68,7 +68,6 @@ void main(void)
 
     int type = int(SSBO_data[ID].center.w);     // 0: astrocyte, 1: neurite
 
-    properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
 
     int filter_value = int(SSBO_data[ID].info.w);
     int visibility = (filter_value >> 0) & 1;
@@ -92,14 +91,14 @@ void main(void)
             ID = ParentID;
 
         if (type == mito && parentType == astrocyte) // astrocytic mitochonderia
-            space_properties = space2d.ast;
+            type = astrocyte;
 
 
     }
 
     V_ID = ID;
 
-
+    properties space_properties = (type == astrocyte) ? space2d.ast : space2d.neu;
     vec2 pos_alpha = space_properties.pos_alpha; // position interpolation (pos1, pos2)
     vec2 trans_alpha = space_properties.trans_alpha; // alpha
     vec2 color_alpha = space_properties.color_alpha; // color_intp
