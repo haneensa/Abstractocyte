@@ -3,6 +3,7 @@
 
 #include <QTime>
 #include <QElapsedTimer>
+#include <queue>
 
 class PerformanceRate
 {
@@ -23,6 +24,9 @@ protected:
 
     bool                                m_first;
     float                               m_fps;
+
+    std::queue<float>                   m_windowFPS;
+    float                               m_windowSUM;
 };
 
 #endif // PERFORMANCERATE_H
