@@ -118,7 +118,7 @@ void main(void)
 
     V_node2D_alpha = translate(slider, interval.x, interval.y, 1, 0); ;
 
-    V_alpha =  0.5;
+    V_alpha =  1.0;
 
     float max_point_size = point_size.y;
     float min_point_size = point_size.x;
