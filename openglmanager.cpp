@@ -81,7 +81,7 @@ bool OpenGLManager::initOpenGLFunctions()
     //load3DTexturesFromRaw("Neuronic_mitochondria_binary_s5.raw", m_nmito_3DTex);
     //load3DTexturesFromRaw("glycogen_volume_s5.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
 	
-	load3DTexturesFromRaw("mask_glycogen_sig3_bured8.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
+	load3DTexturesFromRaw("mask_glycogen_sig3_blured20.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
     //init_Gly3DTex();
     //upload_Gly3DTex(m_dataContainer->getGlycogen3DGridData(), DIM_G, DIM_G, DIM_G);
 	std::vector<unsigned char>* glycogen_tf = new std::vector<unsigned char>(); 
