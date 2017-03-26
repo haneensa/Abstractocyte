@@ -42,5 +42,6 @@
         <file>shaders/path_vert.glsl</file>
         <file>shaders/space2d_grid_points_geom.glsl</file>
         <file>shaders/space2d_grid_triangle_geom.glsl</file>
+        <file>shaders/skeleton_point_frag.glsl</file>
     </qresource>
 </RCC>

@@ -8,14 +8,14 @@ in int          V_ID[];
 
 in float        V_alpha[];
 in float        V_color_intp[];
+in vec3         V_fragTexCoord[];
 
 out float       color_intp;
 out vec4        color_val;
 out float       alpha;
 out float       G_ID;
-out float        node2D_alpha; /*1 -> 3D, 0 -> 2D*/
 flat out int    hasMito;
-
+out vec3        G_fragTexCoord;
 
 uniform int     y_axis;
 uniform int     x_axis;
@@ -62,9 +62,6 @@ layout (std430, binding=3) buffer space2d_data
 
 
 void main() {
-
-    node2D_alpha = 1;
-
     int ID = V_ID[0];
     int type = int(SSBO_data[ID].center.w);
 
@@ -103,6 +100,8 @@ void main() {
 
     color_intp = V_color_intp[0];
     gl_Position = gl_in[0].gl_Position;
+
+    G_fragTexCoord = V_fragTexCoord[0];
 
     EmitVertex();
 }

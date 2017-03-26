@@ -18,6 +18,7 @@ uniform int     x_axis;
 out int         V_ID;
 out float       V_alpha;
 out float       V_color_intp;
+out vec3        V_fragTexCoord;
 
 // make common header and add all these shared data together!
 struct SSBO_datum {
@@ -63,6 +64,8 @@ void main(void)
 {
     mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
     vec4 skeleton_vertex =  pvmMatrix * vec4(vertex.xyz, 1.0);
+
+    V_fragTexCoord = vertex.xyz;
 
     int ID = int(vertex.w);
 
