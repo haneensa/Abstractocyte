@@ -86,6 +86,7 @@ void main() {
 			color = pnk_color;
 		}
 		mix_color = mix(color, pur_color, splat.b * splat_flags.z);
+		mix_color = mix(mix_color, blu_color, splat.g * splat_flags.w);
 		color = mix_color;
 		break;
 	case SPINE:
@@ -117,7 +118,8 @@ void main() {
 	else
 		toon_color *= 0.1;
 
-	float border_value = abs(dot(V1, N));//max(abs(dot(V1, N)), abs(dot(V2, N)));
+	float border_value = max(abs(dot(V1, N)), abs(dot(-V1, N)));//abs(dot(-V1, N));//
+	//float det_value = mix(0.1, 0.05, max(0.0, intensity));
 	float edgeDetection = (border_value < 0.05) ? 0 : 1;
 	outcol = phong_color * color_intp + (1.0 - color_intp) /* edgeDetection*/ * toon_color;
 	outcol.a = alpha;
