@@ -141,6 +141,7 @@ public:
     void update2DTextureUniforms(GLuint program);
     // ************ 3D HeatMap  *******
 	void init_Gly3DTex();
+	void init_TF(GLuint &texture, GLenum texture_unit, GLvoid* data, int size);
 	void upload_Gly3DTex(void* data, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z, GLenum type = GL_UNSIGNED_BYTE);
 	void load3DTexturesFromRaw(QString path, GLuint &texture, GLenum texture_unit, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z);
 	void load3DTexturesFromRaw_3(QString path1, QString path2, QString path3, GLuint &texture, GLenum texture_unit, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z);
@@ -235,6 +236,7 @@ protected:
     GLuint                                  m_mito_3DTex;
 	GLuint									m_nmito_3DTex;
 	GLuint									m_glycogen_3DTex;
+	GLuint									m_tf_glycogen;
  };
 
 #endif // OPENGLMANAGER_H

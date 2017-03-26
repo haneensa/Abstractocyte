@@ -20,6 +20,7 @@ layout (location = 0) out vec4        outcol;
 // textures
 uniform sampler3D   splat_tex; //r=astro g=astro-mito b=neurite-mito
 uniform sampler3D   gly_tex;
+uniform sampler1D	gly_tf;
 
 uniform ivec4     splat_flags;
 uniform int		  specular_flag;
@@ -65,21 +66,32 @@ void main() {
 	float specular = max(sp1, sp2) * specular_flag;
 	vec4 color = vec4(color_val.rgb, 1.0);
 	vec4 mix_color = vec4(1.0, 0.0, 0.0, 1.0);
-	vec3 splat = getSplattedTexture3(splat_tex, G_fragTexCoord, vec3(0.001, 0.001, 0.002));
-	vec3 splat2 = getSplattedTexture3(gly_tex, G_fragTexCoord, vec3(0.001));
-
+	vec3 splat = vec3(0.0);
+	vec3 splat2 = vec3(0.0);
+	if (length(splat_flags.xzw) > 0.0)
+	{
+		splat = getSplattedTexture3(splat_tex, G_fragTexCoord, vec3(0.001, 0.001, 0.002));
+	}
+	if (splat_flags.y > 0.0)
+	{
+		splat2 = getSplattedTexture3(gly_tex, G_fragTexCoord, vec3(0.001));
+	}
 	switch (otype)
 	{
 	case ASTRO:
-		mix_color = mix(color, pnk_color, splat2.r * splat_flags.y * 8.0);
-		color = mix_color;
+		if (splat_flags.y > 0.0)
+		{
+			pnk_color = texture(gly_tf, splat2.r * 10.0);
+			//mix_color = mix(color, pnk_color, pnk_color.a * splat_flags.y);// *8.0);
+			color = pnk_color;
+		}
 		mix_color = mix(color, pur_color, splat.b * splat_flags.z);
 		color = mix_color;
 		break;
 	case SPINE:
 	case BOUTN:
 	case SYNPS:
-		mix_color = mix(color, pnk_color, splat2.r * splat_flags.y * 12.0);
+		mix_color = mix(color, pnk_color, splat2.r * splat_flags.y * 10.0);
 		color = mix_color;
 	case AXONS:
 	case DENDS:
