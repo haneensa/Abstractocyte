@@ -468,17 +468,14 @@ void OpenGLManager::load3DTexturesFromRaw(QString path, GLuint &texture, GLenum 
     // convert to rgba
     for (int i = 0; i < size; ++i) {
         //unsigned int idx = i * 4;
-		bufferRGBA[i] = rawData[i];// (rawData[i] > 0) ? 255 : 0; //hack: remove later
-        //bufferRGBA[idx + 1] = 0;
-        //bufferRGBA[idx + 2] = 0;
-        //bufferRGBA[idx + 3] = 255;
+        bufferRGBA[i] = rawData[i];// (rawData[i] > 0) ? 255 : 0; //hack: remove later
     }
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, sizeX, sizeY, sizeZ, 0, GL_RED, GL_UNSIGNED_BYTE, bufferRGBA);
 
     GL_Error();
-    //glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, sizeX, sizeY, sizeZ, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
+
     delete [] rawData;
     delete [] bufferRGBA;
 
@@ -518,10 +515,8 @@ void OpenGLManager::load3DTexturesFromRaw_3(QString path1, QString path2, QStrin
     }
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    //glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, sizeX, sizeY, sizeZ, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_RGB8, sizeX, sizeY, sizeZ, 0, GL_RGB, GL_UNSIGNED_BYTE, bufferRGBA);
-    //glTexStorage3D(GL_TEXTURE_3D, 0, GL_RGBA, sizeX, sizeY, sizeZ);// , 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
-    //glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, sizeX, sizeY, sizeZ, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)bufferRGBA);
+
     GL_Error();
     delete[] rawData1;
     delete[] rawData2;
@@ -1191,12 +1186,6 @@ bool OpenGLManager::initMeshTrianglesShaders()
     GLint gly_tex = glGetUniformLocation(mesh_program, "gly_tex");
     if (gly_tex >= 0) glUniform1i(gly_tex, 3);
 
-    //GLint mito_tex = glGetUniformLocation(mesh_program, "mito_tex");
-    //glUniform1i(mito_tex, 4);
-
-    //GLint nmito_tex = glGetUniformLocation(mesh_program, "nmito_tex");
-    //glUniform1i(nmito_tex, 5);
-
     m_TMesh.vboCreate("MeshVertices", Buffer_t::VERTEX, Buffer_USAGE_t::STATIC);
     m_TMesh.vboBind("MeshVertices");
 
@@ -1390,7 +1379,7 @@ bool OpenGLManager::initSkeletonShaders()
     bool res = m_SkeletonPoints.compileShader("3DPoints",
                                               ":/shaders/skeleton_point_vert.glsl",
                                               ":/shaders/skeleton_point_geom.glsl",
-                                              ":/shaders/points_3d_frag.glsl");
+                                              ":/shaders/skeleton_point_frag.glsl");
 
     if (res == false)
         return res;
@@ -1501,6 +1490,16 @@ void OpenGLManager::drawSkeletonPoints(bool selection)
         m_SkeletonPoints.vaoBind("SkeletonPoints");
         m_SkeletonPoints.useProgram("3DPoints");
         updateSkeletonUniforms( m_SkeletonPoints.getProgram("3DPoints") );
+
+
+        GLint splat_tex = glGetUniformLocation( m_SkeletonPoints.getProgram("3DPoints"), "splat_tex");
+
+        if (splat_tex >= 0) {
+            glUniform1i(splat_tex, 2);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_3D, m_splat_volume_3DTex);
+        }
+
         glDrawArrays(GL_POINTS, 0,  m_dataContainer->getSkeletonPointsSize()  );
         m_SkeletonPoints.vaoRelease();
     }
