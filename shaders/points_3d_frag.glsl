@@ -62,7 +62,7 @@ void main() {
         outcol = mix( node2d, node3d, node2D_alpha);
     }
 
-    if (length(splat_flags.xzw) > 0.0) {
+    if (splat_flags.z > 0.0) {
         float tex_splat = texture(splat_tex, G_fragTexCoord).g;
         if (tex_splat > 0) {
             vec4 mito_color = vec4(0.482f, 0.408f, 0.933f, 1);
