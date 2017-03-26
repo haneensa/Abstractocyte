@@ -3,27 +3,12 @@
 #define astrocyte   6
 #define spine       5
 #define bouton      3
-#define mito      1
+#define mito        1
 
-/* todo: draw thick lines with 3D effects
-1) get 4 vertices
-    1.a) start of previous segment
-    1.b) end of previous segment
-    1.c) end of current segment
-    1.d) end of next segment
 
-2) naive culling
-3) get direction of each 3 segments
-4) get the normal of each of the 3 segments
-5) miter lines
-6) length of the miter by projecting it onto normal then inverse it
-7) prevent long miters at sharp corners
-8) close the gap
-9) generate triangle strip
-*/
-
+#define points_size   60
 layout (lines) in;
-layout(points, max_vertices = 85) out;
+layout(points, max_vertices = points_size) out;
 
 in int          V_ID[];
 in float        V_alpha[];
@@ -31,14 +16,16 @@ in int          V_render[];
 in int          V_connectivity[];
 in float        V_node2D_alpha[];
 flat out int    hasMito;
+in vec3         V_fragTexCoord[];
 
 out vec4        color_val;
 out float       alpha;
 out float       G_ID;
 out float       node2D_alpha; /*1 -> 3D, 0 -> 2D*/
+out vec3        G_fragTexCoord;
 
-uniform int                 hoveredID;
-uniform int                 x_axis;
+uniform int     hoveredID;
+uniform int     x_axis;
 
 struct SSBO_datum {
     vec4 color;
@@ -80,7 +67,8 @@ void main() {
     else
         hasMito = 0;
 
-    node2D_alpha = V_node2D_alpha[0];
+    node2D_alpha =  V_node2D_alpha[0];
+
 
     gl_PointSize =  gl_in[0].gl_PointSize;
 
@@ -96,11 +84,19 @@ void main() {
     vec4 start = gl_in[0].gl_Position;
     vec4 end = gl_in[1].gl_Position;
 
-    for (int i = 0; i < 85; i++ ) {
-         float u = float(i) / float(85);
+    vec4 startCoord  = vec4(V_fragTexCoord[0], 1);
+    vec4 endCoord  = vec4(V_fragTexCoord[1], 1);
+
+    for (int i = 0; i < points_size; i++ ) {
+         float u = float(i) / float(points_size);
          float x = (end.x - start.x) * u + start.x;
          float y = (start.y - end.y) / (start.x - end.x) * (x - start.x) + start.y;
          gl_Position = vec4(x, y, 0, 1.0);
+
+         float xCoord =  (endCoord.x - startCoord.x) * u + startCoord.x;
+         float yCoord =  (startCoord.y - endCoord.y)  / (startCoord.x - endCoord.x) * (x - startCoord.x) + startCoord.y;
+         G_fragTexCoord = vec3(xCoord, yCoord, (startCoord.z+endCoord.z)/2.0);
+
          EmitVertex();
          EndPrimitive();
 

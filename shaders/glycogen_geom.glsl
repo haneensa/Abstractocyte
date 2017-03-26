@@ -1,18 +1,20 @@
 #version 430
 
-in	int		V_ID[];
-in	int		C_ID[];
-in  int		V_State[];
-in  vec2	V_Radius_volume[];
+in	int	V_ID[];
+in	int	C_ID[];
+in      int	V_State[];
+in      vec2	V_Radius_volume[];
+in      vec3    V_fragTexCoord[];
 
 
 layout (points) in;
 layout (points, max_vertices = 1) out;
 
-out float        alpha;
-out vec4         color_val;
-out float        node2D_alpha; /*1 -> 3D, 0 -> 2D*/
-flat out int    hasMito;
+out float           alpha;
+out vec4            color_val;
+out float           node2D_alpha; /*1 -> 3D, 0 -> 2D*/
+flat out int        hasMito;
+out vec3            G_fragTexCoord;
 
 struct properties {
     vec2 pos_alpha;
@@ -56,27 +58,24 @@ const vec3 selection_color = vec3(221.0 / 255, 52.0 / 255, 151.0 / 255);
 
 
 void main() {
-
+    G_fragTexCoord = V_fragTexCoord[0];
     node2D_alpha = 1;
-
     vec4 render_type = space2d.ast.render_type; // additional info
 
-
-	if (!(render_type.x == 1 || render_type.y == 1) || V_State[0] == 0) {
+    if (!(render_type.x == 1 || render_type.y == 1) || V_State[0] == 0) {
         return;
     }
 
-
     gl_Position = gl_in[0].gl_Position;
-	gl_PointSize = gl_in[0].gl_PointSize;// V_Radius_volume[0].x * 500;//10; //figure out actual way (and input zoom to be used)
+    gl_PointSize = gl_in[0].gl_PointSize;// V_Radius_volume[0].x * 500;//10; //figure out actual way (and input zoom to be used)
     alpha = 0.7;
    // color_val = vec4(1, 0, 0.5, 1); //determine by using cluster ID
-	if (V_State[0] > 1)
-		color_val = vec4(selection_color, 1);
-	else if (C_ID[0] > 0)
-		color_val = vec4(test_colors[C_ID[0]%12], 1);
-	else
-		color_val = vec4(0.7, 0.7, 0.7, 1);
+    if (V_State[0] > 1)
+        color_val = vec4(selection_color, 1);
+    else if (C_ID[0] > 0)
+        color_val = vec4(test_colors[C_ID[0]%12], 1);
+    else
+        color_val = vec4(0.7, 0.7, 0.7, 1);
 
     hasMito = 0;
 

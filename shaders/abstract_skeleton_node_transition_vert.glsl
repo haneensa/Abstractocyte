@@ -16,6 +16,7 @@ out float   V_alpha;
 out int     V_render;
 out float   V_node2D_alpha;
 out int     V_connectivity;
+out vec3    V_fragTexCoord;
 
 // World transformation
 uniform mat4 mMatrix;
@@ -69,6 +70,7 @@ void main(void)
     // if has parent and parent not filtered, then use it
     // else use child if not filtered as well
     int ID = int(vertex.w);
+    V_fragTexCoord = vertex.xyz;
     V_ID = ID;
     int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
 

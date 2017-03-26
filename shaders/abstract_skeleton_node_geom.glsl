@@ -8,11 +8,13 @@ out vec4        color_val;
 out float       G_ID;
 out float       node2D_alpha; /*1 -> 3D, 0 -> 2D*/
 flat out int    hasMito;
+out vec3        G_fragTexCoord;
 
 in int          V_ID[];
 in float        V_alpha[];
 in int          V_render[];
 in float        V_node2D_alpha[];
+in vec3         V_fragTexCoord[];
 
 uniform int     hoveredID;
 
@@ -31,6 +33,7 @@ layout (std430, binding=2) buffer mesh_data
 
 
 void main() {
+    G_fragTexCoord = V_fragTexCoord[0];
 
     node2D_alpha = V_node2D_alpha[0];
 
