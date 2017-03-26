@@ -52,14 +52,14 @@ vec4 pur_color = vec4(0.33, 0.15, 0.56, 1.0);
 vec3 E2 = vec3(0.5, 0.5, -1.0);
 //vec3 E3 = vec3(0.5, 0.5, 1.0);
 void main() {
-	//vec3 E = normalize(eye);
+	vec3 E = normalize(eye);
 	E2 = normalize(E2);
 	//E3 = normalize(E3);
 	float cosTheta = clamp(dot(N, L), 0, 1);
 	float cosTheta2 = clamp(dot(N, L2), 0, 1);
 	float intensity = clamp(max(cosTheta, cosTheta2), 0, 1);
-	//vec3 V1 = normalize(E2 - vposition);
-	//vec3 V2 = normalize(E2 - vposition);
+	vec3 V1 = normalize(E - vposition);
+	//vec3 V2 = normalize(E3 - vposition);
 	vec3 H = normalize(L + E2);
 	float sp1 = pow(max(0.0, dot(reflect(-L2, N), E2)), 32.0);
 	float sp2 = pow(max(0.0, dot(reflect(-L, N), E2)), 32.0);
@@ -81,7 +81,7 @@ void main() {
 	case ASTRO:
 		if (splat_flags.y > 0.0)
 		{
-			pnk_color = texture(gly_tf, splat2.r * 10.0);
+			pnk_color = texture(gly_tf, splat2.r * 3.0);
 			//mix_color = mix(color, pnk_color, pnk_color.a * splat_flags.y);// *8.0);
 			color = pnk_color;
 		}
@@ -91,7 +91,7 @@ void main() {
 	case SPINE:
 	case BOUTN:
 	case SYNPS:
-		mix_color = mix(color, pnk_color, splat2.r * splat_flags.y * 10.0);
+		mix_color = mix(color, pnk_color, splat2.r * splat_flags.y * 3.0);
 		color = mix_color;
 	case AXONS:
 	case DENDS:
@@ -117,8 +117,8 @@ void main() {
 	else
 		toon_color *= 0.1;
 
-	//float border_value = max(abs(dot(V1, N)), abs(dot(V2, N)));
-	//float edgeDetection = (border_value > 0.02) ? 1 : 0;
+	float border_value = abs(dot(V1, N));//max(abs(dot(V1, N)), abs(dot(V2, N)));
+	float edgeDetection = (border_value < 0.05) ? 0 : 1;
 	outcol = phong_color * color_intp + (1.0 - color_intp) /* edgeDetection*/ * toon_color;
 	outcol.a = alpha;
 }

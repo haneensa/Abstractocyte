@@ -73,16 +73,17 @@ vec3 eye = vec3(0.5, 0.5, 1.0);
 void main(void)
 {
 
-	V_normal = vertex_normal;
-        mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
-	V_worldPos = vec4(mesh_vx.xyz, 1.0);
+	V_normal = rMatrix * vertex_normal;
+    mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
+	mat4 irotation = inverse(rMatrix);
+	V_worldPos = rMatrix * vec4(mesh_vx.xyz, 1.0);
 
 	V_fragTexCoord = vec3(mesh_vx.xyz);
 
 	vec4 mesh_vertex =  pvmMatrix * vec4(mesh_vx.xyz , 1.0);
 	vec4 Vskeleton_vx = pvmMatrix * vec4(skeleton_vx.xyz, 1.0);
 
-	E_eye = (mMatrix * vec4(eye, 1.0)).xyz;
+	E_eye = (vec4(normalize(eye), 1.0)).xyz;
 
 	int ID = int(mesh_vx.w);
 

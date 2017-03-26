@@ -71,7 +71,8 @@ void DataContainer::loadData()
     loadParentFromHVGX(hvgxFile);
 
 
-    m_limit = 10000;
+    m_limit = 20;
+
     m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
     m_load_data = LoadData_t::ALL;
     m_normals_t = Normals_t::LOAD_NORMAL;
