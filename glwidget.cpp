@@ -749,3 +749,15 @@ void GLWidget::getHVGXIDAtSelectedRow(int ID)
     m_opengl_mngr->highlightObject(ID);
 
 }
+
+void GLWidget::togglWeightedAstroCoverage()
+{
+    m_opengl_mngr->toggleWeightedCoverage();
+}
+
+void GLWidget::getglycogenMappedSelectedState(QString ID_str, bool state)
+{
+    int ID = ID_str.toInt();
+    m_opengl_mngr->highlightObject(ID);
+    m_opengl_mngr->recursiveFilter(ID, !state);
+}

@@ -109,7 +109,7 @@
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_4">
         <attribute name="title">
@@ -349,8 +349,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>129</width>
-              <height>180</height>
+              <width>352</width>
+              <height>738</height>
              </rect>
             </property>
             <attribute name="label">
@@ -828,6 +828,13 @@
                    </widget>
                   </item>
                  </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBox_4">
+                 <property name="text">
+                  <string>weight astrocyte coverage by size</string>
+                 </property>
                 </widget>
                </item>
               </layout>
@@ -2114,7 +2121,7 @@
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <widget class="QWidget" name="">
+          <widget class="QWidget" name="layoutWidget">
            <property name="geometry">
             <rect>
              <x>10</x>
@@ -2502,17 +2509,6 @@
             </item>
            </layout>
           </widget>
-          <zorder>frame_46</zorder>
-          <zorder>frame_46</zorder>
-          <zorder>frame_43</zorder>
-          <zorder>frame_48</zorder>
-          <zorder></zorder>
-          <zorder></zorder>
-          <zorder>splitter</zorder>
-          <zorder>frame_50</zorder>
-          <zorder></zorder>
-          <zorder>frame_2</zorder>
-          <zorder>frame_48</zorder>
          </widget>
         </item>
        </layout>
@@ -2590,6 +2586,7 @@
     <slot>getActiveGraphTab(int)</slot>
     <slot>reset_layouting(bool)</slot>
     <slot>get2DtextureEncoding(QString)</slot>
+    <slot>togglWeightedAstroCoverage()</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -2698,8 +2695,8 @@
    <slot>getGraphCr(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>564</y>
+     <x>245</x>
+     <y>572</y>
     </hint>
     <hint type="destinationlabel">
      <x>569</x>
@@ -2714,8 +2711,8 @@
    <slot>getGraphCa(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>610</y>
+     <x>245</x>
+     <y>618</y>
     </hint>
     <hint type="destinationlabel">
      <x>584</x>
@@ -2730,8 +2727,8 @@
    <slot>getGraphAABBdim(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>656</y>
+     <x>245</x>
+     <y>664</y>
     </hint>
     <hint type="destinationlabel">
      <x>579</x>
@@ -2746,8 +2743,8 @@
    <slot>getGraphmax_distance(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>702</y>
+     <x>245</x>
+     <y>710</y>
     </hint>
     <hint type="destinationlabel">
      <x>599</x>
@@ -2762,8 +2759,8 @@
    <slot>getGraphslow_factor(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>794</y>
+     <x>245</x>
+     <y>802</y>
     </hint>
     <hint type="destinationlabel">
      <x>582</x>
@@ -2778,8 +2775,8 @@
    <slot>getGraphmax_vertex_movement(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>748</y>
+     <x>245</x>
+     <y>756</y>
     </hint>
     <hint type="destinationlabel">
      <x>576</x>
@@ -2794,8 +2791,8 @@
    <slot>getGraphmax_force(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>840</y>
+     <x>245</x>
+     <y>848</y>
     </hint>
     <hint type="destinationlabel">
      <x>566</x>
@@ -2815,7 +2812,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>29</x>
-     <y>481</y>
+     <y>473</y>
     </hint>
    </hints>
   </connection>
@@ -2830,8 +2827,8 @@
      <y>730</y>
     </hint>
     <hint type="destinationlabel">
-     <x>223</x>
-     <y>481</y>
+     <x>250</x>
+     <y>473</y>
     </hint>
    </hints>
   </connection>
@@ -2842,8 +2839,8 @@
    <slot>getNodeSizeEncoding(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>320</x>
-     <y>560</y>
+     <x>347</x>
+     <y>550</y>
     </hint>
     <hint type="destinationlabel">
      <x>698</x>
@@ -2858,8 +2855,8 @@
    <slot>getColorEncoding(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>320</x>
-     <y>610</y>
+     <x>347</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>700</x>
@@ -2954,8 +2951,8 @@
    <slot>getDoubleClickedTableView(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>136</x>
-     <y>770</y>
+     <x>169</x>
+     <y>766</y>
     </hint>
     <hint type="destinationlabel">
      <x>755</x>
@@ -2970,8 +2967,8 @@
    <slot>getFitlerButtonClicked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>104</x>
-     <y>799</y>
+     <x>137</x>
+     <y>795</y>
     </hint>
     <hint type="destinationlabel">
      <x>698</x>
@@ -3003,7 +3000,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>366</x>
-     <y>799</y>
+     <y>795</y>
     </hint>
     <hint type="destinationlabel">
      <x>802</x>
@@ -3019,7 +3016,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>259</x>
-     <y>799</y>
+     <y>795</y>
     </hint>
     <hint type="destinationlabel">
      <x>411</x>
@@ -3034,8 +3031,8 @@
    <slot>highlightSelected(QModelIndex)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>136</x>
-     <y>770</y>
+     <x>169</x>
+     <y>766</y>
     </hint>
     <hint type="destinationlabel">
      <x>439</x>
@@ -3050,8 +3047,8 @@
    <slot>startPath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>107</x>
-     <y>564</y>
+     <x>149</x>
+     <y>556</y>
     </hint>
     <hint type="destinationlabel">
      <x>102</x>
@@ -3067,7 +3064,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>357</x>
-     <y>564</y>
+     <y>556</y>
     </hint>
     <hint type="destinationlabel">
      <x>267</x>
@@ -3098,8 +3095,8 @@
    <slot>namePath(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>358</x>
-     <y>619</y>
+     <x>367</x>
+     <y>611</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -3114,8 +3111,8 @@
    <slot>savePath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>352</x>
-     <y>693</y>
+     <x>367</x>
+     <y>685</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -3130,8 +3127,8 @@
    <slot>describePath(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>334</x>
-     <y>664</y>
+     <x>366</x>
+     <y>656</y>
     </hint>
     <hint type="destinationlabel">
      <x>296</x>
@@ -3162,12 +3159,12 @@
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>279</x>
-     <y>101</y>
+     <x>298</x>
+     <y>178</y>
     </hint>
     <hint type="destinationlabel">
-     <x>135</x>
-     <y>619</y>
+     <x>167</x>
+     <y>611</y>
     </hint>
    </hints>
   </connection>
@@ -3182,8 +3179,8 @@
      <y>835</y>
     </hint>
     <hint type="destinationlabel">
-     <x>77</x>
-     <y>263</y>
+     <x>137</x>
+     <y>338</y>
     </hint>
    </hints>
   </connection>
@@ -3194,8 +3191,8 @@
    <slot>getGraphoriginalPosAttraction(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>886</y>
+     <x>245</x>
+     <y>894</y>
     </hint>
     <hint type="destinationlabel">
      <x>424</x>
@@ -3210,8 +3207,8 @@
    <slot>getGraphCr(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>564</y>
+     <x>245</x>
+     <y>572</y>
     </hint>
     <hint type="destinationlabel">
      <x>448</x>
@@ -3226,8 +3223,8 @@
    <slot>getGraphCa(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>610</y>
+     <x>245</x>
+     <y>618</y>
     </hint>
     <hint type="destinationlabel">
      <x>415</x>
@@ -3242,8 +3239,8 @@
    <slot>getGraphmax_distance(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>702</y>
+     <x>245</x>
+     <y>710</y>
     </hint>
     <hint type="destinationlabel">
      <x>422</x>
@@ -3258,8 +3255,8 @@
    <slot>getGraphmax_vertex_movement(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>748</y>
+     <x>245</x>
+     <y>756</y>
     </hint>
     <hint type="destinationlabel">
      <x>430</x>
@@ -3274,8 +3271,8 @@
    <slot>getGraphslow_factor(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>794</y>
+     <x>245</x>
+     <y>802</y>
     </hint>
     <hint type="destinationlabel">
      <x>412</x>
@@ -3290,8 +3287,8 @@
    <slot>getGraphmax_force(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>840</y>
+     <x>245</x>
+     <y>848</y>
     </hint>
     <hint type="destinationlabel">
      <x>418</x>
@@ -3306,8 +3303,8 @@
    <slot>getGraphoriginalPosAttraction(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>886</y>
+     <x>245</x>
+     <y>894</y>
     </hint>
     <hint type="destinationlabel">
      <x>473</x>
@@ -3322,8 +3319,8 @@
    <slot>getGraphCr(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>564</y>
+     <x>245</x>
+     <y>572</y>
     </hint>
     <hint type="destinationlabel">
      <x>416</x>
@@ -3338,8 +3335,8 @@
    <slot>getGraphCa(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>610</y>
+     <x>245</x>
+     <y>618</y>
     </hint>
     <hint type="destinationlabel">
      <x>420</x>
@@ -3354,8 +3351,8 @@
    <slot>getGraphAABBdim(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>656</y>
+     <x>245</x>
+     <y>664</y>
     </hint>
     <hint type="destinationlabel">
      <x>428</x>
@@ -3370,8 +3367,8 @@
    <slot>getGraphmax_distance(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>702</y>
+     <x>245</x>
+     <y>710</y>
     </hint>
     <hint type="destinationlabel">
      <x>415</x>
@@ -3386,8 +3383,8 @@
    <slot>getGraphmax_vertex_movement(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>748</y>
+     <x>245</x>
+     <y>756</y>
     </hint>
     <hint type="destinationlabel">
      <x>433</x>
@@ -3402,8 +3399,8 @@
    <slot>getGraphslow_factor(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>794</y>
+     <x>245</x>
+     <y>802</y>
     </hint>
     <hint type="destinationlabel">
      <x>424</x>
@@ -3418,8 +3415,8 @@
    <slot>getGraphmax_force(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>840</y>
+     <x>245</x>
+     <y>848</y>
     </hint>
     <hint type="destinationlabel">
      <x>421</x>
@@ -3434,8 +3431,8 @@
    <slot>getGraphoriginalPosAttraction(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>886</y>
+     <x>245</x>
+     <y>894</y>
     </hint>
     <hint type="destinationlabel">
      <x>416</x>
@@ -3594,8 +3591,8 @@
    <slot>getGraphAABBdim(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>656</y>
+     <x>245</x>
+     <y>664</y>
     </hint>
     <hint type="destinationlabel">
      <x>466</x>
@@ -3658,8 +3655,8 @@
    <slot>get2DtextureEncoding(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>299</x>
-     <y>655</y>
+     <x>347</x>
+     <y>642</y>
     </hint>
     <hint type="destinationlabel">
      <x>428</x>
@@ -3674,8 +3671,8 @@
    <slot>getSlotsY(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>66</x>
-     <y>239</y>
+     <x>62</x>
+     <y>316</y>
     </hint>
     <hint type="destinationlabel">
      <x>107</x>
@@ -3690,12 +3687,28 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>76</x>
-     <y>145</y>
+     <x>136</x>
+     <y>222</y>
     </hint>
     <hint type="destinationlabel">
-     <x>66</x>
-     <y>181</y>
+     <x>62</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_4</sender>
+   <signal>clicked()</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>togglWeightedAstroCoverage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>270</x>
+     <y>670</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>502</x>
+     <y>663</y>
     </hint>
    </hints>
   </connection>

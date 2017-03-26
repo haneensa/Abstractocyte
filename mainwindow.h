@@ -41,6 +41,7 @@ public slots:
 	void on_mitoRadioButton_toggled(bool);
 	void on_boutonsSpinesRadioButton_toggled(bool);
 
+    void on_glycogenMappingTreeWidget_itemChanged(QTreeWidgetItem* item, int column);
     //----- selected objects
     void on_object_clicked(QList<QStandardItem*>);
     void clearTable();
@@ -68,6 +69,8 @@ signals:
     // path
     void signalPathLabel(QString);
     void signalDeletedPathLabel(QString);
+
+    void glycogenMappedSelectedState(QString, bool);
 
 private:
     Ui::MainWindow *mainwindow_ui;

@@ -282,8 +282,6 @@ void Object::addSynapse(Object *synapse_object)
 
 float Object::getAstroCoverage()
 {
-    // return m_VertexidxCloseToAstro.size();
-    // qDebug() << m_averageDistance << " " <<  m_averageDistance /(float) m_meshIndices.size();
     return (1.0 / (m_averageDistance /(float) m_meshIndices.size()) ); // the smaller the better value
 }
 

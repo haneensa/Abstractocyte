@@ -64,7 +64,6 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 void main(void)
 {
     V_connectivity = 0;
-    V_node2D_alpha = 0;
     int ID = int(vertex.w);
     V_fragTexCoord = vertex.xyz;
     V_ID = ID;
@@ -98,6 +97,11 @@ void main(void)
    if (type == mito)
        V_render = 0;
 
+
+   if (type == astrocyte)
+       V_node2D_alpha = 0.1;
+    else
+       V_node2D_alpha = 0;
 
    // if we are in the 2D space, then we have two interpolation for the neurites
    // for the nodes and skeletons along the y axis (node layout 1 and node layout 2)

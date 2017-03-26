@@ -32,7 +32,7 @@ void main() {
     outcol = vec4(color_val.rgb, alpha) * diffuse + S;
 
 
-    if (splat_flags.z > 0.0) {
+    if (splat_flags.w > 0.0) {
         float tex_splat = texture(splat_tex, G_fragTexCoord).g;
 
         if (tex_splat > 0) {

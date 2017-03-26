@@ -97,9 +97,8 @@ public:
     int getMaxVolume()              { return max_volume; }
     int getMaxSynapseVolume()       { return max_synapse_volume; }
 
-
     // iterate over objects and get max volume and astro coverage
-    void recomputeMaxValues();
+    void recomputeMaxValues(bool weighted);
 
     //************ Load Raw Data
     char* loadRawFile(QString path, int size);

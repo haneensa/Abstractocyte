@@ -1,5 +1,11 @@
 #version 430
 
+#define astrocyte   6
+#define spine       5
+#define bouton      3
+#define mito      1
+
+
 layout (points) in;
 layout (points, max_vertices = 1) out;
 
@@ -58,7 +64,9 @@ void main() {
 
     color_val = SSBO_data[ID].color;
 
-    if (SSBO_data[ID].color.w == 1.0)
+    int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
+
+    if (SSBO_data[ID].color.w == 1.0 && (type == spine || type == bouton))
         hasMito = 1;
     else
         hasMito = 0;
