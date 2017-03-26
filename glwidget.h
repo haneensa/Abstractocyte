@@ -71,6 +71,7 @@ public slots:
     void hideSelectedObjects();
     void getHVGXIDAtSelectedRow(int);
     void togglWeightedAstroCoverage();
+    void getglycogenMappedSelectedState(QString, bool);
 
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);

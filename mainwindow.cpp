@@ -62,6 +62,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(this, SIGNAL(signalDeletedPathLabel(QString)),
                      getMousePad(), SLOT(getSelectedPathLabelToDelete(QString)));
 
+    QObject::connect(this, SIGNAL(glycogenMappedSelectedState(QString, bool)),
+                     getGLWidget(), SLOT(getglycogenMappedSelectedState(QString, bool)));
+
+
  }
 
 //------------------------------------------------------
@@ -439,4 +443,14 @@ void MainWindow::on_splatAMitoCheckBox_toggled(bool checked)
 void MainWindow::on_specularLightCheckBox_toggled(bool checked)
 {
 	getGLWidget()->getOpenGLManager()->setSpecularLight(checked);
+}
+
+void  MainWindow::on_glycogenMappingTreeWidget_itemChanged(QTreeWidgetItem* item, int column)
+{
+   bool state = true;
+   if ( item->checkState(0) == Qt::Unchecked)
+       state = false;
+
+   QString ID_str = item->text(0); // highlighted immediately
+   glycogenMappedSelectedState(ID_str, state);
 }
