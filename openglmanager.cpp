@@ -77,8 +77,9 @@ bool OpenGLManager::initOpenGLFunctions()
     //load3DTexturesFromRaw("mask_745_sigma3.raw", m_astro_3DTex ); // Astrocytic_mitochondria_b.raw
     //load3DTexturesFromRaw("astrocytic_mitochondria_s5.raw", m_mito_3DTex ); //
     //load3DTexturesFromRaw("Neuronic_mitochondria_binary_s5.raw", m_nmito_3DTex);
-    load3DTexturesFromRaw("glycogen_volume_s5.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
-	//load3DTexturesFromRaw("mask_gly_blur5_contrast_filtersize_15.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
+    //load3DTexturesFromRaw("glycogen_volume_s5.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
+	
+	load3DTexturesFromRaw("mask_gly_3s_8.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
     //init_Gly3DTex();
     //upload_Gly3DTex(m_dataContainer->getGlycogen3DGridData(), DIM_G, DIM_G, DIM_G);
 
