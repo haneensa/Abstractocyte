@@ -209,7 +209,7 @@ protected:
     bool                                    m_display_synapses;
     int                                     m_depth;
 
-    int                                    m_hoveredID;
+    int                                     m_hoveredID;
 
     Color_e                                 m_color_encoding;
     Size_e                                  m_size_encoding;
@@ -224,6 +224,9 @@ protected:
     std::vector<QVector4D>                  m_Texquad;
     GLuint                                  m_tf_2DHeatMap_tex;
     std::vector<QVector4D>                  m_tf_2DHeatmap;
+
+    GLuint                                  m_tf_2DHeatMap2_tex;
+    std::vector<QVector4D>                  m_tf_2DHeatmap2;
 
     // ************ 3D HeatMap  *******
 	GLuint									m_splat_volume_3DTex;

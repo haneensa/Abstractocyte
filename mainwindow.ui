@@ -277,6 +277,9 @@
           <property name="text">
            <string>A s t r o c y t e</string>
           </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
           <property name="wordWrap">
            <bool>true</bool>
           </property>
