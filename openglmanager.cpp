@@ -180,7 +180,7 @@ void OpenGLManager::write_ssbo_data()
     int bufferSize =  m_ssbo_data.size() * sizeof(struct ssbo_mesh);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo);
-    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
+    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
     memcpy(p,   m_ssbo_data.data(),  bufferSize);
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 }
