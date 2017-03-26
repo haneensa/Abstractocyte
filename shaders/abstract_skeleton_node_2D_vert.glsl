@@ -11,17 +11,18 @@ layout (location = 1) in vec2 layout1;
 layout (location = 2) in vec2 layout2;
 layout (location = 3) in vec2 layout3;
 
-out int                     V_ID;
-out float                   V_alpha;
-out int                     V_render;
-out float                   V_node2D_alpha;
-out int                     V_connectivity;
+out int         V_ID;
+out float       V_alpha;
+out int         V_render;
+out float       V_node2D_alpha;
+out int         V_connectivity;
+out vec3        V_fragTexCoord;
 
-uniform mat4                m_noRartionMatrix;
-uniform mat4                vMatrix;
-uniform mat4                pMatrix;
-uniform int                 y_axis;
-uniform int                 x_axis;
+uniform mat4    m_noRartionMatrix;
+uniform mat4    vMatrix;
+uniform mat4    pMatrix;
+uniform int     y_axis;
+uniform int     x_axis;
 
 struct SSBO_datum {
     vec4 color;
@@ -65,6 +66,7 @@ void main(void)
     V_connectivity = 0;
     V_node2D_alpha = 0;
     int ID = int(vertex.w);
+    V_fragTexCoord = vertex.xyz;
     V_ID = ID;
     mat4 m_noRotvpMatrix = pMatrix * vMatrix * m_noRartionMatrix;
 

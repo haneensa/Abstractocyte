@@ -946,6 +946,14 @@ void OpenGLManager::updateSkeletonGraphUniforms(GLuint program)
 
     int hoveredID = glGetUniformLocation(program, "hoveredID");
     if (hoveredID >= 0) glUniform1iv(hoveredID, 1, &m_hoveredID);
+
+
+    int splat_flags = glGetUniformLocation(program, "splat_flags");
+    if (splat_flags >= 0) glUniform4i(splat_flags,	(m_is_astro_splat) ? 1 : 0,
+                                                    (m_is_glyco_splat) ? 1 : 0,
+                                                    (m_is_nmito_splat) ? 1 : 0,
+                                                    (m_is_amito_splat) ? 1 : 0);
+
     GL_Error();
 }
 
@@ -973,6 +981,13 @@ void OpenGLManager::updateSkeletonGraphTransitionUniforms(GLuint program)
 
     int hoveredID = glGetUniformLocation(program, "hoveredID");
     if (hoveredID >= 0) glUniform1iv(hoveredID, 1, &m_hoveredID);
+
+    int splat_flags = glGetUniformLocation(program, "splat_flags");
+    if (splat_flags >= 0) glUniform4i(splat_flags,	(m_is_astro_splat) ? 1 : 0,
+                                                    (m_is_glyco_splat) ? 1 : 0,
+                                                    (m_is_nmito_splat) ? 1 : 0,
+                                                    (m_is_amito_splat) ? 1 : 0);
+
     GL_Error();
 }
 
@@ -1030,10 +1045,43 @@ void OpenGLManager::drawSkeletonsGraph(bool selection )
 
         m_GSkeleton.useProgram("2D_index");
         updateSkeletonGraphUniforms( m_GSkeleton.getProgram("2D_index"));
+
+        GLint splat_tex = glGetUniformLocation( m_GSkeleton.getProgram("2D_index"), "splat_tex");
+
+        if (splat_tex >= 0) {
+            glUniform1i(splat_tex, 2);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_3D, m_splat_volume_3DTex);// m_astro_3DTex);
+        }
+
+        GLint gly_tex = glGetUniformLocation( m_GSkeleton.getProgram("2D_index"), "gly_tex");
+        if (gly_tex >= 0) {
+            glUniform1i(  gly_tex, 3 );
+            glActiveTexture(GL_TEXTURE3);
+            glBindTexture(GL_TEXTURE_3D, m_glycogen_3DTex);
+         }
+
         glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
 
         m_GSkeleton.useProgram("23D_index");
         updateSkeletonGraphUniforms( m_GSkeleton.getProgram("23D_index"));
+
+
+        splat_tex = glGetUniformLocation( m_GSkeleton.getProgram("23D_index"), "splat_tex");
+
+        if (splat_tex >= 0) {
+            glUniform1i(splat_tex, 2);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_3D, m_splat_volume_3DTex);// m_astro_3DTex);
+        }
+
+        gly_tex = glGetUniformLocation(  m_GSkeleton.getProgram("23D_index"), "gly_tex");
+        if (gly_tex >= 0) {
+            glUniform1i(  gly_tex, 3 );
+            glActiveTexture(GL_TEXTURE3);
+            glBindTexture(GL_TEXTURE_3D, m_glycogen_3DTex);
+         }
+
         glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
         m_GSkeleton.vboRelease("index");
         m_GSkeleton.vaoRelease();
@@ -1509,6 +1557,13 @@ void OpenGLManager::updateSkeletonUniforms(GLuint program)
 
     int hoveredID = glGetUniformLocation(program, "hoveredID");
     if (hoveredID >= 0) glUniform1iv(hoveredID, 1, &m_hoveredID);
+
+    int splat_flags = glGetUniformLocation(program, "splat_flags");
+    if (splat_flags >= 0) glUniform4i(splat_flags,	(m_is_astro_splat) ? 1 : 0,
+                                                    (m_is_glyco_splat) ? 1 : 0,
+                                                    (m_is_nmito_splat) ? 1 : 0,
+                                                    (m_is_amito_splat) ? 1 : 0);
+
     GL_Error();
 }
 
@@ -1564,7 +1619,7 @@ bool OpenGLManager::initGlycogenPointsShaders()
     bool res = m_GlycogenPoints.compileShader("3DPoints",
                                               ":/shaders/glycogen_vert.glsl",
                                               ":/shaders/glycogen_geom.glsl",
-                                                ":/shaders/points_3d_frag.glsl");
+                                                ":/shaders/glycogen_frag.glsl");
     if (res == false)
         return false;
 
@@ -1652,6 +1707,13 @@ void OpenGLManager::updateGlycogenUniforms(GLuint program)
 
      int pMatrix = glGetUniformLocation(program, "pMatrix");
      if (pMatrix >= 0) glUniformMatrix4fv(pMatrix, 1, GL_FALSE, m_uniforms.pMatrix);
+
+     int splat_flags = glGetUniformLocation(program, "splat_flags");
+     if (splat_flags >= 0) glUniform4i(splat_flags,	(m_is_astro_splat) ? 1 : 0,
+                                                     (m_is_glyco_splat) ? 1 : 0,
+                                                     (m_is_nmito_splat) ? 1 : 0,
+                                                     (m_is_amito_splat) ? 1 : 0);
+
      GL_Error();
 
 }
@@ -1666,6 +1728,15 @@ void OpenGLManager::drawGlycogenPoints()
     m_GlycogenPoints.useProgram("3DPoints");
 
     updateGlycogenUniforms(m_GlycogenPoints.getProgram("3DPoints"));
+
+    GLint splat_tex = glGetUniformLocation(m_GlycogenPoints.getProgram("3DPoints"), "splat_tex");
+
+    if (splat_tex >= 0) {
+        glUniform1i(splat_tex, 2);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_3D, m_splat_volume_3DTex);// m_astro_3DTex);
+    }
+
     glDrawArrays(GL_POINTS, 0,  m_dataContainer->getGlycogenSize() );
 
     m_vao_glycogen.release();
