@@ -1500,6 +1500,14 @@ void OpenGLManager::drawSkeletonPoints(bool selection)
             glBindTexture(GL_TEXTURE_3D, m_splat_volume_3DTex);
         }
 
+
+        GLint gly_tex = glGetUniformLocation( m_SkeletonPoints.getProgram("3DPoints"), "gly_tex");
+        if (gly_tex >= 0) {
+            glUniform1i(  gly_tex, 3 );
+            glActiveTexture(GL_TEXTURE3);
+            glBindTexture(GL_TEXTURE_3D, m_glycogen_3DTex);
+         }
+
         glDrawArrays(GL_POINTS, 0,  m_dataContainer->getSkeletonPointsSize()  );
         m_SkeletonPoints.vaoRelease();
     }
