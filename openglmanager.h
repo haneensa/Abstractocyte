@@ -145,6 +145,9 @@ public:
 	void upload_Gly3DTex(void* data, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z, GLenum type = GL_UNSIGNED_BYTE);
 	void load3DTexturesFromRaw(QString path, GLuint &texture, GLenum texture_unit, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z);
 	void load3DTexturesFromRaw_3(QString path1, QString path2, QString path3, GLuint &texture, GLenum texture_unit, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z);
+
+    void toggleWeightedCoverage();
+
 protected:
     DataContainer                           *m_dataContainer;
     AbstractionSpace                        *m_2dspace;
@@ -237,6 +240,8 @@ protected:
 	GLuint									m_nmito_3DTex;
 	GLuint									m_glycogen_3DTex;
 	GLuint									m_tf_glycogen;
+
+    bool                                    m_weighted_coverage;
  };
 
 #endif // OPENGLMANAGER_H

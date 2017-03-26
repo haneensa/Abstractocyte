@@ -33,6 +33,8 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
     m_astro_VBO_label = "AstroIndices";
 
     m_2DHeatMap_encoding = HeatMap2D_e::ASTRO_COVERAGE;
+
+    m_weighted_coverage = false;
 }
 
 // ----------------------------------------------------------------------------
@@ -81,7 +83,7 @@ bool OpenGLManager::initOpenGLFunctions()
     //load3DTexturesFromRaw("Neuronic_mitochondria_binary_s5.raw", m_nmito_3DTex);
     //load3DTexturesFromRaw("glycogen_volume_s5.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
 	
-	load3DTexturesFromRaw("mask_glycogen_sig3_bured8.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
+    load3DTexturesFromRaw("mask_glycogen_sig3_blured20.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
     //init_Gly3DTex();
     //upload_Gly3DTex(m_dataContainer->getGlycogen3DGridData(), DIM_G, DIM_G, DIM_G);
 	std::vector<unsigned char>* glycogen_tf = new std::vector<unsigned char>(); 
@@ -954,6 +956,35 @@ void OpenGLManager::updateSkeletonGraphUniforms(GLuint program)
                                                     (m_is_nmito_splat) ? 1 : 0,
                                                     (m_is_amito_splat) ? 1 : 0);
 
+
+    GLint splat_tex = glGetUniformLocation( program, "splat_tex");
+
+    if (splat_tex >= 0) {
+        glUniform1i(splat_tex, 2);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_3D, m_splat_volume_3DTex);// m_astro_3DTex);
+    }
+
+    GLint gly_tex = glGetUniformLocation( program, "gly_tex");
+    if (gly_tex >= 0) {
+        glUniform1i(  gly_tex, 3 );
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_3D, m_glycogen_3DTex);
+     }
+
+    // transfer function
+    GLint gly_tf = glGetUniformLocation( program, "gly_tf");
+
+    if (gly_tf >= 0)
+    {
+        glUniform1i(gly_tf, 1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_1D, m_tf_glycogen);
+    }
+
+
+
+
     GL_Error();
 }
 
@@ -987,6 +1018,33 @@ void OpenGLManager::updateSkeletonGraphTransitionUniforms(GLuint program)
                                                     (m_is_glyco_splat) ? 1 : 0,
                                                     (m_is_nmito_splat) ? 1 : 0,
                                                     (m_is_amito_splat) ? 1 : 0);
+
+
+    GLint splat_tex = glGetUniformLocation( program, "splat_tex");
+
+    if (splat_tex >= 0) {
+        glUniform1i(splat_tex, 2);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_3D, m_splat_volume_3DTex);// m_astro_3DTex);
+    }
+
+    GLint gly_tex = glGetUniformLocation( program, "gly_tex");
+    if (gly_tex >= 0) {
+        glUniform1i(  gly_tex, 3 );
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_3D, m_glycogen_3DTex);
+     }
+
+    // transfer function
+    GLint gly_tf = glGetUniformLocation( program, "gly_tf");
+
+    if (gly_tf >= 0)
+    {
+        glUniform1i(gly_tf, 1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_1D, m_tf_glycogen);
+    }
+
 
     GL_Error();
 }
@@ -1046,41 +1104,10 @@ void OpenGLManager::drawSkeletonsGraph(bool selection )
         m_GSkeleton.useProgram("2D_index");
         updateSkeletonGraphUniforms( m_GSkeleton.getProgram("2D_index"));
 
-        GLint splat_tex = glGetUniformLocation( m_GSkeleton.getProgram("2D_index"), "splat_tex");
-
-        if (splat_tex >= 0) {
-            glUniform1i(splat_tex, 2);
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_3D, m_splat_volume_3DTex);// m_astro_3DTex);
-        }
-
-        GLint gly_tex = glGetUniformLocation( m_GSkeleton.getProgram("2D_index"), "gly_tex");
-        if (gly_tex >= 0) {
-            glUniform1i(  gly_tex, 3 );
-            glActiveTexture(GL_TEXTURE3);
-            glBindTexture(GL_TEXTURE_3D, m_glycogen_3DTex);
-         }
-
         glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
 
         m_GSkeleton.useProgram("23D_index");
         updateSkeletonGraphUniforms( m_GSkeleton.getProgram("23D_index"));
-
-
-        splat_tex = glGetUniformLocation( m_GSkeleton.getProgram("23D_index"), "splat_tex");
-
-        if (splat_tex >= 0) {
-            glUniform1i(splat_tex, 2);
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_3D, m_splat_volume_3DTex);// m_astro_3DTex);
-        }
-
-        gly_tex = glGetUniformLocation(  m_GSkeleton.getProgram("23D_index"), "gly_tex");
-        if (gly_tex >= 0) {
-            glUniform1i(  gly_tex, 3 );
-            glActiveTexture(GL_TEXTURE3);
-            glBindTexture(GL_TEXTURE_3D, m_glycogen_3DTex);
-         }
 
         glDrawElements(GL_LINES, m_abstract_skel_edges.size(), GL_UNSIGNED_INT, 0 );
         m_GSkeleton.vboRelease("index");
@@ -1601,6 +1628,17 @@ void OpenGLManager::drawSkeletonPoints(bool selection)
             glBindTexture(GL_TEXTURE_3D, m_glycogen_3DTex);
          }
 
+
+        // transfer function
+        GLint gly_tf = glGetUniformLocation( m_SkeletonPoints.getProgram("3DPoints"), "gly_tf");
+
+        if (gly_tf >= 0)
+        {
+            glUniform1i(gly_tf, 1);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_1D, m_tf_glycogen);
+        }
+
         glDrawArrays(GL_POINTS, 0,  m_dataContainer->getSkeletonPointsSize()  );
         m_SkeletonPoints.vaoRelease();
     }
@@ -2087,7 +2125,8 @@ void OpenGLManager::FilterByType(Object_t type, bool flag)
         FilterObject(hvgxID, flag);
 
     }
-    m_dataContainer->recomputeMaxValues();
+    m_dataContainer->recomputeMaxValues(false);
+    if (m_weighted_coverage)     m_dataContainer->recomputeMaxValues(m_weighted_coverage);
     updateSSBO();
 }
 
@@ -2111,7 +2150,8 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids, bool invisibility )
         recursiveFilter(hvgxID, invisibility);
     }
 
-    m_dataContainer->recomputeMaxValues();
+    m_dataContainer->recomputeMaxValues(false);
+    if (m_weighted_coverage)     m_dataContainer->recomputeMaxValues(m_weighted_coverage);
     updateSSBO();
 }
 
@@ -2135,7 +2175,8 @@ void OpenGLManager::FilterByID( std::set<int> tokens_Ids, bool invisibility )
 
     }
 
-    m_dataContainer->recomputeMaxValues();
+    m_dataContainer->recomputeMaxValues(false);
+    if (m_weighted_coverage)     m_dataContainer->recomputeMaxValues(m_weighted_coverage);
     updateSSBO();
 }
 
@@ -2153,7 +2194,8 @@ void OpenGLManager::VisibilityToggleSelectedObjects( std::set<int> tokens_Ids, b
 
     }
 
-    m_dataContainer->recomputeMaxValues();
+    m_dataContainer->recomputeMaxValues(false);
+    if (m_weighted_coverage)     m_dataContainer->recomputeMaxValues(m_weighted_coverage);
     updateSSBO();}
 
 
@@ -2166,7 +2208,15 @@ void OpenGLManager::showAll()
         FilterObject(i, false);
     }
 
-    m_dataContainer->recomputeMaxValues();
+    m_dataContainer->recomputeMaxValues(false);
+    if (m_weighted_coverage)     m_dataContainer->recomputeMaxValues(m_weighted_coverage);
+    updateSSBO();
+}
+
+void OpenGLManager::toggleWeightedCoverage()
+{
+    m_weighted_coverage = !m_weighted_coverage;
+    m_dataContainer->recomputeMaxValues(m_weighted_coverage);
     updateSSBO();
 }
 
@@ -2336,21 +2386,21 @@ void OpenGLManager::updateSSBO()
         if (m_ssbo_data.size() <= hvgxID)
             continue;
 
+        float volume =  translate(obj->getVolume(), 0,
+                                  m_dataContainer->getMaxVolume(), 0, 1);
 
-        float coverage = translate( obj->getAstroCoverage(),
-                                   0,  m_dataContainer->getMaxAstroCoverage() ,
-                                   0, 0.7);
+        float weight = (m_weighted_coverage) ? volume : 1;
 
+        float coverage = weight * ( obj->getAstroCoverage()) /( m_dataContainer->getMaxAstroCoverage() ) ;
 
         if (m_2DHeatMap_encoding == HeatMap2D_e::ASTRO_COVERAGE)
-            m_ssbo_data[hvgxID].info.setY( obj->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage()  );
+            m_ssbo_data[hvgxID].info.setY( coverage );
         else if (m_2DHeatMap_encoding == HeatMap2D_e::GLYCOGEN_MAPPING)
             m_ssbo_data[hvgxID].info.setY( obj->getMappedValue() );
 
         switch(m_size_encoding) {
             case Size_e::VOLUME: {
-                float volume =  translate(obj->getVolume(), 0,
-                                          m_dataContainer->getMaxVolume(), 0, 1);
+
                 m_ssbo_data[hvgxID].info.setX( 20 *  volume);
                 break;
             }
@@ -2378,6 +2428,11 @@ void OpenGLManager::updateSSBO()
             }
             case Color_e::ASTRO_COVERAGE:
             {
+              // either waited or not
+              coverage = translate( coverage,
+                                       0, 1,
+                                       0, 0.7); // we dont want the color to go to black
+
               QVector4D color = obj->getColor();
               m_ssbo_data[hvgxID].color.setX(color.x() + 0.3 - coverage);
               m_ssbo_data[hvgxID].color.setY(color.y() + 0.3 - coverage);

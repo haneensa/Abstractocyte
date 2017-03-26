@@ -16,6 +16,7 @@ vec3  lightDir          = vec3(0.5, 0.0, -0.9);
 uniform sampler3D   splat_tex; //r=astro g=astro-mito b=neurite-mito
 uniform sampler3D   gly_tex;
 uniform ivec4     splat_flags;
+uniform sampler1D	gly_tf;
 
 float triangleArea(vec2 p1, vec2 p2, vec2 p3)
 {
@@ -24,8 +25,6 @@ float triangleArea(vec2 p1, vec2 p2, vec2 p3)
                         p3.x * (p1.y - p2.y));
     return abs(area);
 }
-
-vec4 pnk_color = vec4(0.27, 0.73, 0.25, 1.0);//glyco
 
 void main() {
     if (  hasMito == 1 && node2D_alpha == 0 )  {
@@ -60,23 +59,27 @@ void main() {
         }
 
         outcol = mix( node2d, node3d, node2D_alpha);
-    }
 
-    if (splat_flags.z > 0.0) {
-        float tex_splat = texture(splat_tex, G_fragTexCoord).g;
-        if (tex_splat > 0) {
-            vec4 mito_color = vec4(0.482f, 0.408f, 0.933f, 1);
-            outcol = mix(outcol, mito_color, tex_splat);
+        if ( node2D_alpha > 0 ) {
+            if (splat_flags.w > 0.0) {
+                float tex_splat = texture(splat_tex, G_fragTexCoord).g;
+                if (tex_splat > 0) {
+                    vec4 mito_color = vec4(0.482f, 0.408f, 0.933f, 1);
+                    outcol = mix(outcol, mito_color, tex_splat);
+                }
+            }
+
+            if (splat_flags.y > 0.0) {
+                float gly_splat = texture(gly_tex, G_fragTexCoord).r;
+                if (gly_splat > 0) {
+                    vec4 pnk_color = texture(gly_tf, gly_splat * 10.0);
+                    outcol =  mix( outcol, pnk_color,  gly_splat * 10.0);
+                }
+            }
         }
     }
 
-    if (splat_flags.y > 0.0) {
-        float gly_splat = texture(gly_tex, G_fragTexCoord).r;
-        if (gly_splat > 0) {
-            vec4 t_color =  mix(outcol, pnk_color, 1);
-            outcol =  t_color;
-        }
-    }
+
 
     outcol.a = alpha;
 }

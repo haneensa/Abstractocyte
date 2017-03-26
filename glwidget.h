@@ -70,6 +70,7 @@ public slots:
 
     void hideSelectedObjects();
     void getHVGXIDAtSelectedRow(int);
+    void togglWeightedAstroCoverage();
 
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);

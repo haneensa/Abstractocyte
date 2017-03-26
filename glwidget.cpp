@@ -749,3 +749,8 @@ void GLWidget::getHVGXIDAtSelectedRow(int ID)
     m_opengl_mngr->highlightObject(ID);
 
 }
+
+void GLWidget::togglWeightedAstroCoverage()
+{
+    m_opengl_mngr->toggleWeightedCoverage();
+}

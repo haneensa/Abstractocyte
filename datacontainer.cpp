@@ -41,7 +41,7 @@ DataContainer::DataContainer()
     qDebug() << "octree ready";
 
 
-    this->recomputeMaxValues();
+    this->recomputeMaxValues(false);
 }
 
 //----------------------------------------------------------------------------
@@ -71,7 +71,7 @@ void DataContainer::loadData()
     loadParentFromHVGX(hvgxFile);
 
 
-    m_limit = 200;
+    m_limit = 10000;
     m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
     m_load_data = LoadData_t::ALL;
     m_normals_t = Normals_t::LOAD_NORMAL;
@@ -1284,11 +1284,13 @@ std::vector<Object*> DataContainer::getObjectsByType(Object_t type)
 
  //----------------------------------------------------------------------------
  //
-void DataContainer::recomputeMaxValues()
+void DataContainer::recomputeMaxValues(bool weighted)
 {
-    float temp_max_astro_coverage = 0;
-    float temp_max_synapse_volume = 0;
-    int temp_max_volume = 1;
+    float temp_max_astro_coverage   = 0;
+    float temp_max_synapse_volume   = 0;
+    int temp_max_volume             = 1;
+    float weightByVolume = 1;
+
     for ( auto iter = m_objects.begin(); iter != m_objects.end(); iter++ ) {
         Object *obj = (*iter).second;
         if (obj->isFiltered() || obj->getObjectType() == Object_t::ASTROCYTE)
@@ -1304,12 +1306,16 @@ void DataContainer::recomputeMaxValues()
             }
         }
 
+        if (weighted) {
+            weightByVolume = obj->getVolume() / max_volume;
+        }
+
         if (temp_max_synapse_volume < obj->getSynapseSize())
             temp_max_synapse_volume = obj->getSynapseSize();
 
         // need to update these info whenever we filter or change the threshold
-        if (temp_max_astro_coverage < obj->getAstroCoverage())
-           temp_max_astro_coverage = obj->getAstroCoverage();
+        if (temp_max_astro_coverage < weightByVolume * obj->getAstroCoverage())
+           temp_max_astro_coverage =  weightByVolume * obj->getAstroCoverage();
 
         if (temp_max_volume < obj->getVolume())
             temp_max_volume = obj->getVolume();
