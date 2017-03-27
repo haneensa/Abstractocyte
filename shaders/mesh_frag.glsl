@@ -97,7 +97,7 @@ void main() {
 			color = pnk_color;
                 }
 		mix_color = mix(color, pur_color, splat.b * splat_flags.z);
-		color = mix_color;
+                color =  mix(mix_color, blu_color, splat.g * splat_flags.w);
 		break;
 	case SPINE:
 	case BOUTN:
