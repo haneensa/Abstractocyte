@@ -14,7 +14,7 @@ vec3  lightDir          = vec3(0.5, 0.0, -0.9);
 uniform sampler3D       splat_tex; //r=astro g=astro-mito b=neurite-mito
 uniform sampler3D       gly_tex;
 uniform ivec4           splat_flags;
-uniform sampler1D	gly_tf;
+uniform sampler1D		gly_tf;
 
 void main() {
     vec3 normal;
@@ -43,8 +43,8 @@ void main() {
     if (splat_flags.y > 0.0) {
         float gly_splat = texture(gly_tex, G_fragTexCoord).r;
         if (gly_splat > 0) {
-            vec4 pnk_color = texture(gly_tf, gly_splat * 10.0) * diffuse + S;
-            node3d =  mix(node3d, pnk_color, gly_splat * 10.0);
+            vec4 pnk_color = texture(gly_tf, gly_splat) * diffuse + S;
+			node3d = pnk_color;// mix(node3d, pnk_color, gly_splat * 10.0);
         }
     }
 
