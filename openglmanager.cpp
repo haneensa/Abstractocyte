@@ -2679,8 +2679,31 @@ std::vector<int> OpenGLManager::getSSBOFilterByProximity()
         // check if the distance if it satisfies the condition and the condition is selected
         // then filter it out
 
-        if ( astro_proximity * m_proximity_filter_flags.x() > m_min_proximity ||   gly_proximity * m_proximity_filter_flags.y() > m_min_proximity ||  astro_mito_proximity * m_proximity_filter_flags.z() > m_min_proximity) {
-            filtered_ids.push_back(hvgxID);
+        int sum =  m_proximity_filter_flags.x() + m_proximity_filter_flags.y() + m_proximity_filter_flags.z();
+
+        if (sum  == 3) {
+            if ( astro_proximity * m_proximity_filter_flags.x() > m_min_proximity
+                 &&   gly_proximity * m_proximity_filter_flags.y() > m_min_proximity
+                 &&  astro_mito_proximity * m_proximity_filter_flags.z() > m_min_proximity) {
+                filtered_ids.push_back(hvgxID);
+            }
+        } else if (sum == 2) {
+            if ( astro_proximity * m_proximity_filter_flags.x() > m_min_proximity
+                 &&   gly_proximity * m_proximity_filter_flags.y() > m_min_proximity) {
+                filtered_ids.push_back(hvgxID);
+            } else if ( astro_proximity * m_proximity_filter_flags.x() > m_min_proximity
+                          &&  astro_mito_proximity * m_proximity_filter_flags.z() > m_min_proximity) {
+                filtered_ids.push_back(hvgxID);
+            } else if ( gly_proximity * m_proximity_filter_flags.y() > m_min_proximity
+                          &&  astro_mito_proximity * m_proximity_filter_flags.z() > m_min_proximity) {
+                filtered_ids.push_back(hvgxID);
+            }
+        } else {
+            if ( astro_proximity * m_proximity_filter_flags.x() > m_min_proximity
+                 ||   gly_proximity * m_proximity_filter_flags.y() > m_min_proximity
+                 ||  astro_mito_proximity * m_proximity_filter_flags.z() > m_min_proximity) {
+                filtered_ids.push_back(hvgxID);
+            }
         }
 
     }
