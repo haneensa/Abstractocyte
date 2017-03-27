@@ -761,3 +761,36 @@ void GLWidget::getglycogenMappedSelectedState(QString ID_str, bool state)
     m_opengl_mngr->highlightObject(ID);
     m_opengl_mngr->recursiveFilter(ID, !state);
 }
+
+void GLWidget::getProximityTypeState(QString type, bool flag)
+{
+    int flag_value = (flag) ? 1: 0;
+    if (type == "Astrocyte") {
+        m_filterByProximityType.setX(flag_value);
+    } else if (type == "Glycogen") {
+        m_filterByProximityType.setY(flag_value);
+    } else if (type == "Astrocytic Mitochondria") {
+        m_filterByProximityType.setZ(flag_value);
+    }
+}
+
+void GLWidget::getFilteredListByProximity()
+{
+    m_opengl_mngr->updateFilterByProximityType(m_filterByProximityType);
+
+    qDebug() << "Insert in selected Objects";
+    std::vector<int> ssbo_filtered_by_proximity = m_opengl_mngr->getSSBOFilterByProximity();
+
+    for (int i = 0; i < ssbo_filtered_by_proximity.size(); ++i) {
+        int hvgxID = ssbo_filtered_by_proximity[i];
+        if (m_selectedObjects.find(hvgxID) == m_selectedObjects.end()) {
+            m_selectedObjects.insert(hvgxID);
+            insertInTable(hvgxID);
+        }
+    }
+}
+
+void GLWidget::updateMinProximity(double min)
+{
+    m_opengl_mngr->updateMinProximity(min);
+}

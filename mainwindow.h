@@ -4,6 +4,7 @@
 #include <QTreeWidgetItem>
 #include <QMainWindow>
 #include <QStandardItemModel>
+#include <QListWidgetItem>
 
 namespace Ui {
 class MainWindow;
@@ -62,6 +63,7 @@ public slots:
 
 	void on_specularLightCheckBox_toggled(bool checked);
 
+    void on_filterByProximityListWidget_itemChanged(QListWidgetItem *);
 signals:
     void getDeletedData(int);
     void getIDAtSelectedRow(int);
@@ -71,6 +73,7 @@ signals:
     void signalDeletedPathLabel(QString);
 
     void glycogenMappedSelectedState(QString, bool);
+    void signalProximityTypeState(QString, bool);
 
 private:
     Ui::MainWindow *mainwindow_ui;

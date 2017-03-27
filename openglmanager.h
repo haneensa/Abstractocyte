@@ -43,6 +43,8 @@ public:
     bool initSSBO();
     void write_ssbo_data();
 
+    bool initFilterSSBO();
+    void readFilterSSBO();
     // *********** 1) Mesh Triangles     ***********
     bool initMeshTrianglesShaders();
     bool initMeshVertexAttrib();
@@ -148,6 +150,10 @@ public:
 
     void toggleWeightedCoverage();
 
+    void updateFilterByProximityType(QVector3D);
+    std::vector<int> getSSBOFilterByProximity();
+    void updateMinProximity( double min);
+
 protected:
     DataContainer                           *m_dataContainer;
     AbstractionSpace                        *m_2dspace;
@@ -160,6 +166,14 @@ protected:
     std::vector<struct ssbo_mesh>           m_ssbo_data; // Color, Cenert, Type
     GLuint                                  m_ssbo;
     GLuint                                  m_bindIdx;
+
+    QVector4D                               *m_ssbo_filter_data;
+    GLuint                                  m_ssbo_filter;
+    GLuint                                  m_ssbo_filter_bindIdx;
+
+    bool                                    reset_ssbo;
+    QVector3D                               m_proximity_filter_flags;
+    double                                  m_min_proximity;
 
     // *********** 1) Mesh Triangles     ***********
     RenderVertexData                        m_TMesh;
@@ -188,7 +202,7 @@ protected:
     QOpenGLVertexArrayObject                m_vao_glycogen;
     QOpenGLBuffer                           m_vbo_glycogen;
 
-	bool								m_renderGlycogenGranules;
+    bool                                    m_renderGlycogenGranules;
     float                                   m_zoom;
 
 	// ********** Splatting ************************
