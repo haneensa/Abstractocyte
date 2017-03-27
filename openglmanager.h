@@ -154,6 +154,8 @@ public:
     std::vector<int> getSSBOFilterByProximity();
     void updateMinProximity( double min);
 
+     std::map<Object_t, std::pair<int, int>>  getObjectCountByType() { return m_visibleByType;}
+
 protected:
     DataContainer                           *m_dataContainer;
     AbstractionSpace                        *m_2dspace;
@@ -256,6 +258,8 @@ protected:
 	GLuint									m_tf_glycogen;
 
     bool                                    m_weighted_coverage;
+
+    std::map<Object_t, std::pair<int, int>> m_visibleByType; // <number of objects of this type, visible objects of this type>
  };
 
 #endif // OPENGLMANAGER_H

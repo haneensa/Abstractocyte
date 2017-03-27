@@ -50,6 +50,8 @@ public slots:
     void getIDAt(QModelIndex);
     void checkAllListWidget();
 
+    void checkByType(std::map<QString, int>);
+
     // Path Management
     void getPath(QString);
     void getSelectedPathIndex(QModelIndex);

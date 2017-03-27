@@ -27,6 +27,7 @@ public:
 
     int pickObject(QMouseEvent *event);
     void insertInTable(int);
+    void getToggleCheckBox(std::map<Object_t, std::pair<int, int>>);
 
 
 public slots:
@@ -77,6 +78,8 @@ public slots:
 
     void getFilteredListByProximity();
     void updateMinProximity(double);
+
+
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);
     void setHoveredID(int);
@@ -88,7 +91,7 @@ signals:
     void checkAllListWidget_GL();
     void updateFPS(QString);
     void updateFrameTime(QString);
-
+    void signalCheckByType(std::map<QString, int>);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
