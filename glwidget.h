@@ -28,6 +28,7 @@ public:
     int pickObject(QMouseEvent *event);
     void insertInTable(int);
 
+
 public slots:
     void getSliderX(int value);
     void getSliderY(int value);
@@ -72,7 +73,10 @@ public slots:
     void getHVGXIDAtSelectedRow(int);
     void togglWeightedAstroCoverage();
     void getglycogenMappedSelectedState(QString, bool);
+    void getProximityTypeState(QString, bool);
 
+    void getFilteredListByProximity();
+    void updateMinProximity(double);
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);
     void setHoveredID(int);
@@ -149,6 +153,8 @@ protected:
     int                                 m_active_graph_tab;
 
     PerformanceRate                     m_performaceMeasure;
+
+    QVector3D                           m_filterByProximityType;
 
 };
 

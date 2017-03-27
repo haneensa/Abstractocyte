@@ -71,7 +71,7 @@ void DataContainer::loadData()
     loadParentFromHVGX(hvgxFile);
 
 
-    m_limit = 20;
+    m_limit = 10;
 
     m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
     m_load_data = LoadData_t::ALL;
@@ -112,7 +112,9 @@ void DataContainer::loadData()
 
     } else {
         if (m_load_data == LoadData_t::ASTRO) {
-            importXML("://pipeline_scripts/output/m3_astrocyte.xml");   // 155,266  ms ~ 2.6 min
+           importXML("://pipeline_scripts/output/m3_astrocyte.xml");   // 155,266  ms ~ 2.6 min
+           // importXML("://pipeline_scripts_mouse4/output/m4_astrocyte.xml");   // 155,266  ms ~ 2.6 min
+
         } else if (m_load_data == LoadData_t::NEURITES) {
             importXML("://pipeline_scripts/output/m3_neurites.xml");    // 910741
         } else if (m_load_data == LoadData_t::ALL) {

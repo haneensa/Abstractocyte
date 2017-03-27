@@ -73,7 +73,8 @@ void main() {
     for (int i = 0; i < 3; i++) {
         normal_out = V_normal[i].rgb;
         int ID = V_ID[i];
-        G_ID = float(ID);
+        G_ID =  float(ID);
+
 
         int filter_value = int(SSBO_data[ID].info.w);
 

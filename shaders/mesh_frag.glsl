@@ -16,6 +16,8 @@ in vec4         color_val;
 in vec3			vposition;
 in vec3			eye;
 flat in int		otype;
+in float             G_ID;
+
 layout (location = 0) out vec4        outcol;
 // textures
 uniform sampler3D   splat_tex; //r=astro g=astro-mito b=neurite-mito
@@ -25,6 +27,14 @@ uniform sampler1D	gly_tf;
 uniform ivec4     splat_flags;
 uniform int		  specular_flag;
 in vec3             G_fragTexCoord;
+uniform int         reset_filter_ssbo;
+
+layout (std430, binding=4) buffer filter_data
+{
+    vec4 objects_list_filter[];
+};
+
+
 //-------------------- DIFFUSE LIGHT PROPERTIES --------------------
 vec3 diffuseLightDirection = vec3(-2.5f, -2.5f, -0.9f);
 vec3 lightDir2 = vec3(2.5f, 2.5f, 1.0f);
@@ -68,6 +78,7 @@ void main() {
 	vec4 mix_color = vec4(1.0, 0.0, 0.0, 1.0);
 	vec3 splat = vec3(0.0);
 	vec3 splat2 = vec3(0.0);
+
 	if (length(splat_flags.xzw) > 0.0)
 	{
 		splat = getSplattedTexture3(splat_tex, G_fragTexCoord, vec3(0.001, 0.001, 0.002));
@@ -78,13 +89,13 @@ void main() {
 	}
 	switch (otype)
 	{
-	case ASTRO:
+        case ASTRO:
 		if (splat_flags.y > 0.0)
 		{
 			pnk_color = texture(gly_tf, splat2.r * 3.0);
 			//mix_color = mix(color, pnk_color, pnk_color.a * splat_flags.y);// *8.0);
 			color = pnk_color;
-		}
+                }
 		mix_color = mix(color, pur_color, splat.b * splat_flags.z);
 		color = mix_color;
 		break;
@@ -92,7 +103,8 @@ void main() {
 	case BOUTN:
 	case SYNPS:
 		mix_color = mix(color, pnk_color, splat2.r * splat_flags.y * 3.0);
-		color = mix_color;
+                color = mix_color;
+
 	case AXONS:
 	case DENDS:
 		mix_color = mix(color, red_color, splat.r * splat_flags.x);
@@ -101,6 +113,12 @@ void main() {
 		color = mix_color;
 		break;
 	}
+
+        if (reset_filter_ssbo > 0) { // write into ssbo
+            objects_list_filter[int(G_ID)].x =  max( splat.r, objects_list_filter[int(G_ID)].x );
+            objects_list_filter[int(G_ID)].y =  max( splat2.r * 3.0, objects_list_filter[int(G_ID)].y );
+            objects_list_filter[int(G_ID)].z =  max( splat.g, objects_list_filter[int(G_ID)].z );
+        }
 
 	vec4 toon_color = vec4(color.rgb, 1.0);
 	vec4 diffuse_color = max((color * cosTheta2), (color * cosTheta));

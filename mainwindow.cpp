@@ -65,6 +65,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(this, SIGNAL(glycogenMappedSelectedState(QString, bool)),
                      getGLWidget(), SLOT(getglycogenMappedSelectedState(QString, bool)));
 
+    QObject::connect(this, SIGNAL(signalProximityTypeState(QString, bool)),
+                     getGLWidget(), SLOT(getProximityTypeState(QString, bool)));
+
 
  }
 
@@ -453,4 +456,13 @@ void  MainWindow::on_glycogenMappingTreeWidget_itemChanged(QTreeWidgetItem* item
 
    QString ID_str = item->text(0); // highlighted immediately
    glycogenMappedSelectedState(ID_str, state);
+}
+
+void MainWindow::on_filterByProximityListWidget_itemChanged(QListWidgetItem *item)
+{
+    bool flag = true;
+    if ( item->checkState() == Qt::Unchecked )
+        flag = false;
+
+    signalProximityTypeState( item->text() ,flag );
 }

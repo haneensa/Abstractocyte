@@ -2,7 +2,8 @@
 
 OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpace)
     : m_2D(false),
-      m_bindIdx(2) // ssbo biding point
+      m_bindIdx(2),
+      m_ssbo_filter_bindIdx(4)
 {
     m_dataContainer = obj_mnger;
     m_2dspace = absSpace;
@@ -35,6 +36,9 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
     m_2DHeatMap_encoding = HeatMap2D_e::ASTRO_COVERAGE;
 
     m_weighted_coverage = false;
+
+    reset_ssbo = true;
+    m_min_proximity = 0.0;
 }
 
 // ----------------------------------------------------------------------------
@@ -62,6 +66,16 @@ void OpenGLManager::drawAll()
     renderSelection();
 
     drawNodesInto2DTexture();
+
+    if (reset_ssbo) {
+        glFlush();
+        glFinish();
+        reset_ssbo = false;
+
+        // read the output from ssbo
+        // then reset ssbo to 0
+        readFilterSSBO();
+    }
  }
 
 // ############## Data Initialization ###############################################
@@ -112,6 +126,8 @@ bool OpenGLManager::initOpenGLFunctions()
     initAbstractSkeletonShaders();
     initNeuritesGraphShaders();
     initGlycogenPointsShaders();
+
+    initFilterSSBO();
 
     return true;
 }
@@ -183,6 +199,45 @@ void OpenGLManager::write_ssbo_data()
     GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
     memcpy(p,   m_ssbo_data.data(),  bufferSize);
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+}
+
+// ----------------------------------------------------------------------------
+//
+bool OpenGLManager::initFilterSSBO()
+{
+    if (m_glFunctionsSet == false)
+        return false;
+
+    int bufferSize =  m_ssbo_data.size() * sizeof(m_ssbo_filter_data);
+
+    glGenBuffers(1, &m_ssbo_filter);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo_filter);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize , NULL, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_ssbo_filter_bindIdx, m_ssbo_filter);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+//    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo_filter);
+//    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_WRITE);
+//    memcpy(p,   m_ssbo_filter_data.data(),  bufferSize);
+//    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+//    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    return true;
+}
+
+// ----------------------------------------------------------------------------
+//
+void OpenGLManager::readFilterSSBO()
+{
+    // this would be only once
+    qDebug() << "read ssbo";
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo_filter);
+    int bufferSize =  m_ssbo_data.size() * sizeof(m_ssbo_filter_data);
+    QVector4D* p = (QVector4D*)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_WRITE);
+    m_ssbo_filter_data =  (QVector4D*)calloc( m_ssbo_data.size() , sizeof(QVector4D) );
+    memcpy(m_ssbo_filter_data,  p,  bufferSize);
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -1384,6 +1439,9 @@ void OpenGLManager::updateMeshPrograms(GLuint program)
 
 	int specular_flag = glGetUniformLocation(program, "specular_flag");
 	if (specular_flag >= 0) glUniform1i(specular_flag, (m_is_specular) ? 1 : 0);
+
+    int reset_filter_ssbo = glGetUniformLocation(program, "reset_filter_ssbo");
+    if (reset_filter_ssbo >= 0) glUniform1i(reset_filter_ssbo, (reset_ssbo) ? 1 : 0);
 
     GL_Error();
 }
@@ -2592,4 +2650,45 @@ void OpenGLManager::highlightObject(int hvgxID)
     }
 
     m_hoveredID = hvgxID;
+}
+
+void OpenGLManager::updateFilterByProximityType(QVector3D filterByProximityType)
+{
+    m_proximity_filter_flags = filterByProximityType;
+}
+
+std::vector<int> OpenGLManager::getSSBOFilterByProximity()
+{
+    std::vector<int> filtered_ids;
+    // iterate over
+    std::map<int, Object*> *objectMap = m_dataContainer->getObjectsMapPtr();
+    for ( auto iter = objectMap->begin(); iter != objectMap->end(); iter++ ) {
+        Object *obj = (*iter).second;
+        //if (obj->isFiltered())
+        //    continue;
+
+        int hvgxID = obj->getHVGXID();
+        if (m_ssbo_data.size() <= hvgxID)
+            continue;
+
+        float astro_proximity = m_ssbo_filter_data[hvgxID].x();
+        float gly_proximity = m_ssbo_filter_data[hvgxID].y();
+        float astro_mito_proximity = m_ssbo_filter_data[hvgxID].z();
+
+        // filter by distance, get the ID
+        // check if the distance if it satisfies the condition and the condition is selected
+        // then filter it out
+
+        if ( astro_proximity * m_proximity_filter_flags.x() > m_min_proximity ||   gly_proximity * m_proximity_filter_flags.y() > m_min_proximity ||  astro_mito_proximity * m_proximity_filter_flags.z() > m_min_proximity) {
+            filtered_ids.push_back(hvgxID);
+        }
+
+    }
+
+    return filtered_ids;
+}
+
+void OpenGLManager::updateMinProximity( double min)
+{
+    m_min_proximity = min;
 }
