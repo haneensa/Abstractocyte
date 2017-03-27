@@ -73,7 +73,8 @@ MainWindow::MainWindow(QWidget *parent) :
                      this, SLOT(checkByType(std::map<QString, int>)));
 
 
-
+    QObject::connect(this, SIGNAL(signalMappingTreeWidget(QTreeWidget *)),
+                     getGLWidget(), SLOT(getMappingTreeWidget(QTreeWidget *)));
  }
 
 //------------------------------------------------------
@@ -142,6 +143,9 @@ void MainWindow::checkByType(std::map<QString, int> checkStateByType)
     }
 
     mainwindow_ui->listWidget->blockSignals(oldState);
+
+    // SEND THIS LSIT WIDGET TO GLWIDGET
+     signalMappingTreeWidget(mainwindow_ui->glycogenMappingTreeWidget);
 }
 
 //------------------------------------------------------
@@ -491,4 +495,9 @@ void MainWindow::on_filterByProximityListWidget_itemChanged(QListWidgetItem *ite
         flag = false;
 
     signalProximityTypeState( item->text() ,flag );
+}
+
+void MainWindow::on_listWidget_itemChanged(QListWidgetItem *)
+{
+   signalMappingTreeWidget(mainwindow_ui->glycogenMappingTreeWidget);
 }

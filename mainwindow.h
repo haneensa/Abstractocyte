@@ -66,6 +66,9 @@ public slots:
 	void on_specularLightCheckBox_toggled(bool checked);
 
     void on_filterByProximityListWidget_itemChanged(QListWidgetItem *);
+
+    void on_listWidget_itemChanged(QListWidgetItem *);
+
 signals:
     void getDeletedData(int);
     void getIDAtSelectedRow(int);
@@ -76,6 +79,7 @@ signals:
 
     void glycogenMappedSelectedState(QString, bool);
     void signalProximityTypeState(QString, bool);
+    void signalMappingTreeWidget(QTreeWidget *);
 
 private:
     Ui::MainWindow *mainwindow_ui;

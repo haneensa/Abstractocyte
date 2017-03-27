@@ -859,3 +859,37 @@ void GLWidget::getToggleCheckBox(std::map<Object_t, std::pair<int, int>> visibil
     signalCheckByType(checkBoxByType);
 
 }
+
+// GET THE WIDGET LIST FROM MAIN WINDOW
+// CALL ANOTHER FUNCTINO TO HANDLE THAT
+
+// mapping and fitlering
+// take the whole mapping
+// iterate over the objects
+// get their type
+// check if they should be checked or not
+void GLWidget::getMappingTreeWidget(QTreeWidget * treeWidget)
+{
+    qDebug() << "getListWidget" << treeWidget->topLevelItemCount();
+    std::map<int, Object*> *objectMap = m_data_containter->getObjectsMapPtr();
+
+    // iterate over these
+    // use ID to get type of object
+    // for each check in the visibilityMapByType
+
+    QTreeWidgetItemIterator it(treeWidget);
+    while (*it) {
+      QString ID_str = ((*it)->text(0));
+      int ID = ID_str.toInt();
+      if ( objectMap->find(ID) != objectMap->end() ) {
+           Object *obj = objectMap->at(ID);
+           qDebug() << obj->getName().data();
+           if (obj->isFiltered() )
+            (*it)->setCheckState(0, Qt::Unchecked);
+           else
+               (*it)->setCheckState(0, Qt::Checked);
+      }
+      ++it;
+    }
+
+}

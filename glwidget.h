@@ -79,6 +79,7 @@ public slots:
     void getFilteredListByProximity();
     void updateMinProximity(double);
 
+    void getMappingTreeWidget(QTreeWidget *);
 
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);
