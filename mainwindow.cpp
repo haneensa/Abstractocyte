@@ -69,8 +69,8 @@ MainWindow::MainWindow(QWidget *parent) :
                      getGLWidget(), SLOT(getProximityTypeState(QString, bool)));
 
 
-    QObject::connect(getGLWidget(), SIGNAL(signalCheckByType(QString, bool)),
-                     this, SLOT(checkByType(QString, bool)));
+    QObject::connect(getGLWidget(), SIGNAL(signalCheckByType(std::map<QString, int>)),
+                     this, SLOT(checkByType(std::map<QString, int>)));
 
 
 
@@ -124,20 +124,24 @@ void MainWindow::checkAllListWidget()
     }
 }
 
-void MainWindow::checkByType(QString obj_type, bool flag)
+void MainWindow::checkByType(std::map<QString, int> checkStateByType)
 {
+    bool oldState =  mainwindow_ui->listWidget->blockSignals(true);
+
     for (int row = 0; row < mainwindow_ui->listWidget->count(); row++) {
         QListWidgetItem *item = mainwindow_ui->listWidget->item(row);
-        if ( item->text() == obj_type) {
-            if (flag) {
-                item->setCheckState(Qt::Checked);
-                qDebug() << "check " << obj_type;
-            } else {
-                item->setCheckState(Qt::Unchecked);
-                qDebug() << "uncheck " << obj_type;
-            }
+        int flag = checkStateByType[item->text()];
+
+        if (flag == 0) {
+            item->setCheckState(Qt::Unchecked);
+        } else if (flag == 1) {
+            item->setCheckState(Qt::Checked);
+        } else {
+            item->setCheckState(Qt::PartiallyChecked);
         }
     }
+
+    mainwindow_ui->listWidget->blockSignals(oldState);
 }
 
 //------------------------------------------------------

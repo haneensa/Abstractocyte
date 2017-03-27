@@ -52,6 +52,7 @@ GLWidget::GLWidget(QWidget *parent)
 
     m_active_graph_tab = 0;
     setFocusPolicy(Qt::StrongFocus);
+    m_hide_toggle = false;
 
 }
 
@@ -533,7 +534,6 @@ void GLWidget::getGraphoriginalPosAttraction(double value)
 //
 void GLWidget::getFilteredID(QString value)
 {
-    qDebug() << "Filter: " << value;
     if (m_opengl_mngr == NULL)
         return;
     // check if there are more than one ID
@@ -646,9 +646,14 @@ void GLWidget::get2DtextureEncoding(QString encoding)
 void GLWidget::getItemChanged(QListWidgetItem* item)
 {
     Qt::CheckState state =  item->checkState();
-    bool flag = false;
+    bool flag;
     if (state == Qt::Unchecked) // do filter them from view
         flag = true;
+    else if (state == Qt::Checked) {
+        flag = false;
+    } else {
+        return;
+    }
 
 
    getFilteredType( item->text(), flag);
@@ -660,7 +665,6 @@ void GLWidget::getItemChanged(QListWidgetItem* item)
 //
 void GLWidget::getFilteredType(QString value, bool flag)
 {
-    qDebug() << "Filter: " << value << " " << flag;
     if (m_opengl_mngr == NULL)
         return;
 
@@ -748,14 +752,11 @@ void GLWidget::hideSelectedObjects()
 
 void GLWidget::highlightSelected(QModelIndex index)
 {
-    // signal to get the ID of selected object
-    qDebug() << "highlightSelected";
     GetIDFrom(index);
 }
 
 void GLWidget::getHVGXIDAtSelectedRow(int ID)
 {
-    qDebug() << "** " << ID;
     m_opengl_mngr->highlightObject(ID);
 
 }
@@ -812,13 +813,16 @@ void GLWidget::updateMinProximity(double min)
 
 void GLWidget::getToggleCheckBox(std::map<Object_t, std::pair<int, int>> visibilityUpdate)
 {
+    std::map<QString, int> checkBoxByType;
     for (auto iter = visibilityUpdate.begin(); iter != visibilityUpdate.end(); iter++ ) {
         Object_t obj_type = (*iter).first;
         std::pair<int, int> counts_pair =  (*iter).second;
+
         QString obj_typeName;
+        int flag;
 
         switch(obj_type) {
-            case Object_t::ASTROCYTE:
+            case Object_t::ASTROCYTE: // 0
                 obj_typeName = "Astrocyte";
             break;
             case Object_t::SPINE:
@@ -834,7 +838,7 @@ void GLWidget::getToggleCheckBox(std::map<Object_t, std::pair<int, int>> visibil
                 obj_typeName = "Boutons";
             break;
             case Object_t::MITO:
-                obj_typeName = "Mitochonderia";
+                obj_typeName = "Mitochondria";
             break;
             case Object_t::SYNAPSE:
                 obj_typeName = "Synapse";
@@ -842,8 +846,16 @@ void GLWidget::getToggleCheckBox(std::map<Object_t, std::pair<int, int>> visibil
         }
 
         if (counts_pair.second <= 0)
-            signalCheckByType(obj_typeName, false);
+            flag = 0; // not checked
+        else if (counts_pair.second == counts_pair.first)
+            flag = 1; // full
         else
-            signalCheckByType(obj_typeName, true);
+            flag = 2; // half
+
+
+        checkBoxByType[obj_typeName] = flag;
     }
+
+    signalCheckByType(checkBoxByType);
+
 }

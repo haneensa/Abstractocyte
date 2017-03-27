@@ -91,7 +91,7 @@ signals:
     void checkAllListWidget_GL();
     void updateFPS(QString);
     void updateFrameTime(QString);
-    void signalCheckByType(QString, bool);
+    void signalCheckByType(std::map<QString, int>);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
