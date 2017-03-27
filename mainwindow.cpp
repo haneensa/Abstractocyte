@@ -69,6 +69,11 @@ MainWindow::MainWindow(QWidget *parent) :
                      getGLWidget(), SLOT(getProximityTypeState(QString, bool)));
 
 
+    QObject::connect(getGLWidget(), SIGNAL(signalCheckByType(QString, bool)),
+                     this, SLOT(checkByType(QString, bool)));
+
+
+
  }
 
 //------------------------------------------------------
@@ -114,7 +119,24 @@ void MainWindow::checkAllListWidget()
     qDebug() << "checkAllListWidget";
     for (int row = 0; row < mainwindow_ui->listWidget->count(); row++) {
         QListWidgetItem *item = mainwindow_ui->listWidget->item(row);
+        qDebug() << item->text();
         item->setCheckState(Qt::Checked);
+    }
+}
+
+void MainWindow::checkByType(QString obj_type, bool flag)
+{
+    for (int row = 0; row < mainwindow_ui->listWidget->count(); row++) {
+        QListWidgetItem *item = mainwindow_ui->listWidget->item(row);
+        if ( item->text() == obj_type) {
+            if (flag) {
+                item->setCheckState(Qt::Checked);
+                qDebug() << "check " << obj_type;
+            } else {
+                item->setCheckState(Qt::Unchecked);
+                qDebug() << "uncheck " << obj_type;
+            }
+        }
     }
 }
 

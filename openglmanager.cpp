@@ -215,13 +215,6 @@ bool OpenGLManager::initFilterSSBO()
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufferSize , NULL, GL_DYNAMIC_COPY);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, m_ssbo_filter_bindIdx, m_ssbo_filter);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-//    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo_filter);
-//    GLvoid* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_WRITE);
-//    memcpy(p,   m_ssbo_filter_data.data(),  bufferSize);
-//    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-//    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
     return true;
 }
 
@@ -257,6 +250,12 @@ void OpenGLManager::fillSSBO(Object *object_p)
     m_ssbo_data[ID].info.setX( 20 *  volume);
     m_ssbo_data[ID].info.setY( object_p->getAstroCoverage() / m_dataContainer->getMaxAstroCoverage() );
 
+    if (m_visibleByType.find( object_p->getObjectType() ) == m_visibleByType.end() )
+        m_visibleByType[ object_p->getObjectType() ]  = std::make_pair(1, 1);
+    else {
+         m_visibleByType[ object_p->getObjectType() ].first++;
+         m_visibleByType[ object_p->getObjectType() ].second++;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -2161,10 +2160,16 @@ void OpenGLManager::FilterObject(int ID, bool isfilterd)
 
     int visibility = m_ssbo_data[ID].info.w();
 
-    if (isfilterd) {
-        visibility |= 1 << 0;
+    if (isfilterd) { // means invisible
+        if (visibility != 1) {
+            visibility  = 1;
+            m_visibleByType[ obj->getObjectType() ].second--;
+        }
     } else {
-        visibility &= ~(1 << 0);
+        if (visibility != 0) {
+            visibility = 0;
+            m_visibleByType[ obj->getObjectType() ].second++;
+        }
     }
 
     m_ssbo_data[ID].info.setW(visibility);

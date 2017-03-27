@@ -52,6 +52,7 @@ GLWidget::GLWidget(QWidget *parent)
 
     m_active_graph_tab = 0;
     setFocusPolicy(Qt::StrongFocus);
+
 }
 
 GLWidget::~GLWidget()
@@ -546,6 +547,9 @@ void GLWidget::getFilteredID(QString value)
 
     // start force layout
     m_rotation_timer->start(0);
+    //  check whatever needed to be updated in the checkbox
+    std::map<Object_t, std::pair<int, int>> visibilityUpdate = m_opengl_mngr->getObjectCountByType();
+    this->getToggleCheckBox(visibilityUpdate);
 
     update();
 }
@@ -683,7 +687,6 @@ void GLWidget::getFilteredType(QString value, bool flag)
     // start force layout
     m_rotation_timer->start(0);
 
-
     update();
 }
 
@@ -707,6 +710,10 @@ void GLWidget::getFitlerButtonClicked(bool)
 {
     bool invisibility = false; // meaning not filtered (visible)
     m_opengl_mngr->FilterByID(m_selectedObjects, invisibility);
+    //  check whatever needed to be updated in the checkbox
+    std::map<Object_t, std::pair<int, int>> visibilityUpdate = m_opengl_mngr->getObjectCountByType();
+    this->getToggleCheckBox(visibilityUpdate);
+
     update();
 }
 
@@ -733,6 +740,9 @@ void GLWidget::hideSelectedObjects()
 {
     m_hide_toggle = !m_hide_toggle;
     m_opengl_mngr->VisibilityToggleSelectedObjects(m_selectedObjects, m_hide_toggle);
+    //  check whatever needed to be updated in the checkbox
+    std::map<Object_t, std::pair<int, int>> visibilityUpdate = m_opengl_mngr->getObjectCountByType();
+    this->getToggleCheckBox(visibilityUpdate);
     update();
 }
 
@@ -759,7 +769,12 @@ void GLWidget::getglycogenMappedSelectedState(QString ID_str, bool state)
 {
     int ID = ID_str.toInt();
     m_opengl_mngr->highlightObject(ID);
-    m_opengl_mngr->recursiveFilter(ID, !state);
+    std::set<int> obj_set;
+    obj_set.insert(ID);
+    m_opengl_mngr->VisibilityToggleSelectedObjects(obj_set, !state);
+    //  check whatever needed to be updated in the checkbox
+    std::map<Object_t, std::pair<int, int>> visibilityUpdate = m_opengl_mngr->getObjectCountByType();
+    this->getToggleCheckBox(visibilityUpdate);
 }
 
 void GLWidget::getProximityTypeState(QString type, bool flag)
@@ -793,4 +808,42 @@ void GLWidget::getFilteredListByProximity()
 void GLWidget::updateMinProximity(double min)
 {
     m_opengl_mngr->updateMinProximity(min);
+}
+
+void GLWidget::getToggleCheckBox(std::map<Object_t, std::pair<int, int>> visibilityUpdate)
+{
+    for (auto iter = visibilityUpdate.begin(); iter != visibilityUpdate.end(); iter++ ) {
+        Object_t obj_type = (*iter).first;
+        std::pair<int, int> counts_pair =  (*iter).second;
+        QString obj_typeName;
+
+        switch(obj_type) {
+            case Object_t::ASTROCYTE:
+                obj_typeName = "Astrocyte";
+            break;
+            case Object_t::SPINE:
+                obj_typeName = "Spines";
+            break;
+            case Object_t::DENDRITE:
+                obj_typeName = "Dendrites";
+            break;
+            case Object_t::AXON:
+                obj_typeName = "Axons";
+            break;
+            case Object_t::BOUTON:
+                obj_typeName = "Boutons";
+            break;
+            case Object_t::MITO:
+                obj_typeName = "Mitochonderia";
+            break;
+            case Object_t::SYNAPSE:
+                obj_typeName = "Synapse";
+            break;
+        }
+
+        if (counts_pair.second <= 0)
+            signalCheckByType(obj_typeName, false);
+        else
+            signalCheckByType(obj_typeName, true);
+    }
 }

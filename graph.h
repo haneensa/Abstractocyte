@@ -147,14 +147,6 @@ public:
     void updateNode(Node *node);
     void updateUniforms(struct GlobalUniforms uniforms) {m_uniforms = uniforms;}
 
-    void updateGraphParam1(double value);
-    void updateGraphParam2(double value);
-    void updateGraphParam3(double value);
-    void updateGraphParam4(double value);
-    void updateGraphParam5(double value);
-    void updateGraphParam6(double value);
-    void updateGraphParam7(double value);
-
 
     // GEM
     void GEM_initParameters();
