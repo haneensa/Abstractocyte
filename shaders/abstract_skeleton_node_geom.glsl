@@ -66,7 +66,7 @@ void main() {
 
     int type = int(SSBO_data[ID].center.w); // 0: astrocyte, 1: neurite
 
-    if (SSBO_data[ID].color.w == 1.0 && (type == spine || type == bouton))
+    if (SSBO_data[ID].color.w == 1.0)
         hasMito = 1;
     else
         hasMito = 0;
