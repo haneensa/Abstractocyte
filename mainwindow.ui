@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1472</width>
-    <height>1520</height>
+    <width>1600</width>
+    <height>1600</height>
    </rect>
   </property>
   <property name="cursor">
@@ -32,7 +32,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1472</width>
+     <width>1600</width>
      <height>31</height>
     </rect>
    </property>
@@ -47,7 +47,7 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>575</width>
+     <width>599</width>
      <height>1465</height>
     </size>
    </property>
@@ -623,7 +623,7 @@
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>0</number>
        </property>
        <property name="tabsClosable">
         <bool>false</bool>
@@ -981,92 +981,87 @@
           </widget>
          </item>
          <item>
-          <widget class="QToolBox" name="toolBox">
-           <property name="autoFillBackground">
-            <bool>false</bool>
-           </property>
+          <widget class="QTabWidget" name="tabWidget_2">
            <property name="currentIndex">
-            <number>1</number>
+            <number>0</number>
            </property>
-           <widget class="QWidget" name="page">
-            <property name="geometry">
-             <rect>
-              <x>0</x>
-              <y>0</y>
-              <width>575</width>
-              <height>800</height>
-             </rect>
-            </property>
-            <property name="autoFillBackground">
-             <bool>false</bool>
-            </property>
-            <attribute name="label">
+           <widget class="QWidget" name="tab_8">
+            <attribute name="title">
              <string>Clustering</string>
             </attribute>
-            <layout class="QVBoxLayout" name="verticalLayout">
-             <property name="spacing">
-              <number>4</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
+            <layout class="QVBoxLayout" name="verticalLayout_22">
              <item>
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string>Neighborhood Distance ɛ</string>
+              <widget class="QGroupBox" name="groupBox_19">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>150</height>
+                </size>
                </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="epsDoubleSpinBox">
-               <property name="decimals">
-                <number>3</number>
+               <property name="title">
+                <string>Parameters</string>
                </property>
-               <property name="maximum">
-                <double>1.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.001000000000000</double>
-               </property>
-               <property name="value">
-                <double>0.060000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_13">
-               <property name="text">
-                <string>Minimum Points in a Cluster</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSpinBox" name="minPtsSpinBox">
-               <property name="minimum">
-                <number>2</number>
-               </property>
-               <property name="maximum">
-                <number>1000</number>
-               </property>
-               <property name="value">
-                <number>3</number>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="clusterButton">
-               <property name="text">
-                <string>Cluster</string>
-               </property>
+               <layout class="QFormLayout" name="formLayout_7">
+                <property name="verticalSpacing">
+                 <number>4</number>
+                </property>
+                <property name="rightMargin">
+                 <number>10</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>10</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>Neighborhood Distance ɛ</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QDoubleSpinBox" name="epsDoubleSpinBox">
+                  <property name="decimals">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <double>1.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.001000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>0.060000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_13">
+                  <property name="text">
+                   <string>Minimum Points in a Cluster</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QSpinBox" name="minPtsSpinBox">
+                  <property name="minimum">
+                   <number>2</number>
+                  </property>
+                  <property name="maximum">
+                   <number>1000</number>
+                  </property>
+                  <property name="value">
+                   <number>3</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QPushButton" name="clusterButton">
+                  <property name="text">
+                   <string>Cluster</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
              <item>
@@ -1099,31 +1094,11 @@
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="page_2">
-            <property name="geometry">
-             <rect>
-              <x>0</x>
-              <y>0</y>
-              <width>575</width>
-              <height>800</height>
-             </rect>
-            </property>
-            <property name="autoFillBackground">
-             <bool>false</bool>
-            </property>
-            <attribute name="label">
+           <widget class="QWidget" name="tab_7">
+            <attribute name="title">
              <string>Mapping</string>
             </attribute>
-            <layout class="QVBoxLayout" name="verticalLayout_3">
-             <property name="spacing">
-              <number>4</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
+            <layout class="QVBoxLayout" name="verticalLayout_20">
              <item>
               <widget class="QWidget" name="widget" native="true">
                <layout class="QHBoxLayout" name="horizontalLayout">
@@ -2518,8 +2493,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>557</width>
-              <height>701</height>
+              <width>343</width>
+              <height>588</height>
              </rect>
             </property>
             <attribute name="label">
