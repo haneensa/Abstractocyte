@@ -785,7 +785,7 @@ void GLWidget::getProximityTypeState(QString type, bool flag)
         m_filterByProximityType.setX(flag_value);
     } else if (type == "Glycogen") {
         m_filterByProximityType.setY(flag_value);
-    } else if (type == "Astrocytic Mitochondria") {
+    } else if (type == "Astro. Mitochondria") {
         m_filterByProximityType.setZ(flag_value);
     }
 }
