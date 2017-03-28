@@ -156,6 +156,8 @@ public:
 
      std::map<Object_t, std::pair<int, int>>  getObjectCountByType() { return m_visibleByType;}
 
+     void updateFilteredData();
+
 protected:
     DataContainer                           *m_dataContainer;
     AbstractionSpace                        *m_2dspace;

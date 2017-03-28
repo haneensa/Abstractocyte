@@ -2189,9 +2189,8 @@ void OpenGLManager::FilterByType(Object_t type, bool flag)
         FilterObject(hvgxID, flag);
 
     }
-    m_dataContainer->recomputeMaxValues(false);
-    if (m_weighted_coverage)     m_dataContainer->recomputeMaxValues(m_weighted_coverage);
-    updateSSBO();
+
+    updateFilteredData();
 }
 
 
@@ -2214,9 +2213,7 @@ void OpenGLManager::FilterByID( QList<QString> tokens_Ids, bool invisibility )
         recursiveFilter(hvgxID, invisibility);
     }
 
-    m_dataContainer->recomputeMaxValues(false);
-    if (m_weighted_coverage)     m_dataContainer->recomputeMaxValues(m_weighted_coverage);
-    updateSSBO();
+    updateFilteredData();
 }
 
 // ----------------------------------------------------------------------------
@@ -2239,11 +2236,15 @@ void OpenGLManager::FilterByID( std::set<int> tokens_Ids, bool invisibility )
 
     }
 
+    updateFilteredData();
+}
+
+void  OpenGLManager::updateFilteredData()
+{
     m_dataContainer->recomputeMaxValues(false);
     if (m_weighted_coverage)     m_dataContainer->recomputeMaxValues(m_weighted_coverage);
     updateSSBO();
 }
-
 
 // ----------------------------------------------------------------------------
 //
@@ -2258,10 +2259,8 @@ void OpenGLManager::VisibilityToggleSelectedObjects( std::set<int> tokens_Ids, b
 
     }
 
-    m_dataContainer->recomputeMaxValues(false);
-    if (m_weighted_coverage)     m_dataContainer->recomputeMaxValues(m_weighted_coverage);
-    updateSSBO();}
-
+   updateFilteredData();
+}
 
 // ----------------------------------------------------------------------------
 //
@@ -2272,9 +2271,7 @@ void OpenGLManager::showAll()
         FilterObject(i, false);
     }
 
-    m_dataContainer->recomputeMaxValues(false);
-    if (m_weighted_coverage)     m_dataContainer->recomputeMaxValues(m_weighted_coverage);
-    updateSSBO();
+    updateFilteredData();
 }
 
 void OpenGLManager::toggleWeightedCoverage()
