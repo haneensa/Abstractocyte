@@ -47,7 +47,7 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>512</width>
+     <width>575</width>
      <height>1465</height>
     </size>
    </property>
@@ -127,6 +127,12 @@
              </property>
              <item>
               <widget class="QFrame" name="frame_50">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>18</height>
+                </size>
+               </property>
                <property name="maximumSize">
                 <size>
                  <width>16777215</width>
@@ -154,6 +160,12 @@
                 </property>
                 <item row="0" column="0">
                  <widget class="QFrame" name="frame_51">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>18</height>
+                   </size>
+                  </property>
                   <property name="frameShape">
                    <enum>QFrame::StyledPanel</enum>
                   </property>
@@ -238,7 +250,7 @@
                       </property>
                       <layout class="QHBoxLayout" name="horizontalLayout_40">
                        <property name="spacing">
-                        <number>0</number>
+                        <number>3</number>
                        </property>
                        <property name="leftMargin">
                         <number>0</number>
@@ -611,7 +623,7 @@
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>4</number>
+        <number>3</number>
        </property>
        <property name="tabsClosable">
         <bool>false</bool>
@@ -970,6 +982,9 @@
          </item>
          <item>
           <widget class="QToolBox" name="toolBox">
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
            <property name="currentIndex">
             <number>1</number>
            </property>
@@ -978,9 +993,12 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>199</width>
-              <height>249</height>
+              <width>575</width>
+              <height>800</height>
              </rect>
+            </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
             </property>
             <attribute name="label">
              <string>Clustering</string>
@@ -1089,6 +1107,9 @@
               <width>575</width>
               <height>800</height>
              </rect>
+            </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
             </property>
             <attribute name="label">
              <string>Mapping</string>
@@ -1354,14 +1375,26 @@
          <item>
           <widget class="QFrame" name="frame">
            <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
+            <enum>QFrame::NoFrame</enum>
            </property>
            <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
+            <enum>QFrame::Plain</enum>
+           </property>
+           <property name="lineWidth">
+            <number>0</number>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_14">
             <property name="spacing">
              <number>13</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
             </property>
             <item>
              <widget class="QGroupBox" name="groupBox_18">
@@ -1392,7 +1425,84 @@
                  <property name="frameShadow">
                   <enum>QFrame::Raised</enum>
                  </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_37">
+                 <layout class="QGridLayout" name="gridLayout_17">
+                  <property name="leftMargin">
+                   <number>13</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>13</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>13</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>9</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_16">
+                    <property name="text">
+                     <string>Color:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QComboBox" name="comboBox_4">
+                    <item>
+                     <property name="text">
+                      <string>Type</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Function</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Astrocyte Coverage</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Glycogen Distribution</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QCheckBox" name="specularLightCheckBox">
+                    <property name="text">
+                     <string>Specular Lighting</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_2">
+              <property name="title">
+               <string>Node-Link Diagram</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QFrame" name="frame_41">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_38">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -1427,61 +1537,6 @@
                     <item>
                      <property name="text">
                       <string>Synapse Size</string>
-                     </property>
-                    </item>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QFrame" name="frame_41">
-                 <property name="frameShape">
-                  <enum>QFrame::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Raised</enum>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_38">
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>9</number>
-                  </property>
-                  <item>
-                   <widget class="QLabel" name="label_16">
-                    <property name="text">
-                     <string>Color:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="comboBox_4">
-                    <item>
-                     <property name="text">
-                      <string>Type</string>
-                     </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>Function</string>
-                     </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>Astrocyte Coverage</string>
-                     </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>Glycogen Distribution</string>
                      </property>
                     </item>
                    </widget>
@@ -1551,13 +1606,13 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
                <property name="leftMargin">
-                <number>0</number>
+                <number>13</number>
                </property>
                <property name="topMargin">
                 <number>13</number>
                </property>
                <property name="rightMargin">
-                <number>0</number>
+                <number>13</number>
                </property>
                <item>
                 <widget class="QCheckBox" name="splatAstroCheckBox">
@@ -1600,16 +1655,6 @@
                 </widget>
                </item>
               </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="specularLightCheckBox">
-              <property name="text">
-               <string>Specular Lighting</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
              </widget>
             </item>
             <item>
