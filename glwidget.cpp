@@ -227,6 +227,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
     int hvgxID = pickObject(event);
 
+    if (hvgxID == 0)    goto quit;
     m_opengl_mngr->highlightObject(hvgxID);
 
     if ( event->modifiers() == Qt::ControlModifier) {
@@ -241,6 +242,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
         }
 
     }
+
+quit:
     doneCurrent();
 
     event->accept();
