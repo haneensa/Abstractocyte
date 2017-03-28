@@ -7,6 +7,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <map>
+#include <QPixmap>
 
 //------------------------------------------------------
 //
@@ -75,6 +76,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(this, SIGNAL(signalMappingTreeWidget(QTreeWidget *)),
                      getGLWidget(), SLOT(getMappingTreeWidget(QTreeWidget *)));
+
+
+	//rotate astrocytes label of the abstraction space
+	QPixmap myPixmap(QSize(20, 210));
+	myPixmap.fill(Qt::transparent);
+	QPainter painter(&myPixmap);
+	painter.translate(12, 140);
+	painter.rotate(-90);
+	painter.drawText(0, 0, "Astrocytes");
+	mainwindow_ui->label_44->setPixmap(myPixmap);
+
  }
 
 //------------------------------------------------------
