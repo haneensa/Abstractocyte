@@ -274,6 +274,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			//VertexData* spineVertex = &(m_verticesList->at(spineVertexIndex));
 			//VertexData* boutonVertex = &(m_verticesList->at(boutonVertexIndex));
 
+            /* Glycogen Granules Analysis Crashes Here */
 			float d_spine = SpacePartitioning::L2Distance::compute(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z(), spineVertex->x(), spineVertex->y(), spineVertex->z());
 			float d_bouton = SpacePartitioning::L2Distance::compute(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z(), boutonVertex->x(), boutonVertex->y(), boutonVertex->z());
 
