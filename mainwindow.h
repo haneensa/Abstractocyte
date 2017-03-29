@@ -80,6 +80,9 @@ signals:
     void glycogenMappedSelectedState(QString, bool);
     void signalProximityTypeState(QString, bool);
     void signalMappingTreeWidget(QTreeWidget *);
+    void update_glycogen_clustering_timing(QString);
+    void update_glycogen_cluter_mapping_timing(QString);
+    void update_glycogen_granules_mapping_timing(QString);
 
 private:
     Ui::MainWindow *mainwindow_ui;

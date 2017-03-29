@@ -8,6 +8,7 @@
 #include "ui_mainwindow.h"
 #include <map>
 #include <QPixmap>
+#include <chrono>
 
 //------------------------------------------------------
 //
@@ -76,6 +77,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(this, SIGNAL(signalMappingTreeWidget(QTreeWidget *)),
                      getGLWidget(), SLOT(getMappingTreeWidget(QTreeWidget *)));
+
+    QObject::connect(this, SIGNAL(update_glycogen_clustering_timing(QString)),
+                     mainwindow_ui->glycogen_clustering_ms, SLOT(setText(QString)));
+
+
+    QObject::connect(this, SIGNAL(update_glycogen_cluter_mapping_timing(QString)),
+                     mainwindow_ui->glycogen_cluster_mapping_ms, SLOT(setText(QString)));
+
+    QObject::connect(this, SIGNAL(update_glycogen_granules_mapping_timing(QString)),
+                     mainwindow_ui->glycogen_granules_mapping_ms, SLOT(setText(QString)));
+
 
 
 	//rotate astrocytes label of the abstraction space
@@ -194,6 +206,7 @@ void MainWindow::on_glycogenVisibilityCheckBox_toggled(bool checked)
 //
 void MainWindow::on_clusterButton_clicked()
 {
+    auto t1 = std::chrono::high_resolution_clock::now();
 
     mainwindow_ui->glycogenClustersTreeWidget->clear();
     if (m_clusters)
@@ -233,6 +246,11 @@ void MainWindow::on_clusterButton_clicked()
     mainwindow_ui->glycogenClustersTreeWidget->sortByColumn(2, Qt::SortOrder::DescendingOrder);
     getGLWidget()->getOpenGLManager()->updateGlycogenPoints();
 
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> ms = t2 - t1;
+
+    float duration =  ms.count()/1000.0;
+    update_glycogen_clustering_timing(QString::number(duration));
 }
 
 //------------------------------------------------------
@@ -289,6 +307,8 @@ void MainWindow::on_glycogenClustersTreeWidget_itemSelectionChanged()
 //
 void MainWindow::on_mapGlycogenGranulesButton_clicked()
 {
+    auto t1 = std::chrono::high_resolution_clock::now();
+
 	mainwindow_ui->glycogenMappingTreeWidget->clear();
 
     GlycogenAnalysisManager* gam = getGLWidget()->getGlycogenAnalysisManager();
@@ -340,12 +360,22 @@ void MainWindow::on_mapGlycogenGranulesButton_clicked()
 		current_object->setMappedValue(volume / result_max_volume);
 
     }
+
+
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> ms = t2 - t1;
+
+    float duration =  ms.count()/1000.0;
+    update_glycogen_granules_mapping_timing(QString::number(duration));
 }
 
 //------------------------------------------------------
 //
 void MainWindow::on_mapGlycogenClustersButton_clicked()
 {
+    auto t1 = std::chrono::high_resolution_clock::now();
+
+
     if (m_clusters && m_clusters->size() > 0)
     {
 		mainwindow_ui->glycogenMappingTreeWidget->clear();
@@ -403,6 +433,13 @@ void MainWindow::on_mapGlycogenClustersButton_clicked()
     {
         //show message saying: No clusters available, calculate clusters first
     }
+
+
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> ms = t2 - t1;
+
+    float duration =  ms.count()/1000.0;
+    update_glycogen_cluter_mapping_timing(QString::number(duration));
 }
 
 //------------------------------------------------------

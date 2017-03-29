@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1600</width>
-     <height>31</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -623,7 +623,7 @@
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>5</number>
        </property>
        <property name="tabsClosable">
         <bool>false</bool>
@@ -1665,8 +1665,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>343</width>
-              <height>588</height>
+              <width>245</width>
+              <height>433</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1939,8 +1939,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>343</width>
-              <height>588</height>
+              <width>245</width>
+              <height>433</height>
              </rect>
             </property>
             <attribute name="label">
@@ -2216,8 +2216,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>343</width>
-              <height>588</height>
+              <width>245</width>
+              <height>433</height>
              </rect>
             </property>
             <attribute name="label">
@@ -2493,8 +2493,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>343</width>
-              <height>588</height>
+              <width>537</width>
+              <height>899</height>
              </rect>
             </property>
             <attribute name="label">
@@ -2780,7 +2780,7 @@
         <attribute name="title">
          <string>Debugging</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_21">
+        <layout class="QVBoxLayout" name="verticalLayout">
          <item>
           <widget class="QGroupBox" name="groupBox_17">
            <property name="title">
@@ -2820,6 +2820,114 @@
               <property name="text">
                <string>ms</string>
               </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_20">
+           <property name="title">
+            <string>Timings</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_21">
+            <item row="0" column="0">
+             <widget class="QFrame" name="frame_56">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_22">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_54">
+                 <property name="text">
+                  <string>Clustering Glycogen: </string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLabel" name="glycogen_clustering_ms">
+                 <property name="text">
+                  <string>-</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <widget class="QLabel" name="label_56">
+                 <property name="text">
+                  <string>seconds</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QFrame" name="frame_57">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_43">
+               <item>
+                <widget class="QLabel" name="label_57">
+                 <property name="text">
+                  <string>Mapping Glycogen Clusters: </string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="glycogen_cluster_mapping_ms">
+                 <property name="text">
+                  <string>-</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_59">
+                 <property name="text">
+                  <string>seconds</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QFrame" name="frame_58">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_37">
+               <item>
+                <widget class="QLabel" name="label_60">
+                 <property name="text">
+                  <string>Mapping Glycogen Granules</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="glycogen_granules_mapping_ms">
+                 <property name="text">
+                  <string>-</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_62">
+                 <property name="text">
+                  <string>seconds</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </item>
            </layout>
@@ -2885,6 +2993,7 @@
     <signal>setHoveredName(QString)</signal>
     <signal>updateFPS(QString)</signal>
     <signal>updateFrameTime(QString)</signal>
+    <signal>update_glycogen_clustering_timing(QString)</signal>
     <slot>getSliderX(int)</slot>
     <slot>getSliderY(int)</slot>
     <slot>getIntervalID(int)</slot>
@@ -2917,6 +3026,7 @@
     <slot>togglWeightedAstroCoverage()</slot>
     <slot>getFilteredListByProximity()</slot>
     <slot>updateMinProximity(double)</slot>
+    <slot>useGlobalAstroCoverage(bool)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -2929,12 +3039,12 @@
    <slot>getSlotsX(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>278</x>
-     <y>364</y>
+     <x>392</x>
+     <y>396</y>
     </hint>
     <hint type="destinationlabel">
-     <x>108</x>
-     <y>174</y>
+     <x>283</x>
+     <y>280</y>
     </hint>
    </hints>
   </connection>
@@ -2945,12 +3055,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>94</x>
-     <y>121</y>
+     <x>269</x>
+     <y>227</y>
     </hint>
     <hint type="destinationlabel">
-     <x>233</x>
-     <y>364</y>
+     <x>392</x>
+     <y>396</y>
     </hint>
    </hints>
   </connection>
@@ -2961,12 +3071,12 @@
    <slot>getAbstractionData(AbstractionSpace*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>547</x>
-     <y>209</y>
+     <x>1157</x>
+     <y>240</y>
     </hint>
     <hint type="destinationlabel">
-     <x>129</x>
-     <y>138</y>
+     <x>304</x>
+     <y>244</y>
     </hint>
    </hints>
   </connection>
@@ -2977,12 +3087,12 @@
    <slot>getSliderX(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>143</x>
-     <y>150</y>
+     <x>318</x>
+     <y>256</y>
     </hint>
     <hint type="destinationlabel">
-     <x>550</x>
-     <y>124</y>
+     <x>1160</x>
+     <y>155</y>
     </hint>
    </hints>
   </connection>
@@ -2993,12 +3103,12 @@
    <slot>getIntervalID(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>134</x>
-     <y>154</y>
+     <x>309</x>
+     <y>260</y>
     </hint>
     <hint type="destinationlabel">
-     <x>543</x>
-     <y>236</y>
+     <x>1153</x>
+     <y>267</y>
     </hint>
    </hints>
   </connection>
@@ -3013,8 +3123,8 @@
      <y>163</y>
     </hint>
     <hint type="destinationlabel">
-     <x>553</x>
-     <y>170</y>
+     <x>1163</x>
+     <y>201</y>
     </hint>
    </hints>
   </connection>
@@ -3026,11 +3136,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>572</y>
+     <y>593</y>
     </hint>
     <hint type="destinationlabel">
-     <x>569</x>
-     <y>333</y>
+     <x>1179</x>
+     <y>364</y>
     </hint>
    </hints>
   </connection>
@@ -3042,11 +3152,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>618</y>
+     <y>639</y>
     </hint>
     <hint type="destinationlabel">
-     <x>584</x>
-     <y>358</y>
+     <x>1194</x>
+     <y>389</y>
     </hint>
    </hints>
   </connection>
@@ -3058,11 +3168,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>664</y>
+     <y>685</y>
     </hint>
     <hint type="destinationlabel">
-     <x>579</x>
-     <y>377</y>
+     <x>1189</x>
+     <y>408</y>
     </hint>
    </hints>
   </connection>
@@ -3074,11 +3184,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>710</y>
+     <y>731</y>
     </hint>
     <hint type="destinationlabel">
-     <x>599</x>
-     <y>409</y>
+     <x>1209</x>
+     <y>440</y>
     </hint>
    </hints>
   </connection>
@@ -3090,11 +3200,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>802</y>
+     <y>823</y>
     </hint>
     <hint type="destinationlabel">
-     <x>582</x>
-     <y>434</y>
+     <x>1192</x>
+     <y>465</y>
     </hint>
    </hints>
   </connection>
@@ -3106,11 +3216,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>756</y>
+     <y>777</y>
     </hint>
     <hint type="destinationlabel">
-     <x>576</x>
-     <y>465</y>
+     <x>1186</x>
+     <y>496</y>
     </hint>
    </hints>
   </connection>
@@ -3122,11 +3232,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>848</y>
+     <y>869</y>
     </hint>
     <hint type="destinationlabel">
-     <x>566</x>
-     <y>486</y>
+     <x>1176</x>
+     <y>517</y>
     </hint>
    </hints>
   </connection>
@@ -3142,7 +3252,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>29</x>
-     <y>473</y>
+     <y>494</y>
     </hint>
    </hints>
   </connection>
@@ -3157,8 +3267,8 @@
      <y>730</y>
     </hint>
     <hint type="destinationlabel">
-     <x>250</x>
-     <y>473</y>
+     <x>277</x>
+     <y>494</y>
     </hint>
    </hints>
   </connection>
@@ -3169,8 +3279,8 @@
    <slot>getNodeSizeEncoding(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>347</x>
-     <y>550</y>
+     <x>565</x>
+     <y>647</y>
     </hint>
     <hint type="destinationlabel">
      <x>698</x>
@@ -3185,8 +3295,8 @@
    <slot>getColorEncoding(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>347</x>
-     <y>596</y>
+     <x>561</x>
+     <y>556</y>
     </hint>
     <hint type="destinationlabel">
      <x>700</x>
@@ -3217,8 +3327,8 @@
    <slot>getFilteredID(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>123</x>
-     <y>1155</y>
+     <x>156</x>
+     <y>1461</y>
     </hint>
     <hint type="destinationlabel">
      <x>706</x>
@@ -3233,8 +3343,8 @@
    <slot>getFilterWithChildren(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>123</x>
-     <y>1211</y>
+     <x>503</x>
+     <y>1517</y>
     </hint>
     <hint type="destinationlabel">
      <x>699</x>
@@ -3249,8 +3359,8 @@
    <slot>getFilterWithParent(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>123</x>
-     <y>1234</y>
+     <x>330</x>
+     <y>1517</y>
     </hint>
     <hint type="destinationlabel">
      <x>733</x>
@@ -3265,8 +3375,8 @@
    <slot>getFilterWithSynapses(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>123</x>
-     <y>1257</y>
+     <x>156</x>
+     <y>1517</y>
     </hint>
     <hint type="destinationlabel">
      <x>741</x>
@@ -3297,8 +3407,8 @@
    <slot>getFitlerButtonClicked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>146</x>
-     <y>745</y>
+     <x>179</x>
+     <y>850</y>
     </hint>
     <hint type="destinationlabel">
      <x>698</x>
@@ -3313,8 +3423,8 @@
    <slot>getResetFitlerButtonClicked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>123</x>
-     <y>1296</y>
+     <x>146</x>
+     <y>1556</y>
     </hint>
     <hint type="destinationlabel">
      <x>732</x>
@@ -3329,8 +3439,8 @@
    <slot>clearSelectedObjectsTable()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>357</x>
-     <y>745</y>
+     <x>565</x>
+     <y>850</y>
     </hint>
     <hint type="destinationlabel">
      <x>802</x>
@@ -3345,12 +3455,12 @@
    <slot>hideSelectedObjects()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>256</x>
-     <y>745</y>
+     <x>391</x>
+     <y>850</y>
     </hint>
     <hint type="destinationlabel">
-     <x>411</x>
-     <y>803</y>
+     <x>1021</x>
+     <y>834</y>
     </hint>
    </hints>
   </connection>
@@ -3365,8 +3475,8 @@
      <y>716</y>
     </hint>
     <hint type="destinationlabel">
-     <x>439</x>
-     <y>539</y>
+     <x>1049</x>
+     <y>570</y>
     </hint>
    </hints>
   </connection>
@@ -3377,12 +3487,12 @@
    <slot>startPath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>149</x>
-     <y>556</y>
+     <x>181</x>
+     <y>764</y>
     </hint>
     <hint type="destinationlabel">
-     <x>102</x>
-     <y>284</y>
+     <x>277</x>
+     <y>356</y>
     </hint>
    </hints>
   </connection>
@@ -3393,8 +3503,8 @@
    <slot>endPath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>357</x>
-     <y>556</y>
+     <x>566</x>
+     <y>764</y>
     </hint>
     <hint type="destinationlabel">
      <x>267</x>
@@ -3409,8 +3519,8 @@
    <slot>retracePath(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>103</x>
-     <y>735</y>
+     <x>179</x>
+     <y>563</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -3425,8 +3535,8 @@
    <slot>namePath(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>367</x>
-     <y>611</y>
+     <x>399</x>
+     <y>641</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -3441,8 +3551,8 @@
    <slot>savePath()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>367</x>
-     <y>685</y>
+     <x>399</x>
+     <y>715</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -3457,8 +3567,8 @@
    <slot>describePath(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>366</x>
-     <y>656</y>
+     <x>398</x>
+     <y>686</y>
     </hint>
     <hint type="destinationlabel">
      <x>296</x>
@@ -3493,8 +3603,8 @@
      <y>178</y>
     </hint>
     <hint type="destinationlabel">
-     <x>167</x>
-     <y>611</y>
+     <x>199</x>
+     <y>641</y>
     </hint>
    </hints>
   </connection>
@@ -3509,8 +3619,8 @@
      <y>835</y>
     </hint>
     <hint type="destinationlabel">
-     <x>137</x>
-     <y>338</y>
+     <x>312</x>
+     <y>356</y>
     </hint>
    </hints>
   </connection>
@@ -3522,11 +3632,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>894</y>
+     <y>915</y>
     </hint>
     <hint type="destinationlabel">
-     <x>424</x>
-     <y>516</y>
+     <x>1034</x>
+     <y>547</y>
     </hint>
    </hints>
   </connection>
@@ -3538,11 +3648,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>572</y>
+     <y>593</y>
     </hint>
     <hint type="destinationlabel">
-     <x>448</x>
-     <y>583</y>
+     <x>1058</x>
+     <y>614</y>
     </hint>
    </hints>
   </connection>
@@ -3554,11 +3664,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>618</y>
+     <y>639</y>
     </hint>
     <hint type="destinationlabel">
-     <x>415</x>
-     <y>629</y>
+     <x>1025</x>
+     <y>660</y>
     </hint>
    </hints>
   </connection>
@@ -3570,11 +3680,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>710</y>
+     <y>731</y>
     </hint>
     <hint type="destinationlabel">
-     <x>422</x>
-     <y>716</y>
+     <x>1032</x>
+     <y>747</y>
     </hint>
    </hints>
   </connection>
@@ -3586,11 +3696,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>756</y>
+     <y>777</y>
     </hint>
     <hint type="destinationlabel">
-     <x>430</x>
-     <y>767</y>
+     <x>1040</x>
+     <y>798</y>
     </hint>
    </hints>
   </connection>
@@ -3602,11 +3712,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>802</y>
+     <y>823</y>
     </hint>
     <hint type="destinationlabel">
-     <x>412</x>
-     <y>805</y>
+     <x>1022</x>
+     <y>836</y>
     </hint>
    </hints>
   </connection>
@@ -3618,11 +3728,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>848</y>
+     <y>869</y>
     </hint>
     <hint type="destinationlabel">
-     <x>418</x>
-     <y>852</y>
+     <x>1028</x>
+     <y>883</y>
     </hint>
    </hints>
   </connection>
@@ -3634,11 +3744,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>894</y>
+     <y>915</y>
     </hint>
     <hint type="destinationlabel">
-     <x>473</x>
-     <y>894</y>
+     <x>1083</x>
+     <y>925</y>
     </hint>
    </hints>
   </connection>
@@ -3650,11 +3760,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>572</y>
+     <y>593</y>
     </hint>
     <hint type="destinationlabel">
-     <x>416</x>
-     <y>607</y>
+     <x>1026</x>
+     <y>638</y>
     </hint>
    </hints>
   </connection>
@@ -3666,11 +3776,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>618</y>
+     <y>639</y>
     </hint>
     <hint type="destinationlabel">
-     <x>420</x>
-     <y>656</y>
+     <x>1030</x>
+     <y>687</y>
     </hint>
    </hints>
   </connection>
@@ -3682,11 +3792,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>664</y>
+     <y>685</y>
     </hint>
     <hint type="destinationlabel">
-     <x>428</x>
-     <y>701</y>
+     <x>1038</x>
+     <y>732</y>
     </hint>
    </hints>
   </connection>
@@ -3698,11 +3808,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>710</y>
+     <y>731</y>
     </hint>
     <hint type="destinationlabel">
-     <x>415</x>
-     <y>762</y>
+     <x>1025</x>
+     <y>793</y>
     </hint>
    </hints>
   </connection>
@@ -3714,11 +3824,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>756</y>
+     <y>777</y>
     </hint>
     <hint type="destinationlabel">
-     <x>433</x>
-     <y>797</y>
+     <x>1043</x>
+     <y>828</y>
     </hint>
    </hints>
   </connection>
@@ -3730,11 +3840,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>802</y>
+     <y>823</y>
     </hint>
     <hint type="destinationlabel">
-     <x>424</x>
-     <y>843</y>
+     <x>1034</x>
+     <y>874</y>
     </hint>
    </hints>
   </connection>
@@ -3746,11 +3856,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>848</y>
+     <y>869</y>
     </hint>
     <hint type="destinationlabel">
-     <x>421</x>
-     <y>888</y>
+     <x>1031</x>
+     <y>919</y>
     </hint>
    </hints>
   </connection>
@@ -3762,11 +3872,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>894</y>
+     <y>915</y>
     </hint>
     <hint type="destinationlabel">
-     <x>416</x>
-     <y>930</y>
+     <x>1026</x>
+     <y>961</y>
     </hint>
    </hints>
   </connection>
@@ -3777,12 +3887,12 @@
    <slot>getGraphCr(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>338</x>
-     <y>672</y>
+     <x>537</x>
+     <y>701</y>
     </hint>
     <hint type="destinationlabel">
-     <x>489</x>
-     <y>641</y>
+     <x>1099</x>
+     <y>672</y>
     </hint>
    </hints>
   </connection>
@@ -3793,12 +3903,12 @@
    <slot>getGraphCa(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>338</x>
-     <y>718</y>
+     <x>537</x>
+     <y>747</y>
     </hint>
     <hint type="destinationlabel">
-     <x>433</x>
-     <y>681</y>
+     <x>1043</x>
+     <y>712</y>
     </hint>
    </hints>
   </connection>
@@ -3813,8 +3923,8 @@
      <y>890</y>
     </hint>
     <hint type="destinationlabel">
-     <x>415</x>
-     <y>435</y>
+     <x>1025</x>
+     <y>466</y>
     </hint>
    </hints>
   </connection>
@@ -3825,12 +3935,12 @@
    <slot>getGraphAABBdim(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>338</x>
-     <y>764</y>
+     <x>537</x>
+     <y>793</y>
     </hint>
     <hint type="destinationlabel">
-     <x>428</x>
-     <y>720</y>
+     <x>1038</x>
+     <y>751</y>
     </hint>
    </hints>
   </connection>
@@ -3841,12 +3951,12 @@
    <slot>getGraphmax_distance(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>338</x>
-     <y>810</y>
+     <x>537</x>
+     <y>839</y>
     </hint>
     <hint type="destinationlabel">
-     <x>414</x>
-     <y>774</y>
+     <x>1024</x>
+     <y>805</y>
     </hint>
    </hints>
   </connection>
@@ -3857,12 +3967,12 @@
    <slot>getGraphmax_vertex_movement(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>338</x>
-     <y>856</y>
+     <x>537</x>
+     <y>885</y>
     </hint>
     <hint type="destinationlabel">
-     <x>424</x>
-     <y>820</y>
+     <x>1034</x>
+     <y>851</y>
     </hint>
    </hints>
   </connection>
@@ -3873,12 +3983,12 @@
    <slot>getGraphslow_factor(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>338</x>
-     <y>902</y>
+     <x>537</x>
+     <y>931</y>
     </hint>
     <hint type="destinationlabel">
-     <x>425</x>
-     <y>868</y>
+     <x>1035</x>
+     <y>899</y>
     </hint>
    </hints>
   </connection>
@@ -3889,12 +3999,12 @@
    <slot>getGraphmax_force(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>338</x>
-     <y>948</y>
+     <x>537</x>
+     <y>977</y>
     </hint>
     <hint type="destinationlabel">
-     <x>421</x>
-     <y>915</y>
+     <x>1031</x>
+     <y>946</y>
     </hint>
    </hints>
   </connection>
@@ -3905,12 +4015,12 @@
    <slot>getGraphoriginalPosAttraction(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>338</x>
-     <y>994</y>
+     <x>537</x>
+     <y>1023</y>
     </hint>
     <hint type="destinationlabel">
-     <x>417</x>
-     <y>959</y>
+     <x>1027</x>
+     <y>990</y>
     </hint>
    </hints>
   </connection>
@@ -3922,11 +4032,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>245</x>
-     <y>664</y>
+     <y>685</y>
     </hint>
     <hint type="destinationlabel">
-     <x>466</x>
-     <y>676</y>
+     <x>1076</x>
+     <y>707</y>
     </hint>
    </hints>
   </connection>
@@ -3937,12 +4047,12 @@
    <slot>reset_layouting(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>318</x>
-     <y>1306</y>
+     <x>340</x>
+     <y>1557</y>
     </hint>
     <hint type="destinationlabel">
-     <x>434</x>
-     <y>1342</y>
+     <x>1044</x>
+     <y>1373</y>
     </hint>
    </hints>
   </connection>
@@ -3953,12 +4063,12 @@
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>431</x>
-     <y>1348</y>
+     <x>1041</x>
+     <y>1379</y>
     </hint>
     <hint type="destinationlabel">
-     <x>159</x>
-     <y>1357</y>
+     <x>252</x>
+     <y>557</y>
     </hint>
    </hints>
   </connection>
@@ -3969,12 +4079,12 @@
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>435</x>
-     <y>1285</y>
+     <x>1045</x>
+     <y>1316</y>
     </hint>
     <hint type="destinationlabel">
-     <x>266</x>
-     <y>1349</y>
+     <x>461</x>
+     <y>557</y>
     </hint>
    </hints>
   </connection>
@@ -3985,12 +4095,12 @@
    <slot>get2DtextureEncoding(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>347</x>
-     <y>642</y>
+     <x>565</x>
+     <y>678</y>
     </hint>
     <hint type="destinationlabel">
-     <x>428</x>
-     <y>694</y>
+     <x>1038</x>
+     <y>725</y>
     </hint>
    </hints>
   </connection>
@@ -4001,12 +4111,12 @@
    <slot>getSlotsY(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>62</x>
-     <y>316</y>
+     <x>167</x>
+     <y>356</y>
     </hint>
     <hint type="destinationlabel">
-     <x>107</x>
-     <y>163</y>
+     <x>282</x>
+     <y>269</y>
     </hint>
    </hints>
   </connection>
@@ -4017,12 +4127,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>136</x>
-     <y>222</y>
+     <x>311</x>
+     <y>328</y>
     </hint>
     <hint type="destinationlabel">
-     <x>62</x>
-     <y>258</y>
+     <x>167</x>
+     <y>356</y>
     </hint>
    </hints>
   </connection>
@@ -4033,12 +4143,12 @@
    <slot>togglWeightedAstroCoverage()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>270</x>
-     <y>670</y>
+     <x>302</x>
+     <y>705</y>
     </hint>
     <hint type="destinationlabel">
-     <x>502</x>
-     <y>663</y>
+     <x>1112</x>
+     <y>694</y>
     </hint>
    </hints>
   </connection>
@@ -4049,12 +4159,12 @@
    <slot>getFilteredListByProximity()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>303</x>
-     <y>1076</y>
+     <x>543</x>
+     <y>1401</y>
     </hint>
     <hint type="destinationlabel">
-     <x>438</x>
-     <y>1072</y>
+     <x>1048</x>
+     <y>1103</y>
     </hint>
    </hints>
   </connection>
@@ -4065,12 +4175,12 @@
    <slot>updateMinProximity(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>328</x>
-     <y>1039</y>
+     <x>554</x>
+     <y>1315</y>
     </hint>
     <hint type="destinationlabel">
-     <x>422</x>
-     <y>991</y>
+     <x>1032</x>
+     <y>1022</y>
     </hint>
    </hints>
   </connection>
