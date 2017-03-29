@@ -42,18 +42,21 @@ GLWidget::GLWidget(QWidget *parent)
     m_translation = QVector3D(0.0, 0.0, 0.0);
 
 
-    m_refresh_timer = new QTimer(this);
-    connect(m_refresh_timer, SIGNAL(timeout()), this, SLOT(update()));
-    m_refresh_timer->start(0);
+    m_lockRotation2D_timer = new QTimer(this);
+    connect(m_lockRotation2D_timer, SIGNAL(timeout()), this, SLOT(update()));
+    m_lockRotation2D_timer->start(0);
 
-    m_rotation_timer = new QTimer(this);
-    connect(m_rotation_timer, SIGNAL(timeout()), this, SLOT(lockRotation2D()));
+    m_lockRotation2D_timer = new QTimer(this);
+    connect(m_lockRotation2D_timer, SIGNAL(timeout()), this, SLOT(lockRotation2D()));
 
+    m_auto_rotation_timer = new QTimer(this);
+    connect(m_auto_rotation_timer, SIGNAL(timeout()), this, SLOT(startRotation()));
 
     m_active_graph_tab = 0;
     setFocusPolicy(Qt::StrongFocus);
     m_hide_toggle = false;
-
+    m_auto_rotate = false;
+    m_timestep = 0;
 }
 
 GLWidget::~GLWidget()
@@ -146,7 +149,7 @@ void GLWidget::initializeGL()
         stopForecDirectedLayout();
     }
 
-     m_rotation_timer->start(500);
+     m_lockRotation2D_timer->start(500);
 
 }
 
@@ -158,11 +161,17 @@ void GLWidget::paintGL()
         updateFrameTime(QString::number(1000.0/fps));
     }
 
+    startRotation();
+
+
+
     // paint the text here
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     const qreal retinaScale = devicePixelRatio();
     glViewport(0, 0, width() * retinaScale, height() * retinaScale);
+
+
     updateMVPAttrib();
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -272,7 +281,7 @@ void GLWidget::lockRotation2D()
     if (m_FDL_running == true)
         return;
 
-    m_rotation_timer->stop();
+    m_lockRotation2D_timer->stop();
     m_FDL_running = true;   // run force layout
 
 
@@ -338,7 +347,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
             stopForecDirectedLayout();
         }
 
-         m_rotation_timer->start(500);
+         m_lockRotation2D_timer->start(500);
 
     } else {
         setMouseTracking(false);
@@ -458,7 +467,7 @@ void GLWidget::reset_layouting(bool flag)
         stopForecDirectedLayout();
     }
 
-     m_rotation_timer->start(10);
+     m_lockRotation2D_timer->start(10);
 }
 
 //--------------------- Graph  Parameters ---------------------
@@ -550,7 +559,7 @@ void GLWidget::getFilteredID(QString value)
     m_opengl_mngr->FilterByID(tokens, invisibility);
 
     // start force layout
-    m_rotation_timer->start(0);
+    m_lockRotation2D_timer->start(0);
     //  check whatever needed to be updated in the checkbox
     std::map<Object_t, std::pair<int, int>> visibilityUpdate = m_opengl_mngr->getObjectCountByType();
     this->getToggleCheckBox(visibilityUpdate);
@@ -693,7 +702,7 @@ void GLWidget::getFilteredType(QString value, bool flag)
     m_opengl_mngr->FilterByType(object_type, flag);
 
     // start force layout
-    m_rotation_timer->start(0);
+    m_lockRotation2D_timer->start(0);
 
     update();
 }
@@ -911,5 +920,35 @@ void GLWidget::selectAllVisible()
             m_selectedObjects.insert(hvgxID);
             insertInTable(hvgxID);
         }
+    }
+}
+
+void GLWidget::updateProximitySSBO()
+{
+    m_opengl_mngr->updateProximitySSBOFlag();
+}
+
+void GLWidget::autoRotation()
+{
+    // only enabled if we are not in the 2D space
+
+    m_auto_rotate = !m_auto_rotate;
+}
+
+void GLWidget::startRotation()
+{
+    // Mouse release position - mouse press position
+    if ( m_auto_rotate ) {
+        int deltaY = 1;
+        QVector2D diff = QVector2D(0, deltaY);
+        QVector3D n = QVector3D( diff.x() , diff.y(), 0).normalized();
+
+        // Accelerate angular speed relative to the length of the mouse sweep
+        qreal acc = diff.length()/2.0;;
+
+        // Calculate new rotation axis as weighted sum
+        m_rotationAxis = (m_rotationAxis + n).normalized();
+        // angle in degrees and rotation axis
+        m_rotation = QQuaternion::fromAxisAndAngle(m_rotationAxis, acc) * m_rotation;
     }
 }

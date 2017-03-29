@@ -623,7 +623,7 @@
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>5</number>
        </property>
        <property name="tabsClosable">
         <bool>false</bool>
@@ -793,7 +793,7 @@
               <property name="title">
                <string>Filter by Proximity</string>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_47">
+              <layout class="QHBoxLayout" name="horizontalLayout_50">
                <item>
                 <widget class="QListWidget" name="filterByProximityListWidget">
                  <property name="sizePolicy">
@@ -849,19 +849,10 @@
                   <enum>QFrame::Raised</enum>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_18">
-                  <property name="spacing">
-                   <number>0</number>
-                  </property>
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
                   <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
                    <number>0</number>
                   </property>
                   <item>
@@ -894,10 +885,29 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="pushButton_9">
-                    <property name="text">
-                     <string>Select Objects</string>
+                   <widget class="QFrame" name="frame_60">
+                    <property name="frameShape">
+                     <enum>QFrame::StyledPanel</enum>
                     </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_47">
+                     <item>
+                      <widget class="QPushButton" name="pushButton_9">
+                       <property name="text">
+                        <string>Select Objects</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_12">
+                       <property name="text">
+                        <string>Update View</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </widget>
                   </item>
                  </layout>
@@ -2941,6 +2951,22 @@
           </widget>
          </item>
          <item>
+          <widget class="QGroupBox" name="groupBox_21">
+           <property name="title">
+            <string>Auto Rotation</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_10">
+            <item row="0" column="0">
+             <widget class="QPushButton" name="pushButton_13">
+              <property name="text">
+               <string>Start/Stop</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
           <spacer name="verticalSpacer_2">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -3035,6 +3061,8 @@
     <slot>updateMinProximity(double)</slot>
     <slot>useGlobalAstroCoverage(bool)</slot>
     <slot>selectAllVisible()</slot>
+    <slot>updateProximitySSBO()</slot>
+    <slot>autoRotation()</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -4167,8 +4195,8 @@
    <slot>getFilteredListByProximity()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>555</x>
-     <y>1392</y>
+     <x>403</x>
+     <y>1356</y>
     </hint>
     <hint type="destinationlabel">
      <x>1048</x>
@@ -4183,8 +4211,8 @@
    <slot>updateMinProximity(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>545</x>
-     <y>1306</y>
+     <x>536</x>
+     <y>1272</y>
     </hint>
     <hint type="destinationlabel">
      <x>1032</x>
@@ -4205,6 +4233,38 @@
     <hint type="destinationlabel">
      <x>700</x>
      <y>779</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_12</sender>
+   <signal>clicked()</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>updateProximitySSBO()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>514</x>
+     <y>1343</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>644</x>
+     <y>1326</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_13</sender>
+   <signal>clicked()</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>autoRotation()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>554</x>
+     <y>754</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>652</x>
+     <y>776</y>
     </hint>
    </hints>
   </connection>

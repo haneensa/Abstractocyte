@@ -81,6 +81,10 @@ public slots:
 
     void getMappingTreeWidget(QTreeWidget *);
     void selectAllVisible();
+    void updateProximitySSBO();
+
+    void autoRotation();
+    void startRotation();
 
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);
@@ -147,7 +151,8 @@ protected:
     bool                                m_FDL_running;
 
     QTimer                              *m_refresh_timer;
-    QTimer                              *m_rotation_timer;
+    QTimer                              *m_lockRotation2D_timer;
+    QTimer                              *m_auto_rotation_timer;
 
     std::set<int>                       m_selectedObjects;
 
@@ -161,6 +166,8 @@ protected:
 
     QVector3D                           m_filterByProximityType;
 
+    bool                                m_auto_rotate;
+    int                                 m_timestep;
 };
 
 
