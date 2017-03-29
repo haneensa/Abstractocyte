@@ -158,6 +158,10 @@ public:
 
      void updateFilteredData();
 
+     void updateProximitySSBOFlag()     { reset_ssbo = !reset_ssbo; }
+
+
+
 protected:
     DataContainer                           *m_dataContainer;
     AbstractionSpace                        *m_2dspace;

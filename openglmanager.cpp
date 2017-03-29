@@ -73,7 +73,7 @@ void OpenGLManager::drawAll()
 
         // read the output from ssbo
         // then reset ssbo to 0
-        readFilterSSBO();
+       readFilterSSBO();
     }
  }
 
@@ -207,7 +207,7 @@ bool OpenGLManager::initFilterSSBO()
     if (m_glFunctionsSet == false)
         return false;
 
-    int bufferSize =  m_ssbo_data.size() * sizeof(m_ssbo_filter_data);
+    int bufferSize =  m_ssbo_data.size() * sizeof(QVector4D);
 
     glGenBuffers(1, &m_ssbo_filter);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo_filter);
@@ -224,7 +224,7 @@ void OpenGLManager::readFilterSSBO()
     // this would be only once
     qDebug() << "read ssbo";
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ssbo_filter);
-    int bufferSize =  m_ssbo_data.size() * sizeof(m_ssbo_filter_data);
+    int bufferSize =  m_ssbo_data.size() * sizeof(QVector4D);
     QVector4D* p = (QVector4D*)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_WRITE);
     m_ssbo_filter_data =  (QVector4D*)calloc( m_ssbo_data.size() , sizeof(QVector4D) );
     memcpy(m_ssbo_filter_data,  p,  bufferSize);
@@ -1923,8 +1923,19 @@ void OpenGLManager::renderAbstractions()
         glEnable(GL_DEPTH_TEST);
     }
 
-    if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1)
-        drawMeshTriangles(false);
+    if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1) {
+        if (reset_ssbo) {
+            glDisable(GL_DEPTH_TEST);
+            glDisable(GL_CULL_FACE);
+
+            drawMeshTriangles(false);
+
+            glEnable(GL_CULL_FACE);
+            glEnable(GL_DEPTH_TEST);
+        } else {
+            drawMeshTriangles(false);
+        }
+    }
 
     if ( skeleton_point )
         drawSkeletonPoints(false); // transparency is allowed
@@ -2431,6 +2442,7 @@ float translate(float value, float leftMin, float leftMax, float rightMin, float
 //
 void OpenGLManager::updateSSBO()
 {
+
     std::map<int, Object*> *objectMap = m_dataContainer->getObjectsMapPtr();
 
 	float glycogen_tf[15] = { 
@@ -2669,12 +2681,12 @@ std::vector<int> OpenGLManager::getSSBOFilterByProximity()
     std::map<int, Object*> *objectMap = m_dataContainer->getObjectsMapPtr();
     for ( auto iter = objectMap->begin(); iter != objectMap->end(); iter++ ) {
         Object *obj = (*iter).second;
-        //if (obj->isFiltered())
-        //    continue;
-
+        if (obj->isFiltered())
+                  continue;
         int hvgxID = obj->getHVGXID();
         if (m_ssbo_data.size() <= hvgxID)
             continue;
+
 
         float astro_proximity = m_ssbo_filter_data[hvgxID].x();
         float gly_proximity = m_ssbo_filter_data[hvgxID].y();

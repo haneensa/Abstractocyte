@@ -116,7 +116,7 @@ void main() {
 
         if (reset_filter_ssbo > 0) { // write into ssbo
             objects_list_filter[int(G_ID)].x =  max( splat.r, objects_list_filter[int(G_ID)].x );
-            objects_list_filter[int(G_ID)].y =  max( splat2.r * 3.0, objects_list_filter[int(G_ID)].y );
+            objects_list_filter[int(G_ID)].y =  max(  splat2.r * 3.0, objects_list_filter[int(G_ID)].y );
             objects_list_filter[int(G_ID)].z =  max( splat.g, objects_list_filter[int(G_ID)].z );
         }
 
