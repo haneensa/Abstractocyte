@@ -896,3 +896,19 @@ void GLWidget::getMappingTreeWidget(QTreeWidget * treeWidget)
     }
 
 }
+
+void GLWidget::selectAllVisible()
+{
+    std::map<int, Object*> *objectMap = m_data_containter->getObjectsMapPtr();
+    for ( auto iter = objectMap->rbegin(); iter != objectMap->rend(); iter++) {
+        Object *obj = (*iter).second;
+        if (obj->isFiltered())
+            continue;
+        // add it to list
+        int hvgxID = obj->getHVGXID();
+        if (m_selectedObjects.find(hvgxID) == m_selectedObjects.end()) {
+            m_selectedObjects.insert(hvgxID);
+            insertInTable(hvgxID);
+        }
+    }
+}

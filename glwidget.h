@@ -80,6 +80,7 @@ public slots:
     void updateMinProximity(double);
 
     void getMappingTreeWidget(QTreeWidget *);
+    void selectAllVisible();
 
 signals:
     void setAbstractionData(AbstractionSpace *space_instance);

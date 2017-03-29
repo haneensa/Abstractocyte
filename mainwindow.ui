@@ -623,7 +623,7 @@
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="tabsClosable">
         <bool>false</bool>
@@ -635,7 +635,7 @@
         <attribute name="title">
          <string>Filtering</string>
         </attribute>
-        <layout class="QGridLayout" name="gridLayout_10">
+        <layout class="QGridLayout" name="gridLayout_6">
          <item row="0" column="0">
           <widget class="QFrame" name="frame_52">
            <property name="frameShape">
@@ -644,40 +644,14 @@
            <property name="frameShadow">
             <enum>QFrame::Raised</enum>
            </property>
-           <layout class="QGridLayout" name="gridLayout_6">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
+           <layout class="QGridLayout" name="gridLayout_2">
             <item row="0" column="0">
              <widget class="QGroupBox" name="groupBox_8">
               <property name="title">
                <string>Selected Objects</string>
               </property>
-              <layout class="QGridLayout" name="gridLayout_2">
-               <item row="1" column="2">
-                <widget class="QPushButton" name="pushButton_4">
-                 <property name="text">
-                  <string>Clear</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QPushButton" name="pushButton_3">
-                 <property name="text">
-                  <string>Show / Hide</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0" colspan="3">
+              <layout class="QVBoxLayout" name="verticalLayout_3">
+               <item>
                 <widget class="QTableView" name="tableView">
                  <property name="editTriggers">
                   <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
@@ -693,11 +667,44 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
-                <widget class="QPushButton" name="pushButton">
-                 <property name="text">
-                  <string>Match Exactly</string>
+               <item>
+                <widget class="QFrame" name="frame_59">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
                  </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_48">
+                  <item>
+                   <widget class="QPushButton" name="pushButton">
+                    <property name="text">
+                     <string>Match Exactly</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_3">
+                    <property name="text">
+                     <string>Show / Hide</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_11">
+                    <property name="text">
+                     <string>Select All Visible</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_4">
+                    <property name="text">
+                     <string>Clear</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                </item>
               </layout>
@@ -3027,6 +3034,7 @@
     <slot>getFilteredListByProximity()</slot>
     <slot>updateMinProximity(double)</slot>
     <slot>useGlobalAstroCoverage(bool)</slot>
+    <slot>selectAllVisible()</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -3327,8 +3335,8 @@
    <slot>getFilteredID(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>156</x>
-     <y>1461</y>
+     <x>198</x>
+     <y>1452</y>
     </hint>
     <hint type="destinationlabel">
      <x>706</x>
@@ -3343,8 +3351,8 @@
    <slot>getFilterWithChildren(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>503</x>
-     <y>1517</y>
+     <x>556</x>
+     <y>1508</y>
     </hint>
     <hint type="destinationlabel">
      <x>699</x>
@@ -3359,8 +3367,8 @@
    <slot>getFilterWithParent(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>330</x>
-     <y>1517</y>
+     <x>388</x>
+     <y>1508</y>
     </hint>
     <hint type="destinationlabel">
      <x>733</x>
@@ -3375,8 +3383,8 @@
    <slot>getFilterWithSynapses(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>156</x>
-     <y>1517</y>
+     <x>198</x>
+     <y>1508</y>
     </hint>
     <hint type="destinationlabel">
      <x>741</x>
@@ -3407,8 +3415,8 @@
    <slot>getFitlerButtonClicked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>179</x>
-     <y>850</y>
+     <x>184</x>
+     <y>840</y>
     </hint>
     <hint type="destinationlabel">
      <x>698</x>
@@ -3423,8 +3431,8 @@
    <slot>getResetFitlerButtonClicked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>146</x>
-     <y>1556</y>
+     <x>178</x>
+     <y>1547</y>
     </hint>
     <hint type="destinationlabel">
      <x>732</x>
@@ -3439,8 +3447,8 @@
    <slot>clearSelectedObjectsTable()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>565</x>
-     <y>850</y>
+     <x>546</x>
+     <y>840</y>
     </hint>
     <hint type="destinationlabel">
      <x>802</x>
@@ -3455,8 +3463,8 @@
    <slot>hideSelectedObjects()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>391</x>
-     <y>850</y>
+     <x>305</x>
+     <y>840</y>
     </hint>
     <hint type="destinationlabel">
      <x>1021</x>
@@ -4159,8 +4167,8 @@
    <slot>getFilteredListByProximity()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>543</x>
-     <y>1401</y>
+     <x>555</x>
+     <y>1392</y>
     </hint>
     <hint type="destinationlabel">
      <x>1048</x>
@@ -4175,12 +4183,28 @@
    <slot>updateMinProximity(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>554</x>
-     <y>1315</y>
+     <x>545</x>
+     <y>1306</y>
     </hint>
     <hint type="destinationlabel">
      <x>1032</x>
      <y>1022</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_11</sender>
+   <signal>clicked()</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>selectAllVisible()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>388</x>
+     <y>822</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>700</x>
+     <y>779</y>
     </hint>
    </hints>
   </connection>
