@@ -63,11 +63,10 @@ void OpenGLManager::drawAll()
     render2DHeatMapTexture();
 
     renderAbstractions();
-    renderSelection();
 
     drawNodesInto2DTexture();
 
-    if (reset_ssbo) {
+    if (reset_ssbo) { // only once
         glFlush();
         glFinish();
         reset_ssbo = false;
@@ -1899,17 +1898,21 @@ void OpenGLManager::renderAbstractions()
     if (m_renderGlycogenGranules)
         drawGlycogenPoints();
 
+    bool skeleton_point = false;
 
-    if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1) ) {
+    if ( (space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x() == 1)
+         || ( (space_properties.neu.render_type.x() == 1 && space_properties.neu.render_type.y() == 1 ) /*&& space_properties.ast.render_type.y() == 0*/) ) {
+            // disable transparency
         glDisable (GL_BLEND);
         glBlendFunc (GL_ONE, GL_ONE);
         drawSkeletonPoints(false);
         glEnable (GL_BLEND);
         glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    } else if (space_properties.ast.render_type.y() == 1 || space_properties.neu.render_type.y() == 1 ) {
+        skeleton_point = true;
     }
 
-    if ( (space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x() == 0) || space_properties.neu.render_type.y() == 1 )
-        drawSkeletonPoints(false); // transparency is allowed
 
     if ( space_properties.ast.render_type.z() == 1 ||  space_properties.neu.render_type.z() == 1)
         drawSkeletonsGraph(false);
@@ -1922,6 +1925,10 @@ void OpenGLManager::renderAbstractions()
 
     if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1)
         drawMeshTriangles(false);
+
+    if ( skeleton_point )
+        drawSkeletonPoints(false); // transparency is allowed
+
 }
 
 
@@ -1981,7 +1988,6 @@ void OpenGLManager::renderSelection()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //disable dithering -- important
     glDisable(GL_DITHER);
-    glDisable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     glDisable (GL_BLEND);
 
@@ -1991,9 +1997,7 @@ void OpenGLManager::renderSelection()
     if ( space_properties.ast.render_type.x() == 1 ||  space_properties.neu.render_type.x() == 1)
         drawMeshTriangles(true);
 
-    if ( (space_properties.ast.render_type.x() == 1 &&  space_properties.neu.render_type.x() == 1)
-         ||  (space_properties.ast.render_type.y() == 1 &&  space_properties.ast.render_type.x() == 0)
-         || (space_properties.neu.render_type.y() == 1 ) )
+    if ( space_properties.ast.render_type.y() == 1 ||  space_properties.neu.render_type.y() == 1 )
         drawSkeletonPoints(true);
 
     if ( (space_properties.ast.render_type.w() == 1 ||  space_properties.neu.render_type.w() == 1)
@@ -2005,7 +2009,6 @@ void OpenGLManager::renderSelection()
     //enable dithering again
     glEnable(GL_DITHER);
     glEnable (GL_BLEND);
-    glEnable(GL_MULTISAMPLE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

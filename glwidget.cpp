@@ -225,6 +225,8 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
     makeCurrent();
 
+    m_opengl_mngr->renderSelection();
+
     int hvgxID = pickObject(event);
 
     if (hvgxID == 0)    goto quit;
@@ -277,12 +279,9 @@ void GLWidget::lockRotation2D()
     // start a timer, and reset it whenever we are here
     // once we exceed threshold start force layouted
     // if we are below x < 50 and y < 50
-
-
     updateMVPAttrib();      // update uniforms
     m_graphManager->update2Dflag(true, m_uniforms);
     m_opengl_mngr->update2Dflag(true);
-
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
@@ -292,6 +291,8 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
     if (event->modifiers() == Qt::ShiftModifier) {
         makeCurrent();
+
+        m_opengl_mngr->renderSelection();
 
         int hvgxID = pickObject(event); // hovered object
 
