@@ -167,7 +167,7 @@ protected:
     QVector3D                           m_filterByProximityType;
 
     bool                                m_auto_rotate;
-    int                                 m_timestep;
+    float                               m_rot_ydiff;
 };
 
 

@@ -55,8 +55,9 @@ GLWidget::GLWidget(QWidget *parent)
     m_active_graph_tab = 0;
     setFocusPolicy(Qt::StrongFocus);
     m_hide_toggle = false;
+
     m_auto_rotate = false;
-    m_timestep = 0;
+    m_rot_ydiff = 1;
 }
 
 GLWidget::~GLWidget()
@@ -408,6 +409,18 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 		case(Qt::Key_P) :
 			saveScreenshot();
 		break;
+        case (Qt::Key_Down):
+            if ( ( m_rot_ydiff - 0.1) > 0)
+                m_rot_ydiff -= 0.1;
+            else if ( ( m_rot_ydiff - 0.01) > 0)
+                m_rot_ydiff -= 0.01;
+
+            qDebug() << m_rot_ydiff;
+        break;
+        case (Qt::Key_Up):
+           m_rot_ydiff += 0.1;
+           qDebug() << m_rot_ydiff;
+        break;
     }
 }
 
@@ -939,9 +952,8 @@ void GLWidget::startRotation()
 {
     // Mouse release position - mouse press position
     if ( m_auto_rotate ) {
-        int deltaY = 1;
-        QVector2D diff = QVector2D(0, deltaY);
-        QVector3D n = QVector3D( diff.x() , diff.y(), 0).normalized();
+        QVector2D diff = QVector2D(0, m_rot_ydiff);
+        QVector3D n = QVector3D( diff.x(), diff.y() /* diff.y()*/, 0).normalized();
 
         // Accelerate angular speed relative to the length of the mouse sweep
         qreal acc = diff.length()/2.0;;
