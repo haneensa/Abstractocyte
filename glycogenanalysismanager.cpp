@@ -261,6 +261,7 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 		//clear previous mappings
 		clearMapping();
 		//loop on glycogen granules
+        int skipped = 0;
 		for (auto iter = m_glycogenVertexDataList->begin(); iter != m_glycogenVertexDataList->end(); iter++)
 		{
 			VertexData* glycogenVertex = (*iter);
@@ -269,14 +270,25 @@ GlycogenAnalysisManager::GlycogenAnalysisManager(std::map<int, Glycogen*>* glyco
 			VertexData* boutonVertex = m_boutonHash->getNeighbor(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z());
 			//get nearest spine vertex to this granule
 			//int spineVertexIndex = m_spineOctree->findNeighbor(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z());
-			VertexData* spineVertex = m_spineHash->getNeighbor(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z());
+            VertexData* spineVertex = m_spineHash->getNeighbor(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z()); /* memory access error */
 			//get actual VertexData and use Object Id
 			//VertexData* spineVertex = &(m_verticesList->at(spineVertexIndex));
 			//VertexData* boutonVertex = &(m_verticesList->at(boutonVertexIndex));
 
+            if (skipped >= 174)
+                qDebug() << "crashes after this";
+
+            if (glycogenVertex == NULL || boutonVertex == NULL || spineVertex == NULL)  {
+                qDebug() << ++skipped << " Null Pointer";
+                continue;
+            }
             /* Glycogen Granules Analysis Crashes Here */
-			float d_spine = SpacePartitioning::L2Distance::compute(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z(), spineVertex->x(), spineVertex->y(), spineVertex->z());
-			float d_bouton = SpacePartitioning::L2Distance::compute(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z(), boutonVertex->x(), boutonVertex->y(), boutonVertex->z());
+            float d_bouton = 1000000;
+            float d_spine = 1000000;
+            if (boutonVertex != NULL )
+                d_bouton = SpacePartitioning::L2Distance::compute(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z(), boutonVertex->x(), boutonVertex->y(), boutonVertex->z());
+            if (spineVertex != NULL)
+                d_spine = SpacePartitioning::L2Distance::compute(glycogenVertex->x(), glycogenVertex->y(), glycogenVertex->z(), spineVertex->x(), spineVertex->y(), spineVertex->z());
 
 			//get nearest of two
 			int nearestVertexIndex = 0;
