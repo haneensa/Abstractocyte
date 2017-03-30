@@ -645,144 +645,38 @@
             <enum>QFrame::Raised</enum>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
-            <item row="0" column="0">
-             <widget class="QGroupBox" name="groupBox_8">
-              <property name="title">
-               <string>Selected Objects</string>
+            <item row="5" column="0">
+             <widget class="QPushButton" name="pushButton_2">
+              <property name="text">
+               <string>Reset Filter</string>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_3">
-               <item>
-                <widget class="QTableView" name="tableView">
-                 <property name="editTriggers">
-                  <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
-                 </property>
-                 <property name="dragDropOverwriteMode">
-                  <bool>false</bool>
-                 </property>
-                 <property name="selectionBehavior">
-                  <enum>QAbstractItemView::SelectRows</enum>
-                 </property>
-                 <property name="textElideMode">
-                  <enum>Qt::ElideNone</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QFrame" name="frame_59">
-                 <property name="frameShape">
-                  <enum>QFrame::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Raised</enum>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_48">
-                  <item>
-                   <widget class="QPushButton" name="pushButton">
-                    <property name="text">
-                     <string>Match Exactly</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="pushButton_3">
-                    <property name="text">
-                     <string>Show / Hide</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="pushButton_11">
-                    <property name="text">
-                     <string>Select All Visible</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="pushButton_4">
-                    <property name="text">
-                     <string>Clear</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-              </layout>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QGroupBox" name="groupBox_5">
+            <item row="4" column="0">
+             <widget class="QGroupBox" name="groupBox_6">
               <property name="title">
-               <string>Filter By Type:</string>
+               <string>Preserve</string>
               </property>
-              <layout class="QGridLayout" name="gridLayout_7">
-               <item row="0" column="0">
-                <widget class="QListWidget" name="listWidget">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
+              <layout class="QHBoxLayout" name="horizontalLayout_49">
+               <item>
+                <widget class="QCheckBox" name="checkBox_3">
+                 <property name="text">
+                  <string>Synapses</string>
                  </property>
-                 <item>
-                  <property name="text">
-                   <string>Astrocyte</string>
-                  </property>
-                  <property name="checkState">
-                   <enum>Checked</enum>
-                  </property>
-                  <property name="flags">
-                   <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Axons</string>
-                  </property>
-                  <property name="checkState">
-                   <enum>Checked</enum>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Dendrites</string>
-                  </property>
-                  <property name="checkState">
-                   <enum>Checked</enum>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Spines</string>
-                  </property>
-                  <property name="checkState">
-                   <enum>Checked</enum>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Boutons</string>
-                  </property>
-                  <property name="checkState">
-                   <enum>Checked</enum>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Mitochondria</string>
-                  </property>
-                  <property name="checkState">
-                   <enum>Checked</enum>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Synapse</string>
-                  </property>
-                  <property name="checkState">
-                   <enum>Checked</enum>
-                  </property>
-                 </item>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBox_2">
+                 <property name="text">
+                  <string>Parent</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBox">
+                 <property name="text">
+                  <string>Substructures</string>
+                 </property>
                 </widget>
                </item>
               </layout>
@@ -921,41 +815,150 @@
               </layout>
              </widget>
             </item>
-            <item row="4" column="0">
-             <widget class="QGroupBox" name="groupBox_6">
+            <item row="1" column="0">
+             <widget class="QGroupBox" name="groupBox_5">
               <property name="title">
-               <string>Preserve</string>
+               <string>Filter By Type:</string>
               </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_49">
-               <item>
-                <widget class="QCheckBox" name="checkBox_3">
-                 <property name="text">
-                  <string>Synapses</string>
+              <layout class="QGridLayout" name="gridLayout_7">
+               <item row="0" column="0">
+                <widget class="QListWidget" name="listWidget">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
                  </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="checkBox_2">
-                 <property name="text">
-                  <string>Parent</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="checkBox">
-                 <property name="text">
-                  <string>Substructures</string>
-                 </property>
+                 <item>
+                  <property name="text">
+                   <string>Astrocyte</string>
+                  </property>
+                  <property name="checkState">
+                   <enum>Checked</enum>
+                  </property>
+                  <property name="flags">
+                   <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Axons</string>
+                  </property>
+                  <property name="checkState">
+                   <enum>Checked</enum>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Dendrites</string>
+                  </property>
+                  <property name="checkState">
+                   <enum>Checked</enum>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Spines</string>
+                  </property>
+                  <property name="checkState">
+                   <enum>Checked</enum>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Boutons</string>
+                  </property>
+                  <property name="checkState">
+                   <enum>Checked</enum>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Mitochondria</string>
+                  </property>
+                  <property name="checkState">
+                   <enum>Checked</enum>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Synapse</string>
+                  </property>
+                  <property name="checkState">
+                   <enum>Checked</enum>
+                  </property>
+                 </item>
                 </widget>
                </item>
               </layout>
              </widget>
             </item>
-            <item row="5" column="0">
-             <widget class="QPushButton" name="pushButton_2">
-              <property name="text">
-               <string>Reset Filter</string>
+            <item row="0" column="0">
+             <widget class="QGroupBox" name="groupBox_8">
+              <property name="title">
+               <string>Selected Objects</string>
               </property>
+              <layout class="QVBoxLayout" name="verticalLayout_3">
+               <item>
+                <widget class="QTableView" name="tableView">
+                 <property name="editTriggers">
+                  <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
+                 </property>
+                 <property name="dragDropOverwriteMode">
+                  <bool>false</bool>
+                 </property>
+                 <property name="selectionBehavior">
+                  <enum>QAbstractItemView::SelectRows</enum>
+                 </property>
+                 <property name="textElideMode">
+                  <enum>Qt::ElideNone</enum>
+                 </property>
+                 <attribute name="horizontalHeaderStretchLastSection">
+                  <bool>true</bool>
+                 </attribute>
+                </widget>
+               </item>
+               <item>
+                <widget class="QFrame" name="frame_59">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_48">
+                  <item>
+                   <widget class="QPushButton" name="pushButton">
+                    <property name="text">
+                     <string>Match Exactly</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_3">
+                    <property name="text">
+                     <string>Show / Hide</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_11">
+                    <property name="text">
+                     <string>Select All Visible</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_4">
+                    <property name="text">
+                     <string>Clear</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </item>
            </layout>
