@@ -2730,5 +2730,5 @@ std::vector<int> OpenGLManager::getSSBOFilterByProximity()
 
 void OpenGLManager::updateMinProximity( double min)
 {
-    m_min_proximity = min;
+    m_min_proximity = (1.0 -  min);
 }
