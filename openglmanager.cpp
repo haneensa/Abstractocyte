@@ -558,9 +558,12 @@ void OpenGLManager::load3DTexturesFromRaw(QString path, GLuint &texture, GLenum 
 
     // convert to rgba
     for (int i = 0; i < size; ++i) {
-        //unsigned int idx = i * 4;
-        bufferRGBA[i] = rawData[i];// (rawData[i] > 0) ? 255 : 0; //hack: remove later
+        if (rawData != NULL)
+            bufferRGBA[i] = rawData[i];// (rawData[i] > 0) ? 255 : 0; //hack: remove later
+        else
+            bufferRGBA[i] = 0;
     }
+
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, sizeX, sizeY, sizeZ, 0, GL_RED, GL_UNSIGNED_BYTE, bufferRGBA);
@@ -599,10 +602,21 @@ void OpenGLManager::load3DTexturesFromRaw_3(QString path1, QString path2, QStrin
     // convert to rgba
     for (int i = 0; i < size; ++i) {
         unsigned int idx = i * 3;
-        bufferRGBA[idx] = (rawData1[i] > 0) ? 255 : 0; //hack: remove later
-        bufferRGBA[idx + 1] = (rawData2[i] > 0) ? 255 : 0;
-        bufferRGBA[idx + 2] = (rawData3[i] > 0) ? 255 : 0;
-        //bufferRGBA[idx + 3] = 255;
+
+        if (rawData1 != NULL)
+            bufferRGBA[idx] = (rawData1[i] > 0) ? 255 : 0; //hack: remove later
+        else
+            bufferRGBA[idx] = 0;
+
+        if (rawData2 != NULL)
+            bufferRGBA[idx + 1] = (rawData2[i] > 0) ? 255 : 0;
+        else
+            bufferRGBA[idx + 1] = 0;
+
+        if (rawData3 != NULL)
+            bufferRGBA[idx + 2] = (rawData3[i] > 0) ? 255 : 0;
+        else
+            bufferRGBA[idx + 2] = 0;
     }
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
