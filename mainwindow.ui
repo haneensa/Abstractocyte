@@ -623,7 +623,7 @@
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="tabsClosable">
         <bool>false</bool>
@@ -897,13 +897,6 @@
                       <widget class="QPushButton" name="pushButton_9">
                        <property name="text">
                         <string>Select Objects</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="pushButton_12">
-                       <property name="text">
-                        <string>Update View</string>
                        </property>
                       </widget>
                      </item>
@@ -4233,22 +4226,6 @@
     <hint type="destinationlabel">
      <x>700</x>
      <y>779</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton_12</sender>
-   <signal>clicked()</signal>
-   <receiver>openGLWidget</receiver>
-   <slot>updateProximitySSBO()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>514</x>
-     <y>1343</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>644</x>
-     <y>1326</y>
     </hint>
    </hints>
   </connection>
