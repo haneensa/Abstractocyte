@@ -90,19 +90,12 @@ bool OpenGLManager::initOpenGLFunctions()
     m_GNeurites.initOpenGLFunctions();
     m_GlycogenPoints.initOpenGLFunctions();
 
-    load3DTexturesFromRaw_3("mask_745_sigma3.raw", "astrocytic_mitochondria_s5.raw", "Neuronic_mitochondria_binary_s5.raw", m_splat_volume_3DTex, GL_TEXTURE2);
-    //load3DTexturesFromRaw("mask_745_sigma3.raw", m_astro_3DTex ); // Astrocytic_mitochondria_b.raw
-    //load3DTexturesFromRaw("astrocytic_mitochondria_s5.raw", m_mito_3DTex ); //
-    //load3DTexturesFromRaw("Neuronic_mitochondria_binary_s5.raw", m_nmito_3DTex);
-    //load3DTexturesFromRaw("glycogen_volume_s5.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
-	
+    load3DTexturesFromRaw_3("input/mask_745_sigma3.raw", "input/astrocytic_mitochondria_s5.raw", "input/Neuronic_mitochondria_binary_s5.raw", m_splat_volume_3DTex, GL_TEXTURE2);
 
-	load3DTexturesFromRaw("mask_glycogen_sig3_blured20.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
+    load3DTexturesFromRaw("input/mask_glycogen_sig3_blured20.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
      //init_Gly3DTex();
     //upload_Gly3DTex(m_dataContainer->getGlycogen3DGridData(), DIM_G, DIM_G, DIM_G);
-	std::vector<unsigned char>* glycogen_tf = new std::vector<unsigned char>(); 
-	//glycogen_tf->push_back(255); glycogen_tf->push_back(245); glycogen_tf->push_back(240); glycogen_tf->push_back(255);   // 0 247,252,245
-	//glycogen_tf->push_back(254); glycogen_tf->push_back(224); glycogen_tf->push_back(210); glycogen_tf->push_back(255);   // 1 229,245,224
+    std::vector<unsigned char>* glycogen_tf = new std::vector<unsigned char>();
 	glycogen_tf->push_back(252); glycogen_tf->push_back(187); glycogen_tf->push_back(161); glycogen_tf->push_back(255);   // 2 199,233,192
 	glycogen_tf->push_back(252); glycogen_tf->push_back(146); glycogen_tf->push_back(114); glycogen_tf->push_back(255);   // 3 161,217,155
 	glycogen_tf->push_back(251); glycogen_tf->push_back(106); glycogen_tf->push_back(74); glycogen_tf->push_back(255);   // 4 116,196,118
