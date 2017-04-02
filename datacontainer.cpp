@@ -1,6 +1,3 @@
-// skeletons to take care of : 134, 510
-// 419, 56
-// 422, 59
 #include <chrono>
 #include "datacontainer.h"
 #include <set>
@@ -71,10 +68,9 @@ void DataContainer::loadData()
     loadParentFromHVGX(hvgxFile);
 
 
-    m_limit = 100000;
-
+    m_limit = 1;
     m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
-    m_load_data = LoadData_t::ALL;
+    m_load_data = LoadData_t::NEURITES;
     m_normals_t = Normals_t::LOAD_NORMAL;
 
 
@@ -83,29 +79,29 @@ void DataContainer::loadData()
     if (m_loadType == LoadFile_t::DUMP_ASTRO || m_loadType == LoadFile_t::DUMP_NEURITES) {
         if (m_loadType == LoadFile_t::DUMP_ASTRO) {
             importXML("://pipeline_scripts/output/m3_astrocyte.xml");   // 155,266  ms ~ 2.6 min
-            const char* filename1 = "astro_data_fv.dat";
+            const char* filename1 = "input/astro_data_fv.dat";
             m_mesh->dumpVertexData(filename1);
         } else {
-            const char* filename2 = "neurites_data_fv.dat";
+            const char* filename2 = "input/neurites_data_fv.dat";
             importXML("://pipeline_scripts/output/m3_neurites.xml");    // 910741
             m_mesh->dumpVertexData(filename2);
         }
     } else if (m_loadType == LoadFile_t::LOAD_MESH_NO_VERTEX)  {
 
         if (m_load_data == LoadData_t::ASTRO) {
-            const char* filename1 = "astro_data_fv.dat";
+            const char* filename1 = "input/astro_data_fv.dat";
             m_mesh->readVertexData(filename1);
             importXML("://pipeline_scripts/output/m3_astrocyte_noVertex.xml");   //  110,928  ms ~ 2 min -> 17306
         } else if (m_load_data == LoadData_t::NEURITES) {
-            const char* filename2 = "neurites_data_fv.dat";
+            const char* filename2 = "input/neurites_data_fv.dat";
             m_mesh->readVertexData(filename2); //
             importXML("://pipeline_scripts/output/m3_neurites_noVertexNoFace.xml");    // 674046 ~ 12 min -> 118107 ms -> 134884 with vertex type classification
         } else if (m_load_data == LoadData_t::ALL) {
-            const char* filename1 = "astro_data_fv.dat";
+            const char* filename1 = "input/astro_data_fv.dat";
             m_mesh->readVertexData(filename1);
             importXML("://pipeline_scripts/output/m3_astrocyte_noVertex.xml");   //   110,928  ms ~ 2 min -> 17306 ms
 
-            const char* filename2 = "neurites_data_fv.dat";
+            const char* filename2 = "input/neurites_data_fv.dat";
             m_mesh->readVertexData(filename2); //
             importXML("://pipeline_scripts/output/m3_neurites_noVertexNoFace.xml");    // 674046 ~ 12 min -> 118107 ms
         }
@@ -147,12 +143,12 @@ void DataContainer::loadData()
 
     } else if (m_normals_t == Normals_t::LOAD_NORMAL) {
         if (m_load_data == LoadData_t::ASTRO) {
-            m_mesh->readNormalsBinary("astro_normals.dat");
+            m_mesh->readNormalsBinary("input/astro_normals.dat");
         } else if (m_load_data == LoadData_t::NEURITES) {
-            m_mesh->readNormalsBinary("neurites_normals.dat");
+            m_mesh->readNormalsBinary("input/neurites_normals.dat");
         } else if (m_load_data == LoadData_t::ALL) {
-            m_mesh->readNormalsBinary("astro_normals.dat");
-            m_mesh->readNormalsBinary("neurites_normals.dat");
+            m_mesh->readNormalsBinary("input/astro_normals.dat");
+            m_mesh->readNormalsBinary("input/neurites_normals.dat");
         }
     }
 

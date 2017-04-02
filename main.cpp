@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[])
 {
-    if (!QResource::registerResource("external_resources.rcc")) {
+    if (!QResource::registerResource("input/external_resources.rcc")) {
           qDebug() << "Could not register resources.";
           return 0;
     }
