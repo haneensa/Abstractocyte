@@ -17,7 +17,7 @@
    <string>Abstractocyte</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_15">
+   <layout class="QGridLayout" name="gridLayout_26">
     <item row="0" column="0">
      <layout class="QGridLayout" name="gridLayout_5">
       <item row="0" column="0">
@@ -47,8 +47,8 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>469</width>
-     <height>1199</height>
+     <width>407</width>
+     <height>478</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -61,7 +61,7 @@
     <enum>Qt::LeftToRight</enum>
    </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetFloatable</set>
+    <set>QDockWidget::NoDockWidgetFeatures</set>
    </property>
    <property name="windowTitle">
     <string/>
@@ -79,7 +79,7 @@
     <property name="cursor">
      <cursorShape>ArrowCursor</cursorShape>
     </property>
-    <layout class="QGridLayout" name="gridLayout_25">
+    <layout class="QGridLayout" name="gridLayout_15">
      <item row="0" column="0">
       <widget class="QFrame" name="frame_64">
        <property name="frameShape">
@@ -564,7 +564,19 @@
        </layout>
       </widget>
      </item>
-     <item row="1" column="0">
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget_2">
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QGridLayout" name="gridLayout_25">
+     <item row="0" column="0">
       <widget class="QFrame" name="frame_61">
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
@@ -579,7 +591,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>5</number>
+           <number>0</number>
           </property>
           <property name="tabsClosable">
            <bool>false</bool>
@@ -1695,8 +1707,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>393</width>
-                 <height>892</height>
+                 <width>496</width>
+                 <height>1338</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2523,8 +2535,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>387</width>
-                 <height>961</height>
+                 <width>245</width>
+                 <height>433</height>
                 </rect>
                </property>
                <attribute name="label">
