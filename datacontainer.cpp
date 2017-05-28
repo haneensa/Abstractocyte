@@ -222,6 +222,8 @@ void DataContainer::loadConnectivityGraph(QString path)
     file.close();
 }
 
+//----------------------------------------------------------------------------
+//
 void DataContainer::loadParentFromHVGX(QString path)
 {
     qDebug() << "Func: loadMetaDataHVGX";
@@ -264,6 +266,7 @@ void DataContainer::loadParentFromHVGX(QString path)
     file.close();
 }
 
+//----------------------------------------------------------------------------
 // load this after loading obj file
 // get center from here, and volume, and connectivity?
 void DataContainer::loadMetaDataHVGX(QString path)
@@ -486,59 +489,6 @@ int DataContainer::importXML(QString path)
     return 0;
 }
 
-
-//----------------------------------------------------------------------------
-// Experimental
-/*bool DataContainer::importXML_DOM(QString path)
-{
-    qDebug() << "Func: importXML";
-    auto t1 = std::chrono::high_resolution_clock::now();
-
-    QFile  *file = new QFile(path);
-    if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "Could not open the file for reading";
-        return false;
-    }
-
-    QDomDocument doc;
-    if (!doc.setContent(file)) {
-        file->close();
-        return 0;
-    }
-    file->close();
-
-    m_vertex_offset += m_mesh->getVerticesSize();
-    QDomNode n = doc.firstChild();
-    while (!n.isNull()) {
-        //QXmlStreamReader::TokenType token = xml.readNext();
-        //if (token == QXmlStreamReader::StartDocument) {
-        //	continue;
-        //}
-
-        /*if (token == QXmlStreamReader::StartElement) {
-            if (xml.name() == "o") {
-                if (m_objects.size() > m_limit) {
-                    qDebug() << "* Reached size limit.";
-                    break;
-                }
-                Object *obj = NULL;
-
-                // make a thread that would read this ?
-                // the astrocyte wast most of the time
-                // so if we can optimize reading one object would be better
-                parseObject(xml, obj); // fills the object with obj info
-            }
-        }
-        n = n.firstChild();
-    }
-
-    auto t2 = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double, std::milli> ms = t2 - t1;
-    qDebug() << "time: " << ms.count() << "ms, m_tempCounter: " << m_tempCounter;
-}*/
-
-
-
 //----------------------------------------------------------------------------
 //
 // load the object with all its related informations
@@ -673,7 +623,6 @@ void DataContainer::parseObject(QXmlStreamReader &xml, Object *obj)
     }
 
 }
-
 
 //----------------------------------------------------------------------------
 //
@@ -1272,8 +1221,8 @@ std::vector<Object*> DataContainer::getObjectsByType(Object_t type)
      return m_objects[hvgxID]->getName();
  }
 
- //----------------------------------------------------------------------------
- //
+//----------------------------------------------------------------------------
+//
  Object* DataContainer::getObject(int hvgxID)
  {
 	 if (m_objects.find(hvgxID) == m_objects.end())
@@ -1281,8 +1230,8 @@ std::vector<Object*> DataContainer::getObjectsByType(Object_t type)
 	 else return m_objects.at(hvgxID);
  }
 
- //----------------------------------------------------------------------------
- //
+//----------------------------------------------------------------------------
+//
 void DataContainer::recomputeMaxValues(bool weighted)
 {
     float temp_max_astro_coverage   = 0;
