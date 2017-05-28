@@ -51,17 +51,11 @@ public:
     void parseBranch(QXmlStreamReader &xml, Object *obj);
     void parseSkeletonPoints(QXmlStreamReader &xml, Object *obj);
 
-	/*bool importXML_DOM(QString path);
-	void parseObject_DOM(QXmlStreamReader &xml, Object *obj);
-	void parseMesh_DOM(QXmlStreamReader &xml, Object *obj);
-	void parseSkeleton_DOM(QXmlStreamReader &xml, Object *obj);
-	void parseSkeletonNodes_DOM(QXmlStreamReader &xml, Object *obj);
-	void parseBranch_DOM(QXmlStreamReader &xml, Object *obj);
-	void parseSkeletonPoints_DOM(QXmlStreamReader &xml, Object *obj);*/
-
     void loadConnectivityGraph(QString path);
-    void loadMetaDataHVGX(QString path);
-    void loadParentFromHVGX(QString path);
+    void addEdgeToConnectivityGraph(int, int, std::set< std::tuple<int, int> >&);
+    void parseSynapsesGraph(QList<QByteArray>&,  std::set< std::tuple<int, int> >&);
+    void PostloadMetaDataHVGX(QString path);
+    void PreLoadMetaDataHVGX(QString path);
 
 	//glycogen
     int									getGlycogenSize() { return m_glycogenMap.size(); }

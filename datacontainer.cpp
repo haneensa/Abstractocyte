@@ -62,11 +62,8 @@ DataContainer::~DataContainer()
 // m_loadType = LoadFile_t::LOAD_MESH_W_VERTEX;
 void DataContainer::loadData()
 {
-    /* 1: no need for this, I can later construct this from hvgx file */
-    loadConnectivityGraph(":/data/connectivityList.csv");// -> neurites_neurite_edge
     QString hvgxFile = ":/data/mouse3_metadata_objname_center_astroSyn.hvgx";
-    loadParentFromHVGX(hvgxFile);
-
+    PreLoadMetaDataHVGX(hvgxFile);
 
     m_limit = 1000000;
     m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
@@ -160,7 +157,7 @@ void DataContainer::loadData()
 
 
     /* 3 */
-    loadMetaDataHVGX(hvgxFile);
+    PostloadMetaDataHVGX(hvgxFile);
 }
 
 
@@ -222,9 +219,73 @@ void DataContainer::loadConnectivityGraph(QString path)
     file.close();
 }
 
+void DataContainer::addEdgeToConnectivityGraph(int n1, int n2, std::set< std::tuple<int, int> >&connectivity_e_set)
+{
+
+    if (connectivity_e_set.find(std::tuple<int, int>(n1, n2)) != connectivity_e_set.end())
+        return;
+
+    if (!n1 || !n2)
+        return;
+
+    connectivity_e_set.insert(std::tuple<int, int>(n1, n2));
+    neurites_neurite_edge.push_back(QVector2D(n1, n2));
+}
+
+void DataContainer::parseSynapsesGraph(QList<QByteArray>& wordList, std::set< std::tuple<int, int> >&connectivity_e_set)
+{
+    // connectivity info
+    // id, vol_node_id, abs_edge_id, axon_id, dendrite_id, spine_id, bouton_id, name
+    // if no ID -> 0
+    int hvgxID = wordList[1].toInt(); // object ID
+    int axon_id = wordList[4].toInt();
+    int dendrite_id = wordList[5].toInt();
+    int spine_id = wordList[6].toInt();
+    int bouton_id = wordList[7].toInt();
+
+    unsigned int synapse_parts = 0; // 1111
+
+    if (axon_id > 0)        synapse_parts |= 1 << 3;
+    if (dendrite_id > 0)    synapse_parts |= 1 << 2;
+    if (spine_id > 0)       synapse_parts |= 1 << 1;
+    if (bouton_id > 0)      synapse_parts |= 1 << 0;
+
+
+    switch(synapse_parts) {
+    case 15:
+        addEdgeToConnectivityGraph(dendrite_id, spine_id, connectivity_e_set);
+        addEdgeToConnectivityGraph(axon_id, bouton_id, connectivity_e_set);
+        addEdgeToConnectivityGraph(spine_id, bouton_id, connectivity_e_set);
+        break;
+    case 14:
+        qDebug() << "no bouton";
+        addEdgeToConnectivityGraph(dendrite_id, spine_id, connectivity_e_set);
+        addEdgeToConnectivityGraph(axon_id, spine_id, connectivity_e_set);
+        break;
+    case 13:
+        qDebug() << "no spine";
+        addEdgeToConnectivityGraph(dendrite_id, bouton_id, connectivity_e_set);
+        addEdgeToConnectivityGraph(axon_id, bouton_id, connectivity_e_set);
+        break;
+    case 9:
+        qDebug() << "no den or spine";
+        addEdgeToConnectivityGraph(axon_id, bouton_id, connectivity_e_set);
+        break;
+    case 6:
+        qDebug() << "no axon or bouton";
+        addEdgeToConnectivityGraph(dendrite_id, spine_id, connectivity_e_set);
+        break;
+    case 0:
+        qDebug() << "nothing. Check this problematic object " << hvgxID;
+        break;
+    default:
+        qDebug() << synapse_parts << "Case Was Missed!!"; break;
+    }
+}
+
 //----------------------------------------------------------------------------
 //
-void DataContainer::loadParentFromHVGX(QString path)
+void DataContainer::PreLoadMetaDataHVGX(QString path)
 {
     qDebug() << "Func: loadMetaDataHVGX";
     QFile file(path);
@@ -232,6 +293,9 @@ void DataContainer::loadParentFromHVGX(QString path)
         qDebug() << "Could not open the file for reading";
         return;
     }
+
+    // temp set to check for edges
+    std::set< std::tuple<int, int> > connectivity_e_set;
 
     QTextStream in(&file);
     QList<QByteArray> wordList;
@@ -243,8 +307,9 @@ void DataContainer::loadParentFromHVGX(QString path)
 
         if (wordList[0] == "sg") {
             // vast_id, flags, r,g,b, pattern1, r2, g2, b2, pattern2, anchorx, anchory, anchorz, parent_id, child_id, previous_sibiling_id, next_sibiling_id, collapsed, bboxx1, bboxy1, bboxz1, bboxx2, bboxy2, bboxz2, voxels, type, object_id, name
+            std::string object_type = wordList[26].toStdString();
 
-            if (wordList[26] == "MITOCHONDERIA") {
+            if (object_type == "MITOCHONDERIA") {
                 qDebug() << line;
                 continue;
             }
@@ -254,12 +319,18 @@ void DataContainer::loadParentFromHVGX(QString path)
 
             m_parents[hvgxID] = parentID;
 
+            if ( object_type == "DENDRITE" || object_type == "SPINE" || object_type == "AXON" ||object_type == "BOUTON" ) {
+                addEdgeToConnectivityGraph(parentID, hvgxID, connectivity_e_set);
+            }
+
         } else if (wordList[0] == "mt") {
             // update mitochoneria parent here if any exists
             //"mt,1053,307,DENDRITE,144,mito_d048_01_029\n"
             int hvgxID = wordList[1].toInt();
             int parentID = wordList[4].toInt();
             m_parents[hvgxID] = parentID;
+        } else if (wordList[0] == "sy") {
+            parseSynapsesGraph(wordList, connectivity_e_set);
         }
     }
 
@@ -269,7 +340,7 @@ void DataContainer::loadParentFromHVGX(QString path)
 //----------------------------------------------------------------------------
 // load this after loading obj file
 // get center from here, and volume, and connectivity?
-void DataContainer::loadMetaDataHVGX(QString path)
+void DataContainer::PostloadMetaDataHVGX(QString path)
 {
     qDebug() << "Func: loadMetaDataHVGX";
     QFile file(path);
