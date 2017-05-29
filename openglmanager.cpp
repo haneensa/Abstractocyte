@@ -93,8 +93,7 @@ bool OpenGLManager::initOpenGLFunctions()
     load3DTexturesFromRaw_3("input/mask_745_sigma3.raw", "input/astrocytic_mitochondria_s5.raw", "input/Neuronic_mitochondria_binary_s5.raw", m_splat_volume_3DTex, GL_TEXTURE2);
 
     load3DTexturesFromRaw("input/mask_glycogen_sig3_blured20.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
-     //init_Gly3DTex();
-    //upload_Gly3DTex(m_dataContainer->getGlycogen3DGridData(), DIM_G, DIM_G, DIM_G);
+
     std::vector<unsigned char>* glycogen_tf = new std::vector<unsigned char>();
 	glycogen_tf->push_back(252); glycogen_tf->push_back(187); glycogen_tf->push_back(161); glycogen_tf->push_back(255);   // 2 199,233,192
 	glycogen_tf->push_back(252); glycogen_tf->push_back(146); glycogen_tf->push_back(114); glycogen_tf->push_back(255);   // 3 161,217,155
@@ -404,35 +403,6 @@ void OpenGLManager::fillVBOsData()
 }
 
 // ############## Textures ###############################################
-//
-void OpenGLManager::init_Gly3DTex()
-{
-    m_gly_3D_Tex = 0;
-
-    glGenTextures(1, &m_gly_3D_Tex);
-    glBindTexture(GL_TEXTURE_3D, m_gly_3D_Tex);
-    GL_Error();
-
-    //glTexImage3D(GL_TEXTURE_3D, 0, GL_RED, 1000, 1000, 1000, 0, GL_RED, GL_FLOAT, 0);
-
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-    GL_Error();
-}
-
-// ----------------------------------------------------------------------------
-//
-void OpenGLManager::upload_Gly3DTex(void* data, int sizeX, int sizeY, int sizeZ, GLenum type)
-{
-    glBindTexture(GL_TEXTURE_3D, m_gly_3D_Tex);
-
-    glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, sizeX, sizeY, sizeZ, 0, GL_RGBA, type, (GLvoid*)data);
-}
-
 // ----------------------------------------------------------------------------
 //
 void OpenGLManager::init2DHeatMapTextures()

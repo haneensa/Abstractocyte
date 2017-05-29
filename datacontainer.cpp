@@ -31,12 +31,10 @@ DataContainer::DataContainer()
     /* 2: build missing skeletons due to order of objects in file */
     buildMissingSkeletons();
 
-
     /* 3 */
     qDebug() << "setting up glycogen octree";
     m_glycogenOctree.initialize(&m_glycogenList);
     qDebug() << "octree ready";
-
 
     this->recomputeMaxValues(false);
 }

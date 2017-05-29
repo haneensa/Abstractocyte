@@ -142,9 +142,7 @@ public:
     void render2DHeatMapTexture();
     void update2DTextureUniforms(GLuint program);
     // ************ 3D HeatMap  *******
-	void init_Gly3DTex();
 	void init_TF(GLuint &texture, GLenum texture_unit, GLvoid* data, int size);
-	void upload_Gly3DTex(void* data, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z, GLenum type = GL_UNSIGNED_BYTE);
 	void load3DTexturesFromRaw(QString path, GLuint &texture, GLenum texture_unit, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z);
 	void load3DTexturesFromRaw_3(QString path1, QString path2, QString path3, GLuint &texture, GLenum texture_unit, int sizeX = DIM_X, int sizeY = DIM_Y, int sizeZ = DIM_Z);
 
@@ -154,11 +152,11 @@ public:
     std::vector<int> getSSBOFilterByProximity();
     void updateMinProximity( double min);
 
-     std::map<Object_t, std::pair<int, int>>  getObjectCountByType() { return m_visibleByType;}
+    std::map<Object_t, std::pair<int, int>>  getObjectCountByType() { return m_visibleByType;}
 
-     void updateFilteredData();
+    void updateFilteredData();
 
-     void updateProximitySSBOFlag()     { reset_ssbo = !reset_ssbo; }
+    void updateProximitySSBOFlag()     { reset_ssbo = !reset_ssbo; }
 
 
 
