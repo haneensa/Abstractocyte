@@ -65,14 +65,14 @@ public:
     void allocateVerticesVBO(QOpenGLBuffer vbo_mesh);
     void allocateNormalsVBO(QOpenGLBuffer vbo_mesh);
 
-    void dumpVertexData(const char* filename);
-    void readVertexData(const char* filename);
-
+    void dumpVertexData(QString path);
+    void readVertexData(QString path);
 
     void computeNormalsPerVertex();
     QVector3D computeFaceNormal(struct face);
-    void dumpNormalsList(const char* filename);
-    bool readNormalsBinary(const char* filename);
+
+    void dumpNormalsList(QString path);
+    bool readNormalsBinary(QString path);
 
     size_t getNormalsListSize()         { return m_normalsList.size(); }
 

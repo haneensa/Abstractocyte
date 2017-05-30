@@ -46,6 +46,8 @@ struct input_files {
     QString xml_light_neurites;
     QString binary_vf_astro;        // v: vertices, f: faces
     QString binary_vf_neurites;
+    QString binary_normals_astro;
+    QString binary_normals_neurites;
 };
 
 class DataContainer

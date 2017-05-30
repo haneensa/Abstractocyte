@@ -15,8 +15,11 @@ Mesh::Mesh()
 	m_typeVertexList[7].reserve(350000);   //synps.v: 300,748
 }
 
-void Mesh::dumpVertexData(const char* filename)
+void Mesh::dumpVertexData(QString path)
 {
+    std::string temp_string =  path.toStdString();
+    const char * filename = temp_string.c_str();
+
     std::ofstream outfile(filename, std::ios::binary);
     // write size of file into binary and read it the first thing to allocate
     int size = verticesList.size(); // astro: 1246096
@@ -35,8 +38,11 @@ void Mesh::dumpVertexData(const char* filename)
     outfile.close();
  }
 
-void  Mesh::readVertexData(const char* filename)
+void Mesh::readVertexData(QString path)
 {
+    std::string temp_string =  path.toStdString();
+    const char * filename = temp_string.c_str();
+
     int size = 0;
     std::ifstream ss(filename, std::ios::binary);
 
@@ -52,7 +58,6 @@ void  Mesh::readVertexData(const char* filename)
         //qDebug() << v.mesh_vertex  << " " << v.skeleton_vertex  << " " << v.index;
     }
 
-
     size = 0;
     // check if the file was correctly open
 
@@ -66,7 +71,6 @@ void  Mesh::readVertexData(const char* filename)
     }
 
     ss.close();
-
 
     qDebug() << " verticesList: " << verticesList.size() << " m_faces: " << m_faces.size();
 }
@@ -119,8 +123,11 @@ QVector3D Mesh::computeFaceNormal(struct face f)
     return face_normal.normalized() * sin_alpha;
 }
 
-void Mesh::dumpNormalsList(const char* filename)
+void Mesh::dumpNormalsList(QString path)
 {
+    std::string temp_string =  path.toStdString();
+    const char * filename = temp_string.c_str();
+
     std::ofstream outfile(filename, std::ios::binary);
     // write size of file into binary and read it the first thing to allocate
     int size = m_normalsList.size();
@@ -133,8 +140,11 @@ void Mesh::dumpNormalsList(const char* filename)
 
 }
 
-bool Mesh::readNormalsBinary(const char* filename)
+bool Mesh::readNormalsBinary(QString path)
 {
+    std::string temp_string =  path.toStdString();
+    const char * filename = temp_string.c_str();
+
     int size = 0;
     std::ifstream ss(filename, std::ios::binary);
     ss.read((char*)&size, sizeof(int));
