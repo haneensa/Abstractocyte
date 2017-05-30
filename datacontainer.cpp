@@ -19,12 +19,31 @@ DataContainer::DataContainer()
         m_faces_offset(0),
         m_debug_msg(false)
 {
+    input_files_dir.HVGX_metadata = ":/data/mouse3_metadata_objname_center_astroSyn.hvgx";
+
+    // xml with vertices and faces - slow
+    input_files_dir.xml_detailed_astro = "://pipeline_scripts/output/m3_astrocyte.xml";
+    input_files_dir.xml_detailed_neurites = "://pipeline_scripts/output/m3_neurites.xml";
+
+    // xml without virtices and faces - faster, but needs the vertices and faces as binary (dat) file
+    input_files_dir.xml_light_astro = "://pipeline_scripts/output/m3_astrocyte_noVertex.xml";
+    input_files_dir.xml_light_neurites = "://pipeline_scripts/output/m3_neurites_noVertexNoFace.xml";
+
+    input_files_dir.binary_vf_astro = "input/astro_data_fv.dat";
+    input_files_dir.binary_vf_neurites =  "input/neurites_data_fv.dat";
+
+    // input files for proximity analysis (astrocyte, astrocytic mito, neuronal mito)
+    input_files_dir.proximity_astro = "input/mask_745_sigma3.raw";
+    input_files_dir.proximity_astro_mito = "input/astrocytic_mitochondria_s5.raw";
+    input_files_dir.proximity_neu_mito = "input/Neuronic_mitochondria_binary_s5.raw";
+    input_files_dir.proximity_glycogen = "input/mask_glycogen_sig3_blured210.raw";
 
     m_mesh = new Mesh();
 	m_glycogen3DGrid.setSize(DIM_G, DIM_G, DIM_G);
 	m_boutonHash.setSize(32, 32, 32);
 	m_spineHash.setSize(32, 32, 32);
 	m_neuroMitoHash.setSize(32, 32, 32);
+
     /* 1: load all data */
     loadData();
 
@@ -60,7 +79,7 @@ DataContainer::~DataContainer()
 // m_loadType = LoadFile_t::LOAD_MESH_W_VERTEX;
 void DataContainer::loadData()
 {
-    QString hvgxFile = ":/data/mouse3_metadata_objname_center_astroSyn.hvgx";
+    QString hvgxFile = input_files_dir.HVGX_metadata;
     PreLoadMetaDataHVGX(hvgxFile);
 
     m_limit = 1000000;
@@ -73,12 +92,12 @@ void DataContainer::loadData()
 
     if (m_loadType == LoadFile_t::DUMP_ASTRO || m_loadType == LoadFile_t::DUMP_NEURITES) {
         if (m_loadType == LoadFile_t::DUMP_ASTRO) {
-            importXML("://pipeline_scripts/output/m3_astrocyte.xml");   // 155,266  ms ~ 2.6 min
+            importXML(input_files_dir.xml_detailed_astro);   // 155,266  ms ~ 2.6 min
             const char* filename1 = "input/astro_data_fv.dat";
             m_mesh->dumpVertexData(filename1);
         } else {
             const char* filename2 = "input/neurites_data_fv.dat";
-            importXML("://pipeline_scripts/output/m3_neurites.xml");    // 910741
+            importXML(input_files_dir.xml_detailed_neurites);    // 910741
             m_mesh->dumpVertexData(filename2);
         }
     } else if (m_loadType == LoadFile_t::LOAD_MESH_NO_VERTEX)  {
@@ -86,31 +105,29 @@ void DataContainer::loadData()
         if (m_load_data == LoadData_t::ASTRO) {
             const char* filename1 = "input/astro_data_fv.dat";
             m_mesh->readVertexData(filename1);
-            importXML("://pipeline_scripts/output/m3_astrocyte_noVertex.xml");   //  110,928  ms ~ 2 min -> 17306
+            importXML(input_files_dir.xml_light_astro);   //  110,928  ms ~ 2 min -> 17306
         } else if (m_load_data == LoadData_t::NEURITES) {
             const char* filename2 = "input/neurites_data_fv.dat";
             m_mesh->readVertexData(filename2); //
-            importXML("://pipeline_scripts/output/m3_neurites_noVertexNoFace.xml");    // 674046 ~ 12 min -> 118107 ms -> 134884 with vertex type classification
+            importXML(input_files_dir.xml_light_neurites);    // 674046 ~ 12 min -> 118107 ms -> 134884 with vertex type classification
         } else if (m_load_data == LoadData_t::ALL) {
             const char* filename1 = "input/astro_data_fv.dat";
             m_mesh->readVertexData(filename1);
-            importXML("://pipeline_scripts/output/m3_astrocyte_noVertex.xml");   //   110,928  ms ~ 2 min -> 17306 ms
+            importXML(input_files_dir.xml_light_astro);   //   110,928  ms ~ 2 min -> 17306 ms
 
             const char* filename2 = "input/neurites_data_fv.dat";
             m_mesh->readVertexData(filename2); //
-            importXML("://pipeline_scripts/output/m3_neurites_noVertexNoFace.xml");    // 674046 ~ 12 min -> 118107 ms
+            importXML(input_files_dir.xml_light_neurites);    // 674046 ~ 12 min -> 118107 ms
         }
 
     } else {
         if (m_load_data == LoadData_t::ASTRO) {
-           importXML("://pipeline_scripts/output/m3_astrocyte.xml");   // 155,266  ms ~ 2.6 min
-           // importXML("://pipeline_scripts_mouse4/output/m4_astrocyte.xml");   // 155,266  ms ~ 2.6 min
-
+           importXML(input_files_dir.xml_detailed_astro);   // 155,266  ms ~ 2.6 min
         } else if (m_load_data == LoadData_t::NEURITES) {
-            importXML("://pipeline_scripts/output/m3_neurites.xml");    // 910741
+            importXML(input_files_dir.xml_detailed_neurites);    // 910741
         } else if (m_load_data == LoadData_t::ALL) {
-            importXML("://pipeline_scripts/output/m3_astrocyte.xml");   // 155,266  ms ~ 2.6 min
-            importXML("://pipeline_scripts/output/m3_neurites.xml");    // 910741
+            importXML(input_files_dir.xml_detailed_astro);   // 155,266  ms ~ 2.6 min
+            importXML(input_files_dir.xml_detailed_neurites);    // 910741
         }
 
     }
@@ -150,8 +167,6 @@ void DataContainer::loadData()
      qDebug() << " faces: "  << m_mesh->getFacesListSize() << " " <<
                  " vertices: "  << m_mesh->getVerticesSize() << " " <<
                  " normals: "  << m_mesh->getNormalsListSize();
-
-
 
 
     /* 3 */

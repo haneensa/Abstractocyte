@@ -78,7 +78,7 @@ void OpenGLManager::drawAll()
  }
 
 // ############## Data Initialization ###############################################
-//
+// todo: if the file doesn't open or doesn't exist, then don't load the data here and in GLSL
 bool OpenGLManager::initOpenGLFunctions()
 {
     m_glFunctionsSet = true;
@@ -90,9 +90,13 @@ bool OpenGLManager::initOpenGLFunctions()
     m_GNeurites.initOpenGLFunctions();
     m_GlycogenPoints.initOpenGLFunctions();
 
-    load3DTexturesFromRaw_3("input/mask_745_sigma3.raw", "input/astrocytic_mitochondria_s5.raw", "input/Neuronic_mitochondria_binary_s5.raw", m_splat_volume_3DTex, GL_TEXTURE2);
+    load3DTexturesFromRaw_3(m_dataContainer->input_files_dir.proximity_astro,
+                            m_dataContainer->input_files_dir.proximity_astro_mito,
+                            m_dataContainer->input_files_dir.proximity_neu_mito,
+                            m_splat_volume_3DTex, GL_TEXTURE2);
 
-    load3DTexturesFromRaw("input/mask_glycogen_sig3_blured20.raw", m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
+    load3DTexturesFromRaw(m_dataContainer->input_files_dir.proximity_glycogen,
+                           m_glycogen_3DTex, GL_TEXTURE3, 999, 999, 999);
 
     std::vector<unsigned char>* glycogen_tf = new std::vector<unsigned char>();
 	glycogen_tf->push_back(252); glycogen_tf->push_back(187); glycogen_tf->push_back(161); glycogen_tf->push_back(255);   // 2 199,233,192

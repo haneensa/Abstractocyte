@@ -34,6 +34,20 @@ enum class LoadData_t { ALL, ASTRO, NEURITES };
 enum class LoadFile_t { DUMP_ASTRO, DUMP_NEURITES, LOAD_MESH_NO_VERTEX, LOAD_MESH_W_VERTEX };
 enum class Normals_t { DUMP_NORMAL, LOAD_NORMAL, NO_NORMALS };
 
+struct input_files {
+    QString HVGX_metadata;
+    QString proximity_astro;
+    QString proximity_astro_mito;
+    QString proximity_neu_mito;
+    QString proximity_glycogen;
+    QString xml_detailed_astro;
+    QString xml_detailed_neurites;
+    QString xml_light_astro;
+    QString xml_light_neurites;
+    QString binary_vf_astro;        // v: vertices, f: faces
+    QString binary_vf_neurites;
+};
+
 class DataContainer
 {
 public:
@@ -101,6 +115,9 @@ public:
     void buildMissingSkeletons();
 
     int getIndicesSizeByObjectType(Object_t type)   { return m_indices_size_byType[type]; }
+
+public:
+    struct input_files                          input_files_dir;
 
 protected:
      // maximum volume from displayed objects
