@@ -68,12 +68,6 @@ public:
     void dumpVertexData(const char* filename);
     void readVertexData(const char* filename);
 
-    void dumpVericesList(const char* filename);
-    bool readVertexBinary(const char* filename);
-
-    void dumpFaceList(const char* filename);
-    bool readFacesBinary(const char* filename);
-
 
     void computeNormalsPerVertex();
     QVector3D computeFaceNormal(struct face);
