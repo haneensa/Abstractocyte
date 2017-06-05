@@ -25,15 +25,15 @@ public:
     explicit MainWindow(QWidget *parent = 0, QString input_path = "");
     ~MainWindow();
 
+    void setupSignalsNSlots();
+
 	GLWidget* getGLWidget();
 	MousePad* getMousePad();
 
 public slots:
 	void on_glycogenVisibilityCheckBox_toggled(bool);
 	//------------- glycogen clustering ----------------------------
-	void on_clusterButton_clicked();
-	//void on_glycogenClustersTreeWidget_itemClicked(QTreeWidgetItem* item, int column);
-	//void on_glycogenClustersTreeWidget_itemActivated(QTreeWidgetItem* item, int column);
+    void on_clusterButton_clicked();
 	void on_glycogenClustersTreeWidget_itemChanged(QTreeWidgetItem* item, int column);
 	void on_glycogenClustersTreeWidget_itemSelectionChanged();
 
@@ -44,6 +44,7 @@ public slots:
 	void on_boutonsSpinesRadioButton_toggled(bool);
 
     void on_glycogenMappingTreeWidget_itemChanged(QTreeWidgetItem* item, int column);
+
     //----- selected objects
     void on_object_clicked(QList<QStandardItem*>);
     void clearTable();
@@ -69,7 +70,6 @@ public slots:
     void on_filterByProximityListWidget_itemChanged(QListWidgetItem *);
 
     void on_listWidget_itemChanged(QListWidgetItem *);
-
 
 signals:
     void getDeletedData(int);

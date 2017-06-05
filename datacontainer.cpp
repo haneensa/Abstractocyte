@@ -22,6 +22,11 @@ DataContainer::DataContainer(QString input_path)
     /* 0: extract input files names */
     getInputFilesNames(input_path);
 
+    m_limit = 100000;
+    m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
+    m_load_data = LoadData_t::ALL;
+    m_normals_t = Normals_t::LOAD_NORMAL;
+
     m_mesh = new Mesh();
 	m_glycogen3DGrid.setSize(DIM_G, DIM_G, DIM_G);
 	m_boutonHash.setSize(32, 32, 32);
@@ -99,7 +104,6 @@ void DataContainer::getInputFilesNames(QString input_path)
 
     input_files_dir.binary_normals_astro = input_path + "/astro_normals.dat";
     input_files_dir.binary_normals_neurites = input_path + "/neurites_normals.dat";
-
 }
 
 //----------------------------------------------------------------------------
@@ -113,13 +117,8 @@ void DataContainer::getInputFilesNames(QString input_path)
 // m_loadType = LoadFile_t::LOAD_MESH_W_VERTEX;
 void DataContainer::loadData()
 {
-    QString hvgxFile = input_files_dir.HVGX_metadata;
-    PreLoadMetaDataHVGX(hvgxFile);
+    PreLoadMetaDataHVGX(input_files_dir.HVGX_metadata);
 
-    m_limit = 100000;
-    m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
-    m_load_data = LoadData_t::ALL;
-    m_normals_t = Normals_t::LOAD_NORMAL;
 
     auto t1 = std::chrono::high_resolution_clock::now();
 
@@ -192,9 +191,8 @@ void DataContainer::loadData()
                  " vertices: "  << m_mesh->getVerticesSize() << " " <<
                  " normals: "  << m_mesh->getNormalsListSize();
 
-
     /* 3 */
-    PostloadMetaDataHVGX(hvgxFile);
+    PostloadMetaDataHVGX(input_files_dir.HVGX_metadata);
 }
 
 

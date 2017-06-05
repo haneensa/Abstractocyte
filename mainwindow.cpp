@@ -19,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent, QString input_path) :
     mainwindow_ui->setupUi(this);
     getGLWidget()->init(input_path);
 
+    setupSignalsNSlots();
+
     m_currentSelectedCluster = 0;
     m_clusters = 0;
 
@@ -29,6 +31,30 @@ MainWindow::MainWindow(QWidget *parent, QString input_path) :
 
     mainwindow_ui->tableView->setModel(tableView);
 
+	//rotate astrocytes label of the abstraction space
+	QPixmap myPixmap(QSize(20, 210));
+	myPixmap.fill(Qt::transparent);
+	QPainter painter(&myPixmap);
+	painter.translate(12, 140);
+	painter.rotate(-90);
+	painter.drawText(0, 0, "Astrocytes");
+	mainwindow_ui->label_44->setPixmap(myPixmap);
+ }
+
+//------------------------------------------------------
+//
+MainWindow::~MainWindow()
+{
+    delete mainwindow_ui;
+    delete tableView;
+    delete m_currentSelectedCluster;
+    delete m_clusters;
+}
+
+//------------------------------------------------------
+//
+void MainWindow::setupSignalsNSlots()
+{
     QObject::connect(getGLWidget(), SIGNAL(object_clicked(QList<QStandardItem*>)),
                      this, SLOT(on_object_clicked(QList<QStandardItem*>)));
 
@@ -88,26 +114,6 @@ MainWindow::MainWindow(QWidget *parent, QString input_path) :
 
     QObject::connect(this, SIGNAL(update_glycogen_granules_mapping_timing(QString)),
                      mainwindow_ui->glycogen_granules_mapping_ms, SLOT(setText(QString)));
-
-
-
-	//rotate astrocytes label of the abstraction space
-	QPixmap myPixmap(QSize(20, 210));
-	myPixmap.fill(Qt::transparent);
-	QPainter painter(&myPixmap);
-	painter.translate(12, 140);
-	painter.rotate(-90);
-	painter.drawText(0, 0, "Astrocytes");
-	mainwindow_ui->label_44->setPixmap(myPixmap);
-
-
- }
-
-//------------------------------------------------------
-//
-MainWindow::~MainWindow()
-{
-    delete mainwindow_ui;
 }
 
 //------------------------------------------------------
@@ -529,6 +535,8 @@ void MainWindow::on_specularLightCheckBox_toggled(bool checked)
 	getGLWidget()->getOpenGLManager()->setSpecularLight(checked);
 }
 
+//------------------------------------------------------
+//
 void  MainWindow::on_glycogenMappingTreeWidget_itemChanged(QTreeWidgetItem* item, int column)
 {
    bool state = true;
@@ -539,6 +547,8 @@ void  MainWindow::on_glycogenMappingTreeWidget_itemChanged(QTreeWidgetItem* item
    glycogenMappedSelectedState(ID_str, state);
 }
 
+//------------------------------------------------------
+//
 void MainWindow::on_filterByProximityListWidget_itemChanged(QListWidgetItem *item)
 {
     bool flag = true;
@@ -548,6 +558,8 @@ void MainWindow::on_filterByProximityListWidget_itemChanged(QListWidgetItem *ite
     signalProximityTypeState( item->text() ,flag );
 }
 
+//------------------------------------------------------
+//
 void MainWindow::on_listWidget_itemChanged(QListWidgetItem *)
 {
    signalMappingTreeWidget(mainwindow_ui->glycogenMappingTreeWidget);

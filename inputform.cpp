@@ -34,4 +34,5 @@ void InputForm::on_pushButton_path_clicked()
 void InputForm::on_pushButton_submit_clicked()
 {
     signal_filesPath(m_filesPath);
+    this->accept();
 }

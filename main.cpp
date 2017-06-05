@@ -1,9 +1,7 @@
-#include "mainwindow.h"
 #include <QApplication>
 #include <QGLFormat>
-#include <QResource>
-#include <QDebug>
 
+#include "mainwindow.h"
 #include "inputform.h"
 
 int main(int argc, char *argv[])
