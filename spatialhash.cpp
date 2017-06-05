@@ -73,7 +73,7 @@ void SpatialHash::insert(Node *node)
         m_hashMap.at(cell).push_back( node );
     }
 
-    index = m_hashMap.at(cell).size() - 1;
+    //index = m_hashMap.at(cell).size() - 1;
     node->setHashMap(cell);
 }
 

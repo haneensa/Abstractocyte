@@ -85,7 +85,7 @@ void DataContainer::loadData()
     QString hvgxFile = input_files_dir.HVGX_metadata;
     PreLoadMetaDataHVGX(hvgxFile);
 
-    m_limit = 1000000;
+    m_limit = 100000;
     m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
     m_load_data = LoadData_t::ALL;
     m_normals_t = Normals_t::LOAD_NORMAL;

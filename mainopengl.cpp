@@ -324,6 +324,7 @@ void MainOpenGL::initText( const QFont &_f  )
             vbo.create();
             vbo.setUsagePattern( QOpenGLBuffer::StaticDraw);
             if ( !vbo.bind() ) {
+                // todo: free d
                 qDebug() << "Could not bind vertex buffer to the context.";
                 return;
             }

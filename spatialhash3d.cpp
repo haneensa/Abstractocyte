@@ -498,7 +498,7 @@ float SpacePartitioning::SpatialHash3D::findClosesVertexInCell(int x, int y, int
 		float currentDistance = L2Distance::compute(nX, nY, nZ, (*iter)->x(), (*iter)->y(), (*iter)->z());
 		if (currentDistance < distance2)
 		{
-			out = (*iter);
+            //out = (*iter);
 			distance2 = currentDistance;
 		}
 	}
