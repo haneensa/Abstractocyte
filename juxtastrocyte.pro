@@ -48,7 +48,8 @@ SOURCES += main.cpp\
     spatialhash3d.cpp \
     rendervertexdata.cpp \
     path.cpp \
-    performancerate.cpp
+    performancerate.cpp \
+    inputform.cpp
 
 HEADERS  += mainwindow.h \
     mousepad.h \
@@ -78,10 +79,12 @@ HEADERS  += mainwindow.h \
     spatialhash3d.h \
     rendervertexdata.h \
     path.h \
-    performancerate.h
+    performancerate.h \
+    inputform.h
 
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    inputform.ui
 
 RESOURCES += \
     resources.qrc \

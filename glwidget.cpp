@@ -16,21 +16,6 @@ GLWidget::GLWidget(QWidget *parent)
         m_2D(false),
         m_hover(false)
 {
-    // 2D abstraction space, with intervals properties intializaiton and geometry
-    m_2dspace = new AbstractionSpace(100, 100);
-
-    // objects manager with all objects data
-    m_data_containter = new DataContainer();
-    m_opengl_mngr = new OpenGLManager(m_data_containter, m_2dspace);
-
-    // graph manager with 4 graphs and 2D space layouted data
-    m_graphManager = new GraphManager( m_data_containter, m_opengl_mngr );
-
-	//glycogen analysis manager with clustering
-	m_glycogenAnalysisManager = new GlycogenAnalysisManager(m_data_containter->getGlycogenMapPtr(), m_data_containter->getGlycogenVertexDataPtr(), m_data_containter->getGlycogenOctree(), m_data_containter->getMeshPointer()->getVerticesList());
-	m_glycogenAnalysisManager->setBoutonAndSpineOctrees(m_data_containter->getBoutonHash(), m_data_containter->getSpineHash());
-	m_glycogenAnalysisManager->setMitochondriaSpatialHash(m_data_containter->getNeuroMitoHash());
-
     m_distance = 1.0;
     m_rotation = QQuaternion();
     //reset rotation
@@ -40,7 +25,6 @@ GLWidget::GLWidget(QWidget *parent)
     m_rotation.setZ(0.0f);
     //reset translation
     m_translation = QVector3D(0.0, 0.0, 0.0);
-
 
     m_lockRotation2D_timer = new QTimer(this);
     connect(m_lockRotation2D_timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -70,6 +54,26 @@ GLWidget::~GLWidget()
     delete m_data_containter;
 	delete m_glycogenAnalysisManager;
     doneCurrent();
+}
+
+void GLWidget::init(QString input_path)
+{
+    // 2D abstraction space, with intervals properties intializaiton and geometry
+    m_2dspace = new AbstractionSpace(100, 100);
+
+    m_data_containter = new DataContainer(input_path);
+
+    // objects manager with all objects data
+    m_opengl_mngr = new OpenGLManager(m_data_containter, m_2dspace);
+
+    // graph manager with 4 graphs and 2D space layouted data
+    m_graphManager = new GraphManager( m_data_containter, m_opengl_mngr );
+
+    //glycogen analysis manager with clustering
+    m_glycogenAnalysisManager = new GlycogenAnalysisManager(m_data_containter->getGlycogenMapPtr(), m_data_containter->getGlycogenVertexDataPtr(), m_data_containter->getGlycogenOctree(), m_data_containter->getMeshPointer()->getVerticesList());
+    m_glycogenAnalysisManager->setBoutonAndSpineOctrees(m_data_containter->getBoutonHash(), m_data_containter->getSpineHash());
+    m_glycogenAnalysisManager->setMitochondriaSpatialHash(m_data_containter->getNeuroMitoHash());
+
 }
 
 void GLWidget::updateMVPAttrib()

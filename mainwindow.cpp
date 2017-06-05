@@ -12,11 +12,13 @@
 
 //------------------------------------------------------
 //
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent, QString input_path) :
     QMainWindow(parent),
     mainwindow_ui(new Ui::MainWindow)
 {
     mainwindow_ui->setupUi(this);
+    getGLWidget()->init(input_path);
+
     m_currentSelectedCluster = 0;
     m_clusters = 0;
 
@@ -41,7 +43,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(getGLWidget(), SIGNAL(checkAllListWidget_GL()),
                      this, SLOT(checkAllListWidget()));
-
 
     QObject::connect(getGLWidget(), SIGNAL(GetIDFrom(QModelIndex)),
                      this, SLOT(getIDAt(QModelIndex)));
@@ -98,6 +99,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	painter.rotate(-90);
 	painter.drawText(0, 0, "Astrocytes");
 	mainwindow_ui->label_44->setPixmap(myPixmap);
+
 
  }
 

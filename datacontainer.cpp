@@ -8,7 +8,7 @@
  *           -> get from this the indices of the mesh
  *           -> get the skeleton vertices
  */
-DataContainer::DataContainer()
+DataContainer::DataContainer(QString input_path)
     :   m_indices_size(0),
         m_skeleton_points_size(0),
         max_volume(2),
@@ -19,27 +19,27 @@ DataContainer::DataContainer()
         m_faces_offset(0),
         m_debug_msg(false)
 {
-    input_files_dir.HVGX_metadata = ":/data/mouse3_metadata_objname_center_astroSyn.hvgx";
+    input_files_dir.HVGX_metadata = input_path + "/mouse3_metadata_objname_center_astroSyn.hvgx";
 
     // xml with vertices and faces - slow ~ 30 min
     input_files_dir.xml_detailed_astro = "://pipeline_scripts/output/m3_astrocyte.xml";
     input_files_dir.xml_detailed_neurites = "://pipeline_scripts/output/m3_neurites.xml";
 
     // input files for proximity analysis (astrocyte, astrocytic mito, neuronal mito)
-    input_files_dir.proximity_astro = "input/mask_745_sigma3.raw";
-    input_files_dir.proximity_astro_mito = "input/astrocytic_mitochondria_s5.raw";
-    input_files_dir.proximity_neu_mito = "input/Neuronic_mitochondria_binary_s5.raw";
-    input_files_dir.proximity_glycogen = "input/mask_glycogen_sig3_blured210.raw";
+    input_files_dir.proximity_astro = input_path + "/mask_745_sigma3.raw";
+    input_files_dir.proximity_astro_mito = input_path + "/astrocytic_mitochondria_s5.raw";
+    input_files_dir.proximity_neu_mito = input_path + "/Neuronic_mitochondria_binary_s5.raw";
+    input_files_dir.proximity_glycogen = input_path + "/mask_glycogen_sig3_blured210.raw";
 
     // xml without virtices and faces - faster, but needs the vertices and faces as binary (dat) file
     input_files_dir.xml_light_astro = "://pipeline_scripts/output/m3_astrocyte_noVertex.xml";
     input_files_dir.xml_light_neurites = "://pipeline_scripts/output/m3_neurites_noVertexNoFace.xml";
 
-    input_files_dir.binary_vf_astro = "input/astro_data_fv.dat";
-    input_files_dir.binary_vf_neurites =  "input/neurites_data_fv.dat";
+    input_files_dir.binary_vf_astro = input_path + "/astro_data_fv.dat";
+    input_files_dir.binary_vf_neurites =  input_path + "/neurites_data_fv.dat";
 
-    input_files_dir.binary_normals_astro = "input/astro_normals.dat";
-    input_files_dir.binary_normals_neurites = "input/neurites_normals.dat";
+    input_files_dir.binary_normals_astro = input_path + "/astro_normals.dat";
+    input_files_dir.binary_normals_neurites = input_path + "/neurites_normals.dat";
 
     m_mesh = new Mesh();
 	m_glycogen3DGrid.setSize(DIM_G, DIM_G, DIM_G);

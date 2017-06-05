@@ -53,7 +53,7 @@ struct input_files {
 class DataContainer
 {
 public:
-    DataContainer();
+    DataContainer(QString input_path);
     ~DataContainer();
 
     void loadData();

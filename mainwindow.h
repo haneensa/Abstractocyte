@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QListWidgetItem>
+#include "inputform.h"
 
 namespace Ui {
 class MainWindow;
@@ -21,7 +22,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT // for signals and slots
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = 0, QString input_path = "");
     ~MainWindow();
 
 	GLWidget* getGLWidget();
@@ -69,6 +70,7 @@ public slots:
 
     void on_listWidget_itemChanged(QListWidgetItem *);
 
+
 signals:
     void getDeletedData(int);
     void getIDAtSelectedRow(int);
@@ -89,7 +91,6 @@ private:
 	std::map<int, Clustering::GlycogenCluster*>* m_clusters;
 	QTreeWidgetItem* m_currentSelectedCluster;
     QStandardItemModel *tableView;
-
 };
 
 #endif // MAINWINDOW_H

@@ -19,6 +19,7 @@ class GLWidget : public QOpenGLWidget, MainOpenGL
 public:
     GLWidget(QWidget *parent = 0);
     ~GLWidget();
+    void init(QString input_path);
 
 	GlycogenAnalysisManager* getGlycogenAnalysisManager() { return m_glycogenAnalysisManager; }
 	OpenGLManager*			 getOpenGLManager() { return m_opengl_mngr; }
@@ -98,6 +99,7 @@ signals:
     void updateFPS(QString);
     void updateFrameTime(QString);
     void signalCheckByType(std::map<QString, int>);
+
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
