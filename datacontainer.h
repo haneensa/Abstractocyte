@@ -56,6 +56,7 @@ public:
     DataContainer(QString input_path);
     ~DataContainer();
 
+    void getInputFilesNames(QString input_path);
     void loadData();
 
     int importXML(QString path);
