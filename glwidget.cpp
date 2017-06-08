@@ -56,12 +56,12 @@ GLWidget::~GLWidget()
     doneCurrent();
 }
 
-void GLWidget::init(QString input_path)
+void GLWidget::init(InputForm *input_form)
 {
     // 2D abstraction space, with intervals properties intializaiton and geometry
     m_2dspace = new AbstractionSpace(100, 100);
 
-    m_data_containter = new DataContainer(input_path);
+    m_data_containter = new DataContainer(input_form);
 
     // objects manager with all objects data
     m_opengl_mngr = new OpenGLManager(m_data_containter, m_2dspace);

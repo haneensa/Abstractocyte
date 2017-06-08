@@ -8,7 +8,7 @@
  *           -> get from this the indices of the mesh
  *           -> get the skeleton vertices
  */
-DataContainer::DataContainer(QString input_path)
+DataContainer::DataContainer(InputForm *input_form)
     :   m_indices_size(0),
         m_skeleton_points_size(0),
         max_volume(2),
@@ -19,12 +19,13 @@ DataContainer::DataContainer(QString input_path)
         m_faces_offset(0),
         m_debug_msg(false)
 {
-    /* 0: extract input files names */
-    getInputFilesNames(input_path);
+    input_files_dir = input_form->getInputFilesPath();
 
-    m_limit = 100000;
+    m_limit = input_form->getObjectsCountLimit();
+    m_load_data = input_form->getLoadDataType();
+
+    // check if the extra files exist or not
     m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
-    m_load_data = LoadData_t::ALL;
     m_normals_t = Normals_t::LOAD_NORMAL;
 
     m_mesh = new Mesh();
@@ -59,55 +60,6 @@ DataContainer::~DataContainer()
 
 //----------------------------------------------------------------------------
 //
-void DataContainer::getInputFilesNames(QString input_path)
-{
-    // 1) load the original xml file -> sae the compressed dat files
-    // 2) load the light weight xml file + the dat files
-
-    // compressed faces and vertices
-    // const char* filename1 = "input/astro_data_fv.dat";
-    // const char* filename2 = "input/neurites_data_fv.dat";
-
-    // this is a must
-    // importXML("://pipeline_scripts/output/m3_astrocyte.xml");
-    // importXML("://pipeline_scripts/output/m3_neurites.xml");
-
-    // for the normals:
-    // 1) compute the normals
-    // 2) save the normals as dat file
-    // 3) use the saved normals
-
-    // for splatting:
-    // 1) "input/mask_745_sigma3.raw",
-    // 2) "input/astrocytic_mitochondria_s5.raw",
-    // 3) "input/Neuronic_mitochondria_binary_s5.raw"
-    // 4) "input/mask_glycogen_sig3_blured20.raw"
-
-    input_files_dir.HVGX_metadata = input_path + "/mouse3_metadata_objname_center_astroSyn.hvgx";
-
-    // xml with vertices and faces - slow ~ 30 min
-    input_files_dir.xml_detailed_astro = input_path + "/output/m3_astrocyte.xml";
-    input_files_dir.xml_detailed_neurites = input_path + "/m3_neurites.xml";
-
-    // input files for proximity analysis (astrocyte, astrocytic mito, neuronal mito)
-    input_files_dir.proximity_astro = input_path + "/mask_745_sigma3.raw";
-    input_files_dir.proximity_astro_mito = input_path + "/astrocytic_mitochondria_s5.raw";
-    input_files_dir.proximity_neu_mito = input_path + "/Neuronic_mitochondria_binary_s5.raw";
-    input_files_dir.proximity_glycogen = input_path + "/mask_glycogen_sig3_blured210.raw";
-
-    // xml without virtices and faces - faster, but needs the vertices and faces as binary (dat) file
-    input_files_dir.xml_light_astro = input_path + "/m3_astrocyte_noVertex.xml";
-    input_files_dir.xml_light_neurites = input_path + "/m3_neurites_noVertexNoFace.xml";
-
-    input_files_dir.binary_vf_astro = input_path + "/astro_data_fv.dat";
-    input_files_dir.binary_vf_neurites =  input_path + "/neurites_data_fv.dat";
-
-    input_files_dir.binary_normals_astro = input_path + "/astro_normals.dat";
-    input_files_dir.binary_normals_neurites = input_path + "/neurites_normals.dat";
-}
-
-//----------------------------------------------------------------------------
-//
 // *** To write binary files:
 // run 1)  m_loadType = LoadFile_t::DUMP_ASTRO;
 // run 2)  m_loadType = LoadFile_t::DUMP_NEURITES;
@@ -124,35 +76,35 @@ void DataContainer::loadData()
 
     if (m_loadType == LoadFile_t::DUMP_ASTRO || m_loadType == LoadFile_t::DUMP_NEURITES) {
         if (m_loadType == LoadFile_t::DUMP_ASTRO) {
-            importXML(input_files_dir.xml_detailed_astro);   // 155,266  ms ~ 2.6 min
-            m_mesh->dumpVertexData(input_files_dir.binary_vf_astro);
+            importXML(input_files_dir.xml_astro);   // 155,266  ms ~ 2.6 min
+            m_mesh->dumpVertexData(input_files_dir.extra_files_path +  "/astro_data_fv.dat");
         } else {
-            importXML(input_files_dir.xml_detailed_neurites);    // 910741
-            m_mesh->dumpVertexData(input_files_dir.binary_vf_neurites);
+            importXML(input_files_dir.xml_neurites);    // 910741
+            m_mesh->dumpVertexData(input_files_dir.extra_files_path +  "/neurites_data_fv.dat");
         }
     } else if (m_loadType == LoadFile_t::LOAD_MESH_NO_VERTEX)  {
 
         if (m_load_data == LoadData_t::ASTRO) {
-            m_mesh->readVertexData(input_files_dir.binary_vf_astro);
-            importXML(input_files_dir.xml_light_astro);   //  110,928  ms ~ 2 min -> 17306
+            m_mesh->readVertexData(input_files_dir.extra_files_path +  "/astro_data_fv.dat");
+            importXML(input_files_dir.xml_astro);   //  110,928  ms ~ 2 min -> 17306
         } else if (m_load_data == LoadData_t::NEURITES) {
-            m_mesh->readVertexData(input_files_dir.binary_vf_neurites); //
-            importXML(input_files_dir.xml_light_neurites);    // 674046 ~ 12 min -> 118107 ms -> 134884 with vertex type classification
+            m_mesh->readVertexData(input_files_dir.extra_files_path +  "/neurites_data_fv.dat"); //
+            importXML(input_files_dir.xml_neurites);    // 674046 ~ 12 min -> 118107 ms -> 134884 with vertex type classification
         } else if (m_load_data == LoadData_t::ALL) {
-            m_mesh->readVertexData(input_files_dir.binary_vf_astro);
-            importXML(input_files_dir.xml_light_astro);   //   110,928  ms ~ 2 min -> 17306 ms
+            m_mesh->readVertexData(input_files_dir.extra_files_path +  "/astro_data_fv.dat");
+            importXML(input_files_dir.xml_astro);   //   110,928  ms ~ 2 min -> 17306 ms
 
-            m_mesh->readVertexData(input_files_dir.binary_vf_neurites); //
-            importXML(input_files_dir.xml_light_neurites);    // 674046 ~ 12 min -> 118107 ms
+            m_mesh->readVertexData(input_files_dir.extra_files_path +  "/neurites_data_fv.dat"); //
+            importXML(input_files_dir.xml_neurites);    // 674046 ~ 12 min -> 118107 ms
         }
     } else {
         if (m_load_data == LoadData_t::ASTRO) {
-           importXML(input_files_dir.xml_detailed_astro);   // 155,266  ms ~ 2.6 min
+           importXML(input_files_dir.xml_astro);   // 155,266  ms ~ 2.6 min
         } else if (m_load_data == LoadData_t::NEURITES) {
-            importXML(input_files_dir.xml_detailed_neurites);    // 910741
+            importXML(input_files_dir.xml_neurites);    // 910741
         } else if (m_load_data == LoadData_t::ALL) {
-            importXML(input_files_dir.xml_detailed_astro);   // 155,266  ms ~ 2.6 min
-            importXML(input_files_dir.xml_detailed_neurites);    // 910741
+            importXML(input_files_dir.xml_astro);   // 155,266  ms ~ 2.6 min
+            importXML(input_files_dir.xml_neurites);    // 910741
         }
 
     }
@@ -166,10 +118,10 @@ void DataContainer::loadData()
         t1 = std::chrono::high_resolution_clock::now();
         if (m_load_data == LoadData_t::ASTRO) {
             m_mesh->computeNormalsPerVertex(); // Normals Computing time:  9440.12
-            m_mesh->dumpNormalsList(input_files_dir.binary_normals_astro);
+            m_mesh->dumpNormalsList(input_files_dir.extra_files_path +  "/astro_normals.dat");
         } else if (m_load_data == LoadData_t::NEURITES) {
             m_mesh->computeNormalsPerVertex(); // Normals Computing time:  44305.1
-            m_mesh->dumpNormalsList(input_files_dir.binary_normals_neurites);
+            m_mesh->dumpNormalsList(input_files_dir.extra_files_path +  "/neurites_normals.dat");
         }
         t2 = std::chrono::high_resolution_clock::now();
         ms = t2 - t1;
@@ -178,12 +130,12 @@ void DataContainer::loadData()
 
     } else if (m_normals_t == Normals_t::LOAD_NORMAL) {
         if (m_load_data == LoadData_t::ASTRO) {
-            m_mesh->readNormalsBinary( input_files_dir.binary_normals_astro);
+            m_mesh->readNormalsBinary( input_files_dir.extra_files_path +  "/astro_normals.dat" );
         } else if (m_load_data == LoadData_t::NEURITES) {
-            m_mesh->readNormalsBinary(input_files_dir.binary_normals_neurites);
+            m_mesh->readNormalsBinary( input_files_dir.extra_files_path +  "/neurites_normals.dat" );
         } else if (m_load_data == LoadData_t::ALL) {
-            m_mesh->readNormalsBinary( input_files_dir.binary_normals_astro);
-            m_mesh->readNormalsBinary(input_files_dir.binary_normals_neurites);
+            m_mesh->readNormalsBinary( input_files_dir.extra_files_path +  "/astro_normals.dat" );
+            m_mesh->readNormalsBinary( input_files_dir.extra_files_path +  "/neurites_normals.dat" );
         }
     }
 

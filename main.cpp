@@ -14,12 +14,15 @@ int main(int argc, char *argv[])
     format.setDepthBufferSize(24);
     QSurfaceFormat::setDefaultFormat(format);
 
-    InputForm input_form;
-    input_form.exec();
+    InputForm *input_form;
+    input_form = new InputForm(0);
+    input_form->exec();
 
-    MainWindow *window = new MainWindow(0, input_form.getInputFilesPath());
+    if (input_form->exec() == InputForm::Accepted) {
+        MainWindow *window = new MainWindow(0, input_form);
 
-    window->show();
+        window->show();
+    }
 
     return app.exec();
 }

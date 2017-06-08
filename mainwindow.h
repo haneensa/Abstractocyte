@@ -22,7 +22,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT // for signals and slots
 
 public:
-    explicit MainWindow(QWidget *parent = 0, QString input_path = "");
+    explicit MainWindow(QWidget *parent = 0, InputForm *input_form = NULL);
     ~MainWindow();
 
     void setupSignalsNSlots();

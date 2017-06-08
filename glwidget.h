@@ -11,6 +11,7 @@
 #include "openglmanager.h"
 #include "glycogenanalysismanager.h"
 #include "performancerate.h"
+#include "inputform.h"
 
 class GLWidget : public QOpenGLWidget, MainOpenGL
 {
@@ -19,7 +20,7 @@ class GLWidget : public QOpenGLWidget, MainOpenGL
 public:
     GLWidget(QWidget *parent = 0);
     ~GLWidget();
-    void init(QString input_path);
+    void init(InputForm *input_form);
 
 	GlycogenAnalysisManager* getGlycogenAnalysisManager() { return m_glycogenAnalysisManager; }
 	OpenGLManager*			 getOpenGLManager() { return m_opengl_mngr; }

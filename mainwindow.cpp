@@ -12,12 +12,12 @@
 
 //------------------------------------------------------
 //
-MainWindow::MainWindow(QWidget *parent, QString input_path) :
+MainWindow::MainWindow(QWidget *parent, InputForm *input_form) :
     QMainWindow(parent),
     mainwindow_ui(new Ui::MainWindow)
 {
     mainwindow_ui->setupUi(this);
-    getGLWidget()->init(input_path);
+    getGLWidget()->init(input_form);
 
     setupSignalsNSlots();
 

@@ -22,6 +22,8 @@
 #include "octree.h"
 #include "grid3d.h"
 #include "spatialhash3d.h"
+#include "inputform.h"
+
 //#include "dbscan.h"
 
 #define MESH_MAX    5.0f
@@ -30,33 +32,15 @@
 #define DIM_Z       449
 #define DIM_G		64
 
-enum class LoadData_t { ALL, ASTRO, NEURITES };
 enum class LoadFile_t { DUMP_ASTRO, DUMP_NEURITES, LOAD_MESH_NO_VERTEX, LOAD_MESH_W_VERTEX };
 enum class Normals_t { DUMP_NORMAL, LOAD_NORMAL, NO_NORMALS };
-
-struct input_files {
-    QString HVGX_metadata;
-    QString proximity_astro;
-    QString proximity_astro_mito;
-    QString proximity_neu_mito;
-    QString proximity_glycogen;
-    QString xml_detailed_astro;
-    QString xml_detailed_neurites;
-    QString xml_light_astro;
-    QString xml_light_neurites;
-    QString binary_vf_astro;        // v: vertices, f: faces
-    QString binary_vf_neurites;
-    QString binary_normals_astro;
-    QString binary_normals_neurites;
-};
 
 class DataContainer
 {
 public:
-    DataContainer(QString input_path);
+    DataContainer(InputForm *input_form);
     ~DataContainer();
 
-    void getInputFilesNames(QString input_path);
     void loadData();
 
     int importXML(QString path);
@@ -170,8 +154,6 @@ protected:
     LoadData_t                                  m_load_data;
     bool                                        m_debug_msg;
     std::set<Object*>                           m_missingParentSkeleton;
-
-
 };
 
 #endif // OBJECTMANAGER_H
