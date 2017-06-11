@@ -25,8 +25,12 @@ DataContainer::DataContainer(InputForm *input_form)
     m_load_data = input_form->getLoadDataType();
 
     // check if the extra files exist or not
-    m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
-    m_normals_t = Normals_t::LOAD_NORMAL;
+    m_loadType = input_form->getLoadFileType(); // disable all allow only one type (astrocyte or neurites)
+
+    if (m_loadType == LoadFile_t::DUMP_ASTRO || m_loadType == LoadFile_t::DUMP_NEURITES)
+        m_normals_t = Normals_t::DUMP_NORMAL;
+    else
+        m_normals_t = Normals_t::LOAD_NORMAL;
 
     m_mesh = new Mesh();
 	m_glycogen3DGrid.setSize(DIM_G, DIM_G, DIM_G);
@@ -99,7 +103,7 @@ void DataContainer::loadData()
         }
     } else {
         if (m_load_data == LoadData_t::ASTRO) {
-           importXML(input_files_dir.xml_astro);   // 155,266  ms ~ 2.6 min
+            importXML(input_files_dir.xml_astro);   // 155,266  ms ~ 2.6 min
         } else if (m_load_data == LoadData_t::NEURITES) {
             importXML(input_files_dir.xml_neurites);    // 910741
         } else if (m_load_data == LoadData_t::ALL) {
@@ -114,7 +118,7 @@ void DataContainer::loadData()
 
     qDebug() << "Objects Loading time: " << ms.count();
 
-     if (m_normals_t == Normals_t::DUMP_NORMAL) {
+    if (m_normals_t == Normals_t::DUMP_NORMAL) {
         t1 = std::chrono::high_resolution_clock::now();
         if (m_load_data == LoadData_t::ASTRO) {
             m_mesh->computeNormalsPerVertex(); // Normals Computing time:  9440.12
@@ -129,19 +133,24 @@ void DataContainer::loadData()
         qDebug() << "Normals Computing time: " << ms.count();
 
     } else if (m_normals_t == Normals_t::LOAD_NORMAL) {
+        bool normals_flag = false;
         if (m_load_data == LoadData_t::ASTRO) {
-            m_mesh->readNormalsBinary( input_files_dir.extra_files_path +  "/astro_normals.dat" );
+            normals_flag = m_mesh->readNormalsBinary( input_files_dir.extra_files_path +  "/astro_normals.dat" );
         } else if (m_load_data == LoadData_t::NEURITES) {
-            m_mesh->readNormalsBinary( input_files_dir.extra_files_path +  "/neurites_normals.dat" );
+            normals_flag = m_mesh->readNormalsBinary( input_files_dir.extra_files_path +  "/neurites_normals.dat" );
         } else if (m_load_data == LoadData_t::ALL) {
-            m_mesh->readNormalsBinary( input_files_dir.extra_files_path +  "/astro_normals.dat" );
-            m_mesh->readNormalsBinary( input_files_dir.extra_files_path +  "/neurites_normals.dat" );
+            normals_flag = m_mesh->readNormalsBinary( input_files_dir.extra_files_path +  "/astro_normals.dat" );
+            normals_flag &= m_mesh->readNormalsBinary( input_files_dir.extra_files_path +  "/neurites_normals.dat" );
+        }
+
+        if (normals_flag == false) {
+            m_normals_t = Normals_t::NO_NORMALS; // todo: deal with this case in the openglmanafer.cpp -> dont load normals
         }
     }
 
-     qDebug() << " faces: "  << m_mesh->getFacesListSize() << " " <<
-                 " vertices: "  << m_mesh->getVerticesSize() << " " <<
-                 " normals: "  << m_mesh->getNormalsListSize();
+    qDebug() << " faces: "  << m_mesh->getFacesListSize() << " " <<
+                " vertices: "  << m_mesh->getVerticesSize() << " " <<
+                " normals: "  << m_mesh->getNormalsListSize();
 
     /* 3 */
     PostloadMetaDataHVGX(input_files_dir.HVGX_metadata);

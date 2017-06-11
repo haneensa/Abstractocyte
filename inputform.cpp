@@ -10,7 +10,6 @@ InputForm::InputForm(QWidget *parent) :
     ui->setupUi(this);
 
     m_load_data = LoadData_t::ALL;
-    m_compute_extra_files = false;
 
     m_count_limit = 1000000;
     ui->spinBox_limit->setValue(m_count_limit);
@@ -195,6 +194,14 @@ void InputForm::on_radioButton_load_neurites_toggled(bool val)
 {
     if (!val)
         return;
+
+    if (ui->checkBox_astrocyte_extrafiles->isChecked()) {
+        bool oldState = ui->radioButton_load_astrocyte->blockSignals(true);
+        ui->radioButton_load_astrocyte->setChecked(true);
+        ui->radioButton_load_astrocyte->blockSignals(oldState);
+        return;
+    }
+
     m_load_data = LoadData_t::NEURITES;
 }
 
@@ -202,6 +209,14 @@ void InputForm::on_radioButton_load_astrocyte_toggled(bool val)
 {
     if (!val)
         return;
+
+    if (ui->checkBox_neurites_extrafiles->isChecked()) {
+        bool oldState = ui->radioButton_load_neurites->blockSignals(true);
+        ui->radioButton_load_neurites->setChecked(true);
+        ui->radioButton_load_neurites->blockSignals(oldState);
+        return;
+    }
+
     m_load_data = LoadData_t::ASTRO;
 }
 
@@ -209,12 +224,60 @@ void InputForm::on_radioButton_load_all_toggled(bool val)
 {
     if (!val)
         return;
+
+    if (ui->checkBox_astrocyte_extrafiles->isChecked()) {
+        bool oldState = ui->radioButton_load_astrocyte->blockSignals(true);
+        ui->radioButton_load_astrocyte->setChecked(true);
+        ui->radioButton_load_astrocyte->blockSignals(oldState);
+        return;
+    } else if (ui->checkBox_neurites_extrafiles->isChecked()) {
+        bool oldState = ui->radioButton_load_neurites->blockSignals(true);
+        ui->radioButton_load_neurites->setChecked(true);
+        ui->radioButton_load_neurites->blockSignals(oldState);
+        return;
+    }
+
     m_load_data = LoadData_t::ALL;
 }
 
-void InputForm::on_checkBox_extra_files_toggled(bool val)
+void InputForm::on_checkBox_astrocyte_extrafiles_toggled(bool val)
 {
-    m_compute_extra_files = val;
+    if (!val)
+        return;
+
+    bool oldState = ui->checkBox_neurites_extrafiles->blockSignals(true);
+    ui->checkBox_neurites_extrafiles->setChecked(false);
+    ui->checkBox_neurites_extrafiles->blockSignals(oldState);
+
+    ui->radioButton_load_astrocyte->setChecked(true);
+    ui->radioButton_load_all->setChecked(false);
+    ui->radioButton_load_neurites->setChecked(false);
+
+    m_loadType = LoadFile_t::DUMP_ASTRO;
+}
+
+void InputForm::on_checkBox_neurites_extrafiles_toggled(bool val)
+{
+    if (!val)
+        return;
+    bool oldState = ui->checkBox_astrocyte_extrafiles->blockSignals(true);
+    ui->checkBox_astrocyte_extrafiles->setChecked(false);
+    ui->checkBox_astrocyte_extrafiles->blockSignals(oldState);
+
+    ui->radioButton_load_astrocyte->setChecked(false);
+    ui->radioButton_load_all->setChecked(false);
+    ui->radioButton_load_neurites->setChecked(true);
+
+
+    m_loadType = LoadFile_t::DUMP_NEURITES;
+}
+
+void InputForm::on_checkBox_lightXML_toggled(bool val)
+{
+    if (val)
+        m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
+    else
+        m_loadType = LoadFile_t::LOAD_MESH_W_VERTEX;
 }
 
 void InputForm::on_spinBox_limit_valueChanged(int limit)

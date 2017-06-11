@@ -9,6 +9,8 @@ class InputForm;
 }
 
 enum class LoadData_t { ALL, ASTRO, NEURITES };
+enum class LoadFile_t { DUMP_ASTRO, DUMP_NEURITES, LOAD_MESH_NO_VERTEX, LOAD_MESH_W_VERTEX };
+enum class Normals_t { DUMP_NORMAL, LOAD_NORMAL, NO_NORMALS };
 
 struct input_files {
     QString HVGX_metadata;
@@ -29,8 +31,8 @@ public:
     explicit InputForm(QWidget *parent = 0);
     ~InputForm();
     struct input_files getInputFilesPath()  { return m_input_files; }
-    bool getIsComputerExtraFilesEnabled()   { return m_compute_extra_files; }
     LoadData_t getLoadDataType()            { return m_load_data; }
+    LoadFile_t getLoadFileType()            { return m_loadType; }
     int getObjectsCountLimit()              { return m_count_limit; }
 
 protected slots:
@@ -49,7 +51,10 @@ protected slots:
     void on_radioButton_load_astrocyte_toggled(bool);
     void on_radioButton_load_all_toggled(bool);
 
-    void on_checkBox_extra_files_toggled(bool);
+    void on_checkBox_astrocyte_extrafiles_toggled(bool);
+    void on_checkBox_neurites_extrafiles_toggled(bool);
+
+    void on_checkBox_lightXML_toggled(bool);
 
     void on_spinBox_limit_valueChanged(int);
 
@@ -59,8 +64,11 @@ signals:
 private:
     Ui::InputForm       *ui;
     struct input_files  m_input_files;
+
     LoadData_t          m_load_data;
-    bool                m_compute_extra_files;
+    LoadFile_t          m_loadType;
+    Normals_t           m_normals_t;
+
     int                 m_count_limit;
 };
 

@@ -32,9 +32,6 @@
 #define DIM_Z       449
 #define DIM_G		64
 
-enum class LoadFile_t { DUMP_ASTRO, DUMP_NEURITES, LOAD_MESH_NO_VERTEX, LOAD_MESH_W_VERTEX };
-enum class Normals_t { DUMP_NORMAL, LOAD_NORMAL, NO_NORMALS };
-
 class DataContainer
 {
 public:

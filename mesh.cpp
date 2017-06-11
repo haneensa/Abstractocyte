@@ -46,31 +46,32 @@ void Mesh::readVertexData(QString path)
     int size = 0;
     std::ifstream ss(filename, std::ios::binary);
 
-    // check if the file was correctly open
+    if (ss.is_open()) {
+        ss.read((char*)&size, sizeof(int)); // astro: 1246096
+        //struct vertex  *v = (struct vertex*)malloc(size * sizeof(struct vertex));
+        // to make it dynamic I need to remove qvector4f and use float [4] instead -> not worth it
+        for (int i = 0; i < size; i++) {
+            struct VertexData v;
+            ss.read((char*)&v,  sizeof(struct VertexData));
+            verticesList.push_back(v);
+            //qDebug() << v.mesh_vertex  << " " << v.skeleton_vertex  << " " << v.index;
+        }
 
-    ss.read((char*)&size, sizeof(int)); // astro: 1246096
-    //struct vertex  *v = (struct vertex*)malloc(size * sizeof(struct vertex));
-    // to make it dynamic I need to remove qvector4f and use float [4] instead -> not worth it
-    for (int i = 0; i < size; i++) {
-        struct VertexData v;
-        ss.read((char*)&v,  sizeof(struct VertexData));
-        verticesList.push_back(v);
-        //qDebug() << v.mesh_vertex  << " " << v.skeleton_vertex  << " " << v.index;
+        size = 0;
+
+        ss.read((char*)&size, sizeof(int));  // astro: 2497612
+        //struct vertex  *v = (struct vertex*)malloc(size * sizeof(struct vertex));
+        // to make it dynamic I need to remove qvector4f and use float [4] instead -> not worth it
+        for (int i = 0; i < size; i++) {
+            struct face v;
+            ss.read((char*)&v,  sizeof( struct face));
+            m_faces.push_back(v);
+        }
+
+        ss.close();
+    } else {
+        qDebug() << "Mesh::readVertexData: Problem in input file.";
     }
-
-    size = 0;
-    // check if the file was correctly open
-
-    ss.read((char*)&size, sizeof(int));  // astro: 2497612
-    //struct vertex  *v = (struct vertex*)malloc(size * sizeof(struct vertex));
-    // to make it dynamic I need to remove qvector4f and use float [4] instead -> not worth it
-    for (int i = 0; i < size; i++) {
-        struct face v;
-        ss.read((char*)&v,  sizeof( struct face));
-        m_faces.push_back(v);
-    }
-
-    ss.close();
 
     qDebug() << " verticesList: " << verticesList.size() << " m_faces: " << m_faces.size();
 }
@@ -147,11 +148,15 @@ bool Mesh::readNormalsBinary(QString path)
 
     int size = 0;
     std::ifstream ss(filename, std::ios::binary);
-    ss.read((char*)&size, sizeof(int));
-    for (int i = 0; i < size; ++i) {
-        QVector4D v;
-        ss.read((char*)&v,  sizeof(QVector4D));
-        m_normalsList.push_back(v);
+    if (ss.is_open()) {
+        ss.read((char*)&size, sizeof(int));
+        for (int i = 0; i < size; ++i) {
+            QVector4D v;
+            ss.read((char*)&v,  sizeof(QVector4D));
+            m_normalsList.push_back(v);
+        }
+    } else {
+        return false;
     }
 
 
