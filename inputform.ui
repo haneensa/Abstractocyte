@@ -13,28 +13,28 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_5">
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
     <widget class="QGroupBox" name="groupBox_5">
      <property name="title">
       <string>Options</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <item>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="0">
        <widget class="QCheckBox" name="checkBox_astrocyte_extrafiles">
         <property name="text">
          <string>Compute Astrocyte Normals + Compressed Binary </string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QCheckBox" name="checkBox_neurites_extrafiles">
         <property name="text">
          <string>Compute Neurites Normals +  Compressed Binary </string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="2" column="0">
        <widget class="QFrame" name="frame_10">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -70,7 +70,7 @@
         </layout>
        </widget>
       </item>
-      <item>
+      <item row="3" column="0">
        <widget class="QFrame" name="frame_11">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -100,6 +100,13 @@
           </widget>
          </item>
         </layout>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QPushButton" name="pushButton_options_help">
+        <property name="text">
+         <string>Help</string>
+        </property>
        </widget>
       </item>
      </layout>
@@ -247,13 +254,6 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_xml_astrocyte_help">
-           <property name="text">
-            <string>Help</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
@@ -283,13 +283,6 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_xml_neurites_help">
-           <property name="text">
-            <string>Help</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
@@ -297,6 +290,13 @@
        <widget class="QCheckBox" name="checkBox_lightXML">
         <property name="text">
          <string>Light XML with extra files vertices and faces and normals in binary files) in extra files path</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_xml_help">
+        <property name="text">
+         <string>Help</string>
         </property>
        </widget>
       </item>
@@ -308,8 +308,8 @@
      <property name="title">
       <string>Proximity Analysis</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
        <widget class="QFrame" name="frame_8">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -345,7 +345,7 @@
         </layout>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QFrame" name="frame_4">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -381,7 +381,7 @@
         </layout>
        </widget>
       </item>
-      <item>
+      <item row="2" column="0">
        <widget class="QFrame" name="frame_3">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -417,7 +417,7 @@
         </layout>
        </widget>
       </item>
-      <item>
+      <item row="3" column="0">
        <widget class="QFrame" name="frame_2">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>

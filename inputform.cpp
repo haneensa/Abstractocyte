@@ -1,7 +1,9 @@
 #include "inputform.h"
 #include "ui_inputform.h"
 #include <QFileDialog>
+#include <QDialog>
 #include <qDebug>
+#include <QTextBrowser>
 
 InputForm::InputForm(QWidget *parent) :
     QDialog(parent),
@@ -283,4 +285,84 @@ void InputForm::on_checkBox_lightXML_toggled(bool val)
 void InputForm::on_spinBox_limit_valueChanged(int limit)
 {
     m_count_limit = limit;
+}
+
+void InputForm::on_pushButton_options_help_clicked()
+{
+    QDialog *dialog = new QDialog();
+    QTextBrowser *textBrowser = new QTextBrowser;
+    textBrowser->setSource(QUrl("qrc:/doc/options_help.html"));
+    QVBoxLayout* mainLayout = new QVBoxLayout(dialog);
+    mainLayout->addWidget(textBrowser);
+    dialog->exec();
+}
+
+void InputForm::on_pushButton_extra_files_path_help_clicked()
+{
+    QDialog *dialog = new QDialog();
+    QTextBrowser *textBrowser = new QTextBrowser;
+    textBrowser->setSource(QUrl("qrc:/doc/extrafiles_path_help.html"));
+    QVBoxLayout* mainLayout = new QVBoxLayout(dialog);
+    mainLayout->addWidget(textBrowser);
+    dialog->exec();
+}
+
+void InputForm::on_pushButton_metadata_help_clicked()
+{
+    QDialog *dialog = new QDialog();
+    QTextBrowser *textBrowser = new QTextBrowser;
+    textBrowser->setSource(QUrl("qrc:/doc/metadata_hvgx_help.html"));
+    QVBoxLayout* mainLayout = new QVBoxLayout(dialog);
+    mainLayout->addWidget(textBrowser);
+    dialog->exec();
+}
+
+void InputForm::on_pushButton_xml_help_clicked()
+{
+    QDialog *dialog = new QDialog();
+    QTextBrowser *textBrowser = new QTextBrowser;
+    textBrowser->setSource(QUrl("qrc:/doc/xml_help.html"));
+    QVBoxLayout* mainLayout = new QVBoxLayout(dialog);
+    mainLayout->addWidget(textBrowser);
+    dialog->exec();
+}
+
+void InputForm::on_pushButton_proximity_astrocyte_help_clicked()
+{
+    QDialog *dialog = new QDialog();
+    QTextBrowser *textBrowser = new QTextBrowser;
+    textBrowser->setSource(QUrl("qrc:/doc/proximity_astrocyte_help.html"));
+    QVBoxLayout* mainLayout = new QVBoxLayout(dialog);
+    mainLayout->addWidget(textBrowser);
+    dialog->exec();
+}
+
+void InputForm::on_pushButton_proximity_astro_mito_help_clicked()
+{
+    QDialog *dialog = new QDialog();
+    QTextBrowser *textBrowser = new QTextBrowser;
+    textBrowser->setSource(QUrl("qrc:/doc/proximity_astro_mito_help.html"));
+    QVBoxLayout* mainLayout = new QVBoxLayout(dialog);
+    mainLayout->addWidget(textBrowser);
+    dialog->exec();
+}
+
+void InputForm::on_pushButton_proximity_neu_mito_help_clicked()
+{
+    QDialog *dialog = new QDialog();
+    QTextBrowser *textBrowser = new QTextBrowser;
+    textBrowser->setSource(QUrl("qrc:/doc/proximity_neu_mito_help.html"));
+    QVBoxLayout* mainLayout = new QVBoxLayout(dialog);
+    mainLayout->addWidget(textBrowser);
+    dialog->exec();
+}
+
+void InputForm::on_pushButton_proximity_gly_help_clicked()
+{
+    QDialog *dialog = new QDialog();
+    QTextBrowser *textBrowser = new QTextBrowser;
+    textBrowser->setSource(QUrl("qrc:/doc/proximity_gly_help.html"));
+    QVBoxLayout* mainLayout = new QVBoxLayout(dialog);
+    mainLayout->addWidget(textBrowser);
+    dialog->exec();
 }

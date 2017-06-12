@@ -58,6 +58,15 @@ protected slots:
 
     void on_spinBox_limit_valueChanged(int);
 
+    void on_pushButton_options_help_clicked();
+    void on_pushButton_extra_files_path_help_clicked();
+    void on_pushButton_metadata_help_clicked();
+    void on_pushButton_xml_help_clicked();
+    void on_pushButton_proximity_astrocyte_help_clicked();
+    void on_pushButton_proximity_astro_mito_help_clicked();
+    void on_pushButton_proximity_neu_mito_help_clicked();
+    void on_pushButton_proximity_gly_help_clicked();
+
 signals:
     void signal_filesPath(struct input_files);
 

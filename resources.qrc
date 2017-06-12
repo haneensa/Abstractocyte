@@ -41,5 +41,13 @@
         <file>shaders/space2d_grid_points_geom.glsl</file>
         <file>shaders/space2d_grid_triangle_geom.glsl</file>
         <file>shaders/skeleton_point_frag.glsl</file>
+        <file>doc/options_help.html</file>
+        <file>doc/extrafiles_path_help.html</file>
+        <file>doc/metadata_hvgx_help.html</file>
+        <file>doc/proximity_astro_mito_help.html</file>
+        <file>doc/proximity_astrocyte_help.html</file>
+        <file>doc/proximity_gly_help.html</file>
+        <file>doc/proximity_neu_mito_help.html</file>
+        <file>doc/xml_help.html</file>
     </qresource>
 </RCC>
