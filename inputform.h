@@ -44,7 +44,6 @@ protected slots:
     void on_pushButton_proximity_neu_mito_clicked();
     void on_pushButton_xml_astrocyte_clicked();
     void on_pushButton_xml_neurites_clicked();
-
     void on_pushButton_submit_clicked();
 
     void on_radioButton_load_neurites_toggled(bool);
@@ -53,7 +52,6 @@ protected slots:
 
     void on_checkBox_astrocyte_extrafiles_toggled(bool);
     void on_checkBox_neurites_extrafiles_toggled(bool);
-
     void on_checkBox_lightXML_toggled(bool);
 
     void on_spinBox_limit_valueChanged(int);

@@ -247,6 +247,9 @@ void InputForm::on_checkBox_astrocyte_extrafiles_toggled(bool val)
     if (!val)
         return;
 
+    if (ui->checkBox_lightXML->isChecked())
+        ui->checkBox_lightXML->setChecked(false);
+
     bool oldState = ui->checkBox_neurites_extrafiles->blockSignals(true);
     ui->checkBox_neurites_extrafiles->setChecked(false);
     ui->checkBox_neurites_extrafiles->blockSignals(oldState);
@@ -276,10 +279,18 @@ void InputForm::on_checkBox_neurites_extrafiles_toggled(bool val)
 
 void InputForm::on_checkBox_lightXML_toggled(bool val)
 {
-    if (val)
-        m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
-    else
+    if (val == false) {
         m_loadType = LoadFile_t::LOAD_MESH_W_VERTEX;
+        return;
+    }
+
+    if (ui->checkBox_astrocyte_extrafiles->isChecked() || ui->checkBox_neurites_extrafiles->isChecked()) {
+        ui->checkBox_lightXML->setChecked(false);
+        m_loadType = LoadFile_t::LOAD_MESH_W_VERTEX;
+        return;
+    }
+
+    m_loadType = LoadFile_t::LOAD_MESH_NO_VERTEX;
 }
 
 void InputForm::on_spinBox_limit_valueChanged(int limit)
