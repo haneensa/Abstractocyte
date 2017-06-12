@@ -40,6 +40,8 @@ public:
 
     void loadData();
 
+    bool isNormalsEnabled();
+
     int importXML(QString path);
     void parseObject(QXmlStreamReader &xml, Object *obj);
     void parseMesh(QXmlStreamReader &xml, Object *obj);

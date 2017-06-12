@@ -24,6 +24,7 @@ out vec3		eye;
 flat out int	otype;
 
 uniform int     hoveredID;
+uniform int     smooth_shading;
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
@@ -66,12 +67,15 @@ layout(std430, binding = 3) buffer space2d_data
 
 void main() {
     // if smooth shading is disabled
-    vec3 A = gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz;
-    vec3 B = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
-    normal_out = normalize(cross(A,B));
+    if (smooth_shading == 0) {
+        vec3 A = gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz;
+        vec3 B = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
+        normal_out = normalize(cross(A,B));
+    }
 
     for (int i = 0; i < 3; i++) {
-        normal_out = V_normal[i].rgb;
+        if (smooth_shading == 1)
+            normal_out = V_normal[i].rgb;
         int ID = V_ID[i];
         G_ID =  float(ID);
 

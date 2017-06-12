@@ -156,6 +156,15 @@ void DataContainer::loadData()
     PostloadMetaDataHVGX(input_files_dir.HVGX_metadata);
 }
 
+//----------------------------------------------------------------------------
+//
+bool DataContainer::isNormalsEnabled()
+{
+    if (m_normals_t == Normals_t::NO_NORMALS)
+        return false;
+
+    return true;
+}
 
 //----------------------------------------------------------------------------
 //

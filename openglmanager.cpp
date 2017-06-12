@@ -1,11 +1,11 @@
 #include "openglmanager.h"
 
-OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpace)
+OpenGLManager::OpenGLManager(DataContainer *data_container, AbstractionSpace  *absSpace)
     : m_2D(false),
       m_bindIdx(2),
       m_ssbo_filter_bindIdx(4)
 {
-    m_dataContainer = obj_mnger;
+    m_dataContainer = data_container;
     m_2dspace = absSpace;
     m_glFunctionsSet = false;
 
@@ -18,7 +18,8 @@ OpenGLManager::OpenGLManager(DataContainer *obj_mnger, AbstractionSpace  *absSpa
 
     m_color_encoding = Color_e::TYPE;
     m_size_encoding = Size_e::VOLUME;
-    m_normals_enabled = true;
+
+    m_normals_enabled = data_container->isNormalsEnabled();
 
     m_hoveredID = -1;
 
@@ -1421,6 +1422,10 @@ void OpenGLManager::updateMeshPrograms(GLuint program)
 
     int reset_filter_ssbo = glGetUniformLocation(program, "reset_filter_ssbo");
     if (reset_filter_ssbo >= 0) glUniform1i(reset_filter_ssbo, (reset_ssbo) ? 1 : 0);
+
+    int smooth_shading = glGetUniformLocation(program, "smooth_shading");
+    int smooth_shading_val = (m_normals_enabled) ? 1 : 0;
+    if (smooth_shading >= 0) glUniform1iv(smooth_shading, 1, &smooth_shading_val);
 
     GL_Error();
 }

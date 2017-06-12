@@ -15,6 +15,7 @@ InputForm::InputForm(QWidget *parent) :
 
     m_count_limit = 1000000;
     ui->spinBox_limit->setValue(m_count_limit);
+    ui->checkBox_lightXML->setChecked(true);
     /* 0: extract input files names */
     // 1) load the original xml file -> sae the compressed dat files
     // 2) load the light weight xml file + the dat files

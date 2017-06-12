@@ -27,6 +27,7 @@ uniform mat4    vMatrix;
 // Projection transformation
 uniform mat4    pMatrix;
 uniform mat4    rMatrix;
+uniform int     smooth_shading;
 
 struct SSBO_datum {
     vec4 color;
@@ -68,7 +69,8 @@ vec3 eye = vec3(0.5, 0.5, 1.0);
 
 void main(void)
 {
-    V_normal = rMatrix * vertex_normal;
+    if (smooth_shading == 1)
+        V_normal = rMatrix * vertex_normal;
     mat4 pvmMatrix = pMatrix * vMatrix * mMatrix;
     mat4 irotation = inverse(rMatrix);
     V_worldPos = rMatrix * vec4(mesh_vx.xyz, 1.0);

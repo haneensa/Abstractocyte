@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>525</width>
-    <height>753</height>
+    <height>834</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -290,6 +290,9 @@
        <widget class="QCheckBox" name="checkBox_lightXML">
         <property name="text">
          <string>Light XML with extra files vertices and faces and normals in binary files) in extra files path</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
