@@ -1500,15 +1500,6 @@ void OpenGLManager::drawMeshTriangles(bool selection )
         }
 
        // Astrocyte 3D volume
-
-       //GLint mito_tex = glGetUniformLocation( m_TMesh.getProgram("3Dtriangles"), "mito_tex");
-       //glUniform1i(  mito_tex, 4 );
-       //glActiveTexture(GL_TEXTURE4);
-       //glBindTexture(GL_TEXTURE_3D, m_mito_3DTex);
-
-       //glActiveTexture(GL_TEXTURE5);
-       //glBindTexture(GL_TEXTURE_3D, m_nmito_3DTex);
-
        int astrocyte_indices = m_dataContainer->getIndicesSizeByObjectType(Object_t::ASTROCYTE);
        int neurites_indices =  m_dataContainer->getMeshIndicesSize() - astrocyte_indices;
 
@@ -1715,29 +1706,12 @@ bool OpenGLManager::initGlycogenPointsShaders()
     m_vbo_glycogen.bind();
 
     // fill glycogen points
-
-    //std::map<int, Glycogen*> glycogenMap = m_dataContainer->getGlycogenMap();
     std::vector<VertexData*>* glycogenList = m_dataContainer->getGlycogenVertexDataPtr();
-    //struct glycogen_datum {
-    //    int ID;
-    //    QVector4D center_diam;
-    //};
-
-    //std::vector<struct glycogen_datum> glycogen_data;
     std::vector<VertexData> glycogen_data;
-    //for (auto iter = glycogenMap.begin(); iter != glycogenMap.end(); iter++ ) {
     for (auto iter = glycogenList->begin(); iter != glycogenList->end(); iter++) {
-        //Glycogen*gc = (*iter).second;
         VertexData* vd = (*iter);
-        //QVector4D center_diam = gc->getCenter();
-        //center_diam.setW(gc->getRadius());
-        //struct glycogen_datum gc_datum = {gc->getID(), center_diam};
-        //glycogen_data.push_back(gc_datum);
         glycogen_data.push_back(*vd);
     }
-
-    //m_vbo_glycogen.allocate( glycogen_data.data(),
-    //                              glycogen_data.size() * sizeof(struct glycogen_datum) );
 
     m_vbo_glycogen.allocate(glycogen_data.data(), glycogen_data.size() * sizeof(struct VertexData));
 
@@ -1746,15 +1720,6 @@ bool OpenGLManager::initGlycogenPointsShaders()
     m_GlycogenPoints.useProgram("3DPoints");
 
     // init pointers
-   /* int offset = 0;
-    glEnableVertexAttribArray(0);
-    glVertexAttribIPointer(0, 1, GL_INT, 0, (void*)offset);
-
-    offset +=  sizeof(int);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
-                          sizeof(glycogen_datum), (GLvoid*)offset);*/
-
     int offset = 0;
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
@@ -1767,8 +1732,6 @@ bool OpenGLManager::initGlycogenPointsShaders()
                           sizeof(VertexData), (GLvoid*)offset);
 
     GL_Error();
-
-    // initialize uniforms
 
     m_vbo_glycogen.release();
     m_vao_glycogen.bind();
@@ -1827,28 +1790,14 @@ void OpenGLManager::drawGlycogenPoints()
 //
 void OpenGLManager::updateGlycogenPoints()
 {
-    //m_vao_glycogen.bind();
     m_vbo_glycogen.bind();
 
-
     // fill glycogen points
-    //std::map<int, Glycogen*> glycogenMap = m_dataContainer->getGlycogenMap();
     std::vector<VertexData*>* glycogenList = m_dataContainer->getGlycogenVertexDataPtr();
-    //struct glycogen_datum {
-    //    int ID;
-    //    QVector4D center_diam;
-    //};
 
-    //std::vector<struct glycogen_datum> glycogen_data;
     std::vector<VertexData> glycogen_data;
-    //for (auto iter = glycogenMap.begin(); iter != glycogenMap.end(); iter++ ) {
     for (auto iter = glycogenList->begin(); iter != glycogenList->end(); iter++) {
-        //Glycogen*gc = (*iter).second;
         VertexData* vd = (*iter);
-        //QVector4D center_diam = gc->getCenter();
-        //center_diam.setW(gc->getRadius());
-        //struct glycogen_datum gc_datum = {gc->getID(), center_diam};
-        //glycogen_data.push_back(gc_datum);
         glycogen_data.push_back(*vd);
     }
 
@@ -1857,19 +1806,6 @@ void OpenGLManager::updateGlycogenPoints()
     memcpy(buffer_data, glycogen_data.data(), glycogen_data.size() * sizeof(struct VertexData));
 
     m_vbo_glycogen.unmap();
-    //m_vbo_glycogen.allocate(glycogen_data.data(), glycogen_data.size() * sizeof(struct VertexData));
-
-    /*int offset = 0;
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
-        sizeof(struct VertexData), 0);
-
-
-    offset += sizeof(QVector4D);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-        sizeof(VertexData), (GLvoid*)offset);*/
-
     m_vbo_glycogen.release();
 }
 

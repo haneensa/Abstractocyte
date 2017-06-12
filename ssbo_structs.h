@@ -25,29 +25,6 @@ struct ast_neu_properties {
     struct properties neu;
 };
 
-/*
-info.w:
-
-values:
-1: visibility
-2: selection
-4: hovered
-
-and then you can play around with combinations based on the bit
-
-000 (0) : visible
-001 (1) : invisible
-
-010 (2) : selected - visible
-011 (3) : selected - invisible  (might not make sense in our case)
-
-100 (4) : hovered - visible
-101 (5) : hovered - invisible (does't make sense)
-
-110 (6) : hovered - visible - selected
-111 (7) : hovered - invisible - selected (doesn't make sense)
-*/
-
 struct ssbo_2DState {
     struct ast_neu_properties  states; // val, alpha, color_intp, point_size, additional infos
 };

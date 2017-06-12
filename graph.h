@@ -2,7 +2,6 @@
 // all the nodes of a skeleton should have the same hvgx id
 // so I cant index the map with it
 
-
 // each graph have its own nodes and edges
 // gloal buffer to update the relative data their
 

@@ -101,7 +101,6 @@ signals:
     void updateFrameTime(QString);
     void signalCheckByType(std::map<QString, int>);
 
-
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
     void resizeGL(int w, int h) Q_DECL_OVERRIDE;

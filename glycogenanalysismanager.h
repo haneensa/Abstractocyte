@@ -78,8 +78,4 @@ class GlycogenAnalysisManager
 		float										m_current_max_glycogen_volume;
 };
 
-
-
-
-
 #endif // GLYCOGENANALYSISMANAGER_H_

@@ -10,7 +10,6 @@
 #include "glsluniform_structs.h"
 #include <thread>
 
-
 // (1) neurite-neurite graph
 // (2) neurite-astrocyte skeleton
 // (3) neurites skeletons - astrocyte skeleton

@@ -22,7 +22,6 @@ namespace SpacePartitioning
 		void addNormalizedPoint(float x, float y, float z, VertexData* value);
 		void setSize(int sizeX, int sizeY, int sizeZ);
 		void reset();
-		//std::vector<VertexData*>** getData();
 		std::vector<std::vector<VertexData*>>* getData();
 		std::vector<VertexData*>* getClosestNeighbors(float nX, float nY, float nZ);
 		VertexData* getNeighbor(float nX, float nY, float nZ);
@@ -34,9 +33,7 @@ namespace SpacePartitioning
 
 		int m_size[3];
 		int m_totalSize;
-		//std::vector<T>* m_vectorList[];
 		std::vector<std::vector<VertexData*>> m_vectorList;
-		//std::vector<VertexData*>** m_vectorList;
 	};
 }
 

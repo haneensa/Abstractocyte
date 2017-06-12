@@ -44,22 +44,7 @@ namespace Clustering
 	//--------------------------------------------------------------------------------
 	//
 	void DBScan::run()
-	{
-		//DBSCAN(D, eps, MinPts) {
-		//	C = 0
-		//	for each point P in dataset D {
-		//		if P is visited
-		//			continue next point
-		//		mark P as visited
-		//		NeighborPts = regionQuery(P, eps)
-		//		if sizeof(NeighborPts) < MinPts
-		//			mark P as NOISE
-		//		else {
-		//			C = next cluster
-		//			expandCluster(P, NeighborPts, C, eps, MinPts)
-		//		}
-		//	}
-		//}
+    {
 		for (auto i = m_nodesList->begin(); i != m_nodesList->end(); i++)
 		{
 			VertexData* node = (*i);
@@ -87,20 +72,7 @@ namespace Clustering
 	//--------------------------------------------------------------------------------
 	//
 	void DBScan::expandCluster(VertexData* node, GlycogenCluster* cluster, std::vector<uint32_t> neighbors)
-	{
-		//expandCluster(P, NeighborPts, C, eps, MinPts) {
-		//	add P to cluster C
-		//	for each point P' in NeighborPts { 
-		//		if P' is not visited {
-		//			mark P' as visited
-		//			NeighborPts' = regionQuery(P', eps)
-		//			if sizeof(NeighborPts') >= MinPts
-		//				NeighborPts = NeighborPts joined with NeighborPts'
-		//		}
-		//		if P' is not yet member of any cluster
-		//			add P' to cluster C
-		//	}
-		//}
+    {
 		addNodeToCluster(node, cluster);
 
 		for (auto i = neighbors.begin(); i != neighbors.end(); i++)

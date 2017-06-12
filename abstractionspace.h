@@ -12,7 +12,6 @@ struct abstractionPoint {
     int       ID;
 };
 
-
 class AbstractionSpace : public MainOpenGL
 {
 public:

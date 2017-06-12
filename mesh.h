@@ -89,12 +89,6 @@ protected:
     std::vector< QVector4D >            m_normalsList;
 
     std::vector<VertexData*> m_typeVertexList[9];
-    /*std::vector<VertexData*> m_spineVertexList;
-    std::vector<VertexData*> m_boutonVertexList;
-    std::vector<VertexData*> m_mitochondriaVertexList;
-    std::vector<VertexData*> m_astrocytesVertexList;
-    std::vector<VertexData*> m_axonsVertexList;
-    std::vector<VertexData*> m_dendritesVertexList;*/
 
 
 };
