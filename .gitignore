@@ -1,3 +1,4 @@
+data/*
 scripts/CGAL_code/cmake_install.cmake 
 scripts/CGAL_code/CMake*
 scripts/CGAL_code/Makefile
