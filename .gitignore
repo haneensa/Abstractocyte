@@ -4,4 +4,5 @@ scripts/CGAL_code/CMake*
 scripts/CGAL_code/Makefile
 scripts/CGAL_code/executable
 juxtastrocyte.pro.user*
+Abstractocyte.pro.user*
 *.raw
