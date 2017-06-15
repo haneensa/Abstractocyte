@@ -5,5 +5,9 @@ The project is implemented in C++ with Qt for the GUI elements, and OpenGL 4.3 w
 
 ## Input Data
 
-1. Metadata as HVGX file
-2. TODO
+This framework depends on three input data:
+1. [XML Data](https://github.com/haneensa/Abstractocyte/wiki/XML-Data) storing the set of data needed for mesh and skeleton rendering with the mapping between them that is required for the interpolation of the abstraction
+levels. 
+2. [Metadata as HVGX file](https://github.com/haneensa/Abstractocyte/wiki/Metadata-(HVGX)) which has
+contextual information regarding anatomical objects the data contains
+3. [Binary Segm. Stack](https://github.com/haneensa/Abstractocyte/wiki/Binary-Segmentation-Stack) for proximity analysis.
