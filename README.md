@@ -13,4 +13,4 @@ This framework depends on three input data:
 levels. 
 2. [Metadata as HVGX file](https://github.com/haneensa/Abstractocyte/wiki/Metadata-(HVGX)) which has
 contextual information regarding anatomical objects the data contains
-3. [Binary Segm. Stack](https://github.com/haneensa/Abstractocyte/wiki/Binary-Segmentation-Stack) for proximity analysis.
+3. [Binary Segmentation Stack](https://github.com/haneensa/Abstractocyte/wiki/Binary-Segmentation-Stack) for proximity analysis.
