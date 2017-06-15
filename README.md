@@ -1,5 +1,7 @@
 # Abstractocyte
 
+![alt text](https://github.com/haneensa/Abstractocyte/blob/master/doc/images/teaser.png "Abstractocyte Teaser")
+
 This project provides the implementation of Abstractocyte framework, which is a visual tool for exploring nanoscale astroglial cells.
 
 ## Getting Started
@@ -14,3 +16,9 @@ levels.
 2. [Metadata as HVGX file](https://github.com/haneensa/Abstractocyte/wiki/Metadata-(HVGX)) which has
 contextual information regarding anatomical objects the data contains
 3. [Binary Segmentation Stack](https://github.com/haneensa/Abstractocyte/wiki/Binary-Segmentation-Stack) for proximity analysis.
+
+### Example
+
+![alt text](https://github.com/haneensa/Abstractocyte/blob/master/doc/images/path_case3.png "Case Study 3")
+
+
