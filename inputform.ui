@@ -289,7 +289,7 @@
       <item>
        <widget class="QCheckBox" name="checkBox_lightXML">
         <property name="text">
-         <string>Light XML with extra files vertices and faces and normals in binary files) in extra files path</string>
+         <string>Light XML with extra files (vertices and faces and normals as binary files) in extra files path</string>
         </property>
         <property name="checked">
          <bool>false</bool>

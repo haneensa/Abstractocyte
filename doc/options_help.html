@@ -1,9 +1,36 @@
 <!DOCTYPE html>
 <html>
-<head><title>Page Title</title>
+<head><title>Options Help</title>
 <body>
 
-<h1>This is a Heading</h1>
-<p>This is a paragraph.</p>
+<h1>Options Help</h1>
+<p>
+XML file format was chosen for the convenience of grouping multiple data representation for each object.
+The downside of it, is the slowness to load that data at start.
+Therefore, we enable the user to convert the list of vertices and faces from the XML file to binary file that is faster to read.
+In addition, instead of computing the normals per vertex each time the data is loaded, we compute them once and later require only the directory for the exra file path to access these files.
+</p>
+<p>
+As the Astrocyte and Neurites input files are separated (objects vertices and faces for each file is independent),
+the exra files (including vertices and faces and normals as binary file) are computed separately for each.
+</p>
+
+<ol>
+  <li>Checking "Compute Astrocyte Normals + Compressed Binary" will produce the following files in the "extra files path":</li>
+  <ul>
+    <li>astro_normals.dat</li>
+    <li>astro_data_fv.dat</li>
+  </ul>
+
+  <li>Checking "Compute Neurites Normals + Compressed Binary" will produce the following files in the "extra files path":</li>
+  <ul>
+    <li>neurites_data_fv.dat</li>
+    <li>neurites_normals.dat</li>
+  </ul>
+</ol>
+
+<p>
+Finally, the user can specify the number of objects to load using "Objects Limit".
+</p>
 </body>
 </html>

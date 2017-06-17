@@ -1,9 +1,62 @@
 <!DOCTYPE html>
 <html>
-<head><title>Page Title</title>
+<head><title>Metadata (HVGX) Help</title>
 <body>
 
-<h1>This is a Heading</h1>
-<p>This is a paragraph.</p>
+<h1>Metadata (HVGX) Help</h1>
+<p>
+This input file includes metadata with hvgx extension of the input dataset
+which has contextual information regarding anatomical objects the data contains.
+An example of the metadata includes the function of each object (ex. inhibitory, excitatory),
+synapses and parent-child relationship information.
+</p>
+
+<p>
+The following describe the required metadata format for Abstractocyte:
+
+<ol>
+  <li><b>axon metadata</b></li>
+  <ul>
+    <li>ax, id, function (0:ex,1:in), is_mylenated, abs_node_id, name</li>
+  </ul>
+
+<li><b>dendrite metadata</b></li>
+<ul>
+  <li>dn, id, function (0:ex,1:in), abs_node_id, name</li>
+</ul>
+
+<li><b>spine metadata</b></li>
+<ul>
+  <li>sp, id, psd_area, volume, dendrite_id, does_form_synapse, with_apparatus, has_glia_nearby, spine name</li>
+</ul>
+
+<li><b>bouton metadata</b></li>
+<ul>
+  <li>bo, id, vesicleNo, volume, surfaceArea, axon_id, name, is_terminal_branch, is_mitochondrion</li>
+</ul>
+
+<li><b>synapse metadata</b></li>
+<ul>
+  <li>sy, id, vol_node_id, abs_edge_id, axon_id, dendrite_id, spine_id, bouton_id, name</li>
+</ul>
+
+<li><b>glia metadata</b></li>
+<ul>
+  <li>gl, id, name</li>
+</ul>
+
+<li><b>segmentation metadata</b></li>
+<ul>
+  <li>sg, vast_id, flags, r,g,b, pattern1, r2, g2, b2, pattern2, anchorx, anchory, anchorz, parent_id, child_id, previous_sibiling_id, next_sibiling_id, collapsed, bboxx1, bboxy1, bboxz1, bboxx2, bboxy2, bboxz2, voxels, type, object_id, name
+</li>
+</ul>
+
+<li><b>mitochondria metadata</b></li>
+<ul>
+  <li>mt, id, node_id, PARENT_TYPE, parent_id, name</li>
+</ul>
+
+</ol>
+</p>
 </body>
 </html>
