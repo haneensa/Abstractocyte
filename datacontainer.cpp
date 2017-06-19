@@ -874,7 +874,7 @@ void DataContainer::parseMesh(QXmlStreamReader &xml, Object *obj)
                 // get the point branch knots as well
                 int hvgxID = obj->getHVGXID();
                 std::map<int, bool> missing_skeletons;
-                missing_skeletons[134] = true;
+                missing_skeletons[134] = true; // these are specific to mouse 3 because their skeletons had problems
                 missing_skeletons[510] = true;
                 missing_skeletons[718] = true;
                 missing_skeletons[542] = true;
